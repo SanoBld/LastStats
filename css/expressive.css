@@ -373,16 +373,83 @@ button.cm-tr-btn, .rel-rail button.cm-tr-btn, .rel-toolbar button.cm-tr-btn {
 }
 .color-random.is-active:active { background: color-mix(in srgb, var(--md-primary) 68%, #000); }
 
-/* ---------- Footer: prominent buttons instead of discreet links ---------- */
-.footer .footer-links.footer-buttons { gap: 6px; margin-top: 1rem; max-width: 46rem; margin-inline: auto; }
-.footer .footer-links.footer-buttons a {
-  display: inline-flex; align-items: center; min-height: 44px; padding: 0 1.3rem;
-  border-radius: 22px; text-decoration: none; font-size: .9rem; font-weight: 600;
-  background: var(--md-secondary-container); color: var(--md-on-secondary-container);
-  transition: border-radius .4s var(--spring-default), transform .3s var(--spring-fast);
+/* ---------- Footer: one connected bar, same pattern as the info chips ---------- */
+.footer .footer-links.footer-buttons {
+  display: flex; flex-wrap: nowrap; gap: 2px; width: fit-content; max-width: 100%;
+  margin: 1rem auto 0; justify-content: center;
 }
-.footer .footer-links.footer-buttons a.primary { background: var(--md-primary); color: var(--md-on-primary); }
-.footer .footer-links.footer-buttons a:hover { border-radius: 14px; transform: translateY(-2px); color: inherit; }
-.footer .footer-links.footer-buttons a.primary:hover { color: var(--md-on-primary); }
-.footer .footer-links.footer-buttons a:active { border-radius: 10px; transform: scale(.96); }
-.about-cta { min-height: 44px; padding: 0 1.5rem; font-size: .9rem; font-weight: 600; }
+.footer .footer-links.footer-buttons a {
+  flex: none; white-space: nowrap; justify-content: center; display: inline-flex; align-items: center;
+  min-height: 48px; padding: 0 1.1rem; border-radius: var(--r-inner); text-decoration: none;
+  font-size: .9rem; font-weight: 600;
+  background: var(--md-secondary-container); color: var(--md-on-secondary-container);
+  transition: border-radius .5s var(--spring-default), transform .35s var(--spring-fast),
+              box-shadow .2s var(--effects), background-color .2s var(--effects);
+}
+.footer .footer-links.footer-buttons > :first-child { border-radius: var(--r-pill) var(--r-inner) var(--r-inner) var(--r-pill); }
+.footer .footer-links.footer-buttons > :last-child  { border-radius: var(--r-inner) var(--r-pill) var(--r-pill) var(--r-inner); }
+/* narrow screens: wraps into separate pills instead of a cut-off bar */
+@media (max-width: 1100px) {
+  .footer .footer-links.footer-buttons { flex-wrap: wrap; width: auto; gap: .45rem; }
+  .footer .footer-links.footer-buttons > *,
+  .footer .footer-links.footer-buttons > :first-child,
+  .footer .footer-links.footer-buttons > :last-child { border-radius: var(--r-pill); }
+}
+@media (max-width: 640px) {
+  .footer .footer-links.footer-buttons { max-width: 100%; }
+  .footer .footer-links.footer-buttons a { min-height: 44px; padding: 0 1rem; font-size: .85rem; }
+}
+@media (hover: hover) {
+  .footer .footer-links.footer-buttons a:hover { border-radius: var(--r-hover); transform: translateY(-2px); color: var(--md-on-secondary-container); }
+}
+.footer .footer-links.footer-buttons a:active, .footer .footer-links.footer-buttons a.is-pressed {
+  border-radius: var(--r-press); transform: scale(.95); transition-duration: .2s, .2s, .2s, .2s;
+}
+
+/* ---------- Hero: everything visible right at page load, on any screen ---------- */
+.project-page-header .reveal:not(.back-link) { opacity: 1 !important; transform: none !important; transition: none; }
+.project-page-header .gh-stats .gh-stat { animation: none; }
+.project-page-header .gh-stats { min-height: 0; }
+@media (max-height: 820px) {
+  .project-page-header { padding-top: 5.5rem; padding-bottom: 2.5rem; }
+  .project-page-title { margin: .8rem 0 .6rem; }
+  .project-page-desc { margin-bottom: 1rem; }
+  .project-actions { margin-bottom: 1.5rem; }
+}
+
+/* ---------- Back link: tonal like the other buttons, same shared motion ---------- */
+.back-link, .back-link:hover { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+/* .reveal also sets transform/transition; keep the shared button motion on top of it */
+.back-link.reveal { transition: border-radius .5s var(--spring-default), transform .35s var(--spring-fast), opacity .7s var(--m3-emphasized-decel), background-color .2s var(--effects); }
+@media (hover: hover) { .back-link.reveal.in-view:hover { border-radius: var(--r-hover); transform: translateY(-2px); } }
+.back-link.reveal.in-view:active, .back-link.reveal.in-view.is-pressed { border-radius: var(--r-press); transform: scale(.95); transition-duration: .2s; }
+
+/* ---------- Mobile: every button bubble is a full pill, separated like the info chips ---------- */
+@media (max-width: 640px) {
+  .footer .footer-links.footer-buttons a,
+  .footer .footer-links.footer-buttons > :first-child,
+  .footer .footer-links.footer-buttons > :last-child { border-radius: 999px; }
+  .project-actions, .contact-links { gap: .45rem; }
+  .project-actions > *, .contact-links > *,
+  .project-actions > :first-child, .contact-links > :first-child,
+  .project-actions > :last-child, .contact-links > :last-child,
+  .project-actions > :only-child, .contact-links > :only-child { border-radius: var(--r-pill); }
+}
+
+/* Mobile pills: my pill rules above had overridden the hover/press shapes, so put them back on top */
+@media (max-width: 640px) {
+  .project-actions > :active, .contact-links > :active,
+  .project-actions > .is-pressed, .contact-links > .is-pressed,
+  .footer .footer-links.footer-buttons a:active,
+  .footer .footer-links.footer-buttons a.is-pressed,
+  .footer .footer-links.footer-buttons > :first-child:active,
+  .footer .footer-links.footer-buttons > :last-child:active {
+    border-radius: var(--r-press); transform: scale(.95); transition-duration: .2s, .2s, .2s, .2s;
+  }
+}
+@media (max-width: 640px) and (hover: hover) {
+  .footer .footer-links.footer-buttons a:hover,
+  .project-actions > :hover, .contact-links > :hover,
+  .footer .footer-links.footer-buttons > :first-child:hover,
+  .footer .footer-links.footer-buttons > :last-child:hover { border-radius: var(--r-pill); transform: translateY(-2px); }
+}

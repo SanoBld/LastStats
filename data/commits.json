@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-12T20:46:02Z",
+  "updated": "2026-10-12T20:53:30Z",
   "commits": [
+    {
+      "sha": "33252c7680faedb72674ca3fb6603e93d77cecb4",
+      "message": "feat: amélioration de l'interface du pied de page avec des boutons proéminents et ajustements de style",
+      "date": "2026-10-12T20:53:13Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/33252c7680faedb72674ca3fb6603e93d77cecb4",
+      "tags": []
+    },
     {
       "sha": "698f012f01124466378b2f9b91a7325eef934692",
       "message": "feat: amélioration de l'interface utilisateur avec des boutons proéminents dans le pied de page et ajustement de la largeur des éléments",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/340f8faee47d20854727d720b1dfbf5ce9524b4e",
-      "tags": []
-    },
-    {
-      "sha": "2861749da6e84a05ccb124a4d0b4345be588b76c",
-      "message": "feat: améliorer la mise en page et le style de la carte des graphiques avec un fond dégradé et des ajustements de dimensions",
-      "date": "2026-08-09T08:21:59Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/2861749da6e84a05ccb124a4d0b4345be588b76c",
       "tags": []
     }
   ]
