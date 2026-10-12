@@ -10,7 +10,7 @@ window.I18N.fr = {
   "langAuto": "Auto",
   "color.pick": "Couleur",
   "color.save": "Mémoriser sur ce navigateur",
-  "color.random": "Aléatoire",
+  "color.random": "Aléatoire à chaque actualisation",
   "color.mono": "Une couleur",
   "color.multi": "Multicolore",
   "commits.translate": "Traduire",

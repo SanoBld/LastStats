@@ -172,7 +172,7 @@ window.I18N.de = {
   "langAuto": "Automatisch",
   "color.pick": "Farbe",
   "color.save": "In diesem Browser merken",
-  "color.random": "Zufällig",
+  "color.random": "Zufällig bei jedem Neuladen",
   "color.mono": "Eine Farbe",
   "color.multi": "Mehrfarbig",
   "commits.translate": "Übersetzen",

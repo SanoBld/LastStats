@@ -172,7 +172,7 @@ window.I18N.ar = {
   "langAuto": "تلقائي",
   "color.pick": "اللون",
   "color.save": "تذكّر في هذا المتصفح",
-  "color.random": "عشوائي",
+  "color.random": "عشوائي عند كل تحديث",
   "color.mono": "لون واحد",
   "color.multi": "متعدد الألوان",
   "commits.translate": "ترجمة",

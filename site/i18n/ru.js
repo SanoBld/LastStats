@@ -172,7 +172,7 @@ window.I18N.ru = {
   "langAuto": "Авто",
   "color.pick": "Цвет",
   "color.save": "Запомнить в этом браузере",
-  "color.random": "Случайный",
+  "color.random": "Случайный при каждом обновлении",
   "color.mono": "Один цвет",
   "color.multi": "Несколько цветов",
   "commits.translate": "Перевести",

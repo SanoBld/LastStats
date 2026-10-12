@@ -12,20 +12,22 @@
   const rnd = () => Math.floor(Math.random() * 360);
   const read = (st, k) => { try { const v = parseInt(st.getItem(k), 10); return v >= 0 && v <= 360 ? v : null; } catch (e) { return null; } };
   const savedHue = read(localStorage, KEY);
-  // Random color: drawn once per refresh, then kept while navigating between pages of the site
-  // (stored for the tab). A reload (F5) draws a new one, unless the visitor picked it himself.
-  const AKEY = 'accent-auto';
+  // "Random" is a real switch. ON: a new color at every refresh (F5), kept while navigating
+  // between the pages of the site (stored for the tab). OFF: the color the visitor picked.
+  const RKEY = 'accent-random';
+  const rdFlag = (st) => { try { const v = st.getItem(RKEY); return v === '1' ? true : v === '0' ? false : null; } catch (e) { return null; } };
+  let randomOn = rdFlag(localStorage);
+  if (randomOn === null) randomOn = rdFlag(sessionStorage);
+  if (randomOn === null) randomOn = savedHue === null; // new visitor: random
   let navType = 'navigate';
   try { navType = performance.getEntriesByType('navigation')[0].type; } catch (e) {}
   const sess = read(sessionStorage, SKEY);
-  let isAuto = false;
-  try { isAuto = sessionStorage.getItem(AKEY) === '1'; } catch (e) {}
   let hue;
-  if (savedHue !== null) hue = savedHue;
-  else if (sess !== null && !(isAuto && navType === 'reload')) hue = sess;
-  else {
-    hue = rnd();
-    try { sessionStorage.setItem(SKEY, hue); sessionStorage.setItem(AKEY, '1'); } catch (e) {}
+  if (randomOn) {
+    if (sess !== null && navType !== 'reload') hue = sess;
+    else { hue = rnd(); try { sessionStorage.setItem(SKEY, hue); } catch (e) {} }
+  } else {
+    hue = savedHue !== null ? savedHue : (sess !== null ? sess : rnd());
   }
   const c = (h, s, l) => `hsl(${Math.round(h)}, ${s}%, ${l}%)`;
   const st = document.createElement('style');
@@ -103,7 +105,7 @@
     const rand = wrap.querySelector('.color-random');
     range.value = hue;
     chk.checked = read(localStorage, KEY) !== null;
-    chk.checked = chk.checked || rdMode(localStorage) !== null;
+    chk.checked = chk.checked || rdMode(localStorage) !== null || rdFlag(localStorage) !== null;
 
     [0, 28, 52, 140, 175, 197, 230, 265, 320].forEach((h) => {
       const b = document.createElement('button');
@@ -114,18 +116,23 @@
     });
 
     function marks() {
-      sw.querySelectorAll('.color-sw').forEach((b) => b.classList.toggle('is-active', +b.dataset.h === hue));
+      sw.querySelectorAll('.color-sw').forEach((b) => b.classList.toggle('is-active', !randomOn && +b.dataset.h === hue));
+      rand.classList.toggle('is-active', randomOn); rand.setAttribute('aria-pressed', randomOn);
       range.style.setProperty('--thumb', c(hue, 60, 45));
       wrap.querySelectorAll('.color-modes button').forEach((b) => b.classList.toggle('is-active', b.dataset.m === mode));
     }
     function persist() {
       try {
-        if (chk.checked) { localStorage.setItem(KEY, hue); localStorage.setItem(MKEY, mode); }
-        else { localStorage.removeItem(KEY); localStorage.removeItem(MKEY); }
-        sessionStorage.setItem(SKEY, hue); sessionStorage.setItem(MKEY, mode); sessionStorage.removeItem(AKEY);
+        if (chk.checked) {
+          if (randomOn) localStorage.removeItem(KEY); else localStorage.setItem(KEY, hue);
+          localStorage.setItem(RKEY, randomOn ? '1' : '0'); localStorage.setItem(MKEY, mode);
+        } else {
+          localStorage.removeItem(KEY); localStorage.removeItem(RKEY); localStorage.removeItem(MKEY);
+        }
+        sessionStorage.setItem(SKEY, hue); sessionStorage.setItem(RKEY, randomOn ? '1' : '0'); sessionStorage.setItem(MKEY, mode);
       } catch (e) {}
     }
-    function set(h) { hue = +h; range.value = hue; apply(hue); persist(); marks(); }
+    function set(h, keepRandom) { hue = +h; if (!keepRandom) randomOn = false; range.value = hue; apply(hue); persist(); marks(); }
     function labels() {
       btn.setAttribute('aria-label', t('color.pick', 'Color')); btn.title = t('color.pick', 'Color');
       wrap.querySelector('.color-save-label').textContent = t('color.save', 'Remember on this browser');
@@ -137,7 +144,10 @@
     wrap.querySelectorAll('.color-modes button').forEach((b) => b.addEventListener('click', () => { mode = b.dataset.m; apply(hue); persist(); marks(); }));
     range.addEventListener('input', () => set(range.value));
     chk.addEventListener('change', persist);
-    rand.addEventListener('click', () => { try { sessionStorage.removeItem(SKEY); } catch (e) {} set(rnd()); });
+    rand.addEventListener('click', () => {
+      randomOn = !randomOn;
+      if (randomOn) set(rnd(), true); else { persist(); marks(); }
+    });
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const open = !wrap.classList.contains('is-open');
