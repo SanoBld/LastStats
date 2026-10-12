@@ -170,6 +170,9 @@ window.I18N.ru = {
   "commits.push_one": "пуш",
   "commits.push_many": "пуши",
   "langAuto": "Авто",
+  "color.pick": "Цвет",
+  "color.save": "Запомнить в этом браузере",
+  "color.random": "Случайный",
   "commits.translate": "Перевести",
   "commits.show_original": "Показать оригинал",
 

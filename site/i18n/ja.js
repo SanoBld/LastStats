@@ -170,6 +170,9 @@ window.I18N.ja = {
   "commits.push_one": "プッシュ",
   "commits.push_many": "プッシュ",
   "langAuto": "自動",
+  "color.pick": "カラー",
+  "color.save": "このブラウザに保存",
+  "color.random": "ランダム",
   "commits.translate": "翻訳",
   "commits.show_original": "原文を表示",
 

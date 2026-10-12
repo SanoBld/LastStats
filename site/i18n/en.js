@@ -8,6 +8,9 @@ window.I18N.en = {
   _meta: { short: "EN", name: "English" },
 
   "langAuto": "Auto",
+  "color.pick": "Color",
+  "color.save": "Remember on this browser",
+  "color.random": "Random",
   "commits.translate": "Translate",
   "commits.show_original": "Show original",
 

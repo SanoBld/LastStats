@@ -170,6 +170,9 @@ window.I18N.de = {
   "commits.push_one": "Push",
   "commits.push_many": "Pushes",
   "langAuto": "Automatisch",
+  "color.pick": "Farbe",
+  "color.save": "In diesem Browser merken",
+  "color.random": "Zufällig",
   "commits.translate": "Übersetzen",
   "commits.show_original": "Original anzeigen",
 
