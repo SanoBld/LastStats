@@ -372,3 +372,17 @@ button.cm-tr-btn, .rel-rail button.cm-tr-btn, .rel-toolbar button.cm-tr-btn {
   .color-random.is-active:hover { background: color-mix(in srgb, var(--md-primary) 82%, #000); }
 }
 .color-random.is-active:active { background: color-mix(in srgb, var(--md-primary) 68%, #000); }
+
+/* ---------- Footer: prominent buttons instead of discreet links ---------- */
+.footer .footer-links.footer-buttons { gap: 6px; margin-top: 1rem; max-width: 46rem; margin-inline: auto; }
+.footer .footer-links.footer-buttons a {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 1.3rem;
+  border-radius: 22px; text-decoration: none; font-size: .9rem; font-weight: 600;
+  background: var(--md-secondary-container); color: var(--md-on-secondary-container);
+  transition: border-radius .4s var(--spring-default), transform .3s var(--spring-fast);
+}
+.footer .footer-links.footer-buttons a.primary { background: var(--md-primary); color: var(--md-on-primary); }
+.footer .footer-links.footer-buttons a:hover { border-radius: 14px; transform: translateY(-2px); color: inherit; }
+.footer .footer-links.footer-buttons a.primary:hover { color: var(--md-on-primary); }
+.footer .footer-links.footer-buttons a:active { border-radius: 10px; transform: scale(.96); }
+.about-cta { min-height: 44px; padding: 0 1.5rem; font-size: .9rem; font-weight: 600; }

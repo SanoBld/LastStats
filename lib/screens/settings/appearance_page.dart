@@ -144,9 +144,10 @@ class _AppearancePageState extends State<AppearancePage> {
     return ListTile(
       selected: sel,
       selectedColor: scheme.primary,
-      leading: Row(mainAxisSize: MainAxisSize.min, children: [
+      minLeadingWidth: 60,
+      leading: SizedBox(width: 60, child: Row(children: [
         dot(prev.primary), dot(prev.tertiary), dot(prev.secondaryContainer),
-      ]),
+      ])),
       title: Text(tx('ap_harmony_$key')),
       subtitle: Text(tx('ap_harmony_${key}_sub')),
       trailing: sel ? Icon(Icons.check_circle_rounded, color: scheme.primary) : null,

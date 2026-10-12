@@ -21,10 +21,14 @@
   // each tile keeps its own value + label refs so a language switch only updates text
   let tiles = [];
 
-  function tile(icon, raw, labelKey, n, href) {
-    // the version tile is a link to its entry on the versions page
-    const span = document.createElement(href ? 'a' : 'span');
-    if (href) span.href = href;
+  const repoUrl = 'https://github.com/' + repo;
+  const CACHE = 'ghstats-last:' + repo;
+
+  function tile(icon, raw, labelKey, n, href, external) {
+    // every tile is a link: stars -> GitHub, version -> versions page, downloads -> releases
+    const span = document.createElement('a');
+    span.href = href;
+    if (external) { span.target = '_blank'; span.rel = 'noopener'; }
     span.className = 'gh-stat';
     span.style.setProperty('--n', n);
     span.innerHTML = icon + '<span class="gh-stat-value"></span><span class="gh-stat-label"></span>';
@@ -38,22 +42,28 @@
     });
   }
 
-  function build(stars, tag, downloads) {
-    const defs = [];
-    if (typeof stars === 'number') defs.push([starIcon, stars, 'ghFavorites']);
-    if (tag) defs.push([tagIcon, tag, 'ghLatestVersion', 'releases.html#' + encodeURIComponent(tag)]);
-    if (typeof downloads === 'number') defs.push([downloadIcon, downloads, 'ghDownloads']);
+  // Tiles are built right away (last known values from localStorage, or a dash)
+  // so everything is visible when the page opens; real data just updates the text.
+  let last = {};
+  try { last = JSON.parse(localStorage.getItem(CACHE)) || {}; } catch (e) { last = {}; }
+  const dash = '\u2014';
+  tiles = [
+    tile(starIcon, typeof last.stars === 'number' ? last.stars : dash, 'ghFavorites', 0, repoUrl, true),
+    tile(tagIcon, last.tag || dash, 'ghLatestVersion', 1, last.tag ? 'releases.html#' + encodeURIComponent(last.tag) : 'releases.html', false),
+    tile(downloadIcon, typeof last.downloads === 'number' ? last.downloads : dash, 'ghDownloads', 2, repoUrl + '/releases', true),
+  ];
+  el.textContent = '';
+  tiles.forEach((x) => el.appendChild(x.span));
+  paint();
+  el.removeAttribute('aria-hidden');
+  el.classList.add('is-ready');
 
-    if (!defs.length) {
-      el.classList.add('is-empty'); // nothing to show: give the reserved space back
-      return;
-    }
-    tiles = defs.map((d, i) => tile(d[0], d[1], d[2], i, d[3]));
-    el.textContent = '';
-    tiles.forEach((x) => el.appendChild(x.span));
+  function update(stars, tag, downloads) {
+    if (typeof stars === 'number') tiles[0].raw = stars;
+    if (tag) { tiles[1].raw = tag; tiles[1].span.href = 'releases.html#' + encodeURIComponent(tag); }
+    if (typeof downloads === 'number') tiles[2].raw = downloads;
     paint();
-    el.removeAttribute('aria-hidden');
-    el.classList.add('is-ready');
+    try { localStorage.setItem(CACHE, JSON.stringify({ stars: tiles[0].raw, tag: tiles[1].raw === dash ? null : tiles[1].raw, downloads: tiles[2].raw })); } catch (e) { /* ignore */ }
   }
 
   // data comes from js/gh-data.js (static copy first, API only as fallback)
@@ -62,8 +72,8 @@
     const stable = d.releases.find((r) => !r.prerelease && !r.draft);
     const tag = stable ? stable.tag_name : null;
     const downloads = d.releases.reduce((sum, rel) => sum + (rel.assets || []).reduce((n, a) => n + (a.download_count || 0), 0), 0);
-    build(typeof d.stars === 'number' ? d.stars : null, tag, downloads);
-  }).catch(() => build(null, null, null));
+    update(typeof d.stars === 'number' ? d.stars : null, tag, downloads);
+  }).catch(() => {});
 
   if (window.i18n) i18n.onChange(paint);
 })();
