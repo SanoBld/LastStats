@@ -67,12 +67,17 @@
 
   const ICON_ZIP = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>';
 
+  // last good answer is kept in this browser, used if the static copy and the API both fail
+  const CKEY = 'commits:' + repo;
+  const saveC = (d) => { try { localStorage.setItem(CKEY, JSON.stringify({ updated: d.updated, commits: d.commits })); } catch (e) { /* full */ } return d; };
+  const cachedC = () => { try { const d = JSON.parse(localStorage.getItem(CKEY)); return d && Array.isArray(d.commits) && d.commits.length ? d : null; } catch (e) { return null; } };
+
   function load() {
     return fetch('data/commits.json', { cache: 'no-cache' })
       .then((r) => (r.ok ? r.json() : null))
       .catch(() => null)
       .then((d) => {
-        if (d && Array.isArray(d.commits) && d.commits.length) return d;
+        if (d && Array.isArray(d.commits) && d.commits.length) return saveC(d);
         return fetch(`https://api.github.com/repos/${repo}/commits?per_page=100`)
           .then((r) => { if (!r.ok) throw new Error('api ' + r.status); return r.json(); })
           .then((arr) => ({
@@ -81,7 +86,9 @@
               author: (c.author && c.author.login) || c.commit.author.name,
               avatar: c.author && c.author.avatar_url, url: c.html_url, tags: [],
             })),
-          }));
+          }))
+          .then(saveC)
+          .catch((err) => { const c = cachedC(); if (c) return c; throw err; });
       });
   }
 

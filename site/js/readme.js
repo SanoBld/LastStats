@@ -92,35 +92,52 @@
     onScroll();
   }
 
-  fetch(`https://api.github.com/repos/${repo}`)
-    .then((r) => (r.ok ? r.json() : { default_branch: 'main' }))
-    .then((repoInfo) => {
-      const branch = (repoInfo && repoInfo.default_branch) || 'main';
+  const CACHE_KEY = 'readme:' + repo;
+  const readCache = () => { try { return JSON.parse(localStorage.getItem(CACHE_KEY)); } catch (e) { return null; } };
+  const writeCache = (v) => { try { localStorage.setItem(CACHE_KEY, JSON.stringify(v)); } catch (e) { /* full / blocked */ } };
+
+  // 1) data/readme.json (made by the deploy-site workflow, no rate limit)
+  // 2) the GitHub API (60 requests/hour per visitor)
+  // 3) the last copy saved in this browser
+  function loadReadme() {
+    return fetch('data/readme.json', { cache: 'no-cache' })
+      .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null)
+      .then((d) => {
+        if (d && typeof d.markdown === 'string' && d.markdown) return { markdown: d.markdown, branch: d.branch || 'main' };
+        return fetch(`https://api.github.com/repos/${repo}`)
+          .then((r) => (r.ok ? r.json() : { default_branch: 'main' }))
+          .then((info) => {
+            const branch = (info && info.default_branch) || 'main';
+            return fetch(`https://api.github.com/repos/${repo}/readme`, {
+              headers: { Accept: 'application/vnd.github.raw+json' },
+            }).then((r) => {
+              if (!r.ok) throw new Error('readme fetch failed');
+              return r.text();
+            }).then((markdown) => ({ markdown, branch }));
+          });
+      })
+      .then((res) => { writeCache(res); return res; })
+      .catch((err) => { const c = readCache(); if (c && c.markdown) return c; throw err; });
+  }
+
+  loadReadme()
+    .then(({ markdown, branch }) => {
       const rawBase = `https://raw.githubusercontent.com/${repo}/${branch}/`;
       const blobBase = `https://github.com/${repo}/blob/${branch}/`;
-
-      return fetch(`https://api.github.com/repos/${repo}/readme`, {
-        headers: { Accept: 'application/vnd.github.raw+json' },
-      })
-        .then((r) => {
-          if (!r.ok) throw new Error('readme fetch failed');
-          return r.text();
-        })
-        .then((markdown) => {
-          if (window.marked) {
-            body.innerHTML = marked.parse(markdown);
-            fixRelativeLinks(body, rawBase, blobBase);
-            wireLightbox(body);
-            buildToc(body);
-          } else {
-            // marked failed to load (e.g. offline) — fall back to raw text
-            const pre = document.createElement('pre');
-            pre.textContent = markdown;
-            body.appendChild(pre);
-          }
-          status.style.display = 'none';
-          body.removeAttribute('aria-hidden');
-        });
+      if (window.marked) {
+        body.innerHTML = marked.parse(markdown);
+        fixRelativeLinks(body, rawBase, blobBase);
+        wireLightbox(body);
+        buildToc(body);
+      } else {
+        // marked failed to load (e.g. offline) — fall back to raw text
+        const pre = document.createElement('pre');
+        pre.textContent = markdown;
+        body.appendChild(pre);
+      }
+      status.style.display = 'none';
+      body.removeAttribute('aria-hidden');
     })
     .catch(() => {
       status.textContent = t('readmeError', 'Impossible de charger le README pour le moment.');
