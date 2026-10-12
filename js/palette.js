@@ -12,7 +12,21 @@
   const rnd = () => Math.floor(Math.random() * 360);
   const read = (st, k) => { try { const v = parseInt(st.getItem(k), 10); return v >= 0 && v <= 360 ? v : null; } catch (e) { return null; } };
   const savedHue = read(localStorage, KEY);
-  let hue = savedHue !== null ? savedHue : (read(sessionStorage, SKEY) !== null ? read(sessionStorage, SKEY) : rnd());
+  // Random color: drawn once per refresh, then kept while navigating between pages of the site
+  // (stored for the tab). A reload (F5) draws a new one, unless the visitor picked it himself.
+  const AKEY = 'accent-auto';
+  let navType = 'navigate';
+  try { navType = performance.getEntriesByType('navigation')[0].type; } catch (e) {}
+  const sess = read(sessionStorage, SKEY);
+  let isAuto = false;
+  try { isAuto = sessionStorage.getItem(AKEY) === '1'; } catch (e) {}
+  let hue;
+  if (savedHue !== null) hue = savedHue;
+  else if (sess !== null && !(isAuto && navType === 'reload')) hue = sess;
+  else {
+    hue = rnd();
+    try { sessionStorage.setItem(SKEY, hue); sessionStorage.setItem(AKEY, '1'); } catch (e) {}
+  }
   const c = (h, s, l) => `hsl(${Math.round(h)}, ${s}%, ${l}%)`;
   const st = document.createElement('style');
   document.head.appendChild(st);
@@ -108,7 +122,7 @@
       try {
         if (chk.checked) { localStorage.setItem(KEY, hue); localStorage.setItem(MKEY, mode); }
         else { localStorage.removeItem(KEY); localStorage.removeItem(MKEY); }
-        sessionStorage.setItem(SKEY, hue); sessionStorage.setItem(MKEY, mode);
+        sessionStorage.setItem(SKEY, hue); sessionStorage.setItem(MKEY, mode); sessionStorage.removeItem(AKEY);
       } catch (e) {}
     }
     function set(h) { hue = +h; range.value = hue; apply(hue); persist(); marks(); }

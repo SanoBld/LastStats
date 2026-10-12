@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-12T11:04:36Z",
+  "updated": "2026-10-12T11:08:04Z",
   "commits": [
+    {
+      "sha": "cbdd055dad800d0431ffc02095a91f71d25d17a2",
+      "message": "feat: amélioration du déploiement et de la gestion du README avec mise en cache et récupération des données",
+      "date": "2026-10-12T11:07:49Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/cbdd055dad800d0431ffc02095a91f71d25d17a2",
+      "tags": []
+    },
     {
       "sha": "bdafcd096f0c89d892355df58fba4ac108495d38",
       "message": "feat: ajout de la prise en charge des modes de couleur mono et multicolore avec interface utilisateur",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/9848755d2545609e906f89a0a10926cef9dd16a6",
-      "tags": []
-    },
-    {
-      "sha": "ce77c382f55125781014d7fb8bfdb8bb2bd1f1e8",
-      "message": "feat: améliorer l'affichage des informations dans la carte et ajouter un fond flou pour le visualiseur d'images",
-      "date": "2026-08-08T22:22:15Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/ce77c382f55125781014d7fb8bfdb8bb2bd1f1e8",
       "tags": []
     }
   ]
