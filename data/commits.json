@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-12T11:08:04Z",
+  "updated": "2026-10-12T11:10:17Z",
   "commits": [
+    {
+      "sha": "da0f4241e0316bbc0ec8ffe1910d938648b2ff3c",
+      "message": "feat: mise à jour des traductions pour \"aléatoire\" dans plusieurs langues et amélioration de la gestion des couleurs aléatoires",
+      "date": "2026-10-12T11:10:01Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/da0f4241e0316bbc0ec8ffe1910d938648b2ff3c",
+      "tags": []
+    },
     {
       "sha": "cbdd055dad800d0431ffc02095a91f71d25d17a2",
       "message": "feat: amélioration du déploiement et de la gestion du README avec mise en cache et récupération des données",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/24747d0fa142e621fca3d0237ecbb9f0eb3b7434",
-      "tags": []
-    },
-    {
-      "sha": "9848755d2545609e906f89a0a10926cef9dd16a6",
-      "message": "feat: ajouter un système de badge pour les réalisations dans le widget Tilt3DCard et ajuster l'affichage des scrobbles",
-      "date": "2026-08-08T22:39:09Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/9848755d2545609e906f89a0a10926cef9dd16a6",
       "tags": []
     }
   ]

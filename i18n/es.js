@@ -172,7 +172,7 @@ window.I18N.es = {
   "langAuto": "Automático",
   "color.pick": "Color",
   "color.save": "Recordar en este navegador",
-  "color.random": "Aleatorio",
+  "color.random": "Aleatorio en cada recarga",
   "color.mono": "Un color",
   "color.multi": "Multicolor",
   "commits.translate": "Traducir",

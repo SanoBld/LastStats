@@ -366,3 +366,9 @@ button.cm-tr-btn, .rel-rail button.cm-tr-btn, .rel-toolbar button.cm-tr-btn {
   .color-random:hover { background: color-mix(in srgb, var(--md-secondary-container) 78%, var(--md-on-secondary-container)); }
 }
 .color-random:active { background: color-mix(in srgb, var(--md-secondary-container) 65%, var(--md-on-secondary-container)); }
+
+.color-random.is-active { background: var(--md-primary); color: var(--md-on-primary); }
+@media (hover: hover) {
+  .color-random.is-active:hover { background: color-mix(in srgb, var(--md-primary) 82%, #000); }
+}
+.color-random.is-active:active { background: color-mix(in srgb, var(--md-primary) 68%, #000); }

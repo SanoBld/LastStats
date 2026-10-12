@@ -172,7 +172,7 @@ window.I18N.zh = {
   "langAuto": "自动",
   "color.pick": "颜色",
   "color.save": "在此浏览器中记住",
-  "color.random": "随机",
+  "color.random": "每次刷新随机",
   "color.mono": "单色",
   "color.multi": "多彩",
   "commits.translate": "翻译",

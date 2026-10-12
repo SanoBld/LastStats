@@ -172,7 +172,7 @@ window.I18N.ja = {
   "langAuto": "自動",
   "color.pick": "カラー",
   "color.save": "このブラウザに保存",
-  "color.random": "ランダム",
+  "color.random": "更新のたびにランダム",
   "color.mono": "単色",
   "color.multi": "マルチカラー",
   "commits.translate": "翻訳",

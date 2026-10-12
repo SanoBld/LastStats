@@ -10,7 +10,7 @@ window.I18N.en = {
   "langAuto": "Auto",
   "color.pick": "Color",
   "color.save": "Remember on this browser",
-  "color.random": "Random",
+  "color.random": "Random on every refresh",
   "color.mono": "One color",
   "color.multi": "Multicolor",
   "commits.translate": "Translate",
