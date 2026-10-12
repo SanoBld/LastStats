@@ -170,6 +170,11 @@ window.I18N.ar = {
   "commits.push_one": "عملية دفع",
   "commits.push_many": "عمليات دفع",
   "langAuto": "تلقائي",
+  "color.pick": "اللون",
+  "color.save": "تذكّر في هذا المتصفح",
+  "color.random": "عشوائي",
+  "color.mono": "لون واحد",
+  "color.multi": "متعدد الألوان",
   "commits.translate": "ترجمة",
   "commits.show_original": "عرض الأصل",
 

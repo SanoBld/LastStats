@@ -8,6 +8,11 @@ window.I18N.fr = {
   _meta: { short: "FR", name: "Français" },
 
   "langAuto": "Auto",
+  "color.pick": "Couleur",
+  "color.save": "Mémoriser sur ce navigateur",
+  "color.random": "Aléatoire",
+  "color.mono": "Une couleur",
+  "color.multi": "Multicolore",
   "commits.translate": "Traduire",
   "commits.show_original": "Voir l'original",
 

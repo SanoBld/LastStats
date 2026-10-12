@@ -297,3 +297,72 @@ button.cm-tr-btn, .rel-rail button.cm-tr-btn, .rel-toolbar button.cm-tr-btn {
   margin: .3rem 0 .8rem;
 }
 @media (min-width: 641px) { .rel-toolbar button.cm-tr-btn { align-self: center; margin: 0; } }
+
+/* ---- nav: help + color + language + theme grouped on the right (centered on phones) ---- */
+.nav { justify-content: flex-end; }
+.nav-toggles .nav-logo {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--md-secondary-container); color: var(--md-on-secondary-container);
+}
+.color-wrap { position: relative; display: inline-block; }
+.color-menu {
+  position: absolute; top: calc(100% + 8px); inset-inline-end: 0; z-index: 200;
+  width: 272px; padding: 16px; display: flex; flex-direction: column; gap: 14px;
+  background: var(--md-surface-container-high); color: var(--md-on-surface);
+  border-radius: 28px; box-shadow: 0 8px 28px rgba(0,0,0,.28);
+  transform-origin: top right; transform: scale(.8); opacity: 0; visibility: hidden; pointer-events: none;
+  transition: transform .35s var(--spring-default), opacity .15s var(--effects), visibility 0s .35s;
+}
+.color-wrap.is-open .color-menu {
+  transform: scale(1); opacity: 1; visibility: visible; pointer-events: auto;
+  transition: transform .35s var(--spring-default), opacity .15s var(--effects), visibility 0s;
+}
+.color-range {
+  -webkit-appearance: none; appearance: none; width: 100%; height: 16px; border-radius: 8px; outline: none;
+  background: linear-gradient(90deg, hsl(0,60%,45%), hsl(60,60%,45%), hsl(120,60%,45%), hsl(180,60%,45%), hsl(240,60%,45%), hsl(300,60%,45%), hsl(360,60%,45%));
+}
+.color-range::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+  background: var(--thumb, var(--md-primary)); border: 4px solid var(--md-surface-container-high);
+  box-shadow: 0 0 0 2px var(--md-primary);
+}
+.color-range::-moz-range-thumb {
+  width: 20px; height: 20px; border-radius: 50%; cursor: pointer;
+  background: var(--thumb, var(--md-primary)); border: 4px solid var(--md-surface-container-high);
+  box-shadow: 0 0 0 2px var(--md-primary);
+}
+.color-swatches { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; }
+.color-sw {
+  width: 32px; height: 32px; border-radius: 50%; border: 0; cursor: pointer;
+  transition: transform .3s var(--spring-fast), box-shadow .2s var(--effects);
+}
+.color-sw:hover { transform: scale(1.12); }
+.color-sw.is-active { box-shadow: 0 0 0 3px var(--md-surface-container-high), 0 0 0 5px var(--md-primary); }
+.color-save { display: flex; align-items: center; gap: 12px; font-size: .9rem; cursor: pointer; }
+.color-save input { width: 20px; height: 20px; accent-color: var(--md-primary); cursor: pointer; flex-shrink: 0; }
+.color-random {
+  min-height: 44px; border: 0; border-radius: 22px; cursor: pointer; font: inherit; font-size: .9rem; font-weight: 500;
+  background: var(--md-secondary-container); color: var(--md-on-secondary-container);
+  position: relative; overflow: hidden; transition: border-radius .4s var(--spring-default);
+}
+.color-random:active { border-radius: 14px; }
+@media (max-width: 640px) {
+  .nav { justify-content: center; }
+  .color-menu { position: fixed; top: 4.6rem; left: 50%; inset-inline-end: auto; translate: -50% 0; transform-origin: top center; width: min(300px, calc(100vw - 2rem)); }
+}
+
+.color-modes { display: flex; gap: 2px; }
+.color-modes button {
+  flex: 1; min-height: 40px; border: 0; cursor: pointer; font: inherit; font-size: .85rem; font-weight: 500;
+  background: var(--md-surface-container-highest); color: var(--md-on-surface-variant);
+  border-radius: 6px; position: relative; overflow: hidden;
+  transition: background-color .2s var(--effects), color .2s var(--effects), border-radius .4s var(--spring-default);
+}
+.color-modes button:first-child { border-radius: 20px 6px 6px 20px; }
+.color-modes button:last-child { border-radius: 6px 20px 20px 6px; }
+.color-modes button.is-active { background: var(--md-primary); color: var(--md-on-primary); }
+.color-random { transition: background-color .2s var(--effects), border-radius .4s var(--spring-default); }
+@media (hover: hover) {
+  .color-random:hover { background: color-mix(in srgb, var(--md-secondary-container) 78%, var(--md-on-secondary-container)); }
+}
+.color-random:active { background: color-mix(in srgb, var(--md-secondary-container) 65%, var(--md-on-secondary-container)); }

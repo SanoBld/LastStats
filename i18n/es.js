@@ -170,6 +170,11 @@ window.I18N.es = {
   "commits.push_one": "push",
   "commits.push_many": "pushes",
   "langAuto": "Automático",
+  "color.pick": "Color",
+  "color.save": "Recordar en este navegador",
+  "color.random": "Aleatorio",
+  "color.mono": "Un color",
+  "color.multi": "Multicolor",
   "commits.translate": "Traducir",
   "commits.show_original": "Ver original",
 

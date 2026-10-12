@@ -170,6 +170,11 @@ window.I18N.zh = {
   "commits.push_one": "次推送",
   "commits.push_many": "次推送",
   "langAuto": "自动",
+  "color.pick": "颜色",
+  "color.save": "在此浏览器中记住",
+  "color.random": "随机",
+  "color.mono": "单色",
+  "color.multi": "多彩",
   "commits.translate": "翻译",
   "commits.show_original": "显示原文",
 

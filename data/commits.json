@@ -1,6 +1,42 @@
 {
-  "updated": "2026-10-12T04:47:31Z",
+  "updated": "2026-10-12T11:04:36Z",
   "commits": [
+    {
+      "sha": "bdafcd096f0c89d892355df58fba4ac108495d38",
+      "message": "feat: ajout de la prise en charge des modes de couleur mono et multicolore avec interface utilisateur",
+      "date": "2026-10-12T11:02:45Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/bdafcd096f0c89d892355df58fba4ac108495d38",
+      "tags": []
+    },
+    {
+      "sha": "5b6b4a87dcbf4ced738a0ac109eaab9398698b6c",
+      "message": "feat: ajout d'un sélecteur de couleur avec options de mémorisation et aléatoire",
+      "date": "2026-10-12T11:00:02Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/5b6b4a87dcbf4ced738a0ac109eaab9398698b6c",
+      "tags": []
+    },
+    {
+      "sha": "bea08c7e26785db68575110cb22fd9d2184ae5d4",
+      "message": "feat: ajout d'un script pour une palette de couleurs dynamique sur toutes les pages",
+      "date": "2026-10-12T10:56:16Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/bea08c7e26785db68575110cb22fd9d2184ae5d4",
+      "tags": []
+    },
+    {
+      "sha": "01f9a5e598d5ff8dbf116bdb2fe01ee9665a5cb2",
+      "message": "feat: amélioration de l'affichage des statistiques avec un nouveau design et animations pour les barres de progression",
+      "date": "2026-10-12T10:44:33Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/01f9a5e598d5ff8dbf116bdb2fe01ee9665a5cb2",
+      "tags": []
+    },
     {
       "sha": "fad7b586299922f43446be8be597b24dfd2972a3",
       "message": "feat: ajout de la prise en charge de la répartition week-end vs semaine dans les graphiques",
@@ -2675,42 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/ce77c382f55125781014d7fb8bfdb8bb2bd1f1e8",
-      "tags": []
-    },
-    {
-      "sha": "c9ac356f882d8495172e729bed745b7000337e03",
-      "message": "feat: ajouter la calibration du tilt pour le widget Tilt3DCard et améliorer la gestion des mouvements",
-      "date": "2026-08-08T22:08:35Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/c9ac356f882d8495172e729bed745b7000337e03",
-      "tags": []
-    },
-    {
-      "sha": "6cfbe1e94edead68a9a88ad56e8bb90891ba8237",
-      "message": "feat: ajouter la date de sortie et améliorer l'affichage des informations dans le visualiseur d'images en plein écran",
-      "date": "2026-08-08T21:52:48Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/6cfbe1e94edead68a9a88ad56e8bb90891ba8237",
-      "tags": []
-    },
-    {
-      "sha": "50e38ea6db32f7c424ec0945ba4b0235683b09ee",
-      "message": "feat: améliorer le visualiseur d'images en plein écran avec des informations supplémentaires et un effet de carte 3D",
-      "date": "2026-08-08T21:28:51Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/50e38ea6db32f7c424ec0945ba4b0235683b09ee",
-      "tags": []
-    },
-    {
-      "sha": "60b153a11ff8b633a59e1988e2de082041fda54f",
-      "message": "feat: intégrer le widget Tilt3DCard pour un effet de profondeur sur les images",
-      "date": "2026-08-08T21:14:16Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/60b153a11ff8b633a59e1988e2de082041fda54f",
       "tags": []
     }
   ]
