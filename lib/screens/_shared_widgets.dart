@@ -296,19 +296,8 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Row(children: [
-      Icon(icon, size: 18, color: scheme.primary),
-      const SizedBox(width: 8),
-      Text(title, style: AppText.itemTitle.copyWith(color: scheme.onSurface)),
-      const SizedBox(width: 10),
-      Expanded(
-        child: Divider(
-          color: scheme.outlineVariant.withValues(alpha: 0.5),
-          thickness: 1,
-        ),
-      ),
-    ]);
+    // Same look as the Charts tab: cookie badge with icon + big title.
+    return _ChartHead(title: title, icon: icon);
   }
 }
 

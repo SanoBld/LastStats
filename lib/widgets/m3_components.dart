@@ -639,6 +639,48 @@ class M3SegmentedButton<T> extends StatelessWidget {
   }
 }
 
+// ── Material You tab switch (replaces TabBar) ──────────────────────────────
+class M3TabSwitch extends StatelessWidget {
+  const M3TabSwitch({
+    super.key,
+    required this.controller,
+    required this.labels,
+    this.icons,
+    this.padding = const EdgeInsets.fromLTRB(16, 8, 16, 8),
+  });
+
+  final TabController     controller;
+  final List<String>      labels;
+  final List<IconData>?   icons;
+  final EdgeInsetsGeometry padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: padding,
+      child: AnimatedBuilder(
+        animation: controller.animation ?? controller,
+        builder: (context, _) {
+          final cur = (controller.animation?.value ?? controller.index.toDouble())
+              .round().clamp(0, labels.length - 1);
+          return M3SegmentedButton<int>(
+            segments: [
+              for (var i = 0; i < labels.length; i++)
+                ButtonSegment<int>(
+                  value: i,
+                  icon: icons == null ? null : Icon(icons![i]),
+                  label: Text(labels[i]),
+                ),
+            ],
+            selected: {cur},
+            onSelectionChanged: (v) => controller.animateTo(v.first),
+          );
+        },
+      ),
+    );
+  }
+}
+
 // ── Centers content on wide screens ────────────────────────────────────────
 class M3MaxWidth extends StatelessWidget {
   const M3MaxWidth({super.key, required this.child, this.maxWidth = 1100});

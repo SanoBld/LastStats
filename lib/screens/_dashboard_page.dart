@@ -2752,126 +2752,74 @@ class _HeroStatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
+    final on     = scheme.onPrimaryContainer;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: scheme.primaryContainer,
-        borderRadius: AppRadius.xlR,
-        border: Border.all(
-          color: scheme.primary.withValues(alpha: 0.18),
-          width: 1,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-
-          Row(children: [
-            Icon(Icons.equalizer_rounded,
-                size: 15, color: scheme.onPrimaryContainer.withValues(alpha: 0.6)),
-            const SizedBox(width: 5),
-            Text(
-              L.dashScrobbles.toUpperCase(),
-              style: text.labelSmall?.copyWith(
-                color:         scheme.onPrimaryContainer.withValues(alpha: 0.6),
-                fontWeight:    FontWeight.w700,
-                letterSpacing: 1.2,
-                fontSize:      10,
-              ),
-            ),
-          ]),
-
-          const SizedBox(height: 8),
-
-          _RollingNumber(
-            key:        ValueKey(total),
-            target:     total,
-            fullFormat: true,
-            duration:   const Duration(milliseconds: 1300),
-            style: text.displaySmall?.copyWith(
-                fontWeight: FontWeight.w900,
-                color: scheme.onPrimaryContainer,
-                height: 1),
-          ),
-
-          const SizedBox(height: 16),
-
-          Divider(
-            height: 1, thickness: 1,
-            color: scheme.onPrimaryContainer.withValues(alpha: 0.1),
-          ),
-
-          const SizedBox(height: 14),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _MiniMetric(
-                icon: Icons.bolt_rounded,
-                label: L.dashScrobblesPerDay,
-                color: scheme.onPrimaryContainer,
-                rawInt: avg, prefix: '~',
-              ),
-              _VertDivider(color: scheme.onPrimaryContainer),
-              _MiniMetric(
-                icon: Icons.date_range_rounded,
-                label: L.dashPerWeek,
-                color: scheme.onPrimaryContainer,
-                rawInt: weekly, prefix: '~',
-              ),
-              _VertDivider(color: scheme.onPrimaryContainer),
-              _MiniMetric(
-                icon: Icons.today_rounded,
-                label: L.dashDaysActive,
-                color: scheme.onPrimaryContainer,
-                rawInt: days,
-                suffix: ' ${L.dashDayUnitShort}',
-              ),
-              if (showLoved) ...[
-                _VertDivider(color: scheme.onPrimaryContainer),
-                _MiniMetric(
-                  icon: Icons.favorite_rounded,
-                  label: L.favSectionTitle,
-                  color: scheme.onPrimaryContainer,
-                  rawInt: lovedCount,
-                  onTap: onFavoritesTap,
-                ),
-              ],
-            ],
-          ),
-
-          if (regStr.isNotEmpty) ...[
-            const SizedBox(height: 14),
-            Row(children: [
-              Icon(Icons.calendar_month_outlined,
-                  size: 12, color: scheme.onPrimaryContainer.withValues(alpha: 0.5)),
-              const SizedBox(width: 5),
-              Text(
-                L.memberSince(regStr),
-                style: text.labelSmall?.copyWith(
-                  color: scheme.onPrimaryContainer.withValues(alpha: 0.55),
-                  fontSize: 11,
-                ),
-              ),
-            ]),
-          ],
-
-        ]),
+    Widget tile(Widget m) => Expanded(
+      child: M3ShapeMorph(
+        radius: BorderRadius.circular(20),
+        color: scheme.surface.withValues(alpha: 0.55),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+        child: m,
       ),
     );
+
+    return M3ShapeMorph(
+      radius: BorderRadius.circular(32),
+      color: scheme.primaryContainer,
+      padding: const EdgeInsets.all(20),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          M3CookieBadge(
+            color: scheme.primary, size: 36,
+            child: Icon(Icons.equalizer_rounded, size: 18, color: scheme.onPrimary),
+          ),
+          const SizedBox(width: 10),
+          Text(L.dashScrobbles,
+              style: text.titleMedium?.copyWith(
+                  color: on.withValues(alpha: 0.8), fontWeight: FontWeight.w700)),
+        ]),
+        const SizedBox(height: 14),
+        _RollingNumber(
+          key:        ValueKey(total),
+          target:     total,
+          fullFormat: true,
+          duration:   const Duration(milliseconds: 1300),
+          style: text.displayMedium?.copyWith(
+              fontWeight: FontWeight.w900, color: on, height: 1),
+        ),
+        const SizedBox(height: 18),
+        Row(children: [
+          tile(_MiniMetric(icon: Icons.bolt_rounded, label: L.dashScrobblesPerDay,
+              color: on, rawInt: avg, prefix: '~')),
+          const SizedBox(width: 6),
+          tile(_MiniMetric(icon: Icons.date_range_rounded, label: L.dashPerWeek,
+              color: on, rawInt: weekly, prefix: '~')),
+          const SizedBox(width: 6),
+          tile(_MiniMetric(icon: Icons.today_rounded, label: L.dashDaysActive,
+              color: on, rawInt: days, suffix: ' ${L.dashDayUnitShort}')),
+          if (showLoved) ...[
+            const SizedBox(width: 6),
+            tile(_MiniMetric(icon: Icons.favorite_rounded, label: L.favSectionTitle,
+                color: on, rawInt: lovedCount, onTap: onFavoritesTap)),
+          ],
+        ]),
+        if (regStr.isNotEmpty) ...[
+          const SizedBox(height: 14),
+          M3ShapeMorph(
+            radius: BorderRadius.circular(100),
+            color: scheme.surface.withValues(alpha: 0.4),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(Icons.calendar_month_outlined, size: 14, color: on.withValues(alpha: 0.7)),
+              const SizedBox(width: 6),
+              Text(L.memberSince(regStr),
+                  style: text.labelMedium?.copyWith(color: on.withValues(alpha: 0.8))),
+            ]),
+          ),
+        ],
+      ]),
+    );
   }
-}
-
-
-// ── Thin vertical divider for metric rows ─────────────────────────────────────
-
-class _VertDivider extends StatelessWidget {
-  final Color color;
-  const _VertDivider({required this.color});
-
-  @override
-  Widget build(BuildContext context) =>
-      Container(width: 1, height: 32, color: color.withValues(alpha: 0.15));
 }
 
 
@@ -3002,13 +2950,12 @@ class _DashStatCard extends StatelessWidget {
       onTap: onTap,
       child: Card(
         elevation: 0,
-        color: scheme.surfaceContainerHighest,
+        color: scheme.surfaceContainerHigh,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: _cardBorder(scheme),
+          borderRadius: BorderRadius.circular(24),
         ),
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(24),
           onTap: onTap,
           child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
@@ -3503,27 +3450,18 @@ class _RecentTracksList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: scheme.outlineVariant.withValues(alpha: 0.4),
-          width: 1,
-        ),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        children: tracks.asMap().entries.map((e) {
-          return _RecentTrackRow(
-            track:   e.value as Map<String, dynamic>,
-            isLast:  e.key == tracks.length - 1,
-            service: service,
-          );
-        }).toList(),
-      ),
+    return Column(
+      children: [
+        for (var i = 0; i < tracks.length; i++)
+          M3SegmentTile(
+            index: i, count: tracks.length,
+            child: _RecentTrackRow(
+              track:   tracks[i] as Map<String, dynamic>,
+              isLast:  i == tracks.length - 1,
+              service: service,
+            ),
+          ),
+      ],
     );
   }
 }
@@ -3628,11 +3566,6 @@ class _RecentTrackRowState extends State<_RecentTrackRow> {
 
               ]),
             ),
-            if (!widget.isLast)
-              Divider(
-                height: 1, thickness: 1, indent: 70, endIndent: 0,
-                color: scheme.outlineVariant.withValues(alpha: 0.3),
-              ),
           ],
         ),
       ),

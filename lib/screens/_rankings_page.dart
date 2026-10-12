@@ -189,11 +189,11 @@ class _RankingsPageState extends State<_RankingsPage>
               ),
             ),
 
-          TabBar(controller: _tabs, tabs: [
-            Tab(text: L.commonArtists),
-            Tab(text: L.commonAlbums),
-            Tab(text: L.commonTracks),
-          ]),
+          M3TabSwitch(
+            controller: _tabs,
+            labels: [L.commonArtists, L.commonAlbums, L.commonTracks],
+            icons: const [Icons.mic_rounded, Icons.album_rounded, Icons.music_note_rounded],
+          ),
           Expanded(child: TabBarView(controller: _tabs, children: [
             _TopListBody(service: widget.service, type: 'artists',
                 period: _period, year: _selectedYear, month: _selectedMonth),

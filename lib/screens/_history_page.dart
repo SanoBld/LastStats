@@ -225,20 +225,10 @@ class _HistoryPageState extends State<_HistoryPage>
               ],
             )),
             const SizedBox(height: 10),
-            TabBar(
+            M3TabSwitch(
               controller: _tabController,
-              labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-              unselectedLabelStyle: const TextStyle(fontSize: 13),
-              labelColor: scheme.primary,
-              unselectedLabelColor: scheme.onSurfaceVariant,
-              indicatorColor: scheme.primary,
-              indicatorSize: TabBarIndicatorSize.label,
-              dividerColor: scheme.outlineVariant.withValues(alpha: 0.3),
-              tabs: [
-                Tab(text: L.historyChronological),
-                Tab(text: L.historyList),
-                Tab(text: L.historyStats),
-              ],
+              labels: [L.historyChronological, L.historyList, L.historyStats],
+              icons: const [Icons.timeline_rounded, Icons.view_list_rounded, Icons.bar_chart_rounded],
             ),
           ],
 
