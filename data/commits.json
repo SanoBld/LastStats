@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-12T14:40:16Z",
+  "updated": "2026-10-12T20:26:26Z",
   "commits": [
+    {
+      "sha": "44b781382fcf36d3e0e49ecd1efc7142c05a7094",
+      "message": "feat: remplacement de TabBar par M3TabSwitch pour une meilleure intégration Material You et ajout de composants M3",
+      "date": "2026-10-12T20:24:07Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/44b781382fcf36d3e0e49ecd1efc7142c05a7094",
+      "tags": []
+    },
     {
       "sha": "da0f4241e0316bbc0ec8ffe1910d938648b2ff3c",
       "message": "feat: mise à jour des traductions pour \"aléatoire\" dans plusieurs langues et amélioration de la gestion des couleurs aléatoires",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/2395cc18fdd38f7c30e736693916617802ae62f7",
-      "tags": []
-    },
-    {
-      "sha": "24747d0fa142e621fca3d0237ecbb9f0eb3b7434",
-      "message": "feat: ajouter un système d'achievements avec des catégories et des niveaux de progression",
-      "date": "2026-08-09T07:11:52Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/24747d0fa142e621fca3d0237ecbb9f0eb3b7434",
       "tags": []
     }
   ]
