@@ -491,14 +491,17 @@ class _ChartsPageState extends State<_ChartsPage>
   //   import 'package:share_plus/share_plus.dart';
   //   import 'package:path_provider/path_provider.dart';
   static const _kCharts = [
-    ('monthly', 'ui_chart_monthly', Icons.calendar_month_rounded),
-    ('cumul', 'ui_chart_cumul', Icons.trending_up_rounded),
-    ('genres', 'ui_chart_genres', Icons.equalizer_rounded),
-    ('habits', 'ui_chart_habits', Icons.access_time_rounded),
-    ('artists', 'ui_chart_artists', Icons.mic_rounded),
-    ('albums', 'ui_chart_albums', Icons.album_rounded),
-    ('calendar', 'ui_chart_calendar', Icons.grid_on_rounded),
-    ('streaks', 'ui_chart_streaks', Icons.local_fire_department_rounded),
+    ('trend', 'ui_scrobble_progression', Icons.show_chart_rounded),
+    ('habits', 'ui_listening_habits', Icons.access_time_rounded),
+    ('daypart', 'cx_daypart', Icons.wb_twilight_rounded),
+    ('weekend', 'cx_weekend', Icons.weekend_rounded),
+    ('artists', 'cx_artist_distribution', Icons.mic_rounded),
+    ('albums', 'ui_album_distribution', Icons.album_rounded),
+    ('genres', 'ui_your_musical_genres', Icons.equalizer_rounded),
+    ('calendar', 'ui_listening_calendar', Icons.grid_on_rounded),
+    ('streaks', 'ui_listening_streaks', Icons.local_fire_department_rounded),
+    ('intensity', 'cx_intensity', Icons.bar_chart_rounded),
+    ('busiest', 'cx_busiest', Icons.emoji_events_rounded),
   ];
   late final Map<String, GlobalKey> _xkeys = {
     for (final c in _kCharts) c.$1: GlobalKey(),
@@ -1034,30 +1037,7 @@ class _ChartsPageState extends State<_ChartsPage>
       if (!ctx.mounted) return;
       ui.Image chartImg;
 
-      if (chartId == 'monthly' || chartId == 'cumul') {
-        // These two charts have their own internal horizontal scroll (jumped
-        // to the most recent months) — capturing them live only grabs
-        // whatever happens to be in that inner viewport. Render a full-width,
-        // unclipped copy off-screen instead, so every month is visible.
-        final allTimeMonthly = _buildAllTimeMonthly();
-        final periodMonthly  = _isAllTime ? allTimeMonthly : (_monthly ?? const <String, int>{});
-
-        final child = chartId == 'monthly'
-            ? _MonthlyCard(monthly: periodMonthly, exportMode: true)
-            : _CumulativeLineCard(data: _buildCumulative(periodMonthly), exportMode: true);
-        final naturalWidth = 100.0 + (chartId == 'monthly' ? 52.0 : 42.0) * periodMonthly.length;
-
-        final img = await _renderOffscreen(ctx, SizedBox(width: naturalWidth.clamp(320, 6000), child: child));
-        if (img == null) {
-          closeDialog();
-          if (ctx.mounted) {
-            showAppSnackBar(ctx, SnackBar(content: Text(
-                tx('ui_chart_not_available_fo'))));
-          }
-          return;
-        }
-        chartImg = img;
-      } else if (chartId == 'calendar') {
+      if (chartId == 'calendar') {
         // Same problem as monthly/cumul: the heatmap has its own internal
         // horizontal scroll to fit every year (2025, 2026…) — a live capture
         // only grabs whatever's currently scrolled into view. Render the
@@ -1107,26 +1087,6 @@ class _ChartsPageState extends State<_ChartsPage>
           return;
         }
         chartImg = img;
-      } else if (chartId == 'habits') {
-        // Same class of bug as monthly/cumul/calendar: the hourly chart
-        // auto-scrolls to the peak hour on screen, so a live capture only
-        // grabbed whatever 5-6 hours happened to be scrolled into view.
-        // Render both habit cards off-screen, unclipped, full 24h width.
-        final child = Column(children: [
-          _HourlyBarCard(data: _hourlyData ?? const <int, int>{}, exportMode: true),
-          const SizedBox(height: 12),
-          _WeekdayBarCard(data: _weekdayData ?? const <int, int>{}),
-        ]);
-        final img = await _renderOffscreen(ctx, SizedBox(width: 30 + 24 * 33.0 + 32, child: child));
-        if (img == null) {
-          closeDialog();
-          if (ctx.mounted) {
-            showAppSnackBar(ctx, SnackBar(content: Text(
-                tx('ui_chart_not_available_fo'))));
-          }
-          return;
-        }
-        chartImg = img;
       } else {
         final rb = await _ensureChartLaidOut(chartId);
         if (rb == null || rb.size.isEmpty) {
@@ -1137,6 +1097,9 @@ class _ChartsPageState extends State<_ChartsPage>
           }
           return;
         }
+        // Let entry animations (bars, donut, radar…) finish before capture.
+        await Future.delayed(const Duration(milliseconds: 1300));
+        if (!rb.attached) { closeDialog(); return; }
         chartImg = await rb.toImage(pixelRatio: 3.0);
       }
 
@@ -1425,7 +1388,7 @@ class _ChartsPageState extends State<_ChartsPage>
                     index: 0, title: tx('ui_scrobble_progression'),
                     icon: Icons.show_chart_rounded, sub: periodLabel,
                     child: RepaintBoundary(
-                      key: _xkeys['monthly'],
+                      key: _xkeys['trend'],
                       child: periodMonthly.isNotEmpty
                           ? _TrendChart(key: ValueKey('trend_$_selectedYear'), monthly: periodMonthly)
                           : _EmptyYearCard(),
@@ -1459,13 +1422,13 @@ class _ChartsPageState extends State<_ChartsPage>
                   if (_hourlyData != null && _hourlyData!.values.any((v) => v > 0))
                     _ChartSec(
                       index: 5, title: tx('cx_daypart'), icon: Icons.wb_twilight_rounded,
-                      child: _DaypartChart(data: _hourlyData!),
+                      child: RepaintBoundary(key: _xkeys['daypart'], child: _DaypartChart(data: _hourlyData!)),
                     ),
 
                   if (_weekdayData != null && _weekdayData!.values.any((v) => v > 0))
                     _ChartSec(
                       index: 10, title: tx('cx_weekend'), icon: Icons.weekend_rounded,
-                      child: _WeekendCard(data: _weekdayData!),
+                      child: RepaintBoundary(key: _xkeys['weekend'], child: _WeekendCard(data: _weekdayData!)),
                     ),
 
                   // 3. Artists share
@@ -1578,11 +1541,12 @@ class _ChartsPageState extends State<_ChartsPage>
                     const SizedBox(height: 20),
                     _ChartSec(
                       index: 8, title: tx('cx_intensity'), icon: Icons.bar_chart_rounded,
-                      child: _IntensityChart(key: ValueKey('int_$_selectedYear'), data: calendarForView),
+                      child: RepaintBoundary(key: _xkeys['intensity'],
+                          child: _IntensityChart(key: ValueKey('int_$_selectedYear'), data: calendarForView)),
                     ),
                     _ChartSec(
                       index: 9, title: tx('cx_busiest'), icon: Icons.emoji_events_rounded,
-                      child: _BusiestDays(data: calendarForView),
+                      child: RepaintBoundary(key: _xkeys['busiest'], child: _BusiestDays(data: calendarForView)),
                     ),
                   ],
                           ]),

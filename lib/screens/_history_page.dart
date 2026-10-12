@@ -548,47 +548,84 @@ class _HistStatSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (data.isEmpty) return const SizedBox.shrink();
-    final max = data.values.first;
+    final entries = data.entries.toList();
+    final max = entries.first.value;
+    final first = entries.first;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(children: [
-        Icon(icon, size: 16, color: scheme.primary),
-        const SizedBox(width: 8),
-        Text(title, style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
-      ]),
-      const SizedBox(height: 10),
-      for (final e in data.entries) ...[
-        Row(children: [
-          SizedBox(width: 24,
-            child: Text('${data.keys.toList().indexOf(e.key) + 1}',
-                style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant),
-                textAlign: TextAlign.center)),
-          const SizedBox(width: 8),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              Expanded(child: Text(e.key, maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: text.bodySmall?.copyWith(fontWeight: FontWeight.w600))),
-              Text('${e.value}×', style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
-            ]),
-            const SizedBox(height: 4),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              // Bar animates from 0 to its value on first render
-              child: TweenAnimationBuilder<double>(
-                tween:    Tween(begin: 0.0, end: max > 0 ? e.value / max : 0),
-                duration: const Duration(milliseconds: 500),
-                curve:    M3Motion.emphasizedDecelerate,
-                builder: (_, v, _) => LinearProgressIndicator(
-                  value:           v,
-                  minHeight:       4,
-                  backgroundColor: scheme.surfaceContainerHighest,
-                  valueColor:      AlwaysStoppedAnimation(scheme.primary),
-                ),
+      _ChartHead(title: title, icon: icon),
+      const SizedBox(height: 12),
+      Container(
+        decoration: _chartCardDecoration(scheme, scheme.secondaryContainer),
+        padding: const EdgeInsets.all(12),
+        child: Column(children: [
+          // #1 hero
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: scheme.primaryContainer,
+              borderRadius: BorderRadius.circular(20)),
+            child: Row(children: [
+              Container(
+                width: 36, height: 36, alignment: Alignment.center,
+                decoration: BoxDecoration(color: scheme.primary, shape: BoxShape.circle),
+                child: Text('1', style: text.titleSmall?.copyWith(
+                    color: scheme.onPrimary, fontWeight: FontWeight.w800)),
               ),
+              const SizedBox(width: 12),
+              Expanded(child: Text(first.key, maxLines: 2, overflow: TextOverflow.ellipsis,
+                  style: text.titleSmall?.copyWith(
+                      color: scheme.onPrimaryContainer, fontWeight: FontWeight.w800))),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                    color: scheme.tertiaryContainer, borderRadius: AppRadius.xlR),
+                child: Text('${first.value}×', style: text.labelMedium?.copyWith(
+                    color: scheme.onTertiaryContainer, fontWeight: FontWeight.w800)),
+              ),
+            ]),
+          ),
+          for (var i = 1; i < entries.length; i++)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(6, 10, 6, 0),
+              child: Row(children: [
+                Container(
+                  width: 26, height: 26, alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                      color: scheme.surfaceContainerHighest, shape: BoxShape.circle),
+                  child: Text('${i + 1}', style: text.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant, fontWeight: FontWeight.w700)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(entries[i].key, maxLines: 1, overflow: TextOverflow.ellipsis,
+                      style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 5),
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: max > 0 ? entries[i].value / max : 0),
+                    duration: const Duration(milliseconds: 600),
+                    curve: M3Motion.emphasizedDecelerate,
+                    builder: (_, v, _) => LayoutBuilder(builder: (_, c) => Stack(children: [
+                      Container(height: 8, decoration: BoxDecoration(
+                          color: scheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                          borderRadius: BorderRadius.circular(4))),
+                      Container(
+                        height: 8, width: math.max(8.0, c.maxWidth * v),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          gradient: LinearGradient(colors: [
+                            scheme.primary.withValues(alpha: 0.45), scheme.primary])),
+                      ),
+                    ])),
+                  ),
+                ])),
+                const SizedBox(width: 12),
+                Text('${entries[i].value}×', style: text.labelMedium?.copyWith(
+                    color: scheme.onSurfaceVariant, fontWeight: FontWeight.w700)),
+              ]),
             ),
-          ])),
         ]),
-        const SizedBox(height: 10),
-      ],
+      ),
     ]);
   }
 }
