@@ -122,7 +122,7 @@ Widget build(BuildContext context) {
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
         useSafeArea: true,
-        builder: (_) =&gt; _ChoiceSheet(title: title, options: options, value: value),
+        builder: (_) =&gt; _ChoiceSheet(title: title, options: options, value: value, previewFonts: previewFonts),
       );
       if (r != null &amp;&amp; r != value) onChanged(r);
     },
