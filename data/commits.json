@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-13T15:58:19Z",
+  "updated": "2026-10-13T18:29:42Z",
   "commits": [
+    {
+      "sha": "f50dd781b7298e423967b18e9f0001f19f41a4a6",
+      "message": "Refactor code structure for improved readability and maintainability",
+      "date": "2026-10-13T18:27:31Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/f50dd781b7298e423967b18e9f0001f19f41a4a6",
+      "tags": []
+    },
     {
       "sha": "790dad7b2512d4de8993969f33e4a6c6389bda03",
       "message": "Refactor code structure for improved readability and maintainability",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/c3d706ade71a8b387e41a036d031edce48aa2e69",
-      "tags": []
-    },
-    {
-      "sha": "944cf3168ecae07be441e7f3a138c4f84d5ff1b9",
-      "message": "feat: ajouter un système de niveaux de compte et une animation de scintillement pour les badges d'achievements",
-      "date": "2026-08-09T18:50:19Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/944cf3168ecae07be441e7f3a138c4f84d5ff1b9",
       "tags": []
     }
   ]
