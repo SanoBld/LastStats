@@ -623,7 +623,7 @@ class _SettingsPageState extends State<_SettingsPage> {
     final screenWidth      = MediaQuery.sizeOf(context).width;
     final isWide           = screenWidth >= 720;
     final crossAxisCount   = !isWide ? 2 : (screenWidth >= 1200 ? 4 : 3);
-    final maxContentWidth  = isWide ? 1200.0 : double.infinity;
+    final maxContentWidth  = double.infinity;
     final gridAspectRatio  = isWide ? 1.35 : 1.1;
     final gridSpacing      = isWide ? 16.0 : 12.0;
 

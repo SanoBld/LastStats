@@ -221,10 +221,10 @@ class _HomeScreenState extends State<HomeScreen> {
     _DashboardPage(service: _service, username: widget.username),
     // PC: lists get a centred column instead of stretching across the window
     // (phones: _pcColumn returns the page untouched).
-    _pcColumn(context, _SearchPage(service: _service), maxWidth: 960),
-    _pcColumn(context, _RankingsPage(service: _service), maxWidth: 960),
-    _pcColumn(context, _ChartsPage(service: _service), maxWidth: 1200),
-    _pcColumn(context, _HistoryPage(service: _service), maxWidth: 960),
+    _pcColumn(context, _SearchPage(service: _service), maxWidth: double.infinity),
+    _pcColumn(context, _RankingsPage(service: _service), maxWidth: double.infinity),
+    _pcColumn(context, _ChartsPage(service: _service), maxWidth: double.infinity),
+    _pcColumn(context, _HistoryPage(service: _service), maxWidth: double.infinity),
     _SettingsPage(username: widget.username), // index 5 – wide only
   ];
 
