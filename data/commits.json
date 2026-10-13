@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-13T13:44:04Z",
+  "updated": "2026-10-13T14:57:40Z",
   "commits": [
+    {
+      "sha": "8c037f5f3218d0107257dafc2d0c16a2a39bc3ae",
+      "message": "Refactor onboarding flow and improve localization strings\n\n- Updated Russian and Chinese localization strings for clarity and accuracy in onboarding steps.\n- Enhanced the onboarding flow UI by replacing TextButton with M3LabelButton for a more consistent design.\n- Adjusted button styles and interactions in the onboarding process to improve user experience.\n- Refined appearance settings page layout for better visual alignment.\n- Introduced M3LabelButton component for consistent button styling across the app.\n- Improved setup screen button interactions and error handling.\n- Enhanced CSS for download button hover effects on the website.",
+      "date": "2026-10-13T14:54:52Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/8c037f5f3218d0107257dafc2d0c16a2a39bc3ae",
+      "tags": []
+    },
     {
       "sha": "3010699c286bc6f0f3c19d11e216e4e95686d0f4",
       "message": "feat: amélioration des styles des boutons sur mobile pour conserver la forme connectée des éléments",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/c3de26369d9d0702b85d6385a954ccb09e4a1fd9",
-      "tags": []
-    },
-    {
-      "sha": "36734ee611cee97c4623513b18ef7f4a0973f9ed",
-      "message": "feat: ajouter des animations de transition pour les sections du graphique avec un effet de fondu et de glissement",
-      "date": "2026-08-09T10:15:36Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/36734ee611cee97c4623513b18ef7f4a0973f9ed",
       "tags": []
     }
   ]

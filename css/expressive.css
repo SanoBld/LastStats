@@ -212,7 +212,7 @@ a, button { touch-action: manipulation; }
    rest = small inner corners, hover = big tile corners, press = soft square */
 .project-actions #download-trigger { border-radius: var(--r-inner); }
 @media (hover: hover) {
-  .project-actions #download-trigger:hover { border-radius: var(--r-tile); transform: translateY(-2px); box-shadow: none; }
+  .project-actions #download-trigger:hover { border-radius: var(--r-tile); transform: translateY(-2px); box-shadow: 0 6px 16px -4px rgba(var(--md-shadow), .4); }
 }
 .project-actions #download-trigger:active,
 .project-actions #download-trigger.is-pressed {
