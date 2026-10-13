@@ -287,10 +287,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       body: _pageStack(pages, _kTabHistory + 1),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _idx,
-        onDestinationSelected: (i) { _haptic(_HapticImpact.selection); setState(() => _idx = i); },
-        destinations: _narrowDestinations,
+      bottomNavigationBar: ValueListenableBuilder<bool>(
+        valueListenable: navLabelNotifier,
+        builder: (_, showLabels, _) => NavigationBar(
+          height: showLabels ? null : 56,
+          selectedIndex: _idx,
+          onDestinationSelected: (i) { _haptic(_HapticImpact.selection); setState(() => _idx = i); },
+          destinations: _narrowDestinations,
+        ),
       ),
     );
   }
