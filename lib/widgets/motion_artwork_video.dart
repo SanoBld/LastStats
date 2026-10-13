@@ -76,7 +76,7 @@ class _MotionArtworkVideoState extends State<MotionArtworkVideo>
     }
     // Main link first; for YouTube, the safe 360p link if the main one
     // is refused or never starts.
-    for (final url in [_url, if (_fbUrl != null) _fbUrl!]) {
+    for (final url in [_url, ?_fbUrl]) {
       if (_disposed) return;
       try {
         if (await _open(url, isYt, options)) return;

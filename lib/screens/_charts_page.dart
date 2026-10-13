@@ -579,23 +579,6 @@ class _ChartsPageState extends State<_ChartsPage>
     return result;
   }
 
-  /// Cumulative scrobbles across [monthly], chronologically — works for a
-  /// single year or for the merged all-time series.
-  Map<String, int> _buildCumulative(Map<String, int> monthly) {
-    final now    = DateTime.now();
-    final cutoff = '${now.year}-${now.month.toString().padLeft(2, '0')}';
-    final keys   = monthly.keys
-        .where((k) => k.compareTo(cutoff) <= 0)
-        .toList()..sort();
-    int cum = 0;
-    final result = <String, int>{};
-    for (final k in keys) {
-      cum += monthly[k]!;
-      result[k] = cum;
-    }
-    return result;
-  }
-
   /// Merge daily calendar data across every cached year into one continuous
   /// map, used by the "All time" heatmap.
   Map<String, int> _buildAllTimeCalendar() {
@@ -1293,7 +1276,6 @@ class _ChartsPageState extends State<_ChartsPage>
     // Charts 1 & 2 show only the selected period: that year's months, or
     // every month from start to end when "All time" is selected.
     final periodMonthly    = _isAllTime ? allTimeMonthly : (_monthly ?? const <String, int>{});
-    final periodCumulative = _buildCumulative(periodMonthly);
     final periodLabel      = _isAllTime ? tx('ui_all_time') : '$_selectedYear';
 
     final cachedTs    = _isAllTime ? null : AllScrobblesService.getTimestampsForYear(_selectedYear);
@@ -1680,8 +1662,7 @@ List<Color> _buildPalette(Color base, Color second, int count) {
 
 class _MonthlyCard extends StatefulWidget {
   final Map<String, int> monthly;
-  final bool exportMode; // true = render all months unclipped, no internal scroll
-  const _MonthlyCard({required this.monthly, this.exportMode = false});
+  const _MonthlyCard({required this.monthly});
 
   @override
   State<_MonthlyCard> createState() => _MonthlyCardState();
@@ -1696,11 +1677,9 @@ class _MonthlyCardState extends State<_MonthlyCard> {
   @override
   void initState() {
     super.initState();
-    if (!widget.exportMode) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_sc.hasClients) _sc.jumpTo(_sc.position.maxScrollExtent);
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_sc.hasClients) _sc.jumpTo(_sc.position.maxScrollExtent);
+    });
   }
 
   @override
@@ -1746,9 +1725,7 @@ class _MonthlyCardState extends State<_MonthlyCard> {
               ]),
             ),
             Expanded(
-              child: widget.exportMode
-                ? _buildBarsRow(sorted, maxVal, s, t)
-                : SingleChildScrollView(
+              child: SingleChildScrollView(
                 controller: _sc,
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
@@ -1861,8 +1838,7 @@ class _MonthlyCardState extends State<_MonthlyCard> {
 
 class _CumulativeLineCard extends StatefulWidget {
   final Map<String, int> data;
-  final bool exportMode;
-  const _CumulativeLineCard({required this.data, this.exportMode = false});
+  const _CumulativeLineCard({required this.data});
 
   @override
   State<_CumulativeLineCard> createState() => _CumulativeLineCardState();
@@ -1877,11 +1853,9 @@ class _CumulativeLineCardState extends State<_CumulativeLineCard> {
   @override
   void initState() {
     super.initState();
-    if (!widget.exportMode) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_sc.hasClients) _sc.jumpTo(_sc.position.maxScrollExtent);
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_sc.hasClients) _sc.jumpTo(_sc.position.maxScrollExtent);
+    });
   }
 
   @override
@@ -1966,11 +1940,9 @@ class _CumulativeLineCardState extends State<_CumulativeLineCard> {
               ),
             ),
 
-            // Scrollable chart (or unclipped, in export mode)
+            // Scrollable chart
             Expanded(
-              child: widget.exportMode
-                ? _buildLineContent(keys, vals, contentW, s, t)
-                : SingleChildScrollView(
+              child: SingleChildScrollView(
                 controller: _sc,
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
@@ -2157,8 +2129,7 @@ class _HourlyBarCard extends StatefulWidget {
   // true = render all 24 hours unclipped, no internal scroll (used for
   // sharing — the on-screen version auto-scrolls to the peak hour, which
   // used to mean an export only captured whatever was scrolled into view).
-  final bool exportMode;
-  const _HourlyBarCard({required this.data, this.exportMode = false});
+  const _HourlyBarCard({required this.data});
 
   @override
   State<_HourlyBarCard> createState() => _HourlyBarCardState();
@@ -2180,7 +2151,6 @@ class _HourlyBarCardState extends State<_HourlyBarCard> {
   @override
   void initState() {
     super.initState();
-    if (widget.exportMode) return; // no scroll to settle in export mode
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_sc.hasClients) return;
       final peakH = widget.data.isEmpty ? 0
@@ -2250,9 +2220,7 @@ class _HourlyBarCardState extends State<_HourlyBarCard> {
               ]),
             ),
             Expanded(
-              child: widget.exportMode
-                ? _buildHourColumns(bandColors, maxVal, peakH, s, t)
-                : SingleChildScrollView(
+              child: SingleChildScrollView(
                 controller: _sc,
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
@@ -2371,96 +2339,6 @@ class _HourlyBarCardState extends State<_HourlyBarCard> {
                     ],
                   ),
                 );
-  }
-}
-
-// ══════════════════════════════════════════════════════════════════════════
-//  _WeekdayBarCard — 7 full-width bars
-// ══════════════════════════════════════════════════════════════════════════
-
-class _WeekdayBarCard extends StatelessWidget {
-  final Map<int, int> data;
-  const _WeekdayBarCard({required this.data});
-
-  @override
-  Widget build(BuildContext context) {
-    final s       = Theme.of(context).colorScheme;
-    final t       = Theme.of(context).textTheme;
-    final labels  = _chartWeekdayLabels;
-    final maxVal  = data.values.fold(0, (a, b) => a > b ? a : b);
-    final peakDay = data.isEmpty ? 1
-        : data.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
-
-    return Container(
-      decoration: _chartCardDecoration(s),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(children: [
-            Text(tx('ui_activity_by_day_of_wee'),
-                style: t.labelMedium?.copyWith(fontWeight: FontWeight.w700)),
-            const Spacer(),
-            _PeakChip(
-              label: '📅 ${labels[peakDay - 1]}',
-              color: s.secondaryContainer, onColor: s.onSecondaryContainer, t: t,
-            ),
-          ]),
-          const SizedBox(height: 16),
-          LayoutBuilder(builder: (_, constraints) {
-            const barMaxH = 96.0;
-            final colW    = constraints.maxWidth / 7;
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: List.generate(7, (i) {
-                final day    = i + 1;
-                final v      = data[day] ?? 0;
-                final ratio  = maxVal > 0 ? v / maxVal : 0.0;
-                final barH   = (barMaxH * ratio).clamp(2.0, barMaxH);
-                final isPeak = day == peakDay;
-                final color  = isPeak
-                    ? s.secondary
-                    : Color.lerp(s.secondaryContainer, s.secondary, ratio * 0.8)!;
-                return SizedBox(
-                  width: colW,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(v > 0 ? _fmt(v) : '',
-                          style: t.labelSmall?.copyWith(
-                            fontSize: 8,
-                            color: isPeak ? s.secondary : s.onSurfaceVariant,
-                            fontWeight: isPeak ? FontWeight.w800 : FontWeight.normal,
-                          )),
-                      const SizedBox(height: 3),
-                      Center(
-                        child: Container(
-                          width: colW - 10,
-                          height: barH,
-                          decoration: BoxDecoration(
-                            gradient: _barGradient(color),
-                            borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(6)),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(labels[i], textAlign: TextAlign.center,
-                          style: t.labelSmall?.copyWith(
-                            fontSize: 10,
-                            color: isPeak ? s.secondary : s.onSurfaceVariant,
-                            fontWeight: isPeak ? FontWeight.w700 : FontWeight.normal,
-                          )),
-                    ],
-                  ),
-                );
-              }),
-            );
-          }),
-        ],
-      ),
-    );
   }
 }
 

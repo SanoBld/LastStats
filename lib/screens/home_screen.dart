@@ -136,9 +136,6 @@ List<(String, String)> _localizedPeriods() => [
 
 List<String> get _kMonths => L.months;
 
-BorderSide _cardBorder(ColorScheme s, {double alpha = 0.45}) =>
-    BorderSide(color: s.outlineVariant.withValues(alpha: alpha), width: 1);
-
 // ── Haptic feedback ───────────────────────────────────────────────────────────
 enum _HapticImpact { selection, light, medium, heavy }
 

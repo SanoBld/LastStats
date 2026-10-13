@@ -1,6 +1,6 @@
 import 'dart:ffi' show Abi;
 
-/// Returns a stable "<os>_<arch>" key for the current platform
+/// Returns a stable `<os>_<arch>` key for the current platform
 /// (e.g. "android_arm64", "windows_x64", "macos_arm64").
 String currentAbiKey() {
   final abi = Abi.current();

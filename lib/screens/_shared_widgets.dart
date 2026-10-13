@@ -1210,21 +1210,15 @@ class _AppSearchField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final ValueChanged<String>? onChanged;
-  final ValueChanged<String>? onSubmitted;
   final VoidCallback? onClear;
   final bool loading;
-  final FocusNode? focusNode;
-  final TextInputAction? textInputAction;
 
   const _AppSearchField({
     required this.controller,
     required this.hintText,
     this.onChanged,
-    this.onSubmitted,
     this.onClear,
     this.loading = false,
-    this.focusNode,
-    this.textInputAction,
   });
 
   @override
@@ -1232,10 +1226,8 @@ class _AppSearchField extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return TextField(
       controller:      controller,
-      focusNode:       focusNode,
       onChanged:       onChanged,
-      onSubmitted:     onSubmitted,
-      textInputAction: textInputAction ?? TextInputAction.search,
+      textInputAction: TextInputAction.search,
       decoration: InputDecoration(
         hintText:   hintText,
         prefixIcon: const Icon(Icons.search_rounded),

@@ -330,7 +330,9 @@ class MotionArtworkService {
         if (d < 90 || d > 600) continue;
         final title = v.title.toLowerCase();
         if (RegExp(_ytBad).hasMatch(title) &&
-            !RegExp(_ytBad).hasMatch(track.toLowerCase())) continue;
+            !RegExp(_ytBad).hasMatch(track.toLowerCase())) {
+          continue;
+        }
         if (!_norm(v.title).contains(core)) continue;
         if (!_norm('${v.title} ${v.author}').contains(lead)) continue;
         tried++;

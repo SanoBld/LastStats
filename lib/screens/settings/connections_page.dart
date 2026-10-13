@@ -190,7 +190,6 @@ class _ServiceCard extends StatelessWidget {
   final bool connected;
   final Widget description;
   final List<Widget> actions;
-  final Widget? footer;
   const _ServiceCard({
     required this.logo,
     required this.title,
@@ -198,7 +197,6 @@ class _ServiceCard extends StatelessWidget {
     required this.connected,
     required this.description,
     required this.actions,
-    this.footer,
   });
 
   @override
@@ -257,7 +255,6 @@ class _ServiceCard extends StatelessWidget {
             if (i > 0) const SizedBox(height: 10),
             actions[i],
           ],
-          if (footer != null) ...[const SizedBox(height: 14), footer!],
         ]),
       ),
     );
