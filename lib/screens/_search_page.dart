@@ -27,6 +27,10 @@ class _SearchPageState extends State<_SearchPage> {
   bool          _searching = false;
   String?       _error;
   Timer?        _debounce;
+  // Infinite scroll (single-category tabs): next page is fetched near the end.
+  int  _page        = 1;
+  bool _hasMore     = false;
+  bool _loadingMore = false;
 
   Set<String> _favProfiles = {};
   bool _submitted = false;
@@ -172,7 +176,13 @@ class _SearchPageState extends State<_SearchPage> {
           case _kSearchAlbums:   res = await widget.service.searchAlbums(q,  limit: 15); break;
           default:               res = await widget.service.searchTracks(q,  limit: 15);
         }
-        if (mounted) setState(() { _results = res; _allResults = {}; _searching = false; });
+        if (mounted) {
+          setState(() {
+            _results = res; _allResults = {}; _searching = false;
+            _page = 1; _loadingMore = false;
+            _hasMore = res.length >= _pageSize(_tab);
+          });
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -184,9 +194,45 @@ class _SearchPageState extends State<_SearchPage> {
     }
   }
 
+  int _pageSize(int tab) => tab == _kSearchProfiles ? 20 : 15;
+
+  String _itemKey(dynamic m) {
+    if (m is! Map) return '$m';
+    final a = m['artist'];
+    return '${m['name']}|${a is Map ? a['name'] : a}';
+  }
+
+  Future<void> _loadMore() async {
+    if (_loadingMore || !_hasMore || _searching || _tab == _kSearchAll) return;
+    final q = _ctrl.text.trim();
+    if (q.isEmpty) return;
+    final tab = _tab, next = _page + 1, size = _pageSize(tab);
+    setState(() => _loadingMore = true);
+    try {
+      final List<dynamic> res = switch (tab) {
+        _kSearchProfiles => await widget.service.searchUsers(q,   limit: size, page: next),
+        _kSearchArtists  => await widget.service.searchArtists(q, limit: size, page: next),
+        _kSearchAlbums   => await widget.service.searchAlbums(q,  limit: size, page: next),
+        _                => await widget.service.searchTracks(q,  limit: size, page: next),
+      };
+      // Query or tab changed while loading: drop this page.
+      if (!mounted || tab != _tab || q != _ctrl.text.trim()) return;
+      final seen = {for (final m in _results) _itemKey(m)};
+      final fresh = [for (final m in res) if (seen.add(_itemKey(m))) m];
+      setState(() {
+        _results     = [..._results, ...fresh];
+        _page        = next;
+        _hasMore     = fresh.isNotEmpty && res.length >= size;
+        _loadingMore = false;
+      });
+    } catch (_) {
+      if (mounted) setState(() { _loadingMore = false; _hasMore = false; });
+    }
+  }
+
   void _switchTab(int tab) {
     if (_tab == tab) return;
-    setState(() { _tab = tab; _results = []; _allResults = {}; _error = null; });
+    setState(() { _tab = tab; _results = []; _allResults = {}; _error = null; _hasMore = false; _loadingMore = false; });
     final q = _ctrl.text.trim();
     if (q.isNotEmpty) _search(q);
   }
@@ -721,11 +767,24 @@ class _SearchPageState extends State<_SearchPage> {
           style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)));
     }
 
-    return ListView.builder(
+    return NotificationListener<ScrollNotification>(
+      onNotification: (n) {
+        if (n.metrics.axis == Axis.vertical &&
+            n.metrics.extentAfter < 400) { _loadMore(); }
+        return false;
+      },
+      child: ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       itemCount: _results.length + 1,
       itemBuilder: (ctx, i) {
-        if (i == _results.length) return const SizedBox(height: 32);
+        if (i == _results.length) {
+          return SizedBox(
+            height: 64,
+            child: _loadingMore
+                ? const Center(child: M3LoadingIndicator(size: 28))
+                : null,
+          );
+        }
         final m = _results[i];
         return switch (_tab) {
           _kSearchProfiles => _profileRow(scheme, text, m),
@@ -734,7 +793,7 @@ class _SearchPageState extends State<_SearchPage> {
           _               => _trackRow(scheme, m, rank: '${i + 1}'),
         };
       },
-    );
+    ));
   }
 }
 

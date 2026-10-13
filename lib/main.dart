@@ -24,6 +24,7 @@ import 'services/achievements.dart';
 import 'services/notification_service.dart';
 import 'services/notification_worker.dart';
 import 'services/widget_service.dart';
+import 'services/custom_font_service.dart';
 import 'services/storage_manager.dart';
 import 'services/update_startup.dart';
 import 'services/update_service.dart';
@@ -159,6 +160,7 @@ Future<void> _mainImpl() async {
   dashMotionNotifier.value = prefs.getBool('ls_dash_motion') ?? true;
   textScaleNotifier.value  = prefs.getDouble('ls_text_scale') ?? 1.1;
   appFontNotifier.value    = prefs.getString('ls_app_font') ?? '';
+  await CustomFontService.load(prefs);
   mergeVersionsNotifier.value = prefs.getBool('ls_merge_versions') ?? false;
   splitCollabsNotifier.value  = prefs.getBool('ls_split_collabs')  ?? false;
   imageShapeNotifier.value = prefs.getString('ls_image_shape') ?? 'mix';

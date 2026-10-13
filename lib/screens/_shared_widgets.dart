@@ -1206,7 +1206,7 @@ String _fmtTrackDateLocal(Map t) {
 //  _AppSearchField — one shared look for every search bar in the app
 //  (News, Search tab, Settings search) so they don't drift apart.
 // ══════════════════════════════════════════════════════════════════════════
-class _AppSearchField extends StatelessWidget {
+class _AppSearchField extends StatefulWidget {
   final TextEditingController controller;
   final String hintText;
   final ValueChanged<String>? onChanged;
@@ -1222,31 +1222,82 @@ class _AppSearchField extends StatelessWidget {
   });
 
   @override
+  State<_AppSearchField> createState() => _AppSearchFieldState();
+}
+
+// Material You pill: tonal at rest, lifts to a primary-tinted surface with a
+// primary outline and primary icon while focused.
+class _AppSearchFieldState extends State<_AppSearchField> {
+  final _focus = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _focus.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _focus.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return TextField(
-      controller:      controller,
-      onChanged:       onChanged,
-      textInputAction: TextInputAction.search,
-      decoration: InputDecoration(
-        hintText:   hintText,
-        prefixIcon: const Icon(Icons.search_rounded),
-        suffixIcon: loading
-            ? const Padding(
-                padding: EdgeInsets.all(14),
-                child: SizedBox(width: 16, height: 16,
-                    child: M3Spinner()),
-              )
-            : (controller.text.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(Icons.close_rounded),
-                    onPressed: onClear,
+    final scheme  = Theme.of(context).colorScheme;
+    final focused = _focus.hasFocus;
+    final bg = focused
+        ? Color.alphaBlend(scheme.primary.withValues(alpha: 0.08),
+            scheme.surfaceContainerHighest)
+        : scheme.surfaceContainerHigh;
+    const none = InputBorder.none;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOutCubic,
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(
+          color: focused ? scheme.primary : Colors.transparent,
+          width: 2,
+        ),
+      ),
+      child: ListenableBuilder(
+        listenable: widget.controller,
+        builder: (context, _) => TextField(
+          controller:      widget.controller,
+          focusNode:       _focus,
+          onChanged:       widget.onChanged,
+          textInputAction: TextInputAction.search,
+          cursorColor:     scheme.primary,
+          decoration: InputDecoration(
+            hintText:  widget.hintText,
+            hintStyle: TextStyle(color: scheme.onSurfaceVariant),
+            prefixIcon: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: Icon(Icons.search_rounded,
+                  key: ValueKey(focused),
+                  color: focused ? scheme.primary : scheme.onSurfaceVariant),
+            ),
+            suffixIcon: widget.loading
+                ? const Padding(
+                    padding: EdgeInsets.all(14),
+                    child: SizedBox(width: 16, height: 16, child: M3Spinner()),
                   )
-                : null),
-        border:    OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-        isDense:   true,
-        filled:    true,
-        fillColor: scheme.surfaceContainerHigh,
+                : (widget.controller.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.close_rounded),
+                        color: scheme.onSurfaceVariant,
+                        onPressed: widget.onClear,
+                      )
+                    : null),
+            border: none, enabledBorder: none, focusedBorder: none,
+            filled: false,
+            isDense: true,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          ),
+        ),
       ),
     );
   }

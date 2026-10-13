@@ -14,6 +14,32 @@ part of 'home_screen.dart';
 // setting's keywords, its global ValueNotifier (from app_state.dart), and
 // the SharedPreferences key it's saved under. No other wiring needed —
 // search picks it up automatically.
+// ── Search matching ────────────────────────────────────────────────────────
+// One matcher for every settings result (cards, quick toggles, quick links).
+// Accent/case-insensitive; every word typed must appear somewhere in the
+// haystack (title + subtitle + keywords). Anything you add with a title or
+// subtitle is therefore searchable with no extra keyword work.
+String _fold(String s) {
+  const from = 'àáâãäåçèéêëìíîïñòóôõöùúûüýÿœ';
+  const to   = 'aaaaaaceeeeiiiinooooouuuuyyo';
+  final b = StringBuffer();
+  for (final c in s.toLowerCase().split('')) {
+    final i = from.indexOf(c);
+    b.write(i >= 0 ? to[i] : c);
+  }
+  return b.toString();
+}
+
+bool _settingMatches(String query, Iterable<String> haystack) {
+  final q = _fold(query.trim());
+  if (q.isEmpty) return true;
+  final hay = haystack.map(_fold).toList();
+  final joined = hay.join(' | ');
+  if (q.split(RegExp(r'\s+')).every(joined.contains)) return true;
+  // Longer query that contains a whole keyword ("mode oled activer").
+  return hay.any((h) => h.length >= 3 && q.contains(h));
+}
+
 class _QuickToggle {
   final List<String> keywords;
   final IconData icon;
@@ -119,6 +145,18 @@ final List<_QuickLink> _quickLinks = [
     pageBuilder: (_) => const AppearancePage(),
   ),
   _QuickLink(
+    keywords: ['police', 'font', 'typo', 'typographie', 'fuente', 'schrift',
+        'carattere', 'fonte', 'шрифт', 'フォント', '字体', 'خط'],
+    icon: Icons.font_download_rounded,
+    titleKey: 'qs_l8_t',
+    trailing: (ctx, s, t) {
+      final f = appFontNotifier.value;
+      return Text(f.isEmpty ? tx('txt_font_def') : f,
+          style: t.bodyMedium?.copyWith(color: s.onSurfaceVariant));
+    },
+    pageBuilder: (_) => const AppearancePage(),
+  ),
+  _QuickLink(
     keywords: ['langue', 'language', 'idioma', 'sprache', 'lingua', 'idioma',
         'язык', '言語', '语言', 'اللغة'],
     icon: Icons.language_rounded,
@@ -178,8 +216,14 @@ class _SettingsCardData {
   final String Function() title;
   final String Function() subtitle;
   final Widget Function(String username) pageBuilder;
+  // Extra search words for options living inside the page (title/subtitle
+  // are always searched on their own).
+  final List<String> keywords;
+  final bool updateBadge;
 
   const _SettingsCardData({
+    this.keywords = const [],
+    this.updateBadge = false,
     required this.icon,
     required this.iconBgColor,
     required this.iconFgColor,
@@ -243,12 +287,11 @@ class _SettingsPageState extends State<_SettingsPage> {
   ) {
     final items = <Widget>[];
 
-    bool matches(List<String> keywords) =>
-        keywords.any((k) => k.contains(q) || q.contains(k));
+    bool matches(List<String> hay) => _settingMatches(q, hay);
 
     // Global-notifier-backed toggles — one entry per item in `_quickToggles`.
     for (final t in _quickToggles) {
-      if (!matches(t.keywords)) continue;
+      if (!matches([tx(t.titleKey), tx(t.subKey), ...t.keywords])) continue;
       items.add(ValueListenableBuilder<bool>(
         valueListenable: t.notifier,
         builder: (context, value, child) => _quickToggleTile(
@@ -267,7 +310,8 @@ class _SettingsPageState extends State<_SettingsPage> {
 
     // Widget tint — Android-only, no global notifier, handled locally.
     if (_quickWidgetTint != null && matches(
-        ['widget', 'couleur', 'color', 'accent', 'teinte', 'tint', 'farbe',
+        [tx('ui_colored_widgets'), tx('ui_tint_home_screen_widge'),
+         'widget', 'couleur', 'color', 'accent', 'teinte', 'tint', 'farbe',
          'colore', 'cor', 'цвет', 'ウィジェット', '小组件', 'ودجة'])) {
       items.add(_quickToggleTile(
         icon: Icons.widgets_rounded,
@@ -295,11 +339,10 @@ class _SettingsPageState extends State<_SettingsPage> {
   ) {
     final items = <Widget>[];
 
-    bool matches(List<String> keywords) =>
-        keywords.any((k) => k.contains(q) || q.contains(k));
+    bool matches(List<String> hay) => _settingMatches(q, hay);
 
     for (final l in _quickLinks) {
-      if (!matches(l.keywords)) continue;
+      if (!matches([tx(l.titleKey), ...l.keywords])) continue;
       items.add(_quickLinkTile(
         icon: l.icon,
         title: tx(l.titleKey),
@@ -419,6 +462,7 @@ class _SettingsPageState extends State<_SettingsPage> {
   List<_SettingsCardData> _buildCards() => [
     // 0 — Appearance
     _SettingsCardData(
+      keywords: ['couleur', 'accent', 'color', 'thème', 'theme', 'sombre', 'dark', 'clair', 'light', 'oled', 'nothing', 'police', 'font', 'widget', 'farbe', 'colore', 'cor', 'цвет', 'ウィジェット', '小组件', 'لون'],
       icon: Icons.palette_rounded,
       iconBgColor: (s) => s.primaryContainer,
       iconFgColor: (s) => s.onPrimaryContainer,
@@ -428,6 +472,7 @@ class _SettingsPageState extends State<_SettingsPage> {
     ),
     // 1 — Dashboard
     _SettingsCardData(
+      keywords: ['ordre', 'order', 'carte', 'card', 'graphique', 'chart', 'période', 'period', 'orden', 'reihenfolge', 'ordine', 'ordem', 'порядок', '順序', '顺序', 'ترتيب'],
       icon: Icons.dashboard_rounded,
       iconBgColor: (s) => s.secondaryContainer,
       iconFgColor: (s) => s.onSecondaryContainer,
@@ -437,6 +482,7 @@ class _SettingsPageState extends State<_SettingsPage> {
     ),
     // 2 — Startup
     _SettingsCardData(
+      keywords: ['écran', 'screen', 'accueil', 'home', 'ouverture', 'launch', 'pantalla', 'bildschirm', 'schermata', 'tela', 'экран', '画面', '屏幕', 'شاشة'],
       icon: Icons.rocket_launch_rounded,
       iconBgColor: (s) => s.tertiaryContainer,
       iconFgColor: (s) => s.onTertiaryContainer,
@@ -446,6 +492,7 @@ class _SettingsPageState extends State<_SettingsPage> {
     ),
     // 3 — Notifications
     _SettingsCardData(
+      keywords: ['notification', 'notif', 'palier', 'milestone', 'récap', 'recap', 'actualité', 'news', 'notificación', 'benachrichtigung', 'уведомление', '通知', 'إشعار'],
       icon: Icons.notifications_rounded,
       iconBgColor: (s) => Color.lerp(s.primaryContainer, s.tertiaryContainer, 0.5)!,
       iconFgColor: (s) => s.onPrimaryContainer,
@@ -455,6 +502,7 @@ class _SettingsPageState extends State<_SettingsPage> {
     ),
     // 3b — Sync
     _SettingsCardData(
+      keywords: ['synchro', 'sync', 'arrière-plan', 'background', 'sincronización', 'synchronisierung', 'синхронизация', '同期', '同步', 'مزامنة'],
       icon: Icons.sync_rounded,
       iconBgColor: (s) => s.secondaryContainer,
       iconFgColor: (s) => s.onSecondaryContainer,
@@ -464,6 +512,7 @@ class _SettingsPageState extends State<_SettingsPage> {
     ),
     // 3c — Battery saver
     _SettingsCardData(
+      keywords: ['batterie', 'battery', 'éco', 'eco', 'batería', 'akku', 'batteria', 'bateria', 'батарея', 'バッテリー', '电池', 'بطارية'],
       icon: Icons.battery_saver_rounded,
       iconBgColor: (s) => s.tertiaryContainer,
       iconFgColor: (s) => s.onTertiaryContainer,
@@ -473,6 +522,7 @@ class _SettingsPageState extends State<_SettingsPage> {
     ),
     // 4 — Language
     _SettingsCardData(
+      keywords: ['langue', 'language', 'français', 'french', 'english', 'anglais', 'idioma', 'sprache', 'lingua', 'язык', '言語', '语言', 'اللغة'],
       icon: Icons.translate_rounded,
       iconBgColor: (s) => Color.lerp(s.primaryContainer, s.secondaryContainer, 0.5)!,
       iconFgColor: (s) => s.onPrimaryContainer,
@@ -485,6 +535,7 @@ class _SettingsPageState extends State<_SettingsPage> {
     ),
     // 5 — Account
     _SettingsCardData(
+      keywords: ['compte', 'account', 'last.fm', 'lastfm', 'déconnexion', 'logout', 'profil', 'cuenta', 'konto', 'conta', 'аккаунт', 'アカウント', '账户', 'الحساب'],
       icon: Icons.person_rounded,
       iconBgColor: (s) => s.primaryContainer,
       iconFgColor: (s) => s.onPrimaryContainer,
@@ -494,6 +545,7 @@ class _SettingsPageState extends State<_SettingsPage> {
     ),
     // 6 — Cache
     _SettingsCardData(
+      keywords: ['cache', 'stockage', 'storage', 'vider', 'clear', 'hors-ligne', 'offline', 'almacenamiento', 'speicher', 'хранилище', 'ストレージ', '存储', 'التخزين'],
       icon: Icons.storage_rounded,
       iconBgColor: (s) => Color.lerp(s.primaryContainer, s.tertiaryContainer, 0.5)!,
       iconFgColor: (s) => s.onPrimaryContainer,
@@ -503,6 +555,7 @@ class _SettingsPageState extends State<_SettingsPage> {
     ),
     // 6b — API usage & limits
     _SettingsCardData(
+      keywords: ['api', 'quota', 'limite', 'limit', 'requêtes', 'requests', 'consommation', 'usage', 'musicbrainz', 'deezer', 'itunes', 'audiodb', 'listenbrainz', 'clé', 'key', 'límite', 'solicitudes', 'anfragen', 'richieste', 'pedidos', 'запросы', 'リクエスト', '请求', 'طلبات'],
       icon: Icons.hub_rounded,
       iconBgColor: (s) => Color.lerp(s.secondaryContainer, s.primaryContainer, 0.5)!,
       iconFgColor: (s) => s.onSecondaryContainer,
@@ -512,6 +565,7 @@ class _SettingsPageState extends State<_SettingsPage> {
     ),
     // 7 — Backup
     _SettingsCardData(
+      keywords: ['sauvegarde', 'backup', 'export', 'import', 'restaurer', 'restore', 'copia de seguridad', 'sicherung', 'backup', 'резервная копия', 'バックアップ', '备份', 'نسخة احتياطية'],
       icon: Icons.backup_rounded,
       iconBgColor: (s) => s.secondaryContainer,
       iconFgColor: (s) => s.onSecondaryContainer,
@@ -521,6 +575,8 @@ class _SettingsPageState extends State<_SettingsPage> {
     ),
     // 8 — Updates
     _SettingsCardData(
+      keywords: ['mise à jour', 'update', 'version', 'actualización', 'aktualisierung', 'aggiornamento', 'atualização', 'обновление', 'アップデート', '更新', 'تحديث'],
+      updateBadge: true,
       icon: Icons.system_update_rounded,
       iconBgColor: (s) => s.tertiaryContainer,
       iconFgColor: (s) => s.onTertiaryContainer,
@@ -530,6 +586,7 @@ class _SettingsPageState extends State<_SettingsPage> {
     ),
     // 9 — About
     _SettingsCardData(
+      keywords: ['à propos', 'about', 'contact', 'crédit', 'acerca de', 'über', 'informazioni', 'sobre', 'о приложении', 'アプリについて', '关于', 'حول'],
       icon: Icons.info_outline_rounded,
       iconBgColor: (s) => Color.lerp(s.tertiaryContainer, s.surface, 0.4)!,
       iconFgColor: (s) => s.onTertiaryContainer,
@@ -539,6 +596,7 @@ class _SettingsPageState extends State<_SettingsPage> {
     ),
     // 10 — FAQ
     _SettingsCardData(
+      keywords: ['aide', 'faq', 'question', 'ayuda', 'hilfe', 'aiuto', 'ajuda', 'помощь', 'ヘルプ', '帮助', 'مساعدة'],
       icon: Icons.help_outline_rounded,
       iconBgColor: (s) => Color.lerp(s.secondaryContainer, s.tertiaryContainer, 0.5)!,
       iconFgColor: (s) => s.onSecondaryContainer,
@@ -548,48 +606,8 @@ class _SettingsPageState extends State<_SettingsPage> {
     ),
   ];
 
-  // Keyword index of specific options living *inside* each category page —
-  // so a search for e.g. "couleur" or "notif" finds the right category even
-  // though those words aren't in the category's own title/subtitle.
-  static const Map<int, List<String>> _subKeywords = {
-    0: ['couleur', 'accent', 'color', 'thème', 'theme', 'sombre', 'dark',
-        'clair', 'light', 'oled', 'nothing', 'police', 'font', 'widget',
-        'farbe', 'colore', 'cor', 'цвет', 'ウィジェット', '小组件', 'لون'],
-    1: ['ordre', 'order', 'carte', 'card', 'graphique', 'chart', 'période', 'period',
-        'orden', 'reihenfolge', 'ordine', 'ordem', 'порядок', '順序', '顺序', 'ترتيب'],
-    2: ['écran', 'screen', 'accueil', 'home', 'ouverture', 'launch',
-        'pantalla', 'bildschirm', 'schermata', 'tela', 'экран', '画面', '屏幕', 'شاشة'],
-    3: ['notification', 'notif', 'palier', 'milestone', 'récap', 'recap', 'actualité', 'news',
-        'notificación', 'benachrichtigung', 'уведомление', '通知', 'إشعار'],
-    4: ['synchro', 'sync', 'arrière-plan', 'background',
-        'sincronización', 'synchronisierung', 'синхронизация', '同期', '同步', 'مزامنة'],
-    5: ['batterie', 'battery', 'éco', 'eco',
-        'batería', 'akku', 'batteria', 'bateria', 'батарея', 'バッテリー', '电池', 'بطارية'],
-    6: ['langue', 'language', 'français', 'french', 'english', 'anglais',
-        'idioma', 'sprache', 'lingua', 'язык', '言語', '语言', 'اللغة'],
-    7: ['compte', 'account', 'last.fm', 'lastfm', 'déconnexion', 'logout', 'profil',
-        'cuenta', 'konto', 'conta', 'аккаунт', 'アカウント', '账户', 'الحساب'],
-    8: ['cache', 'stockage', 'storage', 'vider', 'clear', 'hors-ligne', 'offline',
-        'almacenamiento', 'speicher', 'хранилище', 'ストレージ', '存储', 'التخزين'],
-    9: ['api', 'quota', 'limite', 'limit', 'requêtes', 'requests', 'consommation',
-        'usage', 'musicbrainz', 'deezer', 'itunes', 'audiodb', 'listenbrainz', 'clé', 'key',
-        'límite', 'solicitudes', 'anfragen', 'richieste', 'pedidos', 'запросы', 'リクエスト', '请求', 'طلبات'],
-    10: ['sauvegarde', 'backup', 'export', 'import', 'restaurer', 'restore',
-        'copia de seguridad', 'sicherung', 'backup', 'резервная копия', 'バックアップ', '备份', 'نسخة احتياطية'],
-    11: ['mise à jour', 'update', 'version', 'actualización', 'aktualisierung',
-        'aggiornamento', 'atualização', 'обновление', 'アップデート', '更新', 'تحديث'],
-    12: ['à propos', 'about', 'contact', 'crédit', 'acerca de', 'über', 'informazioni',
-        'sobre', 'о приложении', 'アプリについて', '关于', 'حول'],
-    13: ['aide', 'faq', 'question', 'ayuda', 'hilfe', 'aiuto', 'ajuda', 'помощь', 'ヘルプ', '帮助', 'مساعدة'],
-  };
-
-  bool _matchesQuery(_SettingsCardData c, int index, String q) {
-    if (c.title().toLowerCase().contains(q)) return true;
-    if (c.subtitle().toLowerCase().contains(q)) return true;
-    final sub = _subKeywords[index];
-    if (sub != null && sub.any((k) => k.contains(q) || q.contains(k))) return true;
-    return false;
-  }
+  bool _matchesQuery(_SettingsCardData c, String q) =>
+      _settingMatches(q, [c.title(), c.subtitle(), ...c.keywords]);
 
   @override
   Widget build(BuildContext context) {
@@ -599,7 +617,7 @@ class _SettingsPageState extends State<_SettingsPage> {
     final q = _searchQuery.trim().toLowerCase();
     final filteredCards = q.isEmpty
         ? cards
-        : [for (var i = 0; i < cards.length; i++) if (_matchesQuery(cards[i], i, q)) cards[i]];
+        : [for (final c in cards) if (_matchesQuery(c, q)) c];
     final initial = widget.username.isNotEmpty ? widget.username[0].toUpperCase() : '?';
 
     final screenWidth      = MediaQuery.sizeOf(context).width;
@@ -732,7 +750,7 @@ class _SettingsPageState extends State<_SettingsPage> {
                   username: widget.username,
                   compact:  !isWide,
                   // Badge on the Updates card, wherever it lands post-filter.
-                  badge: (filteredCards[i].title() == cards[8].title() && _updateInfo != null) ? '!' : null,
+                  badge: (filteredCards[i].updateBadge && _updateInfo != null) ? '!' : null,
                   onTap: () { _haptic(_HapticImpact.light); _push(ctx, filteredCards[i].pageBuilder(widget.username)); },
                 ),
                 childCount: filteredCards.length,

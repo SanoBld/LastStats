@@ -13,6 +13,7 @@ import '../../l10n/l10n.dart';
 import '../../services/motion_artwork_service.dart';
 import '../../services/spotify_canvas_service.dart';
 import '../../services/widget_service.dart';
+import '../../services/custom_font_service.dart';
 import '../../services/library_merge.dart';
 import 'settings_helpers.dart';
 import 'settings_rows.dart';
@@ -465,10 +466,13 @@ class _AppearancePageState extends State<AppearancePage> {
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           ValueListenableBuilder<String>(
+            valueListenable: CustomFontService.name,
+            builder: (_, customName, _) => ValueListenableBuilder<String>(
             valueListenable: appFontNotifier,
-            builder: (_, f, _) => SettingChoiceRow(
+            builder: (_, f, _) => Column(children: [SettingChoiceRow(
               icon: Icons.font_download_rounded,
               title: tx('txt_font'),
+              previewFonts: true,
               options: [
                 ('',            tx('txt_font_def'), Icons.android_rounded),
                 ('Inter',       'Inter',            Icons.text_fields_rounded),
@@ -486,6 +490,8 @@ class _AppearancePageState extends State<AppearancePage> {
                 ('Ndot55',      'Nothing Ndot 55',  Icons.grain_rounded),
                 ('Ndot77',      'Nothing Ndot 77',  Icons.grain_rounded),
                 ('NType82',     'Nothing NType 82', Icons.grain_rounded),
+                if (customName.isNotEmpty)
+                  (CustomFontService.family, customName, Icons.upload_file_rounded),
               ],
               value: f,
               onChanged: (v) async {
@@ -494,6 +500,32 @@ class _AppearancePageState extends State<AppearancePage> {
                 await p.setString('ls_app_font', v);
               },
             ),
+            SettingTile(
+              leading: const Icon(Icons.upload_file_rounded),
+              title: Text(tx('font_import')),
+              subtitle: Text(tx('font_import_s')),
+              onTap: () async {
+                final err = await CustomFontService.pick();
+                if (err == null) {
+                  appFontNotifier.value = CustomFontService.family;
+                  final p = await SharedPreferences.getInstance();
+                  await p.setString('ls_app_font', CustomFontService.family);
+                } else if (err != 'cancel' && context.mounted) {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(tx('font_bad'))));
+                }
+              },
+            ),
+            if (customName.isNotEmpty)
+              SettingTile(
+                leading: const Icon(Icons.delete_outline_rounded),
+                title: Text(tx('font_remove')),
+                onTap: () async {
+                  await CustomFontService.remove();
+                  appFontNotifier.value = f == CustomFontService.family ? '' : f;
+                },
+              ),
+          ])),
           ),
         ]),
         const SizedBox(height: 12),

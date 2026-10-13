@@ -232,6 +232,7 @@ class SettingChoiceRow extends StatelessWidget {
   final String value;
   final ValueChanged<String> onChanged;
   final String? description; // small explanation under the title
+  final bool previewFonts; // show each option in its own font (value = family)
   const SettingChoiceRow({
     super.key,
     required this.icon,
@@ -240,6 +241,7 @@ class SettingChoiceRow extends StatelessWidget {
     required this.value,
     required this.onChanged,
     this.description,
+    this.previewFonts = false,
   });
 
   @override
@@ -257,7 +259,7 @@ class SettingChoiceRow extends StatelessWidget {
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
           useSafeArea: true,
-          builder: (_) => _ChoiceSheet(title: title, options: options, value: value),
+          builder: (_) => _ChoiceSheet(title: title, options: options, value: value, previewFonts: previewFonts),
         );
         if (r != null && r != value) onChanged(r);
       },
@@ -526,7 +528,8 @@ Widget _badge(BuildContext context, IconData? icon, {bool selected = false, Stri
 class _ChoiceSheet extends StatelessWidget {
   final String title, value;
   final List<ChoiceOption> options;
-  const _ChoiceSheet({required this.title, required this.options, required this.value});
+  final bool previewFonts;
+  const _ChoiceSheet({required this.title, required this.options, required this.value, this.previewFonts = false});
 
   @override
   Widget build(BuildContext context) {
@@ -546,7 +549,10 @@ class _ChoiceSheet extends StatelessWidget {
           _OptionCard(
             selected: o.$1 == value,
             leading: _badge(context, o.$3, selected: o.$1 == value),
-            title: Text(o.$2),
+            title: Text(o.$2,
+                style: previewFonts && o.$1.isNotEmpty
+                    ? TextStyle(fontFamily: o.$1)
+                    : null),
             trailing: o.$1 == value
                 ? Icon(Icons.check_circle_rounded, color: scheme.primary)
                 : null,

@@ -40,9 +40,17 @@ Widget _linkifiedText(String body, TextStyle? style, Color linkColor) {
 }
 
 // ── Simple fade-in wrapper for content that pops in after loading ──────────
-/// PC only: centres [child] in a column of at most [maxWidth] dp.
-/// Phones: returns [child] untouched.
-Widget _pcColumn(BuildContext ctx, Widget child, {double maxWidth = 980}) => child;
+/// PC only: centres [child] in a column of at most [maxWidth] dp — same
+/// layout as the profile page. Phones: returns [child] untouched.
+Widget _pcColumn(BuildContext ctx, Widget child, {double maxWidth = 980}) {
+  if (!_isDesktopLayout(ctx)) return child;
+  return Center(
+    child: ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: child,
+    ),
+  );
+}
 
 class _FadeIn extends StatelessWidget {
   final Widget child;

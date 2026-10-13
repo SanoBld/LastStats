@@ -21,6 +21,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../app_state.dart';
 import '../l10n/extra_strings.dart' show tx;
+import 'custom_font_service.dart';
 import 'scrobbles_file_cache.dart';
 import 'all_scrobbles_service.dart';
 import 'lastfm_service.dart';
@@ -650,6 +651,7 @@ class BackupService {
     dashMotionNotifier.value            = p.getBool('ls_dash_motion')          ?? true;
     textScaleNotifier.value             = p.getDouble('ls_text_scale')         ?? 1.1;
     appFontNotifier.value               = p.getString('ls_app_font')           ?? '';
+    await CustomFontService.load(p);
     imageShapeNotifier.value            = p.getString('ls_image_shape')        ?? 'mix';
     achievementsEnabledNotifier.value   = p.getBool('ls_achievements_enabled') ?? true;
     ecoModeManualNotifier.value         = p.getBool('ls_eco_mode_manual')      ?? false;

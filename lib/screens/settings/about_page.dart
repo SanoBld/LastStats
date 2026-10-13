@@ -94,7 +94,7 @@ class AboutPage extends StatelessWidget {
             subtitle: Text(L.settingsWebVersionSub,
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             trailing: const Icon(Icons.open_in_new_rounded, size: 16),
-            onTap: () => _open('https://sanobld.github.io/LastStats-Web/'),
+            onTap: () => _open('https://sanobld.github.io/LastStats/'),
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           ListTile(
