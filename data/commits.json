@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-13T11:07:11Z",
+  "updated": "2026-10-13T11:12:42Z",
   "commits": [
+    {
+      "sha": "3010699c286bc6f0f3c19d11e216e4e95686d0f4",
+      "message": "feat: amélioration des styles des boutons sur mobile pour conserver la forme connectée des éléments",
+      "date": "2026-10-13T11:12:25Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/3010699c286bc6f0f3c19d11e216e4e95686d0f4",
+      "tags": []
+    },
     {
       "sha": "87f863ac6507a7a7cfd2bf976106cb5c5e63b8de",
       "message": "feat: ajout de styles pour le bouton de téléchargement sur mobile avec des coins arrondis",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/36734ee611cee97c4623513b18ef7f4a0973f9ed",
-      "tags": []
-    },
-    {
-      "sha": "5b800d0fd94b24d27457c582a8efb84bdc5be0ed",
-      "message": "feat: refactor la génération d'images exportées en utilisant des widgets Flutter pour un rendu plus net et aligné",
-      "date": "2026-08-09T09:51:27Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/5b800d0fd94b24d27457c582a8efb84bdc5be0ed",
       "tags": []
     }
   ]
