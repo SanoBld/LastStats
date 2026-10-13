@@ -1,6 +1,7 @@
 // lib/main.dart
 import 'dart:async';
 import 'dart:io' show Platform;
+import 'dart:math' show Random;
 import 'dart:ui' show PlatformDispatcher;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -95,6 +96,12 @@ Future<void> _mainImpl() async {
   final apiKey     = prefs.getString('ls_apikey')   ?? '';
   final startupTab = prefs.getInt('ls_startup_tab') ?? 0;
   await InternalKeys.loadFallback(prefs);
+
+  // First launch: pick a random accent instead of the default purple.
+  if (prefs.getString('ls_accent') == null && username.isEmpty) {
+    const keys = ['purple', 'blue', 'green', 'red', 'orange', 'pink', 'teal'];
+    await prefs.setString('ls_accent', keys[Random().nextInt(keys.length)]);
+  }
 
   // ── Appearance ──────────────────────────────────────────────────────────
   themeStyleNotifier.value             = prefs.getString('ls_theme_style')           ?? 'default';

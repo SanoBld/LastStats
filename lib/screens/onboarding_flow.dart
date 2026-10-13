@@ -313,7 +313,10 @@ class _OnbChoice extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-          leading: leading,
+          leading: IconTheme(
+            data: IconThemeData(color: selected ? scheme.onPrimary : scheme.primary),
+            child: leading,
+          ),
           title: Text(title, style: TextStyle(
               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
               color: selected ? scheme.onPrimary : scheme.onSurface)),
@@ -870,11 +873,11 @@ class _CoversStepState extends State<_CoversStep> {
             final isSq = cur == 'square';
             final isCi = cur == 'circle';
             return Column(children: [
-              _OnbChoice(leading: Icon(Icons.auto_awesome_mosaic_rounded, color: scheme.primary),
+              _OnbChoice(leading: const Icon(Icons.auto_awesome_mosaic_rounded),
                   title: tx('shape_mix'), selected: isMix, onTap: () => _shape('mix')),
-              _OnbChoice(leading: Icon(Icons.crop_square_rounded, color: scheme.primary),
+              _OnbChoice(leading: const Icon(Icons.crop_square_rounded),
                   title: tx('shape_square'), selected: isSq, onTap: () => _shape('square')),
-              _OnbChoice(leading: Icon(Icons.circle_outlined, color: scheme.primary),
+              _OnbChoice(leading: const Icon(Icons.circle_outlined),
                   title: tx('shape_circle'), selected: isCi, onTap: () => _shape('circle')),
             ]);
           },
@@ -1021,7 +1024,6 @@ class _StartupStepState extends State<_StartupStep> {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final labels = buildStartupLabels();
     return _Step(
       icon: Icons.rocket_launch_rounded,
@@ -1029,7 +1031,7 @@ class _StartupStepState extends State<_StartupStep> {
       child: Column(children: labels.asMap().entries.map((e) {
         final sel = _tab == e.key;
         return _OnbChoice(
-          leading: Icon(e.value.$1, color: sel ? scheme.onPrimaryContainer : scheme.onSurfaceVariant),
+          leading: Icon(e.value.$1),
           title: e.value.$2,
           selected: sel,
           onTap: () => _set(e.key),
@@ -1088,7 +1090,7 @@ class _MusicPlatformStepState extends State<_MusicPlatformStep> {
               asset: o.asset,
               fallbackIcon: o.icon,
               size: 22,
-              color: sel ? scheme.onPrimaryContainer : scheme.onSurfaceVariant,
+              color: sel ? scheme.onPrimary : scheme.primary,
           ),
           title: o.label,
           selected: sel,

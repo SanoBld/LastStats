@@ -138,19 +138,18 @@ class _AppearancePageState extends State<AppearancePage> {
   Widget _harmonyTile(String key, ColorScheme scheme) {
     final prev = buildAppScheme(accentNotifier.value, Theme.of(context).brightness, key);
     final sel = _harmony == key;
+    final ring = scheme.onPrimaryContainer.withValues(alpha: 0.3);
     Widget dot(Color c) => Container(
-        width: 16, height: 16, margin: const EdgeInsets.only(right: 3),
-        decoration: BoxDecoration(color: c, shape: BoxShape.circle));
+        width: 8, height: 8, margin: const EdgeInsets.symmetric(horizontal: 1.5),
+        decoration: BoxDecoration(
+            color: c, shape: BoxShape.circle,
+            border: Border.all(color: ring, width: 0.75)));
     return ListTile(
       selected: sel,
       selectedColor: scheme.primary,
-      minLeadingWidth: 60,
-      leading: SizedBox(width: 60, child: FittedBox(
-        fit: BoxFit.scaleDown, alignment: Alignment.centerLeft,
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          dot(prev.primary), dot(prev.tertiary), dot(prev.secondaryContainer),
-        ]),
-      )),
+      leading: Row(mainAxisSize: MainAxisSize.min, children: [
+        dot(prev.primary), dot(prev.tertiary), dot(prev.secondaryContainer),
+      ]),
       title: Text(tx('ap_harmony_$key')),
       subtitle: Text(tx('ap_harmony_${key}_sub')),
       trailing: sel ? Icon(Icons.check_circle_rounded, color: scheme.primary) : null,
