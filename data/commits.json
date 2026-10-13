@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-13T15:18:58Z",
+  "updated": "2026-10-13T15:31:38Z",
   "commits": [
+    {
+      "sha": "a8400df1a966794ba4eac6bfd8d52aa27f3ffe12",
+      "message": "Refactor code structure and remove redundant sections for improved readability and maintainability",
+      "date": "2026-10-13T15:29:12Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/a8400df1a966794ba4eac6bfd8d52aa27f3ffe12",
+      "tags": []
+    },
     {
       "sha": "26d539436f0499ff622b5a31b1447531189b3382",
       "message": "feat: ajout d'un ValueListenableBuilder pour gérer dynamiquement l'affichage des étiquettes dans la barre de navigation",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/5a27b089d49b3149875fa9e721d20acd1824a61f",
-      "tags": []
-    },
-    {
-      "sha": "cfa03dc9d3ca397f240b0bc5b9b2a0f30e92d4cf",
-      "message": "feat: ajouter le service FriendsLibrary pour la synchronisation des bibliothèques musicales des amis et intégrer la synchronisation dans plusieurs pages",
-      "date": "2026-08-09T17:30:57Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/cfa03dc9d3ca397f240b0bc5b9b2a0f30e92d4cf",
       "tags": []
     }
   ]
