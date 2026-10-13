@@ -91,7 +91,7 @@ class _StartupPageState extends State<StartupPage> {
 
         SettingsSection(label: L.settingsMusicPlatform, children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(4, 4, 4, 10),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
             child: Text(
               L.settingsMusicPlatformSub,
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
@@ -103,7 +103,7 @@ class _StartupPageState extends State<StartupPage> {
           // here too, but it read as a second "show everything" chip next
           // to "all" (its label literally said "tout afficher") — dropped,
           // kept as a legacy value only (see platformLinksShowAll).
-          Wrap(spacing: 8, runSpacing: 8, children: [
+          Padding(padding: const EdgeInsets.fromLTRB(16, 0, 16, 14), child: Wrap(spacing: 8, runSpacing: 8, children: [
             for (final (key, icon) in const [
               ('all',     Icons.done_all_rounded),
               ('lastfm',  Icons.bar_chart_rounded),
@@ -121,7 +121,7 @@ class _StartupPageState extends State<StartupPage> {
                 selected: _platforms.contains(key),
                 onSelected: (_) => _togglePlatform(key),
               ),
-          ]),
+          ])),
         ]),
 
         const SizedBox(height: 16),

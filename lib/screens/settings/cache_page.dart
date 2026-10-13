@@ -171,13 +171,13 @@ class _CachePageState extends State<CachePage> {
       body: SafeArea(top: false, 
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 720),
+            constraints: const BoxConstraints(maxWidth: double.infinity),
             child: Column(children: [
 Expanded(
                 child: _loading
           ? const SkeletonList()
           : ListView(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
               children: [
                 // ── Usage overview ─────────────────────────────────────────
                 _UsageCard(stats: _stats!, scheme: scheme, text: text),

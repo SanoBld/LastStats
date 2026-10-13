@@ -552,13 +552,12 @@ class _AppearancePageState extends State<AppearancePage> {
             opacity: _isNothing ? 0.3 : (_theme == 'light' ? 0.4 : 1.0),
             child: IgnorePointer(
               ignoring: _isNothing || _theme == 'light',
-              child: SwitchListTile(
-                secondary: Icon(Icons.phone_android_rounded,
-                    color: scheme.primary),
-                title: Text(L.apOledTitle),
-                subtitle: Text(_isNothing
+              child: SettingSwitchRow(
+                icon: Icons.phone_android_rounded,
+                title: L.apOledTitle,
+                subtitle: _isNothing
                     ? L.apOledBuiltIntoNothing
-                    : L.apOledPureBlack),
+                    : L.apOledPureBlack,
                 value: _isNothing ? false : _oledMode,
                 onChanged: _isNothing || _theme == 'light'
                     ? null
@@ -1495,20 +1494,20 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
       children: [
         ValueListenableBuilder<bool>(
           valueListenable: mergeVersionsNotifier,
-          builder: (_, on, _) => SwitchListTile(
-            secondary: Icon(Icons.merge_type_rounded, color: scheme.primary),
-            title: Text(tx('lib_merge_t')),
-            subtitle: Text(tx('lib_merge_s')),
+          builder: (_, on, _) => SettingSwitchRow(
+            icon: Icons.merge_type_rounded,
+            title: tx('lib_merge_t'),
+            subtitle: tx('lib_merge_s'),
             value: on,
             onChanged: (v) => LibraryMerge.setMerge(v),
           ),
         ),
         ValueListenableBuilder<bool>(
           valueListenable: splitCollabsNotifier,
-          builder: (_, on, _) => SwitchListTile(
-            secondary: Icon(Icons.call_split_rounded, color: scheme.primary),
-            title: Text(tx('lib_split_t')),
-            subtitle: Text(tx('lib_split_s')),
+          builder: (_, on, _) => SettingSwitchRow(
+            icon: Icons.call_split_rounded,
+            title: tx('lib_split_t'),
+            subtitle: tx('lib_split_s'),
             value: on,
             onChanged: (v) => LibraryMerge.setSplit(v),
           ),

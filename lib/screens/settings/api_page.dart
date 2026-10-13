@@ -159,9 +159,9 @@ class _ApiPageState extends State<ApiPage> {
         top: false,
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 720),
+            constraints: const BoxConstraints(maxWidth: double.infinity),
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
               children: [
                 _summary(scheme, text, today, errors, limited),
                 const SizedBox(height: 12),

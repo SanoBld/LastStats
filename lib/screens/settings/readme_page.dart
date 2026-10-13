@@ -81,13 +81,13 @@ class _ReadmePageState extends State<ReadmePage> {
       body: SafeArea(top: false, 
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 720),
+            constraints: const BoxConstraints(maxWidth: double.infinity),
             child: Column(children: [
 Expanded(
                 child: RefreshIndicator(
                   onRefresh: () async { setState(_load); },
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
                     children: [
                       _StatsCard(repo: _repoInfo, releases: _releases),
                       const SizedBox(height: 20),

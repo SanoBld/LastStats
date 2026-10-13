@@ -211,7 +211,7 @@ class SettingsSection extends StatelessWidget {
           ),
         ),
         // Each row is its own tile: big outer corners, small inner corners.
-        child: Column(children: [
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           for (var i = 0; i < rows.length; i++)
             M3SegmentTile(index: i, count: rows.length, child: rows[i]),
         ]),
