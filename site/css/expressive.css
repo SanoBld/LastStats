@@ -453,3 +453,15 @@ button.cm-tr-btn, .rel-rail button.cm-tr-btn, .rel-toolbar button.cm-tr-btn {
   .footer .footer-links.footer-buttons > :first-child:hover,
   .footer .footer-links.footer-buttons > :last-child:hover { border-radius: var(--r-pill); transform: translateY(-2px); }
 }
+
+/* Mobile: download button is a full pill like the other buttons */
+@media (max-width: 640px) {
+  .project-actions #download-trigger { border-radius: var(--r-pill); }
+}
+@media (max-width: 640px) and (hover: hover) {
+  .project-actions #download-trigger:hover { border-radius: var(--r-pill); }
+}
+@media (max-width: 640px) {
+  .project-actions #download-trigger:active,
+  .project-actions #download-trigger.is-pressed { border-radius: var(--r-press); }
+}
