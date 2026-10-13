@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-13T15:31:38Z",
+  "updated": "2026-10-13T15:37:46Z",
   "commits": [
+    {
+      "sha": "790dad7b2512d4de8993969f33e4a6c6389bda03",
+      "message": "Refactor code structure for improved readability and maintainability",
+      "date": "2026-10-13T15:37:18Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/790dad7b2512d4de8993969f33e4a6c6389bda03",
+      "tags": []
+    },
     {
       "sha": "a8400df1a966794ba4eac6bfd8d52aa27f3ffe12",
       "message": "Refactor code structure and remove redundant sections for improved readability and maintainability",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/944cf3168ecae07be441e7f3a138c4f84d5ff1b9",
-      "tags": []
-    },
-    {
-      "sha": "5a27b089d49b3149875fa9e721d20acd1824a61f",
-      "message": "feat: mettre à jour le système d'achievements avec de nouvelles catégories et des seuils ajustés pour une meilleure progression",
-      "date": "2026-08-09T18:09:42Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/5a27b089d49b3149875fa9e721d20acd1824a61f",
       "tags": []
     }
   ]
