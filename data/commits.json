@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-13T15:06:25Z",
+  "updated": "2026-10-13T15:14:15Z",
   "commits": [
+    {
+      "sha": "26d539436f0499ff622b5a31b1447531189b3382",
+      "message": "feat: ajout d'un ValueListenableBuilder pour gérer dynamiquement l'affichage des étiquettes dans la barre de navigation",
+      "date": "2026-10-13T15:13:57Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/26d539436f0499ff622b5a31b1447531189b3382",
+      "tags": []
+    },
     {
       "sha": "64162219d24af1c7416b22897ba2e516cfb12c28",
       "message": "feat: ajout d'une sélection aléatoire de couleur d'accent lors du premier lancement et amélioration des icônes dans le flux d'onboarding",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/cfa03dc9d3ca397f240b0bc5b9b2a0f30e92d4cf",
-      "tags": []
-    },
-    {
-      "sha": "60e01ca662de8841574cdb05efc6e317108f67e7",
-      "message": "feat: ajouter des catégories et descriptions d'achievements pour les titres et le rythme, mettre à jour le système d'achievements",
-      "date": "2026-08-09T12:19:01Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/60e01ca662de8841574cdb05efc6e317108f67e7",
       "tags": []
     }
   ]
