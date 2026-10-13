@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-13T18:42:24Z",
+  "updated": "2026-10-13T21:04:30Z",
   "commits": [
+    {
+      "sha": "af5fcb355580904c4a8a8e034e91f29e1a1ac95f",
+      "message": "fix: ajuster les contraintes et les espacements dans les pages de paramètres pour une meilleure présentation",
+      "date": "2026-10-13T21:01:45Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/af5fcb355580904c4a8a8e034e91f29e1a1ac95f",
+      "tags": []
+    },
     {
       "sha": "f50dd781b7298e423967b18e9f0001f19f41a4a6",
       "message": "Refactor code structure for improved readability and maintainability",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/776c970e5d4e2777877152046ef135e6dc99a986",
-      "tags": []
-    },
-    {
-      "sha": "c3d706ade71a8b387e41a036d031edce48aa2e69",
-      "message": "feat: ajouter un historique des niveaux pour le compte utilisateur et ajuster les seuils des achievements",
-      "date": "2026-08-10T04:22:08Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/c3d706ade71a8b387e41a036d031edce48aa2e69",
       "tags": []
     }
   ]
