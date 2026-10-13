@@ -454,14 +454,21 @@ button.cm-tr-btn, .rel-rail button.cm-tr-btn, .rel-toolbar button.cm-tr-btn {
   .footer .footer-links.footer-buttons > :last-child:hover { border-radius: var(--r-pill); transform: translateY(-2px); }
 }
 
-/* Mobile: download button is a full pill like the other buttons */
+/* Mobile: buttons keep the connected shape like the stat tiles (big outer corners, small inner) */
 @media (max-width: 640px) {
-  .project-actions #download-trigger { border-radius: var(--r-pill); }
+  .project-actions { gap: 2px; }
+  .project-actions > * { border-radius: var(--r-inner); }
+  .project-actions > :first-child { border-radius: var(--r-outer) var(--r-inner) var(--r-inner) var(--r-outer); }
+  .project-actions > :last-child { border-radius: var(--r-inner) var(--r-outer) var(--r-outer) var(--r-inner); }
+  .project-actions > :only-child { border-radius: var(--r-pill); }
+}
+@media (max-width: 520px) {
+  .project-actions > :first-child { border-radius: var(--r-outer) var(--r-outer) var(--r-inner) var(--r-inner); }
+  .project-actions > :last-child { border-radius: var(--r-inner) var(--r-inner) var(--r-outer) var(--r-outer); }
 }
 @media (max-width: 640px) and (hover: hover) {
-  .project-actions #download-trigger:hover { border-radius: var(--r-pill); }
+  .project-actions > :hover { border-radius: var(--r-tile); }
 }
 @media (max-width: 640px) {
-  .project-actions #download-trigger:active,
-  .project-actions #download-trigger.is-pressed { border-radius: var(--r-press); }
+  .project-actions > :active, .project-actions > .is-pressed { border-radius: var(--r-press); }
 }
