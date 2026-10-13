@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-13T00:15:27Z",
+  "updated": "2026-10-13T11:07:11Z",
   "commits": [
+    {
+      "sha": "87f863ac6507a7a7cfd2bf976106cb5c5e63b8de",
+      "message": "feat: ajout de styles pour le bouton de téléchargement sur mobile avec des coins arrondis",
+      "date": "2026-10-13T11:06:55Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/87f863ac6507a7a7cfd2bf976106cb5c5e63b8de",
+      "tags": []
+    },
     {
       "sha": "33252c7680faedb72674ca3fb6603e93d77cecb4",
       "message": "feat: amélioration de l'interface du pied de page avec des boutons proéminents et ajustements de style",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/5b800d0fd94b24d27457c582a8efb84bdc5be0ed",
-      "tags": []
-    },
-    {
-      "sha": "340f8faee47d20854727d720b1dfbf5ce9524b4e",
-      "message": "feat: améliorer le rendu de l'image du graphique en supprimant le cadre supplémentaire et en optimisant la qualité de filtrage",
-      "date": "2026-08-09T08:38:21Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/340f8faee47d20854727d720b1dfbf5ce9524b4e",
       "tags": []
     }
   ]
