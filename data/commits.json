@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-13T15:05:52Z",
+  "updated": "2026-10-13T15:06:25Z",
   "commits": [
+    {
+      "sha": "64162219d24af1c7416b22897ba2e516cfb12c28",
+      "message": "feat: ajout d'une sélection aléatoire de couleur d'accent lors du premier lancement et amélioration des icônes dans le flux d'onboarding",
+      "date": "2026-10-13T15:06:05Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/64162219d24af1c7416b22897ba2e516cfb12c28",
+      "tags": []
+    },
     {
       "sha": "8c037f5f3218d0107257dafc2d0c16a2a39bc3ae",
       "message": "Refactor onboarding flow and improve localization strings\n\n- Updated Russian and Chinese localization strings for clarity and accuracy in onboarding steps.\n- Enhanced the onboarding flow UI by replacing TextButton with M3LabelButton for a more consistent design.\n- Adjusted button styles and interactions in the onboarding process to improve user experience.\n- Refined appearance settings page layout for better visual alignment.\n- Introduced M3LabelButton component for consistent button styling across the app.\n- Improved setup screen button interactions and error handling.\n- Enhanced CSS for download button hover effects on the website.",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/60e01ca662de8841574cdb05efc6e317108f67e7",
-      "tags": []
-    },
-    {
-      "sha": "c3de26369d9d0702b85d6385a954ccb09e4a1fd9",
-      "message": "feat: ajouter une option pour ignorer l'animation d'entrée dans le widget _FadeSlideIn et mettre à jour les pages de tableau de bord et de graphiques pour une animation unique par session",
-      "date": "2026-08-09T12:11:17Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/c3de26369d9d0702b85d6385a954ccb09e4a1fd9",
       "tags": []
     }
   ]
