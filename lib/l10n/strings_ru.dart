@@ -254,11 +254,11 @@ class AppStringsRu implements AppStrings {
   @override String get onboardFinish => 'Готово';
   @override String get onboardBack => 'Назад';
   @override String get onboardAppearanceTitle => 'Настройте свой стиль';
-  @override String get onboardAppearanceSub => 'Тема, акцентный цвет и Material You.';
+  @override String get onboardAppearanceSub => 'Выберите светлую или тёмную тему, акцентный цвет и внешний стиль приложения.';
   @override String get onboardNotifTitle => 'Будьте в курсе';
-  @override String get onboardNotifSub => 'Уведомления и вибрация.';
+  @override String get onboardNotifSub => 'Выберите, какие уведомления вы хотите получать и должен ли телефон вибрировать.';
   @override String get onboardFavTitle => 'Ваши избранные профили';
-  @override String get onboardFavSub => 'Добавьте друзей с Last.fm, чтобы быстро их находить.';
+  @override String get onboardFavSub => 'Добавьте друзей из Last.fm, чтобы быстро открывать их профили в приложении.';
   @override String get onboardFavHint => 'Имя пользователя Last.fm';
   @override String get onboardFavAdd => 'Добавить';
   @override String get onboardFavEmpty => 'Пока нет избранного';
@@ -268,11 +268,11 @@ class AppStringsRu implements AppStrings {
   @override String get onboardFavNoFriends => 'На этом аккаунте друзья не найдены';
   @override String get onboardFavSelected => 'Выбранное избранное';
   @override String get onboardDashTitle => 'Ваш обзор';
-  @override String get onboardDashSub => 'Выберите, какие разделы показывать.';
+  @override String get onboardDashSub => 'Выберите, какие разделы показывать на главном экране. Позже вы сможете изменить их в настройках.';
   @override String get onboardStartupTitle => 'Экран запуска';
-  @override String get onboardStartupSub => 'Какую вкладку вы хотите видеть первой?';
+  @override String get onboardStartupSub => 'Выберите, какая вкладка будет открываться первой при запуске приложения.';
   @override String get onboardPlatformTitle => 'На чём вы слушаете музыку?';
-  @override String get onboardPlatformSub => 'Это отображает только полезные ссылки на страницах треков/исполнителей/альбомов.';
+  @override String get onboardPlatformSub => 'Укажите, где вы слушаете музыку. В приложении на страницах треков, исполнителей и альбомов будут показаны только нужные ссылки.';
   @override String get platformLastfm => 'Last.fm';
   @override String get platformSpotify => 'Spotify';
   @override String get platformYtMusic => 'YouTube Music';
@@ -282,13 +282,13 @@ class AppStringsRu implements AppStrings {
   @override String get settingsShowAllPlatformLinks => 'Всегда показывать всё';
   @override String get settingsShowAllPlatformLinksSub => 'Игнорировать фильтр и показывать все ссылки (Last.fm, Spotify, YT Music, Web)';
   @override String get onboardUpdatesTitle => 'Обновления';
-  @override String get onboardUpdatesSub => 'Автоматическая проверка новых версий.';
+  @override String get onboardUpdatesSub => 'Приложение автоматически проверяет, доступна ли новая версия.';
   @override String get onboardStyle => 'Стиль';
   @override String get onboardStyleMaterialYou => 'Material You';
   @override String get onboardStyleNothing => 'Nothing OS';
   @override String get onboardPreview => 'Предпросмотр';
   @override String get onboardPreviewButton => 'Кнопка';
-  @override String get onboardPreviewOutline => 'Контур';
+  @override String get onboardPreviewOutline => 'Основная кнопка';
   @override String get onboardPreviewText => 'Пример текста';
   @override String get onboardPreviewBubble => 'Пузырь';
   @override String get onboardAccentTint => 'Оттенок акцента';
@@ -296,28 +296,28 @@ class AppStringsRu implements AppStrings {
   @override String get onboardNothingRedYellow => 'Красный + жёлтый';
   @override String get onboardDisplay => 'Экран';
   @override String get onboardOledTitle => 'Настоящий чёрный OLED';
-  @override String get onboardOledSub => 'Абсолютно чёрный фон в тёмном режиме';
+  @override String get onboardOledSub => 'В тёмном режиме фон становится полностью чёрным, что экономит заряд на экранах OLED.';
   @override String get onboardArtworkColorTitle => 'Цвет из обложки';
-  @override String get onboardArtworkColorSub => 'Подстраивает акцентный цвет под текущую обложку';
+  @override String get onboardArtworkColorSub => 'Акцентный цвет приложения автоматически подстраивается под обложку трека, который сейчас играет.';
   @override String get onboardNewsTitle => 'Уведомления о новостях';
-  @override String get onboardNewsSub => 'Получайте уведомления о новых функциях и исправлениях';
+  @override String get onboardNewsSub => 'Вы получите уведомление, когда появится новая функция или будет исправлена ошибка.';
   @override String get onboardNewsBadgeTitle => 'Значок новостей';
-  @override String get onboardNewsBadgeSub => 'Красная точка на колокольчике, когда есть новости';
+  @override String get onboardNewsBadgeSub => 'Когда есть новость, которую стоит прочитать, на колокольчике главного экрана появляется красная точка.';
   @override String get onboardHapticTitle => 'Тактильная отдача';
-  @override String get onboardHapticSub => 'Лёгкая вибрация при ключевых действиях';
+  @override String get onboardHapticSub => 'Телефон слегка вибрирует при нажатии на кнопки и важные элементы.';
   @override String get onboardRecaps => 'Сводки';
   @override String get onboardDailyRecapTitle => 'Дневная сводка';
-  @override String get onboardDailyRecapSub => 'Краткий обзор вашего дня прослушивания';
+  @override String get onboardDailyRecapSub => 'Каждый день получайте краткую сводку того, что вы слушали.';
   @override String get onboardWeeklyRecapTitle => 'Недельная сводка';
-  @override String get onboardWeeklyRecapSub => 'Ваши топ исполнители, альбомы и треки недели';
+  @override String get onboardWeeklyRecapSub => 'Каждую неделю получайте список самых прослушиваемых исполнителей, альбомов и треков.';
   @override String get onboardMilestonesSection => 'Рубежи по скробблам';
   @override String get onboardMilestonesTitle => 'Рубежи';
-  @override String get onboardMilestonesSub => 'Отмечайте круглые числа скробблов';
+  @override String get onboardMilestonesSub => 'Уведомление поздравит вас, когда число прослушиваний достигнет круглой отметки.';
   @override String get onboardGrandMilestonesTitle => 'Крупные рубежи';
-  @override String get onboardGrandMilestonesSub => 'Особое празднование крупных рубежей';
-  @override String get onboardDynamicColorSub => 'Использовать цвета из обоев (Android 12+)';
+  @override String get onboardGrandMilestonesSub => 'Когда число прослушиваний достигает очень большой отметки, появляется особое поздравление.';
+  @override String get onboardDynamicColorSub => 'Приложение использует цвета ваших обоев. Эта функция доступна начиная с Android 12.';
   @override String get onboardBetaTitle => 'Бета-обновления';
-  @override String get onboardBetaSub => 'Ранний доступ к предварительным версиям';
+  @override String get onboardBetaSub => 'Получайте тестовые версии раньше всех. В них могут быть ошибки.';
   @override String get notifDetailTitle => 'Уведомление';
   @override String get notifDetailOpenLink => 'Открыть ссылку';
   @override String get settingsCheckingUpdates => 'Проверка обновлений…';
@@ -332,7 +332,7 @@ class AppStringsRu implements AppStrings {
   @override String get setupUsernameLabel => 'Имя пользователя Last.fm';
   @override String get setupApiKeyLabel => 'Ключ API Last.fm';
   @override String get setupApiKeyHint => '16-ричный ключ из 32 символов';
-  @override String get setupApiKeyPrivacyNote => 'Хранится локально. Никогда не передаётся третьим лицам.';
+  @override String get setupApiKeyPrivacyNote => 'Ваш ключ хранится только на этом устройстве и никогда не передаётся третьим лицам.';
   @override String get setupRememberMe => 'Запомнить меня';
   @override String get setupGetApiKey => 'Получить бесплатный ключ API';
   @override String get setupWelcomeBanner => 'Добро пожаловать в LastStats!';
@@ -406,7 +406,7 @@ class AppStringsRu implements AppStrings {
   @override String get backupFileSaved => 'Резервная копия сохранена';
   @override String get backupFileSaveFailed => 'Не удалось сохранить файл';
   @override String get setupRestoreBackup => 'Восстановить резервную копию';
-  @override String get setupRestoreBackupSub => 'Восстановите аккаунт и настройки из файла резервной копии .json';
+  @override String get setupRestoreBackupSub => 'Восстановите аккаунт и настройки из файла резервной копии в формате .json.';
   @override String get backupRestoreKeysTitle => 'Восстановить ключи API';
   @override String get backupRestoreKeysDesc => 'Выберите, какие ключи Last.fm восстановить из этой резервной копии.';
   @override String get backupRestoreApiKeyLabel => 'Ключ API';
@@ -574,7 +574,7 @@ class AppStringsRu implements AppStrings {
   @override String get dashThisWeekLabel => 'На этой неделе';
   @override String get dashDayUnitShort => 'д';
   @override String get setupEnableFavorites      => 'Включить избранное (необязательно)';
-  @override String get setupFavoritesExplain     => 'Секретный ключ позволяет приложению добавлять (или убирать) треки из избранного прямо на Last.fm.';
+  @override String get setupFavoritesExplain     => 'Секретный ключ позволяет приложению добавлять трек в избранное или убирать его прямо в вашем аккаунте Last.fm.';
   @override String get setupSecretKeyLabel       => 'Секретный ключ Last.fm';
   @override String get favConnectInvalidSecret   => 'Секретный ключ должен содержать 32 символа.';
   @override String get favConnectDialogTitle     => 'Авторизовать избранное';
@@ -890,7 +890,7 @@ const Map<String, String> kTxRu = {
   'lib_split_t': 'Разделять коллаборации',
   'lib_split_s': '«Gims & Damso» засчитывается и Gims, и Damso, а не как отдельный артист. Группы вроде «Simon & Garfunkel» остаются целыми.',
   'lib_step_t': 'Ваша библиотека',
-  'lib_step_s': 'Выберите, как группировать прослушивания. Это можно изменить в любой момент в настройках.',
+  'lib_step_s': 'Выберите, как приложение объединяет ваши прослушивания. Это можно изменить в любой момент в настройках.',
   'bk_dash_t': 'Дашборд и запуск',
   'bk_dash_s': 'Разделы, шапка, карточки статистики, обзор, стартовая вкладка',
   'bk_notif_t': 'Уведомления',
@@ -931,13 +931,14 @@ const Map<String, String> kTxRu = {
   'dash_motion_t': 'Анимированная обложка на главной',
   'dash_motion_s': 'Воспроизводит видео текущего трека на карточке воспроизведения и в шапке. Требуются видеообложки.',
   'onb_cov_t': 'Обложки и изображения',
-  'onb_cov_s': 'Выберите форму изображений и поведение обложек.',
+  'onb_cov_s': 'Выберите форму изображений и способ отображения обложек.',
   'onb_sync_t': 'Синхронизация и батарея',
-  'onb_sync_s': 'Держите статистику актуальной, не разряжая батарею.',
+  'onb_sync_s': 'Поддерживайте статистику в актуальном состоянии, не расходуя слишком много заряда телефона.',
   'onb_autosync_t': 'Автоматическая синхронизация',
-  'onb_autosync_s': 'Регулярно проверяет новые скробблы в фоновом режиме.',
+  'onb_autosync_s': 'Приложение регулярно проверяет в фоновом режиме, появились ли у вас новые прослушивания.',
   'onb_freq': 'Частота проверки',
-  'onb_every_h': 'Каждые {h} ч',
+  'onb_every_h': 'Интервал в часах: {h}',
+  'onb_every_1h': 'Каждый час',
   'load_backup_note': 'Найдена резервная копия: проверяются только новые скробблы.',
   'dash_nowplay': 'Сейчас играет',
   'dash_stats': 'Статистика',
@@ -956,11 +957,11 @@ const Map<String, String> kTxRu = {
   'lvl': 'Уровень {n}',
   'lvl_history': 'История уровней',
   'set_living_t': 'Живые обложки',
-  'set_living_s': 'Плавный зум и эффект глубины на изображениях',
+  'set_living_s': 'Изображения плавно двигаются с лёгким эффектом приближения и глубины.',
   'set_motion_t': 'Видеообложки',
-  'set_motion_s': 'Воспроизводит анимированную обложку, если она есть',
+  'set_motion_s': 'Воспроизводит анимированную видеообложку, если она есть у трека.',
   'set_achv_t': 'Достижения и уровни',
-  'set_achv_s': 'Ранги, значки и уровень аккаунта',
+  'set_achv_s': 'Следите за своими целями, значками и уровнем аккаунта.',
   'cache_img_limit_t': 'Лимит кэша фото',
   'cache_img_limit_s': 'Обложки, фото артистов и аватары. Сначала удаляются самые старые.',
   'cache_vid_limit_t': 'Лимит кэша видео',
@@ -1114,8 +1115,8 @@ const Map<String, String> kTxRu = {
   'ui_always_on': 'Всегда включено',
   'ui_force_eco_mode_on_rega': 'Принудительно включает режим экономии при любом уровне заряда.',
   'ui_auto_activate': 'Автовключение',
-  'ui_turn_on_below_a_batter': 'Включать ниже заданного % заряда',
-  'ui_switches_on_by_itself_': 'Включается сама, когда заряд опускается до уровня ниже.',
+  'ui_turn_on_below_a_batter': 'Включать режим экономии энергии при низком заряде батареи',
+  'ui_switches_on_by_itself_': 'Режим экономии энергии включается сам, когда заряд батареи становится низким. Точный уровень можно выбрать позже в настройках.',
   'ui_threshold': 'Порог',
   'ui_choose_the_tab_display': 'Выберите вкладку, которая открывается при запуске приложения.',
   'ui_the_selected_tab_will_': 'Выбранная вкладка появится при следующем запуске приложения.',
@@ -1138,7 +1139,7 @@ const Map<String, String> kTxRu = {
   'ui_details': 'Подробнее',
   'ui_all_past_releases_chan': 'Все прошлые версии, списки изменений и загрузки',
   'ui_please_fill_both_field': 'Заполните оба поля.',
-  'ui_api_key_must_be_32_cha': 'Ключ API должен содержать 32 символа.',
+  'ui_api_key_must_be_32_cha': 'Ключ API должен состоять ровно из 32 символов.',
   'ui_profile_not_found': 'Профиль не найден.',
   'ui_chart_monthly': 'Столбцы по месяцам',
   'ui_chart_cumul': 'Динамика',
@@ -1299,16 +1300,16 @@ const Map<String, String> kTxRu = {
   'dg_nofound': 'видео нет',
   'dg_notpl': 'нет шаблона поиска (повторите через минуту)',
   'dg_results': 'результатов',
-  'lfm_web_sub': 'API-ключ не нужен: используется ключ, встроенный в приложение.',
+  'lfm_web_sub': 'Ключ API не нужен: приложение использует собственный встроенный ключ.',
   'lfm_manual_hint': 'Имя пользователя не найдено автоматически. После входа введите его ниже.',
   'lfm_manual_label': 'Имя пользователя',
   'rec': 'рекомендуется',
   'not_rec': 'не рекомендуется',
   'sm_title': 'Способ подключения',
   'sm_key_t': 'Мой API-ключ',
-  'sm_key_s': 'Собственная квота, доступны избранные.',
+  'sm_key_s': 'У вас собственный лимит использования, и доступно избранное.',
   'sm_builtin_t': 'Встроенный ключ',
-  'sm_builtin_s': 'Только имя пользователя. Квота общая с другими пользователями.',
+  'sm_builtin_s': 'Нужно только имя пользователя. Лимит использования общий с другими пользователями.',
   'wl_title': 'Добро пожаловать',
   'wl_sub': 'Выберите, как подключиться к Last.fm.',
   'sr_from_recent': 'Из недавних запросов',

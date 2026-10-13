@@ -622,30 +622,15 @@ class _SetupScreenState extends State<SetupScreen>
                                 const SizedBox(height: 12),
 
                                 // Main button
-                                SizedBox(
-                                  height: 56,
-                                  child: FilledButton.icon(
-                                    onPressed: _isLoading
-                                        ? null
-                                        : (_method == 2 ? _lastfmWeb : _launch),
-                                    icon: _isLoading
-                                        ? SizedBox(
-                                            width: 20, height: 20,
-                                            child: M3Spinner(color: scheme.onPrimary))
-                                        : Icon(_method == 2
-                                            ? Icons.login_rounded
-                                            : Icons.arrow_forward_rounded),
-                                    label: Text(_isLoading
-                                        ? L.setupConnecting
-                                        : (_method == 2
-                                            ? tx('conn_lfm_web')
-                                            : tx('conn_connect'))),
-                                    style: FilledButton.styleFrom(
-                                      shape: const StadiumBorder(),
-                                      textStyle: text.titleMedium?.copyWith(
-                                          fontWeight: FontWeight.w700),
-                                    ),
-                                  ),
+                                M3LabelButton(
+                                  kind: M3ButtonKind.filled,
+                                  expand: true,
+                                  loading: _isLoading,
+                                  icon: _method == 2 ? Icons.login_rounded : Icons.arrow_forward_rounded,
+                                  label: _isLoading
+                                      ? L.setupConnecting
+                                      : (_method == 2 ? tx('conn_lfm_web') : tx('conn_connect')),
+                                  onTap: _method == 2 ? _lastfmWeb : _launch,
                                 ),
 
                                 // Error message
@@ -720,17 +705,17 @@ class _SetupScreenState extends State<SetupScreen>
                           if (_method == 0) ...[
                             const SizedBox(height: 6),
                             Center(
-                              child: TextButton.icon(
-                                onPressed: () async {
-                                  final uri = Uri.parse(
-                                      'https://www.last.fm/api/account/create');
+                              child: M3LabelButton(
+                                kind: M3ButtonKind.text,
+                                height: 44,
+                                icon: Icons.open_in_new_rounded,
+                                label: L.setupGetApiKey,
+                                onTap: () async {
+                                  final uri = Uri.parse('https://www.last.fm/api/account/create');
                                   if (await canLaunchUrl(uri)) {
-                                    await launchUrl(uri,
-                                        mode: LaunchMode.externalApplication);
+                                    await launchUrl(uri, mode: LaunchMode.externalApplication);
                                   }
                                 },
-                                icon: const Icon(Icons.open_in_new_rounded, size: 16),
-                                label: Text(L.setupGetApiKey),
                               ),
                             ),
                           ],

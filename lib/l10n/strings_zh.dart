@@ -284,11 +284,11 @@ class AppStringsZh implements AppStrings {
   @override String get onboardFinish           => '完成';
   @override String get onboardBack             => '返回';
   @override String get onboardAppearanceTitle  => '自定义您的风格';
-  @override String get onboardAppearanceSub    => '主题、强调色和 Material You。';
+  @override String get onboardAppearanceSub    => '选择浅色或深色主题、强调色以及应用的视觉风格。';
   @override String get onboardNotifTitle       => '及时获知动态';
-  @override String get onboardNotifSub         => '通知与震动。';
+  @override String get onboardNotifSub         => '选择要接收的通知,以及手机是否需要振动。';
   @override String get onboardFavTitle         => '您的收藏用户';
-  @override String get onboardFavSub           => '添加 Last.fm 好友以便快速查看。';
+  @override String get onboardFavSub           => '添加 Last.fm 好友,以便在应用中快速找到他们的资料。';
   @override String get onboardFavHint          => 'Last.fm 用户名';
   @override String get onboardFavAdd           => '添加';
   @override String get onboardFavEmpty         => '暂无收藏';
@@ -298,11 +298,11 @@ class AppStringsZh implements AppStrings {
   @override String get onboardFavNoFriends     => '该账号没有好友';
   @override String get onboardFavSelected      => '已选收藏';
   @override String get onboardDashTitle        => '您的仪表盘';
-  @override String get onboardDashSub          => '选择要显示的板块。';
+  @override String get onboardDashSub          => '选择要在主屏幕上显示的板块。你之后可以在设置中更改。';
   @override String get onboardStartupTitle     => '启动界面';
-  @override String get onboardStartupSub       => '您想先看到哪个标签页？';
+  @override String get onboardStartupSub       => '选择启动应用时首先打开的标签页。';
   @override String get onboardPlatformTitle    => '您在哪里听音乐？';
-  @override String get onboardPlatformSub      => '这样详情页只显示对您有用的链接。';
+  @override String get onboardPlatformSub      => '告诉我们你在哪里听音乐。应用只会在曲目、艺术家和专辑页面中显示有用的链接。';
   @override String get platformLastfm          => 'Last.fm';
   @override String get platformSpotify         => 'Spotify';
   @override String get platformYtMusic         => 'YouTube Music';
@@ -312,13 +312,13 @@ class AppStringsZh implements AppStrings {
   @override String get settingsShowAllPlatformLinks    => '始终显示全部';
   @override String get settingsShowAllPlatformLinksSub => '忽略过滤，显示所有链接（Last.fm、Spotify、YT Music、网页）';
   @override String get onboardUpdatesTitle     => '更新';
-  @override String get onboardUpdatesSub       => '自动检查新版本。';
+  @override String get onboardUpdatesSub       => '应用会自动检查是否有新版本可用。';
   @override String get onboardStyle              => '风格';
   @override String get onboardStyleMaterialYou    => 'Material You';
   @override String get onboardStyleNothing        => 'Nothing OS';
   @override String get onboardPreview             => '预览';
   @override String get onboardPreviewButton       => '按钮';
-  @override String get onboardPreviewOutline      => '轮廓';
+  @override String get onboardPreviewOutline      => '主按钮';
   @override String get onboardPreviewText         => '示例文字';
   @override String get onboardPreviewBubble       => '气泡';
   @override String get onboardAccentTint          => '强调色调';
@@ -326,28 +326,28 @@ class AppStringsZh implements AppStrings {
   @override String get onboardNothingRedYellow    => '红+黄';
   @override String get onboardDisplay             => '显示';
   @override String get onboardOledTitle           => 'OLED 纯黑';
-  @override String get onboardOledSub             => '深色模式下使用纯黑背景';
+  @override String get onboardOledSub             => '在深色模式下背景变为纯黑色,可以在 OLED 屏幕上节省电量。';
   @override String get onboardArtworkColorTitle   => '取色自封面';
-  @override String get onboardArtworkColorSub     => '将强调色与当前播放的封面匹配';
+  @override String get onboardArtworkColorSub     => '应用的强调色会自动匹配当前正在播放的曲目的封面。';
   @override String get onboardNewsTitle           => '资讯通知';
-  @override String get onboardNewsSub             => '获取新功能和修复的通知';
+  @override String get onboardNewsSub             => '添加新功能或修复问题时,你会收到通知。';
   @override String get onboardNewsBadgeTitle      => '资讯红点';
-  @override String get onboardNewsBadgeSub        => '有新动态时在仪表盘铃铛上显示红点';
+  @override String get onboardNewsBadgeSub        => '有新内容可阅读时,主屏幕的铃铛上会出现一个红点。';
   @override String get onboardHapticTitle         => '触感反馈';
-  @override String get onboardHapticSub           => '在关键操作时感受轻微振动';
+  @override String get onboardHapticSub           => '点按按钮和重要元素时,手机会轻轻振动。';
   @override String get onboardRecaps              => '汇总';
   @override String get onboardDailyRecapTitle     => '每日汇总';
-  @override String get onboardDailyRecapSub       => '您当天收听情况的简要汇总';
+  @override String get onboardDailyRecapSub       => '每天收到一份你所听内容的摘要。';
   @override String get onboardWeeklyRecapTitle    => '每周汇总';
-  @override String get onboardWeeklyRecapSub      => '您本周的热门艺术家、专辑和歌曲';
+  @override String get onboardWeeklyRecapSub      => '每周收到你听得最多的艺术家、专辑和曲目列表。';
   @override String get onboardMilestonesSection   => 'Scrobble 里程碑';
   @override String get onboardMilestonesTitle     => '里程碑';
-  @override String get onboardMilestonesSub       => '庆祝整数的 scrobble 次数';
+  @override String get onboardMilestonesSub       => '当播放次数达到整数里程碑时,你会收到一条祝贺通知。';
   @override String get onboardGrandMilestonesTitle => '重大里程碑';
-  @override String get onboardGrandMilestonesSub   => '为重大里程碑献上特别庆祝';
-  @override String get onboardDynamicColorSub      => '使用您的壁纸颜色（Android 12+）';
+  @override String get onboardGrandMilestonesSub   => '当播放次数达到很大的数字时,会显示特别的庆祝效果。';
+  @override String get onboardDynamicColorSub      => '应用会使用你壁纸中的颜色。此选项需要 Android 12 或更高版本。';
   @override String get onboardBetaTitle            => '测试版更新';
-  @override String get onboardBetaSub              => '抢先体验预发布版本';
+  @override String get onboardBetaSub              => '比其他人更早收到测试版本。这些版本可能包含错误。';
 
   @override String get notifDetailTitle            => '通知';
   @override String get notifDetailOpenLink         => '打开链接';
@@ -367,7 +367,7 @@ class AppStringsZh implements AppStrings {
   @override String get setupUsernameLabel          => 'Last.fm 用户名';
   @override String get setupApiKeyLabel            => 'Last.fm API 密钥';
   @override String get setupApiKeyHint             => '32 位十六进制密钥';
-  @override String get setupApiKeyPrivacyNote      => '仅保存在本地，绝不发送给第三方。';
+  @override String get setupApiKeyPrivacyNote      => '你的密钥只保存在此设备上,绝不会发送给第三方。';
   @override String get setupRememberMe             => '记住我';
   @override String get setupGetApiKey              => '免费获取 API 密钥';
   @override String setupScrobblesToImport(String c) => '待导入 $c 条 scrobble';
@@ -451,7 +451,7 @@ class AppStringsZh implements AppStrings {
   @override String get backupFileSaved             => '备份已保存';
   @override String get backupFileSaveFailed        => '保存失败';
   @override String get setupRestoreBackup          => '恢复备份';
-  @override String get setupRestoreBackupSub       => '从 .json 备份文件恢复您的账号和设置';
+  @override String get setupRestoreBackupSub       => '从 .json 格式的备份文件中恢复你的账号和设置。';
   @override String get backupRestoreKeysTitle => '恢复 API 密钥';
   @override String get backupRestoreKeysDesc => '选择要从此备份恢复的 Last.fm 密钥。';
   @override String get backupRestoreApiKeyLabel => 'API 密钥';
@@ -637,7 +637,7 @@ class AppStringsZh implements AppStrings {
   @override String get dashThisWeekLabel        => '本周';
   @override String get dashDayUnitShort         => '天';
   @override String get setupEnableFavorites      => '启用收藏（可选）';
-  @override String get setupFavoritesExplain     => '密钥可让应用直接在 Last.fm 上添加或取消收藏歌曲。';
+  @override String get setupFavoritesExplain     => '你的密钥可让应用直接在你的 Last.fm 账号上将曲目添加到收藏或移除。';
   @override String get setupSecretKeyLabel       => 'Last.fm 密钥';
   @override String get favConnectInvalidSecret   => '密钥长度必须为 32 个字符。';
   @override String get favConnectDialogTitle     => '授权收藏功能';
@@ -916,7 +916,7 @@ const Map<String, String> kTxZh = {
   'lib_split_t': '拆分合作艺人',
   'lib_split_s': '“Gims & Damso”会分别计入 Gims 和 Damso,而不是单独的艺人。像“Simon & Garfunkel”这样的乐队保持完整。',
   'lib_step_t': '您的资料库',
-  'lib_step_s': '选择如何归类您的收听记录。您可以随时在设置中更改。',
+  'lib_step_s': '选择应用如何归并你的播放记录。你可以随时在设置中更改。',
   'bk_dash_t': '仪表盘与启动',
   'bk_dash_s': '板块、头图、统计卡片、发现、启动标签页',
   'bk_notif_t': '通知',
@@ -957,13 +957,14 @@ const Map<String, String> kTxZh = {
   'dash_motion_t': '仪表盘动态封面',
   'dash_motion_s': '在播放卡片和顶部栏中播放当前曲目的视频。需要开启视频封面。',
   'onb_cov_t': '封面和图片',
-  'onb_cov_s': '请选择图片的形状以及封面的行为。',
+  'onb_cov_s': '选择图片的形状以及封面的显示方式。',
   'onb_sync_t': '同步与电池',
-  'onb_sync_s': '在不耗尽电量的情况下保持您的统计数据为最新。',
+  'onb_sync_s': '让统计数据保持最新,同时不过多消耗手机电量。',
   'onb_autosync_t': '自动同步',
-  'onb_autosync_s': '在后台定期检查您的新播放记录。',
+  'onb_autosync_s': '应用会定期在后台检查你是否有新的播放记录。',
   'onb_freq': '检查频率',
   'onb_every_h': '每 {h} 小时',
+  'onb_every_1h': '每小时',
   'load_backup_note': '检测到备份:只会检查更新的 scrobble。',
   'dash_nowplay': '正在播放',
   'dash_stats': '统计',
@@ -982,11 +983,11 @@ const Map<String, String> kTxZh = {
   'lvl': '等级 {n}',
   'lvl_history': '等级历史',
   'set_living_t': '动态封面效果',
-  'set_living_s': '图片带有柔和缩放与景深效果',
+  'set_living_s': '图片会以轻微的缩放和景深效果缓缓移动。',
   'set_motion_t': '视频封面',
-  'set_motion_s': '有动态封面时自动播放',
+  'set_motion_s': '当曲目有动态视频封面时自动播放。',
   'set_achv_t': '成就与等级',
-  'set_achv_s': '等级档位、徽章与账号等级',
+  'set_achv_s': '查看你的目标、徽章和账号等级。',
   'cache_img_limit_t': '照片缓存上限',
   'cache_img_limit_s': '封面、艺术家照片和头像。优先删除最旧的。',
   'cache_vid_limit_t': '视频缓存上限',
@@ -1140,8 +1141,8 @@ const Map<String, String> kTxZh = {
   'ui_always_on': '始终开启',
   'ui_force_eco_mode_on_rega': '无论电量多少都强制开启省电模式。',
   'ui_auto_activate': '自动启用',
-  'ui_turn_on_below_a_batter': '电量低于百分比时开启',
-  'ui_switches_on_by_itself_': '电量降到下方设定值时自动开启。',
+  'ui_turn_on_below_a_batter': '电量低时开启省电模式',
+  'ui_switches_on_by_itself_': '当电量变低时,省电模式会自动开启。你之后可以在设置中选择具体的电量。',
   'ui_threshold': '阈值',
   'ui_choose_the_tab_display': '选择应用启动时显示的标签页。',
   'ui_the_selected_tab_will_': '所选标签页将在下次启动应用时显示。',
@@ -1164,7 +1165,7 @@ const Map<String, String> kTxZh = {
   'ui_details': '详情',
   'ui_all_past_releases_chan': '所有历史版本、更新日志和下载',
   'ui_please_fill_both_field': '请填写两个字段。',
-  'ui_api_key_must_be_32_cha': 'API 密钥必须为 32 个字符。',
+  'ui_api_key_must_be_32_cha': 'API 密钥必须正好是 32 个字符。',
   'ui_profile_not_found': '找不到个人资料。',
   'ui_chart_monthly': '月度柱状图',
   'ui_chart_cumul': '进度趋势',
@@ -1325,16 +1326,16 @@ const Map<String, String> kTxZh = {
   'dg_nofound': '没有视频',
   'dg_notpl': '缺少搜索模板（请稍后重试）',
   'dg_results': '个结果',
-  'lfm_web_sub': '无需 API 密钥：将使用应用内置密钥。',
+  'lfm_web_sub': '无需 API 密钥:应用会使用其内置的密钥。',
   'lfm_manual_hint': '未能自动识别用户名。登录后请在下方输入。',
   'lfm_manual_label': '用户名',
   'rec': '推荐',
   'not_rec': '不推荐',
   'sm_title': '连接方式',
   'sm_key_t': '我的 API 密钥',
-  'sm_key_s': '独享配额，可使用收藏。',
+  'sm_key_s': '你拥有独立的使用额度,并且可以使用收藏功能。',
   'sm_builtin_t': '内置密钥',
-  'sm_builtin_s': '仅需用户名。配额与其他用户共享。',
+  'sm_builtin_s': '只需要你的用户名。使用额度与其他用户共享。',
   'wl_title': '欢迎',
   'wl_sub': '请选择连接 Last.fm 的方式。',
   'sr_from_recent': '来自你最近的搜索',

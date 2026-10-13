@@ -145,9 +145,12 @@ class _AppearancePageState extends State<AppearancePage> {
       selected: sel,
       selectedColor: scheme.primary,
       minLeadingWidth: 60,
-      leading: SizedBox(width: 60, child: Row(children: [
-        dot(prev.primary), dot(prev.tertiary), dot(prev.secondaryContainer),
-      ])),
+      leading: SizedBox(width: 60, child: FittedBox(
+        fit: BoxFit.scaleDown, alignment: Alignment.centerLeft,
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          dot(prev.primary), dot(prev.tertiary), dot(prev.secondaryContainer),
+        ]),
+      )),
       title: Text(tx('ap_harmony_$key')),
       subtitle: Text(tx('ap_harmony_${key}_sub')),
       trailing: sel ? Icon(Icons.check_circle_rounded, color: scheme.primary) : null,

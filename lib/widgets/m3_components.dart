@@ -583,7 +583,7 @@ class M3SegmentedButton<T> extends StatelessWidget {
     final n = segments.length;
     // Selected = full pill. Others: round outside, small inside.
     final big = 24.0, small = 8.0;
-    final fg = sel ? scheme.onSecondaryContainer : scheme.onSurfaceVariant;
+    final fg = sel ? scheme.onPrimary : scheme.onSurfaceVariant;
     return M3PressBuilder(builder: (context, down0, setDown) {
     final down = down0 && !M3Motion.reduced(context);
     final r = down
@@ -600,7 +600,7 @@ class M3SegmentedButton<T> extends StatelessWidget {
       child: M3ShapeMorph(
       radius: r,
       height: 48,
-      color: sel ? scheme.secondaryContainer : scheme.surfaceContainerHigh,
+      color: sel ? scheme.primary : scheme.surfaceContainerHigh,
       child: Material(
         type: MaterialType.transparency,
         child: InkWell(
@@ -995,4 +995,72 @@ class _WavyPainter extends CustomPainter {
   @override
   bool shouldRepaint(_WavyPainter o) =>
       o.v != v || o.phase != phase || o.color != color || o.track != track;
+}
+
+// ── Labelled button (same look everywhere) ─────────────────────────────────
+enum M3ButtonKind { filled, tonal, text }
+
+/// One button style for the whole app: pill at rest, morphs to a soft
+/// square when pressed. [filled] = main action, [tonal] = secondary,
+/// [text] = quiet action (skip, back, links).
+class M3LabelButton extends StatelessWidget {
+  const M3LabelButton({
+    super.key,
+    required this.label,
+    this.icon,
+    this.onTap,
+    this.kind = M3ButtonKind.tonal,
+    this.expand = false,
+    this.loading = false,
+    this.height = 56,
+  });
+
+  final String label;
+  final IconData? icon;
+  final VoidCallback? onTap;
+  final M3ButtonKind kind;
+  final bool expand;
+  final bool loading;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final Color bg, fg;
+    switch (kind) {
+      case M3ButtonKind.filled:
+        bg = scheme.primary;
+        fg = scheme.onPrimary;
+      case M3ButtonKind.tonal:
+        bg = scheme.secondaryContainer;
+        fg = scheme.onSecondaryContainer;
+      case M3ButtonKind.text:
+        bg = Colors.transparent;
+        fg = scheme.primary;
+    }
+    return M3TonalButton(
+      onTap: loading ? null : onTap,
+      color: bg,
+      height: height,
+      width: expand ? double.infinity : null,
+      radius: BorderRadius.circular(height / 2),
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (loading)
+            SizedBox(width: 20, height: 20, child: M3Spinner(color: fg))
+          else if (icon != null)
+            Icon(icon, size: 20, color: fg),
+          if (loading || icon != null) const SizedBox(width: 8),
+          Flexible(
+            child: Text(label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: fg, fontSize: 16, fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+  }
 }

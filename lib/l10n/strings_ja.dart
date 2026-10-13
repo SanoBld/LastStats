@@ -254,11 +254,11 @@ class AppStringsJa implements AppStrings {
   @override String get onboardFinish => '完了';
   @override String get onboardBack => '戻る';
   @override String get onboardAppearanceTitle => 'スタイルをカスタマイズ';
-  @override String get onboardAppearanceSub => 'テーマ、アクセントカラー、Material You。';
+  @override String get onboardAppearanceSub => 'ライトテーマまたはダークテーマ、アクセントカラー、アプリの見た目のスタイルを選択してください。';
   @override String get onboardNotifTitle => '最新情報をチェック';
-  @override String get onboardNotifSub => '通知とバイブレーション。';
+  @override String get onboardNotifSub => '受け取る通知の種類と、端末を振動させるかどうかを選択してください。';
   @override String get onboardFavTitle => 'お気に入りのプロフィール';
-  @override String get onboardFavSub => 'Last.fmフレンドを追加してすぐに見つけられるようにします。';
+  @override String get onboardFavSub => 'Last.fm の友達を追加すると、アプリからすぐにそのプロフィールを開けます。';
   @override String get onboardFavHint => 'Last.fmユーザー名';
   @override String get onboardFavAdd => '追加';
   @override String get onboardFavEmpty => 'お気に入りはまだありません';
@@ -268,11 +268,11 @@ class AppStringsJa implements AppStrings {
   @override String get onboardFavNoFriends => 'このアカウントにはフレンドがいません';
   @override String get onboardFavSelected => '選択中のお気に入り';
   @override String get onboardDashTitle => 'あなたのダッシュボード';
-  @override String get onboardDashSub => '表示するセクションを選択してください。';
+  @override String get onboardDashSub => 'ホーム画面に表示するセクションを選択してください。後から設定で変更できます。';
   @override String get onboardStartupTitle => '起動画面';
-  @override String get onboardStartupSub => '最初に表示するタブはどれですか？';
+  @override String get onboardStartupSub => 'アプリを起動したときに最初に開くタブを選択してください。';
   @override String get onboardPlatformTitle => '何で音楽を聴いていますか？';
-  @override String get onboardPlatformSub => 'トラック・アーティスト・アルバムページで役立つリンクのみを表示します。';
+  @override String get onboardPlatformSub => '音楽を聴いている場所を教えてください。曲、アーティスト、アルバムのページには、役に立つリンクだけが表示されます。';
   @override String get platformLastfm => 'Last.fm';
   @override String get platformSpotify => 'Spotify';
   @override String get platformYtMusic => 'YouTube Music';
@@ -282,13 +282,13 @@ class AppStringsJa implements AppStrings {
   @override String get settingsShowAllPlatformLinks => '常にすべて表示';
   @override String get settingsShowAllPlatformLinksSub => 'フィルターを無視してすべてのリンクを表示（Last.fm、Spotify、YT Music、Web）';
   @override String get onboardUpdatesTitle => 'アップデート';
-  @override String get onboardUpdatesSub => '新しいバージョンを自動でチェックします。';
+  @override String get onboardUpdatesSub => '新しいバージョンが公開されているかどうかを自動で確認します。';
   @override String get onboardStyle => 'スタイル';
   @override String get onboardStyleMaterialYou => 'Material You';
   @override String get onboardStyleNothing => 'Nothing OS';
   @override String get onboardPreview => 'プレビュー';
   @override String get onboardPreviewButton => 'ボタン';
-  @override String get onboardPreviewOutline => 'アウトライン';
+  @override String get onboardPreviewOutline => 'メインボタン';
   @override String get onboardPreviewText => 'サンプルテキスト';
   @override String get onboardPreviewBubble => '吹き出し';
   @override String get onboardAccentTint => 'アクセントの色合い';
@@ -296,28 +296,28 @@ class AppStringsJa implements AppStrings {
   @override String get onboardNothingRedYellow => 'レッド＋イエロー';
   @override String get onboardDisplay => '表示';
   @override String get onboardOledTitle => 'OLED純黒';
-  @override String get onboardOledSub => 'ダークモード時に完全な黒背景を使用';
+  @override String get onboardOledSub => 'ダークモードで背景が完全な黒になり、OLED 画面ではバッテリーの節約になります。';
   @override String get onboardArtworkColorTitle => 'アートワークから色を取得';
-  @override String get onboardArtworkColorSub => '再生中のジャケット写真にアクセントカラーを合わせます';
+  @override String get onboardArtworkColorSub => 'アプリのアクセントカラーが、再生中の曲のジャケットに合わせて自動的に変わります。';
   @override String get onboardNewsTitle => 'お知らせ通知';
-  @override String get onboardNewsSub => '新機能や修正についての通知を受け取ります';
+  @override String get onboardNewsSub => '新機能が追加されたときや不具合が修正されたときに通知します。';
   @override String get onboardNewsBadgeTitle => 'お知らせバッジ';
-  @override String get onboardNewsBadgeSub => '新着情報があるときにベルアイコンに赤い点を表示';
+  @override String get onboardNewsBadgeSub => '読んでいない新しいお知らせがあると、ホーム画面のベルに赤い点が表示されます。';
   @override String get onboardHapticTitle => '触覚フィードバック';
-  @override String get onboardHapticSub => '主要な操作時に軽い振動を感じられます';
+  @override String get onboardHapticSub => 'ボタンや重要な項目をタップすると、端末が軽く振動します。';
   @override String get onboardRecaps => 'まとめ';
   @override String get onboardDailyRecapTitle => 'デイリーまとめ';
-  @override String get onboardDailyRecapSub => 'その日のリスニングの簡単なサマリー';
+  @override String get onboardDailyRecapSub => '毎日、その日に聴いた内容のまとめを受け取ります。';
   @override String get onboardWeeklyRecapTitle => 'ウィークリーまとめ';
-  @override String get onboardWeeklyRecapSub => 'その週のトップアーティスト、アルバム、トラック';
+  @override String get onboardWeeklyRecapSub => '毎週、よく聴いたアーティスト、アルバム、曲のランキングを受け取ります。';
   @override String get onboardMilestonesSection => 'スクロブルの節目';
   @override String get onboardMilestonesTitle => 'マイルストーン';
-  @override String get onboardMilestonesSub => 'キリのいいスクロブル数をお祝いします';
+  @override String get onboardMilestonesSub => '再生回数がキリのいい数字に達すると、お祝いの通知が届きます。';
   @override String get onboardGrandMilestonesTitle => '大きな節目';
-  @override String get onboardGrandMilestonesSub => '大きなマイルストーン達成時に特別なお祝いを表示';
-  @override String get onboardDynamicColorSub => '壁紙から色を取得します（Android 12以降）';
+  @override String get onboardGrandMilestonesSub => '再生回数がとても大きな節目に達すると、特別なお祝いが表示されます。';
+  @override String get onboardDynamicColorSub => '壁紙の色をアプリに反映します。この機能は Android 12 以降で利用できます。';
   @override String get onboardBetaTitle => 'ベータアップデート';
-  @override String get onboardBetaSub => '先行リリース版への早期アクセス';
+  @override String get onboardBetaSub => 'テスト版を誰よりも早く受け取れます。不具合が含まれている場合があります。';
   @override String get notifDetailTitle => '通知';
   @override String get notifDetailOpenLink => 'リンクを開く';
   @override String get settingsCheckingUpdates => 'アップデートを確認中…';
@@ -332,7 +332,7 @@ class AppStringsJa implements AppStrings {
   @override String get setupUsernameLabel => 'Last.fmユーザー名';
   @override String get setupApiKeyLabel => 'Last.fm APIキー';
   @override String get setupApiKeyHint => '32文字の16進数キー';
-  @override String get setupApiKeyPrivacyNote => 'ローカルに保存され、第三者に送信されることはありません。';
+  @override String get setupApiKeyPrivacyNote => 'キーはこの端末にのみ保存され、第三者に送信されることはありません。';
   @override String get setupRememberMe => 'ログイン情報を保存';
   @override String get setupGetApiKey => '無料でAPIキーを取得';
   @override String get setupWelcomeBanner => 'LastStatsへようこそ！';
@@ -406,7 +406,7 @@ class AppStringsJa implements AppStrings {
   @override String get backupFileSaved => 'バックアップを保存しました';
   @override String get backupFileSaveFailed => 'ファイルの保存に失敗しました';
   @override String get setupRestoreBackup => 'バックアップを復元';
-  @override String get setupRestoreBackupSub => '.jsonバックアップファイルからアカウントと設定を復元します';
+  @override String get setupRestoreBackupSub => 'JSON 形式のバックアップファイルから、アカウントと設定を復元します。';
   @override String get backupRestoreKeysTitle => 'APIキーを復元';
   @override String get backupRestoreKeysDesc => 'このバックアップから復元するLast.fmのキーを選んでください。';
   @override String get backupRestoreApiKeyLabel => 'APIキー';
@@ -574,7 +574,7 @@ class AppStringsJa implements AppStrings {
   @override String get dashThisWeekLabel => '今週';
   @override String get dashDayUnitShort => '日';
   @override String get setupEnableFavorites      => 'お気に入りを有効にする（任意）';
-  @override String get setupFavoritesExplain     => 'シークレットキーを使うと、Last.fm上で直接曲をお気に入り登録・解除できます。';
+  @override String get setupFavoritesExplain     => 'シークレットキーを使うと、アプリから直接 Last.fm のアカウントで曲をお気に入りに追加したり、削除したりできます。';
   @override String get setupSecretKeyLabel       => 'Last.fm シークレットキー';
   @override String get favConnectInvalidSecret   => 'シークレットキーは32文字である必要があります。';
   @override String get favConnectDialogTitle     => 'お気に入り機能を許可';
@@ -889,7 +889,7 @@ const Map<String, String> kTxJa = {
   'lib_split_t': 'コラボを分割',
   'lib_split_s': '「Gims & Damso」は独立したアーティストではなく、Gims と Damso の両方にカウントされます。「Simon & Garfunkel」のようなグループはそのままです。',
   'lib_step_t': 'あなたのライブラリ',
-  'lib_step_s': '再生履歴のまとめ方を選びます。設定でいつでも変更できます。',
+  'lib_step_s': 'アプリが再生履歴をどのようにまとめるかを選択してください。設定でいつでも変更できます。',
   'bk_dash_t': 'ダッシュボードと起動',
   'bk_dash_s': 'セクション、ヘッダー、統計カード、発見、起動タブ',
   'bk_notif_t': '通知',
@@ -930,13 +930,14 @@ const Map<String, String> kTxJa = {
   'dash_motion_t': 'ダッシュボードのアニメーションカバー',
   'dash_motion_s': '再生中の曲の動画を再生カードとヘッダーで再生します。動画カバーが必要です。',
   'onb_cov_t': 'カバーと画像',
-  'onb_cov_s': '画像の形とカバーの動作を選択してください。',
+  'onb_cov_s': '画像の形と、ジャケットの表示方法を選択してください。',
   'onb_sync_t': '同期とバッテリー',
-  'onb_sync_s': 'バッテリーを消耗せずに統計を最新の状態に保ちます。',
+  'onb_sync_s': 'スマートフォンのバッテリーを使いすぎずに、統計を最新の状態に保ちます。',
   'onb_autosync_t': '自動同期',
-  'onb_autosync_s': 'バックグラウンドで新しいスクロブルを定期的に確認します。',
+  'onb_autosync_s': 'アプリがバックグラウンドで定期的に、新しい再生履歴があるかどうかを確認します。',
   'onb_freq': '確認の頻度',
   'onb_every_h': '{h}時間ごと',
+  'onb_every_1h': '1時間ごと',
   'load_backup_note': 'バックアップを検出:新しいスクロブルのみ確認します。',
   'dash_nowplay': '再生中',
   'dash_stats': '統計',
@@ -955,11 +956,11 @@ const Map<String, String> kTxJa = {
   'lvl': 'レベル {n}',
   'lvl_history': 'レベル履歴',
   'set_living_t': '動くカバー',
-  'set_living_s': '画像にやわらかなズームと奥行き効果',
+  'set_living_s': '画像が、軽いズームと奥行きの効果でゆっくり動きます。',
   'set_motion_t': 'ビデオカバー',
-  'set_motion_s': 'アニメーションカバーがあれば再生します',
+  'set_motion_s': '曲にアニメーション動画のジャケットがある場合は再生します。',
   'set_achv_t': '実績とレベル',
-  'set_achv_s': 'ティア、バッジ、アカウントレベル',
+  'set_achv_s': '目標、バッジ、アカウントのレベルを確認できます。',
   'cache_img_limit_t': '写真キャッシュの上限',
   'cache_img_limit_s': 'ジャケット、アーティスト写真、アバター。古いものから削除されます。',
   'cache_vid_limit_t': '動画キャッシュの上限',
@@ -1113,8 +1114,8 @@ const Map<String, String> kTxJa = {
   'ui_always_on': '常にオン',
   'ui_force_eco_mode_on_rega': 'バッテリー残量に関わらず省電力モードを強制的にオンにします。',
   'ui_auto_activate': '自動でオン',
-  'ui_turn_on_below_a_batter': 'バッテリー残量が一定％を下回ったらオン',
-  'ui_switches_on_by_itself_': 'バッテリー残量が下のレベルまで下がると自動でオンになります。',
+  'ui_turn_on_below_a_batter': 'バッテリー残量が少ないときに省電力モードをオンにする',
+  'ui_switches_on_by_itself_': 'バッテリー残量が少なくなると、省電力モードが自動でオンになります。具体的な残量は後から設定で選べます。',
   'ui_threshold': 'しきい値',
   'ui_choose_the_tab_display': 'アプリ起動時に表示するタブを選択します。',
   'ui_the_selected_tab_will_': '選択したタブは次回の起動時に表示されます。',
@@ -1137,7 +1138,7 @@ const Map<String, String> kTxJa = {
   'ui_details': '詳細',
   'ui_all_past_releases_chan': '過去のすべてのバージョン、変更履歴、ダウンロード',
   'ui_please_fill_both_field': '両方の欄を入力してください。',
-  'ui_api_key_must_be_32_cha': 'APIキーは32文字である必要があります。',
+  'ui_api_key_must_be_32_cha': 'API キーはちょうど 32 文字で入力してください。',
   'ui_profile_not_found': 'プロフィールが見つかりません。',
   'ui_chart_monthly': '月別の棒グラフ',
   'ui_chart_cumul': '推移',
@@ -1298,16 +1299,16 @@ const Map<String, String> kTxJa = {
   'dg_nofound': '動画なし',
   'dg_notpl': '検索テンプレートがありません（しばらくしてから再試行してください）',
   'dg_results': '件の結果',
-  'lfm_web_sub': 'APIキーは不要です：アプリ内蔵のキーを使用します。',
+  'lfm_web_sub': 'API キーは不要です。アプリに組み込まれたキーを使用します。',
   'lfm_manual_hint': 'ユーザー名を自動で取得できませんでした。ログイン後に下に入力してください。',
   'lfm_manual_label': 'ユーザー名',
   'rec': '推奨',
   'not_rec': '非推奨',
   'sm_title': '接続方法',
   'sm_key_t': '自分のAPIキー',
-  'sm_key_s': '専用の利用枠、お気に入りも利用可。',
+  'sm_key_s': '自分専用の利用上限が使え、お気に入り機能も利用できます。',
   'sm_builtin_t': '内蔵キー',
-  'sm_builtin_s': 'ユーザー名のみ。利用枠は他のユーザーと共有。',
+  'sm_builtin_s': '必要なのはユーザー名だけです。利用上限は他のユーザーと共有されます。',
   'wl_title': 'ようこそ',
   'wl_sub': 'Last.fm への接続方法をお選びください。',
   'sr_from_recent': '最近の検索から',

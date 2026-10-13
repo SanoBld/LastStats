@@ -287,11 +287,11 @@ class AppStringsPt implements AppStrings {
   @override String get onboardFinish           => 'Concluir';
   @override String get onboardBack             => 'Voltar';
   @override String get onboardAppearanceTitle  => 'Personalize seu estilo';
-  @override String get onboardAppearanceSub    => 'Tema, cor de destaque e Material You.';
+  @override String get onboardAppearanceSub    => 'Escolha o tema claro ou escuro, a cor de destaque e o estilo visual do aplicativo.';
   @override String get onboardNotifTitle       => 'Fique por dentro';
-  @override String get onboardNotifSub         => 'Notificações e vibrações.';
+  @override String get onboardNotifSub         => 'Escolha quais notificações deseja receber e se o telefone deve vibrar.';
   @override String get onboardFavTitle         => 'Seus perfis favoritos';
-  @override String get onboardFavSub           => 'Adicione amigos do Last.fm para encontrá-los rapidamente.';
+  @override String get onboardFavSub           => 'Adicione amigos do Last.fm para encontrar rapidamente os perfis deles no aplicativo.';
   @override String get onboardFavHint          => 'Usuário do Last.fm';
   @override String get onboardFavAdd           => 'Adicionar';
   @override String get onboardFavEmpty         => 'Nenhum favorito ainda';
@@ -301,11 +301,11 @@ class AppStringsPt implements AppStrings {
   @override String get onboardFavNoFriends     => 'Nenhum amigo encontrado nessa conta';
   @override String get onboardFavSelected      => 'Favoritos selecionados';
   @override String get onboardDashTitle        => 'Seu painel';
-  @override String get onboardDashSub          => 'Escolha quais seções mostrar.';
+  @override String get onboardDashSub          => 'Escolha quais seções mostrar na tela inicial. Você poderá alterá-las depois nas configurações.';
   @override String get onboardStartupTitle     => 'Tela inicial';
-  @override String get onboardStartupSub       => 'Qual aba você quer ver primeiro?';
+  @override String get onboardStartupSub       => 'Escolha qual aba abre primeiro quando o aplicativo é iniciado.';
   @override String get onboardPlatformTitle    => 'Onde você ouve música?';
-  @override String get onboardPlatformSub      => 'Assim só aparecem os links úteis nas fichas de faixa/artista/álbum.';
+  @override String get onboardPlatformSub      => 'Informe onde você ouve música. O aplicativo mostrará apenas os links úteis nas páginas de músicas, artistas e álbuns.';
   @override String get platformLastfm          => 'Last.fm';
   @override String get platformSpotify         => 'Spotify';
   @override String get platformYtMusic         => 'YouTube Music';
@@ -315,13 +315,13 @@ class AppStringsPt implements AppStrings {
   @override String get settingsShowAllPlatformLinks    => 'Sempre mostrar tudo';
   @override String get settingsShowAllPlatformLinksSub => 'Ignora o filtro e mostra todos os links (Last.fm, Spotify, YT Music, Web)';
   @override String get onboardUpdatesTitle     => 'Atualizações';
-  @override String get onboardUpdatesSub       => 'Verificação automática de novas versões.';
+  @override String get onboardUpdatesSub       => 'O aplicativo verifica automaticamente se há uma nova versão disponível.';
   @override String get onboardStyle              => 'Estilo';
   @override String get onboardStyleMaterialYou    => 'Material You';
   @override String get onboardStyleNothing        => 'Nothing OS';
   @override String get onboardPreview             => 'Prévia';
   @override String get onboardPreviewButton       => 'Botão';
-  @override String get onboardPreviewOutline      => 'Contorno';
+  @override String get onboardPreviewOutline      => 'Botão principal';
   @override String get onboardPreviewText         => 'Texto de exemplo';
   @override String get onboardPreviewBubble       => 'Bolha';
   @override String get onboardAccentTint          => 'Tom de destaque';
@@ -329,28 +329,28 @@ class AppStringsPt implements AppStrings {
   @override String get onboardNothingRedYellow    => 'Vermelho + amarelo';
   @override String get onboardDisplay             => 'Tela';
   @override String get onboardOledTitle           => 'Preto OLED';
-  @override String get onboardOledSub             => 'Fundo preto puro no modo escuro';
+  @override String get onboardOledSub             => 'O fundo fica totalmente preto no modo escuro, o que economiza bateria em telas OLED.';
   @override String get onboardArtworkColorTitle   => 'Cor a partir da capa';
-  @override String get onboardArtworkColorSub     => 'Combina a cor de destaque com a capa em reprodução';
+  @override String get onboardArtworkColorSub     => 'A cor de destaque do aplicativo se adapta automaticamente à capa da música que está tocando.';
   @override String get onboardNewsTitle           => 'Notificações de novidades';
-  @override String get onboardNewsSub             => 'Seja avisado sobre novos recursos e correções';
+  @override String get onboardNewsSub             => 'Você é avisado quando uma nova função é adicionada ou um problema é corrigido.';
   @override String get onboardNewsBadgeTitle      => 'Ponto de novidades';
-  @override String get onboardNewsBadgeSub        => 'Ponto vermelho no sino do painel quando há novidades';
+  @override String get onboardNewsBadgeSub        => 'Um ponto vermelho aparece no sino da tela inicial quando há uma novidade para ler.';
   @override String get onboardHapticTitle         => 'Feedback tátil';
-  @override String get onboardHapticSub           => 'Sinta vibrações sutis em interações importantes';
+  @override String get onboardHapticSub           => 'O telefone vibra levemente quando você toca em botões e em elementos importantes.';
   @override String get onboardRecaps              => 'Resumos';
   @override String get onboardDailyRecapTitle     => 'Resumo diário';
-  @override String get onboardDailyRecapSub       => 'Um resumo rápido da sua escuta do dia';
+  @override String get onboardDailyRecapSub       => 'Todos os dias, receba um resumo do que você ouviu.';
   @override String get onboardWeeklyRecapTitle    => 'Resumo semanal';
-  @override String get onboardWeeklyRecapSub      => 'Seus tops de artistas, álbuns e faixas da semana';
+  @override String get onboardWeeklyRecapSub      => 'Toda semana, receba a lista dos seus artistas, álbuns e músicas mais ouvidos.';
   @override String get onboardMilestonesSection   => 'Marcos de scrobbles';
   @override String get onboardMilestonesTitle     => 'Marcos';
-  @override String get onboardMilestonesSub       => 'Celebre números redondos de scrobbles';
+  @override String get onboardMilestonesSub       => 'Uma notificação parabeniza você quando o número de reproduções chega a um número redondo.';
   @override String get onboardGrandMilestonesTitle => 'Grandes marcos';
-  @override String get onboardGrandMilestonesSub   => 'Comemoração especial para grandes marcos';
-  @override String get onboardDynamicColorSub      => 'Usar as cores do seu papel de parede (Android 12+)';
+  @override String get onboardGrandMilestonesSub   => 'Uma comemoração especial aparece quando você atinge um número muito grande de reproduções.';
+  @override String get onboardDynamicColorSub      => 'O aplicativo usa as cores do seu papel de parede. Esta opção está disponível a partir do Android 12.';
   @override String get onboardBetaTitle            => 'Atualizações beta';
-  @override String get onboardBetaSub              => 'Acesso antecipado a pré-lançamentos';
+  @override String get onboardBetaSub              => 'Receba as versões de teste antes de todo mundo. Elas podem conter erros.';
 
   @override String get notifDetailTitle            => 'Notificação';
   @override String get notifDetailOpenLink         => 'Abrir link';
@@ -370,7 +370,7 @@ class AppStringsPt implements AppStrings {
   @override String get setupUsernameLabel          => 'Usuário do Last.fm';
   @override String get setupApiKeyLabel            => 'Chave de API do Last.fm';
   @override String get setupApiKeyHint             => 'Chave hexadecimal de 32 caracteres';
-  @override String get setupApiKeyPrivacyNote      => 'Armazenada localmente. Nunca enviada a terceiros.';
+  @override String get setupApiKeyPrivacyNote      => 'Sua chave é salva apenas neste dispositivo e nunca é enviada a terceiros.';
   @override String get setupRememberMe             => 'Lembrar de mim';
   @override String get setupGetApiKey              => 'Obter uma chave de API grátis';
   @override String setupScrobblesToImport(String c) => '$c scrobbles para importar';
@@ -454,7 +454,7 @@ class AppStringsPt implements AppStrings {
   @override String get backupFileSaved             => 'Backup salvo';
   @override String get backupFileSaveFailed        => 'Falha ao salvar o arquivo';
   @override String get setupRestoreBackup          => 'Restaurar um backup';
-  @override String get setupRestoreBackupSub       => 'Recupere sua conta e configurações a partir de um arquivo .json de backup';
+  @override String get setupRestoreBackupSub       => 'Recupere sua conta e suas configurações a partir de um arquivo de backup no formato .json.';
   @override String get backupRestoreKeysTitle => 'Restaurar chaves de API';
   @override String get backupRestoreKeysDesc => 'Escolha quais chaves do Last.fm restaurar a partir deste backup.';
   @override String get backupRestoreApiKeyLabel => 'Chave de API';
@@ -640,7 +640,7 @@ class AppStringsPt implements AppStrings {
   @override String get dashThisWeekLabel        => 'Esta semana';
   @override String get dashDayUnitShort         => 'd';
   @override String get setupEnableFavorites      => 'Ativar favoritos (opcional)';
-  @override String get setupFavoritesExplain     => 'Sua chave secreta permite curtir (ou descurtir) faixas diretamente no Last.fm.';
+  @override String get setupFavoritesExplain     => 'Sua chave secreta permite que o aplicativo adicione uma música aos favoritos, ou a remova, diretamente na sua conta do Last.fm.';
   @override String get setupSecretKeyLabel       => 'Chave secreta do Last.fm';
   @override String get favConnectInvalidSecret   => 'A chave secreta deve ter 32 caracteres.';
   @override String get favConnectDialogTitle     => 'Autorizar favoritos';
@@ -919,7 +919,7 @@ const Map<String, String> kTxPt = {
   'lib_split_t': 'Separar colaborações',
   'lib_split_s': '"Gims & Damso" conta para Gims e para Damso em vez de ser um artista à parte. Bandas como "Simon & Garfunkel" continuam inteiras.',
   'lib_step_t': 'Sua biblioteca',
-  'lib_step_s': 'Escolha como agrupar suas reproduções. Você pode mudar isso a qualquer momento nas configurações.',
+  'lib_step_s': 'Escolha como o aplicativo agrupa suas reproduções. Você pode alterar isso a qualquer momento nas configurações.',
   'bk_dash_t': 'Painel e inicialização',
   'bk_dash_s': 'Seções, cabeçalho, cartões de estatísticas, descobrir, aba inicial',
   'bk_notif_t': 'Notificações',
@@ -960,13 +960,14 @@ const Map<String, String> kTxPt = {
   'dash_motion_t': 'Capa animada no painel',
   'dash_motion_s': 'Reproduz o vídeo da faixa atual no cartão de reprodução e no cabeçalho. Requer as capas de vídeo.',
   'onb_cov_t': 'Capas e imagens',
-  'onb_cov_s': 'Escolha a forma das imagens e o comportamento das capas.',
+  'onb_cov_s': 'Escolha o formato das imagens e como as capas são exibidas.',
   'onb_sync_t': 'Sincronização e bateria',
-  'onb_sync_s': 'Mantenha as suas estatísticas atualizadas sem gastar a bateria.',
+  'onb_sync_s': 'Mantenha suas estatísticas atualizadas sem gastar muita bateria do telefone.',
   'onb_autosync_t': 'Sincronização automática',
-  'onb_autosync_s': 'Verifica regularmente os seus novos scrobbles em segundo plano.',
+  'onb_autosync_s': 'O aplicativo verifica regularmente, em segundo plano, se você tem novas reproduções.',
   'onb_freq': 'Frequência de verificação',
-  'onb_every_h': 'A cada {h} h',
+  'onb_every_h': 'A cada {h} horas',
+  'onb_every_1h': 'A cada hora',
   'load_backup_note': 'Backup detectado: só os scrobbles mais recentes serão verificados.',
   'dash_nowplay': 'Tocando agora',
   'dash_stats': 'Estatísticas',
@@ -985,11 +986,11 @@ const Map<String, String> kTxPt = {
   'lvl': 'Nível {n}',
   'lvl_history': 'Histórico de níveis',
   'set_living_t': 'Capas animadas',
-  'set_living_s': 'Zoom suave e efeito de profundidade nas imagens',
+  'set_living_s': 'As imagens se movem suavemente com um leve efeito de zoom e profundidade.',
   'set_motion_t': 'Capas em vídeo',
-  'set_motion_s': 'Reproduz a capa animada quando existir',
+  'set_motion_s': 'Reproduz a capa animada em vídeo quando ela existe para a música.',
   'set_achv_t': 'Conquistas e níveis',
-  'set_achv_s': 'Níveis, selos e nível da conta',
+  'set_achv_s': 'Acompanhe suas metas, seus emblemas e o nível da sua conta.',
   'cache_img_limit_t': 'Limite do cache de fotos',
   'cache_img_limit_s': 'Capas, fotos de artistas e avatares. As mais antigas são removidas primeiro.',
   'cache_vid_limit_t': 'Limite do cache de vídeo',
@@ -1143,8 +1144,8 @@ const Map<String, String> kTxPt = {
   'ui_always_on': 'Sempre ativado',
   'ui_force_eco_mode_on_rega': 'Força o modo de economia, independentemente do nível da bateria.',
   'ui_auto_activate': 'Ativação automática',
-  'ui_turn_on_below_a_batter': 'Ativar abaixo de um % de bateria',
-  'ui_switches_on_by_itself_': 'Ativa sozinho quando a bateria cair até o nível abaixo.',
+  'ui_turn_on_below_a_batter': 'Ativar a economia de energia quando a bateria estiver baixa',
+  'ui_switches_on_by_itself_': 'A economia de energia é ativada sozinha quando o nível da bateria fica baixo. Você poderá escolher o nível exato depois nas configurações.',
   'ui_threshold': 'Limite',
   'ui_choose_the_tab_display': 'Escolha a aba exibida ao iniciar o app.',
   'ui_the_selected_tab_will_': 'A aba selecionada aparecerá na próxima vez que o app for iniciado.',
@@ -1167,7 +1168,7 @@ const Map<String, String> kTxPt = {
   'ui_details': 'Detalhes',
   'ui_all_past_releases_chan': 'Todas as versões anteriores, changelogs e downloads',
   'ui_please_fill_both_field': 'Preencha os dois campos.',
-  'ui_api_key_must_be_32_cha': 'A chave da API deve ter 32 caracteres.',
+  'ui_api_key_must_be_32_cha': 'A chave de API deve ter exatamente 32 caracteres.',
   'ui_profile_not_found': 'Perfil não encontrado.',
   'ui_chart_monthly': 'Barras mensais',
   'ui_chart_cumul': 'Progressão',
@@ -1328,16 +1329,16 @@ const Map<String, String> kTxPt = {
   'dg_nofound': 'sem vídeo',
   'dg_notpl': 'modelo de busca ausente (tente de novo em instantes)',
   'dg_results': 'resultados',
-  'lfm_web_sub': 'Sem chave de API: a chave integrada ao aplicativo é usada.',
+  'lfm_web_sub': 'Nenhuma chave de API é necessária: o aplicativo usa a própria chave integrada.',
   'lfm_manual_hint': 'Não foi possível encontrar o nome de usuário automaticamente. Digite-o abaixo depois de entrar.',
   'lfm_manual_label': 'Nome de usuário',
   'rec': 'recomendado',
   'not_rec': 'não recomendado',
   'sm_title': 'Método de conexão',
   'sm_key_t': 'Minha chave de API',
-  'sm_key_s': 'Cota só sua, favoritos possíveis.',
+  'sm_key_s': 'Você tem seu próprio limite de uso e os favoritos ficam disponíveis.',
   'sm_builtin_t': 'Chave integrada',
-  'sm_builtin_s': 'Só o nome de usuário. Cota compartilhada com outros usuários.',
+  'sm_builtin_s': 'Apenas o seu nome de usuário é necessário. O limite de uso é compartilhado com os outros usuários.',
   'wl_title': 'Bem-vindo',
   'wl_sub': 'Escolha como deseja se conectar ao Last.fm.',
   'sr_from_recent': 'Das suas pesquisas recentes',

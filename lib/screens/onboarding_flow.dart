@@ -156,7 +156,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               Text('${_page + 1}/$_pages',
                   style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12, fontWeight: FontWeight.w600)),
               const Spacer(),
-              TextButton(onPressed: _finish, child: Text(L.onboardSkip)),
+              M3LabelButton(kind: M3ButtonKind.text, height: 40, label: L.onboardSkip, onTap: _finish),
             ]),
           ),
           Expanded(
@@ -176,11 +176,13 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
             child: Row(children: [
               if (_page > 0)
-                TextButton(onPressed: () => _goTo(_page - 1), child: Text(L.onboardBack)),
+                M3LabelButton(kind: M3ButtonKind.tonal, icon: Icons.arrow_back_rounded, label: L.onboardBack, onTap: () => _goTo(_page - 1)),
               const Spacer(),
-              FilledButton(
-                onPressed: () => _page == _pages - 1 ? _finish() : _goTo(_page + 1),
-                child: Text(_page == _pages - 1 ? L.onboardFinish : L.onboardNext),
+              M3LabelButton(
+                kind: M3ButtonKind.filled,
+                icon: _page == _pages - 1 ? Icons.check_rounded : Icons.arrow_forward_rounded,
+                label: _page == _pages - 1 ? L.onboardFinish : L.onboardNext,
+                onTap: () => _page == _pages - 1 ? _finish() : _goTo(_page + 1),
               ),
             ]),
           ),
@@ -305,7 +307,7 @@ class _OnbChoice extends StatelessWidget {
         duration: const Duration(milliseconds: 240),
         curve: M3Motion.emphasizedDecelerate,
         decoration: BoxDecoration(
-          color: selected ? scheme.primaryContainer : scheme.surfaceContainerLow,
+          color: selected ? scheme.primary : scheme.surfaceContainerLow,
           borderRadius: BorderRadius.circular(selected ? 28 : 20),
         ),
         clipBehavior: Clip.antiAlias,
@@ -314,8 +316,8 @@ class _OnbChoice extends StatelessWidget {
           leading: leading,
           title: Text(title, style: TextStyle(
               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-              color: selected ? scheme.onPrimaryContainer : scheme.onSurface)),
-          trailing: selected ? Icon(Icons.check_rounded, color: scheme.onPrimaryContainer) : null,
+              color: selected ? scheme.onPrimary : scheme.onSurface)),
+          trailing: selected ? Icon(Icons.check_rounded, color: scheme.onPrimary) : null,
           onTap: onTap,
         ),
       ),
@@ -472,8 +474,8 @@ class _AppearanceStepState extends State<_AppearanceStep> {
                   // rather than the raw accent value, so it stays accurate
                   // and visible in every mode (custom, dynamic, artwork).
                   child: Wrap(spacing: 10, runSpacing: 10, crossAxisAlignment: WrapCrossAlignment.center, children: [
-                    FilledButton.tonal(onPressed: () {}, child: Text(L.onboardPreviewButton)),
-                    OutlinedButton(onPressed: () {}, child: Text(L.onboardPreviewOutline)),
+                    M3LabelButton(kind: M3ButtonKind.tonal, height: 48, label: L.onboardPreviewButton, onTap: () {}),
+                    M3LabelButton(kind: M3ButtonKind.filled, height: 48, label: L.onboardPreviewOutline, onTap: () {}),
                     Text(L.onboardPreviewText, style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w700)),
                     Chip(label: Text(L.onboardPreviewBubble),
                         backgroundColor: scheme.secondaryContainer,
@@ -965,7 +967,7 @@ class _SyncBatteryStepState extends State<_SyncBatteryStep> {
                     Wrap(spacing: 8, runSpacing: 8, children: [
                       for (final h in _freqs)
                         ChoiceChip(
-                          label: Text(tx('onb_every_h', {'h': '$h'})),
+                          label: Text(h == 1 ? tx('onb_every_1h') : tx('onb_every_h', {'h': '$h'})),
                           selected: _freq == h,
                           onSelected: (_) => _setFreq(h),
                         ),
