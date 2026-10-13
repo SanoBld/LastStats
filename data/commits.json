@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-13T21:04:30Z",
+  "updated": "2026-10-13T21:09:09Z",
   "commits": [
+    {
+      "sha": "532e1ef00e8d2b4e3964121940079cb1ec05030e",
+      "message": "fix: ajuster la largeur maximale des colonnes pour une meilleure adaptabilité sur différents écrans",
+      "date": "2026-10-13T21:06:40Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/532e1ef00e8d2b4e3964121940079cb1ec05030e",
+      "tags": []
+    },
     {
       "sha": "af5fcb355580904c4a8a8e034e91f29e1a1ac95f",
       "message": "fix: ajuster les contraintes et les espacements dans les pages de paramètres pour une meilleure présentation",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/a665bbe5ec2977cd3c35d9bfcf092a342e57dfb4",
-      "tags": []
-    },
-    {
-      "sha": "776c970e5d4e2777877152046ef135e6dc99a986",
-      "message": "feat: ajouter un système d'achievements avec activation, affichage et options de configuration",
-      "date": "2026-08-10T19:58:15Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/776c970e5d4e2777877152046ef135e6dc99a986",
       "tags": []
     }
   ]
