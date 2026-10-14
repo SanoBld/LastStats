@@ -302,7 +302,7 @@ class AppStringsJa implements AppStrings {
   @override String get onboardNewsTitle => 'お知らせ通知';
   @override String get onboardNewsSub => '新機能が追加されたときや不具合が修正されたときに通知します。';
   @override String get onboardNewsBadgeTitle => 'お知らせバッジ';
-  @override String get onboardNewsBadgeSub => '読んでいない新しいお知らせがあると、ホーム画面のベルに赤い点が表示されます。';
+  @override String get onboardNewsBadgeSub => '読んでいない新しいお知らせがあると、ホーム画面のベルにバッジが表示されます。';
   @override String get onboardHapticTitle => '触覚フィードバック';
   @override String get onboardHapticSub => 'ボタンや重要な項目をタップすると、端末が軽く振動します。';
   @override String get onboardRecaps => 'まとめ';
@@ -489,7 +489,7 @@ class AppStringsJa implements AppStrings {
   @override String get aboutAiDevNote => 'このアプリの開発にも AI が使用されています。';
   @override String get notifWorkManagerInfo => '通知はWorkManagerによりバックグラウンドで動作します。アプリを開いておく必要はありません。インターネット接続が必要です。';
   @override String get notifIntervalTitle => 'スクロブルX回ごと';
-  @override String get notifIntervalSubtitle => '一定間隔で通知を受け取ります';
+  @override String get notifIntervalSubtitle => '指定した数のスクロブルが増えるたびに通知します';
   @override String get notifRecapsSection => 'リスニングまとめ';
   @override String get notifDailyRecapSubtitle => 'その日のスクロブル数とトップアーティスト';
   @override String get notifWeeklyRecapSubtitle => 'その週のスクロブル数とトップアーティスト';
@@ -507,13 +507,13 @@ class AppStringsJa implements AppStrings {
   @override String get notifPermissionDisabledBody => 'システム設定で通知を許可すると、LastStats からまとめや節目、お知らせを受け取れます。';
   @override String get notifGrantPermission => '権限を許可';
   @override String get notifThresholdIntro => '次の節目ごとに特別な通知を受け取ります：';
-  @override String get notifIntervalDescription => 'スクロブルX回ごとに通知を送信します';
+  @override String get notifIntervalDescription => '新しいスクロブルが X 件たまるたびに通知されます';
   @override String get notifCustomValueLabel => 'カスタム値';
   @override String get notifTimeNotifyAt => '通知時刻';
   @override String get notifDayOfWeek => '曜日';
   @override String get notifSendTest => 'テスト通知を送信';
   @override String get notifSentCheckBar => '通知バーを確認してください！';
-  @override String get notifMakeSureWorks => '正しく動作するか確認してください。';
+  @override String get notifMakeSureWorks => 'お使いの端末で通知が正しく届くか確認できます。';
   @override String get notifSentBang => '送信しました！';
   @override String get notifSendButton => '送信';
   @override String get apVisualStyle => 'ビジュアルスタイル';
@@ -636,7 +636,7 @@ class AppStringsJa implements AppStrings {
   @override String get faqQ8 => '\u30ec\u30d9\u30eb\u3068\u5b9f\u7e3e\u306e\u4ed5\u7d44\u307f\u306f\uff1f';
   @override String get faqA8 => '\u30a2\u30ab\u30a6\u30f3\u30c8\u30ec\u30d9\u30eb\u306f\u7dcf scrobble \u6570\u306b\u5fdc\u3058\u3066\u4e0a\u304c\u308a\u3001\u4e0a\u9650\u306f\u3042\u308a\u307e\u305b\u3093\u3002\u30ab\u30fc\u30c9\u306b\u306f\u305d\u306e\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8/\u697d\u66f2/\u30a2\u30eb\u30d0\u30e0\u306e\u518d\u751f\u56de\u6570\u306b\u5fdc\u3058\u305f\u679a\u679a(\u30d6\u30ed\u30f3\u30ba\u2192\u865a\u5f69)\u304c\u4ed8\u304d\u307e\u3059\u3002\u3059\u3079\u3066\u30ed\u30fc\u30ab\u30eb\u306b\u30ad\u30e3\u30c3\u30b7\u30e5\u6e08\u307f\u306e\u7d71\u8a08\u304b\u3089\u81ea\u52d5\u8a08\u7b97\u3055\u308c\u3001\u8ffd\u52a0\u306e\u901a\u4fe1\u306f\u767a\u751f\u3057\u307e\u305b\u3093\u3002';
   @override String get faqQ9 => '省電力モードはどのように機能しますか？';
-  @override String get faqA9 => '省電力モードは自動同期の間隔を広げてバッテリーを節約します。常にオンにする、スマートフォン標準の省電力モードに連動させる、選んだバッテリー残量を下回ったらオンにする、のいずれかを設定 > 一般から選べます。';
+  @override String get faqA9 => '省電力モードでは、バッテリーを節約するためにアプリの動作を抑えます。傾きによるパララックス効果をオフにし、画面のリフレッシュレートを約 60 Hz に制限し、バックグラウンド更新の頻度を下げ、動くカバーやバッジの輝きを一時停止します。画像、エクスポート、シェアカードは通常の品質のままです。\n\n常にオンにするほか、端末の省電力モードに合わせたり、指定したバッテリー残量を下回ったときに自動でオンにしたりできます。設定 > バッテリーセーバー から変更できます。';
   @override String get faqQ10 => 'データのバックアップや復元はどうすればいいですか？';
   @override String get faqA10 => '設定 > バックアップを開くと、バックアップファイルを書き出せます。Last.fmキーを含めるかどうかは選べます。後からこの端末や別の端末に読み込めば、設定を元に戻せます。';
   @override String get faqQ11 => 'オフラインでも使えますか？';
@@ -952,7 +952,7 @@ const Map<String, String> kTxJa = {
   'dash_chart': 'ダッシュボードのグラフ',
   'dash_calendar': 'カレンダー',
   'dash_monthly': '月別',
-  'cache_video_t': 'アニメーションカバー (Apple Music)',
+  'cache_video_t': 'メモリ内の動くカバー',
   'cache_video_s': '使用中のビデオメモリ:{mem} · アクティブなプレーヤー {players} · キャッシュ済みリンク {links}',
   'cache_video_short': 'アニメカバー',
   'cache_video_cleared': '動くカバーの動画をメモリから解放しました',
@@ -969,9 +969,9 @@ const Map<String, String> kTxJa = {
   'cache_img_limit_t': '写真キャッシュの上限',
   'cache_img_limit_s': 'ジャケット、アーティスト写真、アバター。古いものから削除されます。',
   'cache_vid_limit_t': '動画キャッシュの上限',
-  'cache_vid_limit_s': 'Apple Musicのアニメーションカバーをディスクに保存し、オフラインで再生します（Android）。',
+  'cache_vid_limit_s': 'オフラインで再生できるよう、動くカバーを端末に保存します（Android）。',
   'cache_video_off': 'オフ',
-  'cache_vid_disk_t': 'Apple Music動画',
+  'cache_vid_disk_t': '保存済みの動くカバー',
   'cache_vid_disk_s': '{size} · 保存済みのアニメーションカバー',
   'cache_no_limit_note': 'スクロブルとAPIデータは制限されません。',
   'key_internal_use': 'アプリ内蔵キーを使用',

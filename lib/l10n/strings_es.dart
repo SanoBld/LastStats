@@ -335,7 +335,7 @@ class AppStringsEs implements AppStrings {
   @override String get onboardNewsTitle           => 'Notificaciones de novedades';
   @override String get onboardNewsSub             => 'Se le avisa cuando se añade una función nueva o se corrige un problema.';
   @override String get onboardNewsBadgeTitle      => 'Punto de novedades';
-  @override String get onboardNewsBadgeSub        => 'Aparece un punto rojo en la campana de la pantalla de inicio cuando hay una novedad por leer.';
+  @override String get onboardNewsBadgeSub        => 'Aparece un punto en la campana de la pantalla de inicio cuando hay algo nuevo por leer.';
   @override String get onboardHapticTitle         => 'Retroalimentación háptica';
   @override String get onboardHapticSub           => 'El teléfono vibra ligeramente cuando toca los botones y los elementos importantes.';
   @override String get onboardRecaps              => 'Resúmenes';
@@ -541,7 +541,7 @@ class AppStringsEs implements AppStrings {
   @override String get aboutAiDevNote => 'La IA también se usó para desarrollar esta app.';
   @override String get notifWorkManagerInfo => 'Las notificaciones se ejecutan en segundo plano mediante WorkManager. La app no necesita estar abierta. Se requiere conexión a internet.';
   @override String get notifIntervalTitle       => 'Cada X scrobbles';
-  @override String get notifIntervalSubtitle    => 'Reciba avisos a intervalos regulares';
+  @override String get notifIntervalSubtitle    => 'Recibe un aviso cada vez que sumes un número fijo de scrobbles';
   @override String get notifRecapsSection       => 'Resúmenes de escucha';
   @override String get notifDailyRecapSubtitle  => 'Total de scrobbles + artista favorito del día';
   @override String get notifWeeklyRecapSubtitle => 'Total de scrobbles + artista favorito de la semana';
@@ -565,7 +565,7 @@ class AppStringsEs implements AppStrings {
     'Es un verdadero adicto a la música. 🔥',
     'Un millón de scrobbles. Eso es legendario. 🎸',
   ];
-  @override String get notifIntervalDescription => 'Enviar una notificación cada X scrobbles';
+  @override String get notifIntervalDescription => 'Recibirás un aviso cada vez que alcances X scrobbles nuevos';
   @override String get notifCustomValueLabel    => 'Valor personalizado';
   @override String get notifTimeNotifyAt        => 'Notificar a';
   @override String get notifDayOfWeek           => 'Día de la semana';
@@ -574,7 +574,7 @@ class AppStringsEs implements AppStrings {
   @override String get weekAbbrev => 'S';
   @override String get notifSendTest            => 'Enviar una notificación de prueba';
   @override String get notifSentCheckBar        => '¡Revise su barra de notificaciones!';
-  @override String get notifMakeSureWorks       => 'Verifique que todo funcione.';
+  @override String get notifMakeSureWorks       => 'Comprueba que las notificaciones funcionan bien en tu teléfono.';
   @override String get notifSentBang            => '¡Enviado!';
   @override String get notifSendButton          => 'Enviar';
   @override String get apVisualStyle             => 'Estilo visual';
@@ -702,7 +702,7 @@ class AppStringsEs implements AppStrings {
   @override String get faqQ8 => '\u00bfC\u00f3mo funcionan los niveles y los logros?';
   @override String get faqA8 => 'Su nivel de cuenta crece con su total de scrobbles (no hay nivel m\u00e1ximo). Las tarjetas tambi\u00e9n muestran un borde (bronce \u2192 iridiscente) seg\u00fan las veces que se ha escuchado ese artista/canci\u00f3n/\u00e1lbum. Todo se calcula autom\u00e1ticamente a partir de estad\u00edsticas ya guardadas en cach\u00e9, sin llamadas de red adicionales.';
   @override String get faqQ9 => '¿Cómo funciona el modo de ahorro de energía?';
-  @override String get faqA9 => 'El modo de ahorro de energía espacia las sincronizaciones automáticas para ahorrar batería. Puede estar siempre activo, seguir el modo de ahorro del teléfono o activarse por debajo de un nivel de batería que elijas, desde Ajustes > General.';
+  @override String get faqA9 => 'El modo de ahorro de energía reduce la actividad de la app para cuidar la batería: se desactiva el efecto de paralaje al inclinar el móvil, la frecuencia de actualización de pantalla se limita a unos 60 Hz, las actualizaciones en segundo plano son menos frecuentes, y las portadas animadas y el brillo de las insignias se pausan. Las imágenes, las exportaciones y las tarjetas para compartir mantienen la calidad completa.\n\nPuedes dejarlo siempre activado, hacer que siga el ahorro de batería de tu teléfono o que se active por debajo de un nivel de batería que elijas. Lo encontrarás en Ajustes > Ahorro de batería.';
   @override String get faqQ10 => '¿Cómo hago una copia de seguridad o la restauro?';
   @override String get faqA10 => 'Vaya a Ajustes > Copia de seguridad. Puede exportar un archivo de copia, con o sin su clave de Last.fm según prefiera, e importarlo más tarde en este teléfono o en otro dispositivo para recuperar sus ajustes.';
   @override String get faqQ11 => '¿Funciona la app sin conexión?';
@@ -982,7 +982,7 @@ const Map<String, String> kTxEs = {
   'dash_chart': 'Gráfico del panel',
   'dash_calendar': 'Calendario',
   'dash_monthly': 'Mensual',
-  'cache_video_t': 'Portadas animadas (Apple Music)',
+  'cache_video_t': 'Portadas animadas en memoria',
   'cache_video_s': 'Memoria de vídeo en uso: {mem} · {players} reproductor(es) activo(s) · {links} enlace(s) en caché',
   'cache_video_short': 'Portadas animadas',
   'cache_video_cleared': 'Vídeos de portadas animadas liberados de la memoria',
@@ -999,9 +999,9 @@ const Map<String, String> kTxEs = {
   'cache_img_limit_t': 'Límite de caché de fotos',
   'cache_img_limit_s': 'Portadas, fotos de artistas y avatares. Se borran primero las más antiguas.',
   'cache_vid_limit_t': 'Límite de caché de vídeo',
-  'cache_vid_limit_s': 'Portadas animadas de Apple Music guardadas en disco para verlas sin conexión (Android).',
+  'cache_vid_limit_s': 'Portadas animadas guardadas en el dispositivo para verlas sin conexión (Android).',
   'cache_video_off': 'Desactivado',
-  'cache_vid_disk_t': 'Vídeos de Apple Music',
+  'cache_vid_disk_t': 'Portadas animadas en disco',
   'cache_vid_disk_s': '{size} · Portadas animadas guardadas',
   'cache_no_limit_note': 'Los scrobbles y los datos de la API nunca se limitan.',
   'key_internal_use': 'Usar la clave integrada de la app',

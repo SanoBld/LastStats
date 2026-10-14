@@ -335,7 +335,7 @@ class AppStringsPt implements AppStrings {
   @override String get onboardNewsTitle           => 'Notificações de novidades';
   @override String get onboardNewsSub             => 'Você é avisado quando uma nova função é adicionada ou um problema é corrigido.';
   @override String get onboardNewsBadgeTitle      => 'Ponto de novidades';
-  @override String get onboardNewsBadgeSub        => 'Um ponto vermelho aparece no sino da tela inicial quando há uma novidade para ler.';
+  @override String get onboardNewsBadgeSub        => 'Um ponto aparece no sino da tela inicial quando há uma novidade para ler.';
   @override String get onboardHapticTitle         => 'Feedback tátil';
   @override String get onboardHapticSub           => 'O telefone vibra levemente quando você toca em botões e em elementos importantes.';
   @override String get onboardRecaps              => 'Resumos';
@@ -541,7 +541,7 @@ class AppStringsPt implements AppStrings {
   @override String get aboutAiDevNote => 'A IA também foi usada para desenvolver este app.';
   @override String get notifWorkManagerInfo => 'As notificações são executadas em segundo plano via WorkManager. O app não precisa estar aberto. É necessária conexão com a internet.';
   @override String get notifIntervalTitle       => 'A cada X scrobbles';
-  @override String get notifIntervalSubtitle    => 'Receba avisos em intervalos regulares';
+  @override String get notifIntervalSubtitle    => 'Receba um aviso a cada vez que somar um número definido de scrobbles';
   @override String get notifRecapsSection       => 'Resumos de escuta';
   @override String get notifDailyRecapSubtitle  => 'Total de scrobbles + artista favorito do dia';
   @override String get notifWeeklyRecapSubtitle => 'Total de scrobbles + artista favorito da semana';
@@ -565,7 +565,7 @@ class AppStringsPt implements AppStrings {
     'Você é um verdadeiro viciado em música. 🔥',
     'Um milhão de scrobbles. Isso é lendário. 🎸',
   ];
-  @override String get notifIntervalDescription => 'Enviar uma notificação a cada X scrobbles';
+  @override String get notifIntervalDescription => 'Você será avisado toda vez que atingir X novos scrobbles';
   @override String get notifCustomValueLabel    => 'Valor personalizado';
   @override String get notifTimeNotifyAt        => 'Notificar às';
   @override String get notifDayOfWeek           => 'Dia da semana';
@@ -574,7 +574,7 @@ class AppStringsPt implements AppStrings {
   @override String get weekAbbrev => 'S';
   @override String get notifSendTest            => 'Enviar uma notificação de teste';
   @override String get notifSentCheckBar        => 'Confira sua barra de notificações!';
-  @override String get notifMakeSureWorks       => 'Verifique se tudo funciona.';
+  @override String get notifMakeSureWorks       => 'Verifique se as notificações funcionam bem no seu celular.';
   @override String get notifSentBang            => 'Enviado!';
   @override String get notifSendButton          => 'Enviar';
   @override String get apVisualStyle             => 'Estilo visual';
@@ -702,7 +702,7 @@ class AppStringsPt implements AppStrings {
   @override String get faqQ8 => 'Como funcionam os n\u00edveis e conquistas?';
   @override String get faqA8 => 'Seu n\u00edvel de conta cresce com o total de scrobbles (n\u00e3o h\u00e1 n\u00edvel m\u00e1ximo). Os cart\u00f5es tamb\u00e9m ganham uma borda (bronze \u2192 iridescente) de acordo com quantas vezes aquele artista/faixa/\u00e1lbum foi tocado. Tudo \u00e9 calculado automaticamente a partir das estat\u00edsticas j\u00e1 em cache local, sem chamadas de rede extras.';
   @override String get faqQ9 => 'Como funciona o modo de economia de energia?';
-  @override String get faqA9 => 'O modo de economia de energia espaça as sincronizações automáticas para economizar bateria. Ele pode ficar sempre ativo, acompanhar o modo de economia do telefone ou ligar abaixo de um nível de bateria que você escolher, em Ajustes > Geral.';
+  @override String get faqA9 => 'O modo de economia de energia reduz a atividade do app para poupar bateria: o efeito de paralaxe ao inclinar o aparelho é desativado, a taxa de atualização da tela é limitada a cerca de 60 Hz, as atualizações em segundo plano ficam menos frequentes e as capas animadas e o brilho das insígnias são pausados. Imagens, exportações e cartões de compartilhamento mantêm a qualidade total.\n\nVocê pode deixá-lo sempre ativado, fazer com que siga a economia de bateria do próprio celular ou ativá-lo abaixo de um nível de bateria que você escolher. Você o encontra em Configurações > Economia de bateria.';
   @override String get faqQ10 => 'Como faço backup ou restauro meus dados?';
   @override String get faqA10 => 'Acesse Configurações > Backup. Você pode exportar um arquivo de backup, com ou sem a sua chave do Last.fm, como preferir, e importá-lo depois neste celular ou em outro dispositivo para recuperar suas configurações.';
   @override String get faqQ11 => 'O aplicativo funciona offline?';
@@ -982,7 +982,7 @@ const Map<String, String> kTxPt = {
   'dash_chart': 'Gráfico do painel',
   'dash_calendar': 'Calendário',
   'dash_monthly': 'Mensal',
-  'cache_video_t': 'Capas animadas (Apple Music)',
+  'cache_video_t': 'Capas animadas na memória',
   'cache_video_s': 'Memória de vídeo em uso: {mem} · {players} player(s) ativo(s) · {links} link(s) em cache',
   'cache_video_short': 'Capas animadas',
   'cache_video_cleared': 'Vídeos das capas animadas liberados da memória',
@@ -999,9 +999,9 @@ const Map<String, String> kTxPt = {
   'cache_img_limit_t': 'Limite do cache de fotos',
   'cache_img_limit_s': 'Capas, fotos de artistas e avatares. As mais antigas são removidas primeiro.',
   'cache_vid_limit_t': 'Limite do cache de vídeo',
-  'cache_vid_limit_s': 'Capas animadas do Apple Music guardadas no disco para rever offline (Android).',
+  'cache_vid_limit_s': 'Capas animadas guardadas no dispositivo para reproduzir offline (Android).',
   'cache_video_off': 'Desativado',
-  'cache_vid_disk_t': 'Vídeos do Apple Music',
+  'cache_vid_disk_t': 'Capas animadas no armazenamento',
   'cache_vid_disk_s': '{size} · Capas animadas guardadas',
   'cache_no_limit_note': 'Scrobbles e dados da API nunca são limitados.',
   'key_internal_use': 'Usar a chave interna do app',

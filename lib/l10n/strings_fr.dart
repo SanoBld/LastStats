@@ -335,7 +335,7 @@ class AppStringsFr implements AppStrings {
   @override String get onboardNewsTitle           => 'Notifications d\'actualités';
   @override String get onboardNewsSub             => 'Vous êtes prévenu lorsqu\'une nouvelle fonction est ajoutée ou qu\'un problème est corrigé.';
   @override String get onboardNewsBadgeTitle      => 'Pastille d\'actualités';
-  @override String get onboardNewsBadgeSub        => 'Un point rouge apparaît sur la cloche de l\'écran d\'accueil lorsqu\'il y a une nouveauté à lire.';
+  @override String get onboardNewsBadgeSub        => 'Une pastille apparaît sur la cloche de l\'accueil quand il y a une nouveauté à lire.';
   @override String get onboardHapticTitle         => 'Retour haptique';
   @override String get onboardHapticSub           => 'Le téléphone vibre légèrement lorsque vous touchez les boutons et les éléments importants.';
   @override String get onboardRecaps              => 'Récapitulatifs';
@@ -541,7 +541,7 @@ class AppStringsFr implements AppStrings {
   @override String get aboutAiDevNote => "L'IA a aussi été utilisée pour le développement de cette app.";
   @override String get notifWorkManagerInfo => "Les notifications tournent en arrière-plan via WorkManager. L'app n'a pas besoin d'être ouverte. Une connexion internet est nécessaire.";
   @override String get notifIntervalTitle       => 'Tous les X scrobbles';
-  @override String get notifIntervalSubtitle    => 'Notification à intervalle régulier';
+  @override String get notifIntervalSubtitle    => 'Recevez une notification chaque fois que vous ajoutez un certain nombre de scrobbles';
   @override String get notifRecapsSection       => 'Récapitulatifs';
   @override String get notifDailyRecapSubtitle  => 'Scrobbles du jour + artiste favori';
   @override String get notifWeeklyRecapSubtitle => 'Scrobbles de la semaine + artiste favori';
@@ -565,7 +565,7 @@ class AppStringsFr implements AppStrings {
     'Vous êtes un vrai accro à la musique. 🔥',
     'Un million de scrobbles. C\'est légendaire. 🎸',
   ];
-  @override String get notifIntervalDescription => 'Envoyer une notification tous les X scrobbles';
+  @override String get notifIntervalDescription => 'Vous serez notifié chaque fois que vous atteignez X nouveaux scrobbles';
   @override String get notifCustomValueLabel    => 'Valeur personnalisée';
   @override String get notifTimeNotifyAt        => 'Notifier à';
   @override String get notifDayOfWeek           => 'Jour de la semaine';
@@ -574,7 +574,7 @@ class AppStringsFr implements AppStrings {
   @override String get weekAbbrev => 'S';
   @override String get notifSendTest            => 'Envoyer une notification test';
   @override String get notifSentCheckBar        => 'Vérifiez la barre de notifs !';
-  @override String get notifMakeSureWorks       => 'Vérifiez que tout fonctionne.';
+  @override String get notifMakeSureWorks       => 'Vérifiez que les notifications fonctionnent bien sur votre téléphone.';
   @override String get notifSentBang            => 'Envoyé !';
   @override String get notifSendButton          => 'Envoyer';
   @override String get apVisualStyle             => 'Style visuel';
@@ -702,7 +702,7 @@ class AppStringsFr implements AppStrings {
   @override String get faqQ8 => 'Comment fonctionnent les niveaux et les succ\u00e8s ?';
   @override String get faqA8 => 'Votre niveau de compte augmente avec votre nombre total de scrobbles, il n\'y a pas de maximum. Les cartes affichent aussi une bordure (du bronze \u00e0 l\'iridescent) selon le nombre d\'\u00e9coutes de l\'artiste, du titre ou de l\'album concern\u00e9. Tout est calcul\u00e9 automatiquement \u00e0 partir de vos statistiques d\u00e9j\u00e0 en cache, sans requ\u00eate suppl\u00e9mentaire.';
   @override String get faqQ9 => 'Comment fonctionne le mode économie d\'énergie ?';
-  @override String get faqA9 => 'Le mode économie d\'énergie espace les synchronisations automatiques pour économiser la batterie. Il peut s\'activer en permanence, avec le mode économie d\'énergie de votre téléphone, ou sous un niveau de batterie choisi, depuis Paramètres > Général.';
+  @override String get faqA9 => 'Le mode économie d\'énergie réduit l\'activité de l\'app pour préserver la batterie : l\'effet de parallaxe au mouvement est désactivé, la fréquence d\'affichage est limitée à environ 60 Hz, les mises à jour en arrière-plan sont moins fréquentes, et les pochettes animées ainsi que les reflets des badges sont mis en pause. Les images, les exports et les cartes de partage gardent leur pleine qualité.\n\nVous pouvez l\'activer en permanence, le faire suivre l\'économiseur de batterie de votre téléphone, ou le déclencher sous un niveau de batterie de votre choix. Vous le trouverez dans Paramètres > Mode économie d\'énergie.';
   @override String get faqQ10 => 'Comment sauvegarder ou restaurer mes données ?';
   @override String get faqA10 => 'Allez dans Paramètres > Sauvegarde. Vous pouvez exporter un fichier de sauvegarde, avec ou sans votre clé Last.fm selon votre choix, puis l\'importer plus tard sur ce téléphone ou sur un autre appareil pour retrouver vos réglages.';
   @override String get faqQ11 => 'L\'application fonctionne-t-elle hors ligne ?';
@@ -982,7 +982,7 @@ const Map<String, String> kTxFr = {
   'dash_chart': 'Graphique du tableau de bord',
   'dash_calendar': 'Calendrier',
   'dash_monthly': 'Mensuel',
-  'cache_video_t': 'Vidéos animées (Apple Music)',
+  'cache_video_t': 'Pochettes animées en mémoire',
   'cache_video_s': 'Mémoire vidéo utilisée : {mem} · {players} lecteur(s) actif(s) · {links} lien(s) en mémoire',
   'cache_video_short': 'Vidéos animées',
   'cache_video_cleared': 'Vidéos des pochettes animées libérées de la mémoire',
@@ -999,9 +999,9 @@ const Map<String, String> kTxFr = {
   'cache_img_limit_t': 'Limite du cache photos',
   'cache_img_limit_s': 'Pochettes, photos d\'artistes et avatars. Les plus anciennes sont supprimées en premier.',
   'cache_vid_limit_t': 'Limite du cache vidéo',
-  'cache_vid_limit_s': 'Pochettes animées Apple Music gardées sur le disque pour les revoir hors ligne (Android).',
+  'cache_vid_limit_s': 'Pochettes animées conservées sur l\'appareil pour les relire hors ligne (Android).',
   'cache_video_off': 'Désactivé',
-  'cache_vid_disk_t': 'Vidéos Apple Music',
+  'cache_vid_disk_t': 'Pochettes animées sur le disque',
   'cache_vid_disk_s': '{size} · Pochettes animées enregistrées',
   'cache_no_limit_note': 'Les scrobbles et les données API ne sont jamais limités.',
   'key_internal_use': 'Utiliser la clé interne de l\'application',

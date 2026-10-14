@@ -2503,19 +2503,38 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
     );
   }
 
+  // Real platform logo (assets/icons) for each source; sources without a
+  // bundled logo (TheAudioDB, MusicBrainz, Wikipedia) keep a generic icon.
+  Widget _sourceLogo(String name, Color color) {
+    final (asset, fallback) = switch (name) {
+      'Last.fm'       => ('assets/icons/lastfm.svg',     Icons.bar_chart_rounded),
+      'YouTube Music' => ('assets/icons/ytmusic.svg',    Icons.music_video_rounded),
+      'Apple Music' || 'iTunes'
+                      => ('assets/icons/applemusic.svg', Icons.music_note_rounded),
+      'Spotify'       => ('assets/icons/spotify.svg',    Icons.graphic_eq_rounded),
+      'Deezer'        => ('assets/icons/deezer.svg',     Icons.play_circle_outline_rounded),
+      _               => ('',                            Icons.image_rounded),
+    };
+    if (asset.isEmpty) return Icon(fallback, size: 20, color: color);
+    return BrandIcon(asset, fallback, size: 20, color: color);
+  }
+
   List<Widget> _sourceRows(BuildContext ctx) {
     final cs = Theme.of(ctx).colorScheme;
     final parts = widget.source.split(' · ');
     final mu = _motionUrl ?? '';
-    final items = <(IconData, String, String)>[
-      (Icons.bar_chart_rounded, 'Last.fm', tx('src_scrobbles_meta')),
-      (Icons.image_rounded, parts.last, tx('src_artwork')),
+    // The animated cover can come from three places (see MotionArtworkService):
+    // YouTube (googlevideo), Spotify Canvas (canvaz.scdn.co) or Apple Music.
+    final motionSource = mu.contains('canvaz') || mu.contains('scdn.co')
+        ? 'Spotify'
+        : (mu.contains('google') || mu.contains('youtube') ? 'YouTube Music' : 'Apple Music');
+    final items = <(String, String, String)>[
+      ('Last.fm', 'Last.fm', tx('src_scrobbles_meta')),
+      (parts.last, parts.last, tx('src_artwork')),
       if (_previewAvailable == true)
-        (Icons.play_circle_outline_rounded, 'Deezer', tx('src_audio_preview')),
+        ('Deezer', 'Deezer', tx('src_audio_preview')),
       if (mu.isNotEmpty)
-        (Icons.videocam_rounded,
-            mu.contains('google') || mu.contains('youtube') ? 'YouTube Music' : 'Apple Music',
-            tx('src_video_artwork')),
+        (motionSource, motionSource, tx('src_video_artwork')),
     ];
     return [
       Text(tx('src_title'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
@@ -2524,7 +2543,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Row(children: [
-            Icon(i.$1, size: 20, color: cs.primary),
+            _sourceLogo(i.$1, cs.primary),
             const SizedBox(width: 12),
             Expanded(child: Text(i.$2, style: const TextStyle(fontWeight: FontWeight.w600))),
             Text(i.$3, style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12)),

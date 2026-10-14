@@ -302,7 +302,7 @@ class AppStringsIt implements AppStrings {
   @override String get onboardNewsTitle => 'Notifiche novità';
   @override String get onboardNewsSub => 'Viene avvisato quando viene aggiunta una nuova funzione o corretto un problema.';
   @override String get onboardNewsBadgeTitle => 'Puntino novità';
-  @override String get onboardNewsBadgeSub => 'Compare un punto rosso sulla campanella della schermata iniziale quando c\'è una novità da leggere.';
+  @override String get onboardNewsBadgeSub => 'Compare un punto sulla campanella della schermata Home quando c\'è una novità da leggere.';
   @override String get onboardHapticTitle => 'Feedback aptico';
   @override String get onboardHapticSub => 'Il telefono vibra leggermente quando tocca i pulsanti e gli elementi importanti.';
   @override String get onboardRecaps => 'Riepiloghi';
@@ -489,7 +489,7 @@ class AppStringsIt implements AppStrings {
   @override String get aboutAiDevNote => "L'IA è stata usata anche per sviluppare questa app.";
   @override String get notifWorkManagerInfo => 'Le notifiche vengono eseguite in background tramite WorkManager. L\'app non deve essere aperta. È richiesta una connessione a internet.';
   @override String get notifIntervalTitle => 'Ogni X scrobble';
-  @override String get notifIntervalSubtitle => 'Riceva notifiche a intervalli regolari';
+  @override String get notifIntervalSubtitle => 'Ricevi una notifica ogni volta che aggiungi un certo numero di scrobble';
   @override String get notifRecapsSection => 'Riepiloghi d\'ascolto';
   @override String get notifDailyRecapSubtitle => 'Numero di scrobble + artista principale del giorno';
   @override String get notifWeeklyRecapSubtitle => 'Numero di scrobble + artista principale della settimana';
@@ -507,13 +507,13 @@ class AppStringsIt implements AppStrings {
   @override String get notifPermissionDisabledBody => 'Consenti le notifiche nelle impostazioni di sistema così LastStats potrà inviarti riepiloghi, traguardi e novità.';
   @override String get notifGrantPermission => 'Concedi permesso';
   @override String get notifThresholdIntro => 'Riceverà una notifica speciale a ciascuno di questi traguardi:';
-  @override String get notifIntervalDescription => 'Invia una notifica ogni X scrobble';
+  @override String get notifIntervalDescription => 'Riceverai una notifica ogni volta che raggiungi X nuovi scrobble';
   @override String get notifCustomValueLabel => 'Valore personalizzato';
   @override String get notifTimeNotifyAt => 'Notifica alle';
   @override String get notifDayOfWeek => 'Giorno della settimana';
   @override String get notifSendTest => 'Invia una notifica di prova';
   @override String get notifSentCheckBar => 'Controlli la barra delle notifiche!';
-  @override String get notifMakeSureWorks => 'Si assicuri che tutto funzioni.';
+  @override String get notifMakeSureWorks => 'Verifica che le notifiche funzionino correttamente sul tuo telefono.';
   @override String get notifSentBang => 'Inviata!';
   @override String get notifSendButton => 'Invia';
   @override String get apVisualStyle => 'Stile visivo';
@@ -636,7 +636,7 @@ class AppStringsIt implements AppStrings {
   @override String get faqQ8 => 'Come funzionano livelli e obiettivi?';
   @override String get faqA8 => 'Il suo livello account cresce con il numero totale di scrobble (non c\u2019\u00e8 un livello massimo). Le card mostrano anche un bordo (bronzo \u2192 iridescente) in base a quante volte quell\u2019artista/brano/album \u00e8 stato ascoltato. Tutto viene calcolato automaticamente dalle statistiche gi\u00e0 in cache locale, senza chiamate di rete aggiuntive.';
   @override String get faqQ9 => 'Come funziona la modalità risparmio energetico?';
-  @override String get faqA9 => 'La modalità risparmio energetico distanzia le sincronizzazioni automatiche per risparmiare batteria. Può restare sempre attiva, seguire il risparmio energetico del telefono o attivarsi sotto un livello di batteria scelto, da Impostazioni > Generali.';
+  @override String get faqA9 => 'La modalità risparmio energetico riduce l\'attività dell\'app per risparmiare batteria: l\'effetto parallasse all\'inclinazione viene disattivato, la frequenza di aggiornamento dello schermo è limitata a circa 60 Hz, gli aggiornamenti in background sono meno frequenti e le copertine animate e il riflesso dei badge vengono messi in pausa. Immagini, esportazioni e schede di condivisione mantengono la qualità piena.\n\nPuoi tenerla sempre attiva, farle seguire il risparmio energetico del telefono oppure attivarla sotto un livello di batteria a tua scelta. La trovi in Impostazioni > Risparmio batteria.';
   @override String get faqQ10 => 'Come faccio un backup o lo ripristino?';
   @override String get faqA10 => 'Vada su Impostazioni > Backup. Può esportare un file di backup, con o senza la sua chiave Last.fm a sua scelta, e importarlo in seguito su questo telefono o su un altro dispositivo per ritrovare le sue impostazioni.';
   @override String get faqQ11 => 'L\'app funziona offline?';
@@ -953,7 +953,7 @@ const Map<String, String> kTxIt = {
   'dash_chart': 'Grafico della dashboard',
   'dash_calendar': 'Calendario',
   'dash_monthly': 'Mensile',
-  'cache_video_t': 'Copertine animate (Apple Music)',
+  'cache_video_t': 'Copertine animate in memoria',
   'cache_video_s': 'Memoria video in uso: {mem} · {players} player attivo/i · {links} link in cache',
   'cache_video_short': 'Copertine animate',
   'cache_video_cleared': 'Video delle copertine animate rimossi dalla memoria',
@@ -970,9 +970,9 @@ const Map<String, String> kTxIt = {
   'cache_img_limit_t': 'Limite cache foto',
   'cache_img_limit_s': 'Copertine, foto degli artisti e avatar. Le più vecchie vengono eliminate per prime.',
   'cache_vid_limit_t': 'Limite cache video',
-  'cache_vid_limit_s': 'Copertine animate di Apple Music salvate su disco per rivederle offline (Android).',
+  'cache_vid_limit_s': 'Copertine animate conservate sul dispositivo per rivederle offline (Android).',
   'cache_video_off': 'Disattivato',
-  'cache_vid_disk_t': 'Video Apple Music',
+  'cache_vid_disk_t': 'Copertine animate su disco',
   'cache_vid_disk_s': '{size} · Copertine animate salvate',
   'cache_no_limit_note': 'Scrobble e dati API non hanno mai limiti.',
   'key_internal_use': 'Usa la chiave interna dell\'app',

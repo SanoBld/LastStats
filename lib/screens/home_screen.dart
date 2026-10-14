@@ -56,6 +56,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../widgets/markdown_lite.dart';
 import '../widgets/living_artwork.dart';
+import '../widgets/brand_icon.dart';
 import '../widgets/motion_artwork_video.dart';
 import '../widgets/scroll_status_bar.dart';
 import '../services/motion_artwork_service.dart';

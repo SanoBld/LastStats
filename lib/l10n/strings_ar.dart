@@ -302,7 +302,7 @@ class AppStringsAr implements AppStrings {
   @override String get onboardNewsTitle => 'إشعارات الأخبار';
   @override String get onboardNewsSub => 'يصلك إشعار عند إضافة ميزة جديدة أو إصلاح مشكلة.';
   @override String get onboardNewsBadgeTitle => 'نقطة الأخبار';
-  @override String get onboardNewsBadgeSub => 'تظهر نقطة حمراء على الجرس في الشاشة الرئيسية عندما يكون هناك جديد للقراءة.';
+  @override String get onboardNewsBadgeSub => 'تظهر نقطة على الجرس في الشاشة الرئيسية عندما يوجد شيء جديد للقراءة.';
   @override String get onboardHapticTitle => 'الاستجابة اللمسية';
   @override String get onboardHapticSub => 'يهتز الهاتف اهتزازًا خفيفًا عند لمس الأزرار والعناصر المهمة.';
   @override String get onboardRecaps => 'الملخصات';
@@ -489,7 +489,7 @@ class AppStringsAr implements AppStrings {
   @override String get aboutAiDevNote => 'استُخدم الذكاء الاصطناعي أيضًا في تطوير هذا التطبيق.';
   @override String get notifWorkManagerInfo => 'تعمل الإشعارات في الخلفية عبر WorkManager. لا حاجة لفتح التطبيق. يلزم اتصال بالإنترنت.';
   @override String get notifIntervalTitle => 'كل X من التشغيلات';
-  @override String get notifIntervalSubtitle => 'تلقَّ إشعارات على فترات منتظمة';
+  @override String get notifIntervalSubtitle => 'احصل على إشعار كلما أضفت عددًا محددًا من scrobbles';
   @override String get notifRecapsSection => 'ملخصات الاستماع';
   @override String get notifDailyRecapSubtitle => 'عدد التشغيلات + أفضل فنان لليوم';
   @override String get notifWeeklyRecapSubtitle => 'عدد التشغيلات + أفضل فنان للأسبوع';
@@ -507,13 +507,13 @@ class AppStringsAr implements AppStrings {
   @override String get notifPermissionDisabledBody => 'اسمح بالإشعارات في إعدادات النظام ليتمكن LastStats من إرسال الملخصات والإنجازات والأخبار إليك.';
   @override String get notifGrantPermission => 'منح الإذن';
   @override String get notifThresholdIntro => 'ستتلقى إشعارًا خاصًا عند كل محطة من هذه المحطات:';
-  @override String get notifIntervalDescription => 'إرسال إشعار كل X من التشغيلات';
+  @override String get notifIntervalDescription => 'ستتلقى إشعارًا كلما وصلت إلى X من scrobbles الجديدة';
   @override String get notifCustomValueLabel => 'قيمة مخصصة';
   @override String get notifTimeNotifyAt => 'الإشعار في الساعة';
   @override String get notifDayOfWeek => 'يوم الأسبوع';
   @override String get notifSendTest => 'إرسال إشعار تجريبي';
   @override String get notifSentCheckBar => 'تحقق من شريط الإشعارات!';
-  @override String get notifMakeSureWorks => 'تأكد من أن كل شيء يعمل.';
+  @override String get notifMakeSureWorks => 'تحقّق من أن الإشعارات تعمل بشكل صحيح على هاتفك.';
   @override String get notifSentBang => 'تم الإرسال!';
   @override String get notifSendButton => 'إرسال';
   @override String get apVisualStyle => 'النمط المرئي';
@@ -636,7 +636,7 @@ class AppStringsAr implements AppStrings {
   @override String get faqQ8 => '\u0643\u064a\u0641 \u064a\u0639\u0645\u0644 \u0646\u0638\u0627\u0645 \u0627\u0644\u0645\u0633\u062a\u0648\u064a\u0627\u062a \u0648\u0627\u0644\u0625\u0646\u062c\u0627\u0632\u0627\u062a\u061f';
   @override String get faqA8 => '\u064a\u0631\u062a\u0641\u0639 \u0645\u0633\u062a\u0648\u0649 \u062d\u0633\u0627\u0628\u0643 \u0645\u0639 \u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0640scrobbles (\u0644\u0627 \u064a\u0648\u062c\u062f \u0645\u0633\u062a\u0648\u0649 \u0623\u0642\u0635\u0649). \u062a\u0638\u0647\u0631 \u0627\u0644\u0628\u0637\u0627\u0642\u0627\u062a \u0623\u064a\u0636\u064b\u0627 \u0625\u0637\u0627\u0631\u064b\u0627 (\u0628\u0631\u0648\u0646\u0632\u064a \u2192 \u0645\u062a\u0639\u062f\u062f \u0627\u0644\u0623\u0644\u0648\u0627\u0646) \u062d\u0633\u0628 \u0639\u062f\u062f \u0645\u0631\u0627\u062a \u0627\u0644\u0627\u0633\u062a\u0645\u0627\u0639 \u0644\u0630\u0644\u0643 \u0627\u0644\u0641\u0646\u0627\u0646/\u0627\u0644\u0645\u0642\u0637\u0648\u0639\u0629/\u0627\u0644\u0623\u0644\u0628\u0648\u0645. \u064a\u0643\u0644 \u0634\u064a\u0623 \u064a\u064f\u062d\u0633\u0628 \u062a\u0644\u0642\u0627\u0626\u064a\u064b\u0627 \u0645\u0646 \u0627\u0644\u0625\u062d\u0635\u0627\u0626\u064a\u0627\u062a \u0627\u0644\u0645\u062e\u0632\u0651\u0646\u0629 \u0645\u062d\u0644\u064a\u064b\u0627 \u0628\u0627\u0644\u0641\u0639\u0644\u060c \u0628\u062f\u0648\u0646 \u0623\u064a \u0637\u0644\u0628\u0627\u062a \u0634\u0628\u0643\u0629 \u0625\u0636\u0627\u0641\u064a\u0629.';
   @override String get faqQ9 => 'كيف يعمل وضع توفير الطاقة؟';
-  @override String get faqA9 => 'يباعد وضع توفير الطاقة بين عمليات المزامنة التلقائية لتوفير البطارية. يمكن تفعيله دائمًا، أو مع وضع توفير الطاقة في هاتفك، أو عند انخفاض البطارية عن مستوى تختاره، من الإعدادات > عام.';
+  @override String get faqA9 => 'يقلّل وضع توفير الطاقة نشاط التطبيق للحفاظ على البطارية: يتم إيقاف تأثير الإزاحة عند إمالة الجهاز، ويُحدّ معدل تحديث الشاشة بحوالي 60 هرتز، وتصبح التحديثات في الخلفية أقل تكرارًا، وتتوقف الأغلفة المتحركة ولمعان الشارات مؤقتًا. تحتفظ الصور وعمليات التصدير وبطاقات المشاركة بجودتها الكاملة.\n\nيمكنك إبقاؤه مفعّلًا دائمًا، أو جعله يتبع وضع توفير الطاقة في هاتفك، أو تفعيله عند انخفاض البطارية عن مستوى تختاره. ستجده في الإعدادات > توفير البطارية.';
   @override String get faqQ10 => 'كيف أنسخ بياناتي احتياطيًا أو أستعيدها؟';
   @override String get faqA10 => 'انتقل إلى الإعدادات > النسخ الاحتياطي. يمكنك تصدير ملف نسخة احتياطية مع مفتاح Last.fm أو بدونه حسب رغبتك، ثم استيراده لاحقًا على هذا الهاتف أو على جهاز آخر لاستعادة إعداداتك.';
   @override String get faqQ11 => 'هل يعمل التطبيق دون اتصال بالإنترنت؟';
@@ -953,7 +953,7 @@ const Map<String, String> kTxAr = {
   'dash_chart': 'مخطط لوحة المعلومات',
   'dash_calendar': 'التقويم',
   'dash_monthly': 'شهري',
-  'cache_video_t': 'أغلفة متحركة (Apple Music)',
+  'cache_video_t': 'الأغلفة المتحركة في الذاكرة',
   'cache_video_s': 'ذاكرة الفيديو المستخدمة: {mem} · {players} مشغّل نشط · {links} رابط في الذاكرة',
   'cache_video_short': 'أغلفة متحركة',
   'cache_video_cleared': 'تم تحرير فيديوهات الأغلفة المتحركة من الذاكرة',
@@ -970,9 +970,9 @@ const Map<String, String> kTxAr = {
   'cache_img_limit_t': 'حد ذاكرة الصور المؤقتة',
   'cache_img_limit_s': 'الأغلفة وصور الفنانين والصور الرمزية. تُحذف الأقدم أولاً.',
   'cache_vid_limit_t': 'حد ذاكرة الفيديو المؤقتة',
-  'cache_vid_limit_s': 'أغلفة Apple Music المتحركة تُحفظ على القرص لإعادة عرضها دون اتصال (Android).',
+  'cache_vid_limit_s': 'أغلفة متحركة محفوظة على الجهاز لتشغيلها دون اتصال (Android).',
   'cache_video_off': 'متوقف',
-  'cache_vid_disk_t': 'فيديوهات Apple Music',
+  'cache_vid_disk_t': 'الأغلفة المتحركة المحفوظة على الجهاز',
   'cache_vid_disk_s': '{size} · أغلفة متحركة محفوظة',
   'cache_no_limit_note': 'لا يُقيَّد سجل الاستماع وبيانات API أبداً.',
   'key_internal_use': 'استخدام مفتاح التطبيق الداخلي',

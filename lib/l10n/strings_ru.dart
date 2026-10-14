@@ -302,7 +302,7 @@ class AppStringsRu implements AppStrings {
   @override String get onboardNewsTitle => 'Уведомления о новостях';
   @override String get onboardNewsSub => 'Вы получите уведомление, когда появится новая функция или будет исправлена ошибка.';
   @override String get onboardNewsBadgeTitle => 'Значок новостей';
-  @override String get onboardNewsBadgeSub => 'Когда есть новость, которую стоит прочитать, на колокольчике главного экрана появляется красная точка.';
+  @override String get onboardNewsBadgeSub => 'На колокольчике на главном экране появляется точка, когда есть что-то новое для прочтения.';
   @override String get onboardHapticTitle => 'Тактильная отдача';
   @override String get onboardHapticSub => 'Телефон слегка вибрирует при нажатии на кнопки и важные элементы.';
   @override String get onboardRecaps => 'Сводки';
@@ -489,7 +489,7 @@ class AppStringsRu implements AppStrings {
   @override String get aboutAiDevNote => 'ИИ также использовался при разработке этого приложения.';
   @override String get notifWorkManagerInfo => 'Уведомления работают в фоне через WorkManager. Приложение не обязательно должно быть открыто. Требуется подключение к интернету.';
   @override String get notifIntervalTitle => 'Каждые X скробблов';
-  @override String get notifIntervalSubtitle => 'Получайте уведомления через регулярные интервалы';
+  @override String get notifIntervalSubtitle => 'Уведомление каждый раз, когда набирается заданное число скробблов';
   @override String get notifRecapsSection => 'Сводки прослушивания';
   @override String get notifDailyRecapSubtitle => 'Количество скробблов + топ исполнитель за день';
   @override String get notifWeeklyRecapSubtitle => 'Количество скробблов + топ исполнитель за неделю';
@@ -507,13 +507,13 @@ class AppStringsRu implements AppStrings {
   @override String get notifPermissionDisabledBody => 'Разрешите уведомления в настройках системы, чтобы LastStats мог присылать итоги, достижения и новости.';
   @override String get notifGrantPermission => 'Предоставить разрешение';
   @override String get notifThresholdIntro => 'Вы получите особое уведомление на каждом из этих рубежей:';
-  @override String get notifIntervalDescription => 'Отправлять уведомление каждые X скробблов';
+  @override String get notifIntervalDescription => 'Вы будете получать уведомление каждый раз, когда наберётся X новых скробблов';
   @override String get notifCustomValueLabel => 'Своё значение';
   @override String get notifTimeNotifyAt => 'Уведомлять в';
   @override String get notifDayOfWeek => 'День недели';
   @override String get notifSendTest => 'Отправить тестовое уведомление';
   @override String get notifSentCheckBar => 'Проверьте панель уведомлений!';
-  @override String get notifMakeSureWorks => 'Убедитесь, что всё работает.';
+  @override String get notifMakeSureWorks => 'Проверьте, что уведомления нормально работают на вашем телефоне.';
   @override String get notifSentBang => 'Отправлено!';
   @override String get notifSendButton => 'Отправить';
   @override String get apVisualStyle => 'Визуальный стиль';
@@ -636,7 +636,7 @@ class AppStringsRu implements AppStrings {
   @override String get faqQ8 => '\u041a\u0430\u043a \u0440\u0430\u0431\u043e\u0442\u0430\u044e\u0442 \u0443\u0440\u043e\u0432\u043d\u0438 \u0438 \u0434\u043e\u0441\u0442\u0438\u0436\u0435\u043d\u0438\u044f?';
   @override String get faqA8 => '\u0423\u0440\u043e\u0432\u0435\u043d\u044c \u0430\u043a\u043a\u0430\u0443\u043d\u0442\u0430 \u0440\u0430\u0441\u0442\u0451\u0442 \u0432\u043c\u0435\u0441\u0442\u0435 \u0441 \u043e\u0431\u0449\u0438\u043c \u0447\u0438\u0441\u043b\u043e\u043c scrobble (\u043c\u0430\u043a\u0441\u0438\u043c\u0430\u043b\u044c\u043d\u043e\u0433\u043e \u0443\u0440\u043e\u0432\u043d\u044f \u043d\u0435\u0442). \u041a\u0430\u0440\u0442\u043e\u0447\u043a\u0438 \u0442\u0430\u043a\u0436\u0435 \u043f\u043e\u043b\u0443\u0447\u0430\u044e\u0442 \u0440\u0430\u043c\u043a\u0443 (\u0431\u0440\u043e\u043d\u0437\u0430 \u2192 \u043f\u0435\u0440\u0435\u043b\u0438\u0432\u0447\u0430\u0442\u0430\u044f) \u0432 \u0437\u0430\u0432\u0438\u0441\u0438\u043c\u043e\u0441\u0442\u0438 \u043e\u0442 \u0447\u0438\u0441\u043b\u0430 \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u0439 \u044d\u0442\u043e\u0433\u043e \u0438\u0441\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044f/\u0442\u0440\u0435\u043a\u0430/\u0430\u043b\u044c\u0431\u043e\u043c\u0430. \u0412\u0441\u0451 \u0432\u044b\u0447\u0438\u0441\u043b\u044f\u0435\u0442\u0441\u044f \u0430\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438 \u0438\u0437 \u0443\u0436\u0435 \u0437\u0430\u043a\u044d\u0448\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u043e\u0439 \u043b\u043e\u043a\u0430\u043b\u044c\u043d\u043e\u0439 \u0441\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043a\u0438, \u0431\u0435\u0437 \u0434\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0445 \u0441\u0435\u0442\u0435\u0432\u044b\u0445 \u0437\u0430\u043f\u0440\u043e\u0441\u043e\u0432.';
   @override String get faqQ9 => 'Как работает режим энергосбережения?';
-  @override String get faqA9 => 'Режим энергосбережения увеличивает интервалы между автосинхронизациями для экономии заряда. Его можно включить постоянно, привязать к режиму энергосбережения телефона или включать при выбранном уровне заряда: Настройки > Общие.';
+  @override String get faqA9 => 'Режим энергосбережения снижает активность приложения, чтобы экономить заряд: отключается параллакс при наклоне, частота обновления экрана ограничивается примерно 60 Гц, фоновые обновления выполняются реже, а анимированные обложки и блик на значках приостанавливаются. Изображения, экспорт и карточки для публикации сохраняют полное качество.\n\nВы можете включить его постоянно, привязать к системному режиму экономии заряда или включать при падении заряда ниже выбранного уровня. Он находится в разделе «Настройки» > Экономия заряда.';
   @override String get faqQ10 => 'Как сделать резервную копию или восстановить данные?';
   @override String get faqA10 => 'Откройте Настройки > Резервное копирование. Вы можете экспортировать файл резервной копии с вашим ключом Last.fm или без него, а затем импортировать его на этом телефоне или на другом устройстве, чтобы вернуть свои настройки.';
   @override String get faqQ11 => 'Работает ли приложение офлайн?';
@@ -953,7 +953,7 @@ const Map<String, String> kTxRu = {
   'dash_chart': 'График дашборда',
   'dash_calendar': 'Календарь',
   'dash_monthly': 'По месяцам',
-  'cache_video_t': 'Анимированные обложки (Apple Music)',
+  'cache_video_t': 'Анимированные обложки в памяти',
   'cache_video_s': 'Видеопамять: {mem} · активных плееров: {players} · ссылок в кэше: {links}',
   'cache_video_short': 'Анимации',
   'cache_video_cleared': 'Видео анимированных обложек удалены из памяти',
@@ -970,9 +970,9 @@ const Map<String, String> kTxRu = {
   'cache_img_limit_t': 'Лимит кэша фото',
   'cache_img_limit_s': 'Обложки, фото артистов и аватары. Сначала удаляются самые старые.',
   'cache_vid_limit_t': 'Лимит кэша видео',
-  'cache_vid_limit_s': 'Анимированные обложки Apple Music хранятся на диске для просмотра офлайн (Android).',
+  'cache_vid_limit_s': 'Анимированные обложки, сохранённые на устройстве для просмотра офлайн (Android).',
   'cache_video_off': 'Выкл.',
-  'cache_vid_disk_t': 'Видео Apple Music',
+  'cache_vid_disk_t': 'Анимированные обложки на диске',
   'cache_vid_disk_s': '{size} · Сохранённые анимированные обложки',
   'cache_no_limit_note': 'Скробблы и данные API никогда не ограничиваются.',
   'key_internal_use': 'Использовать встроенный ключ приложения',

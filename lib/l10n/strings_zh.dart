@@ -332,7 +332,7 @@ class AppStringsZh implements AppStrings {
   @override String get onboardNewsTitle           => '资讯通知';
   @override String get onboardNewsSub             => '添加新功能或修复问题时,你会收到通知。';
   @override String get onboardNewsBadgeTitle      => '资讯红点';
-  @override String get onboardNewsBadgeSub        => '有新内容可阅读时,主屏幕的铃铛上会出现一个红点。';
+  @override String get onboardNewsBadgeSub        => '有新内容可读时，主屏幕的铃铛图标上会显示提示点。';
   @override String get onboardHapticTitle         => '触感反馈';
   @override String get onboardHapticSub           => '点按按钮和重要元素时,手机会轻轻振动。';
   @override String get onboardRecaps              => '汇总';
@@ -538,7 +538,7 @@ class AppStringsZh implements AppStrings {
   @override String get aboutAiDevNote => '本应用的开发也使用了 AI。';
   @override String get notifWorkManagerInfo => '通知通过 WorkManager 在后台运行，应用无需保持打开状态，但需要网络连接。';
   @override String get notifIntervalTitle       => '每 X 次 scrobble';
-  @override String get notifIntervalSubtitle    => '按固定间隔接收通知';
+  @override String get notifIntervalSubtitle    => '每新增指定数量的 scrobble 就通知你一次';
   @override String get notifRecapsSection       => '收听汇总';
   @override String get notifDailyRecapSubtitle  => '当天 scrobble 数 + 最喜爱的艺术家';
   @override String get notifWeeklyRecapSubtitle => '本周 scrobble 数 + 最喜爱的艺术家';
@@ -562,7 +562,7 @@ class AppStringsZh implements AppStrings {
     '您是真正的音乐狂热者。🔥',
     '一百万次 scrobble。这是传奇。🎸',
   ];
-  @override String get notifIntervalDescription => '每 X 次 scrobble 发送一次通知';
+  @override String get notifIntervalDescription => '每新增 X 个 scrobble 就会通知你';
   @override String get notifCustomValueLabel    => '自定义数值';
   @override String get notifTimeNotifyAt        => '通知时间';
   @override String get notifDayOfWeek           => '星期几';
@@ -571,7 +571,7 @@ class AppStringsZh implements AppStrings {
   @override String get weekAbbrev => '周';
   @override String get notifSendTest            => '发送测试通知';
   @override String get notifSentCheckBar        => '看看您的通知栏！';
-  @override String get notifMakeSureWorks       => '确认一切正常。';
+  @override String get notifMakeSureWorks       => '检查通知能否在你的手机上正常显示。';
   @override String get notifSentBang            => '已发送！';
   @override String get notifSendButton          => '发送';
   @override String get apVisualStyle             => '视觉风格';
@@ -699,7 +699,7 @@ class AppStringsZh implements AppStrings {
   @override String get faqQ8 => '\u7b49\u7ea7\u4e0e\u6210\u5c31\u7cfb\u7edf\u662f\u600e\u4e48\u8fd0\u4f5c\u7684\uff1f';
   @override String get faqA8 => '\u4f60\u7684\u8d26\u6237\u7b49\u7ea7\u968f\u603b scrobble \u6570\u589e\u957f\uff08\u6ca1\u6709\u4e0a\u9650\uff09\u3002\u5361\u7247\u4e5f\u4f1a\u6839\u636e\u8be5\u827a\u672f\u5bb6/\u6b4c\u66f2/\u4e13\u8f91\u7684\u64ad\u653e\u6b21\u6570\u663e\u793a\u8fb9\u6846\u989c\u8272\uff08\u9752\u94dc\u2192\u4e94\u5f69\uff09\u3002\u8fd9\u4e9b\u90fd\u57fa\u4e8e\u672c\u5730\u5df2\u7f13\u5b58\u7684\u7edf\u8ba1\u6570\u636e\u81ea\u52a8\u8ba1\u7b97\uff0c\u4e0d\u4f1a\u989d\u5916\u8bf7\u6c42\u7f51\u7edc\u3002';
   @override String get faqQ9 => '省电模式是如何工作的？';
-  @override String get faqA9 => '省电模式会拉长自动同步的间隔以节省电量。您可以在设置 > 通用中选择始终开启、跟随手机自带的省电模式，或在电量低于设定值时开启。';
+  @override String get faqA9 => '省电模式会减少应用的活动以节省电量：关闭倾斜视差效果，将屏幕刷新率限制在约 60 Hz，降低后台更新频率，并暂停动态封面和徽章光泽。图片、导出内容和分享卡片仍保持完整画质。\n\n你可以让它始终开启，也可以跟随手机自带的省电模式，或在电量低于你设定的值时自动开启。可在“设置”>“省电模式”中找到。';
   @override String get faqQ10 => '如何备份或恢复我的数据？';
   @override String get faqA10 => '前往设置 > 备份，您可以导出备份文件，并自行选择是否包含 Last.fm 密钥。之后可以在本机或其他设备上重新导入，找回您的设置。';
   @override String get faqQ11 => '应用可以离线使用吗？';
@@ -979,7 +979,7 @@ const Map<String, String> kTxZh = {
   'dash_chart': '仪表盘图表',
   'dash_calendar': '日历',
   'dash_monthly': '按月',
-  'cache_video_t': '动态封面 (Apple Music)',
+  'cache_video_t': '内存中的动态封面',
   'cache_video_s': '视频内存占用:{mem} · {players} 个活动播放器 · 已缓存 {links} 个链接',
   'cache_video_short': '动态封面',
   'cache_video_cleared': '已从内存中释放动态封面视频',
@@ -996,9 +996,9 @@ const Map<String, String> kTxZh = {
   'cache_img_limit_t': '照片缓存上限',
   'cache_img_limit_s': '封面、艺术家照片和头像。优先删除最旧的。',
   'cache_vid_limit_t': '视频缓存上限',
-  'cache_vid_limit_s': 'Apple Music 动态封面保存在磁盘上，可离线重播（Android）。',
+  'cache_vid_limit_s': '将动态封面保存在设备上，以便离线播放（Android）。',
   'cache_video_off': '关闭',
-  'cache_vid_disk_t': 'Apple Music 视频',
+  'cache_vid_disk_t': '已保存的动态封面',
   'cache_vid_disk_s': '{size} · 已保存的动态封面',
   'cache_no_limit_note': '听歌记录和 API 数据永远不受限制。',
   'key_internal_use': '使用应用内置密钥',

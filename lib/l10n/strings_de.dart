@@ -302,7 +302,7 @@ class AppStringsDe implements AppStrings {
   @override String get onboardNewsTitle => 'Neuigkeiten-Benachrichtigungen';
   @override String get onboardNewsSub => 'Sie werden benachrichtigt, wenn eine neue Funktion hinzukommt oder ein Fehler behoben wird.';
   @override String get onboardNewsBadgeTitle => 'Neuigkeiten-Punkt';
-  @override String get onboardNewsBadgeSub => 'Ein roter Punkt erscheint an der Glocke auf dem Startbildschirm, wenn es etwas Neues zu lesen gibt.';
+  @override String get onboardNewsBadgeSub => 'Auf der Glocke im Startbildschirm erscheint ein Punkt, wenn es etwas Neues zu lesen gibt.';
   @override String get onboardHapticTitle => 'Haptisches Feedback';
   @override String get onboardHapticSub => 'Das Telefon vibriert leicht, wenn Sie Schaltflächen und wichtige Elemente berühren.';
   @override String get onboardRecaps => 'Zusammenfassungen';
@@ -489,7 +489,7 @@ class AppStringsDe implements AppStrings {
   @override String get aboutAiDevNote => 'KI wurde auch bei der Entwicklung dieser App eingesetzt.';
   @override String get notifWorkManagerInfo => 'Benachrichtigungen laufen über WorkManager im Hintergrund. Die App muss nicht geöffnet sein. Eine Internetverbindung ist erforderlich.';
   @override String get notifIntervalTitle => 'Alle X Scrobbles';
-  @override String get notifIntervalSubtitle => 'In regelmäßigen Abständen benachrichtigt werden';
+  @override String get notifIntervalSubtitle => 'Erhalte jedes Mal eine Benachrichtigung, wenn eine bestimmte Anzahl Scrobbles dazukommt';
   @override String get notifRecapsSection => 'Hörzusammenfassungen';
   @override String get notifDailyRecapSubtitle => 'Anzahl Scrobbles + Lieblingskünstler des Tages';
   @override String get notifWeeklyRecapSubtitle => 'Anzahl Scrobbles + Lieblingskünstler der Woche';
@@ -507,13 +507,13 @@ class AppStringsDe implements AppStrings {
   @override String get notifPermissionDisabledBody => 'Erlaube Benachrichtigungen in den Systemeinstellungen, damit LastStats dir Rückblicke, Meilensteine und Neuigkeiten senden kann.';
   @override String get notifGrantPermission => 'Berechtigung erteilen';
   @override String get notifThresholdIntro => 'Sie erhalten bei jedem dieser Meilensteine eine besondere Benachrichtigung:';
-  @override String get notifIntervalDescription => 'Alle X Scrobbles eine Benachrichtigung auslösen';
+  @override String get notifIntervalDescription => 'Du wirst jedes Mal benachrichtigt, wenn X neue Scrobbles zusammenkommen';
   @override String get notifCustomValueLabel => 'Eigener Wert';
   @override String get notifTimeNotifyAt => 'Benachrichtigen um';
   @override String get notifDayOfWeek => 'Wochentag';
   @override String get notifSendTest => 'Testbenachrichtigung senden';
   @override String get notifSentCheckBar => 'Schauen Sie in Ihre Benachrichtigungsleiste!';
-  @override String get notifMakeSureWorks => 'Stellen Sie sicher, dass alles funktioniert.';
+  @override String get notifMakeSureWorks => 'Prüfe, ob Benachrichtigungen auf deinem Handy richtig funktionieren.';
   @override String get notifSentBang => 'Gesendet!';
   @override String get notifSendButton => 'Senden';
   @override String get apVisualStyle => 'Visueller Stil';
@@ -636,7 +636,7 @@ class AppStringsDe implements AppStrings {
   @override String get faqQ8 => 'Wie funktionieren Level und Erfolge?';
   @override String get faqA8 => 'Ihr Kontolevel steigt mit Ihrer Gesamtzahl an Scrobbles (es gibt kein H\u00f6chstlevel). Karten erhalten au\u00dferdem einen Rahmen (Bronze \u2192 schillernd), je nachdem wie oft der jeweilige Interpret/Titel/das Album gespielt wurde. Alles wird automatisch aus bereits lokal zwischengespeicherten Statistiken berechnet, ohne zus\u00e4tzliche Netzwerkaufrufe.';
   @override String get faqQ9 => 'Wie funktioniert der Energiesparmodus?';
-  @override String get faqA9 => 'Der Energiesparmodus verlängert die Abstände zwischen automatischen Synchronisierungen, um Akku zu sparen. Er kann dauerhaft an sein, dem Energiesparmodus Ihres Telefons folgen oder sich unter einem gewählten Akkustand einschalten, unter Einstellungen > Allgemein.';
+  @override String get faqA9 => 'Der Energiesparmodus reduziert die Aktivität der App, um Akku zu sparen: Der Neigungs-Parallaxeffekt wird abgeschaltet, die Bildwiederholrate ist auf etwa 60 Hz begrenzt, Hintergrundaktualisierungen laufen seltener und animierte Cover sowie der Glanz der Abzeichen werden pausiert. Bilder, Exporte und Teilen-Karten behalten ihre volle Qualität.\n\nDu kannst ihn dauerhaft aktivieren, ihn dem Energiesparmodus deines Handys folgen lassen oder ihn unterhalb eines selbst gewählten Akkustands einschalten. Du findest ihn unter Einstellungen > Energiesparmodus.';
   @override String get faqQ10 => 'Wie sichere oder stelle ich meine Daten wieder her?';
   @override String get faqA10 => 'Gehen Sie zu Einstellungen > Sicherung. Sie können eine Sicherungsdatei exportieren, wahlweise mit oder ohne Ihren Last.fm-Schlüssel, und sie später auf diesem Telefon oder einem anderen Gerät wieder importieren, um Ihre Einstellungen zurückzuholen.';
   @override String get faqQ11 => 'Funktioniert die App offline?';
@@ -953,7 +953,7 @@ const Map<String, String> kTxDe = {
   'dash_chart': 'Dashboard-Diagramm',
   'dash_calendar': 'Kalender',
   'dash_monthly': 'Monatlich',
-  'cache_video_t': 'Animierte Cover (Apple Music)',
+  'cache_video_t': 'Animierte Cover im Speicher',
   'cache_video_s': 'Videospeicher in Nutzung: {mem} · {players} aktive(r) Player · {links} Link(s) im Cache',
   'cache_video_short': 'Animierte Cover',
   'cache_video_cleared': 'Videos der animierten Cover aus dem Speicher entfernt',
@@ -970,9 +970,9 @@ const Map<String, String> kTxDe = {
   'cache_img_limit_t': 'Limit für Foto-Cache',
   'cache_img_limit_s': 'Cover, Künstlerfotos und Avatare. Die ältesten werden zuerst gelöscht.',
   'cache_vid_limit_t': 'Limit für Video-Cache',
-  'cache_vid_limit_s': 'Animierte Apple-Music-Cover werden offline auf dem Gerät gespeichert (Android).',
+  'cache_vid_limit_s': 'Animierte Cover, die auf dem Gerät gespeichert werden, um sie offline abzuspielen (Android).',
   'cache_video_off': 'Aus',
-  'cache_vid_disk_t': 'Apple-Music-Videos',
+  'cache_vid_disk_t': 'Animierte Cover auf dem Speicher',
   'cache_vid_disk_s': '{size} · Gespeicherte animierte Cover',
   'cache_no_limit_note': 'Scrobbles und API-Daten werden nie begrenzt.',
   'key_internal_use': 'Interne App-Schlüssel verwenden',

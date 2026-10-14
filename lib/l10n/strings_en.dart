@@ -335,7 +335,7 @@ class AppStringsEn implements AppStrings {
   @override String get onboardNewsTitle           => 'News notifications';
   @override String get onboardNewsSub             => 'You are notified when a new feature is added or a problem is fixed.';
   @override String get onboardNewsBadgeTitle      => 'News badge dot';
-  @override String get onboardNewsBadgeSub        => 'A red dot appears on the bell on the home screen when there is something new to read.';
+  @override String get onboardNewsBadgeSub        => 'A dot appears on the bell on the home screen when there is something new to read.';
   @override String get onboardHapticTitle         => 'Haptic feedback';
   @override String get onboardHapticSub           => 'The phone vibrates lightly when you tap buttons and important elements.';
   @override String get onboardRecaps              => 'Recaps';
@@ -541,7 +541,7 @@ class AppStringsEn implements AppStrings {
   @override String get aboutAiDevNote => 'AI was also used to help develop this app.';
   @override String get notifWorkManagerInfo => 'Notifications run in the background via WorkManager. The app does not need to be open. An internet connection is required.';
   @override String get notifIntervalTitle       => 'Every X scrobbles';
-  @override String get notifIntervalSubtitle    => 'Get notified at regular intervals';
+  @override String get notifIntervalSubtitle    => 'Get a notification each time you add a set number of scrobbles';
   @override String get notifRecapsSection       => 'Listening recaps';
   @override String get notifDailyRecapSubtitle  => 'Scrobble count + top artist for the day';
   @override String get notifWeeklyRecapSubtitle => 'Scrobble count + top artist for the week';
@@ -565,7 +565,7 @@ class AppStringsEn implements AppStrings {
     "You're a true music addict. 🔥",
     "One million scrobbles. That's legendary. 🎸",
   ];
-  @override String get notifIntervalDescription => 'Fire a notification every X scrobbles';
+  @override String get notifIntervalDescription => 'You\'ll be notified every time you reach X new scrobbles';
   @override String get notifCustomValueLabel    => 'Custom value';
   @override String get notifTimeNotifyAt        => 'Notify at';
   @override String get notifDayOfWeek           => 'Day of the week';
@@ -574,7 +574,7 @@ class AppStringsEn implements AppStrings {
   @override String get weekAbbrev => 'W';
   @override String get notifSendTest            => 'Send a test notification';
   @override String get notifSentCheckBar        => 'Check your notification bar!';
-  @override String get notifMakeSureWorks       => 'Make sure everything works.';
+  @override String get notifMakeSureWorks       => 'Check that notifications work properly on your phone.';
   @override String get notifSentBang            => 'Sent!';
   @override String get notifSendButton          => 'Send';
   @override String get apVisualStyle             => 'Visual style';
@@ -702,7 +702,7 @@ class AppStringsEn implements AppStrings {
   @override String get faqQ8 => 'How do levels and achievements work?';
   @override String get faqA8 => 'Your account level grows with your total scrobble count (there\'s no max level). Cards also get a border (bronze \u2192 iridescent) based on how many times that artist/track/album has been played. Everything is computed automatically from stats already cached locally, with no extra network calls.';
   @override String get faqQ9 => 'How does power saving mode work?';
-  @override String get faqA9 => 'Power saving mode spaces out automatic syncs to save battery. It can be always on, follow your phone\'s own power saving mode, or turn on below a battery level you choose, from Settings > General.';
+  @override String get faqA9 => 'Power saving mode reduces what the app does to save battery: tilt parallax is turned off, the screen refresh rate is capped at about 60 Hz, background updates run less often, and animated artwork and badge shine are paused. Images, exports and share cards keep full quality.\n\nYou can keep it always on, make it follow your phone\'s own battery saver, or have it turn on below a battery level you choose. You\'ll find it in Settings > Power saving mode.';
   @override String get faqQ10 => 'How do I back up or restore my data?';
   @override String get faqA10 => 'Go to Settings > Backup. You can export a backup file, with or without your Last.fm key as you prefer, and import it later on this phone or on another device to get your settings back.';
   @override String get faqQ11 => 'Does the app work offline?';
@@ -982,7 +982,7 @@ const Map<String, String> kTxEn = {
   'dash_chart': 'Dashboard chart',
   'dash_calendar': 'Calendar',
   'dash_monthly': 'Monthly',
-  'cache_video_t': 'Animated covers (Apple Music)',
+  'cache_video_t': 'Animated covers in memory',
   'cache_video_s': 'Video memory in use: {mem} · {players} active player(s) · {links} link(s) cached',
   'cache_video_short': 'Animated covers',
   'cache_video_cleared': 'Animated cover videos removed from memory',
@@ -999,9 +999,9 @@ const Map<String, String> kTxEn = {
   'cache_img_limit_t': 'Photo cache limit',
   'cache_img_limit_s': 'Covers, artist photos and avatars. Oldest ones are removed first.',
   'cache_vid_limit_t': 'Video cache limit',
-  'cache_vid_limit_s': 'Apple Music animated covers kept on disk to replay offline (Android).',
+  'cache_vid_limit_s': 'Animated covers kept on disk to replay offline (Android).',
   'cache_video_off': 'Off',
-  'cache_vid_disk_t': 'Apple Music videos',
+  'cache_vid_disk_t': 'Animated covers on disk',
   'cache_vid_disk_s': '{size} · Saved animated covers',
   'cache_no_limit_note': 'Scrobbles and API data are never limited.',
   'key_internal_use': 'Use the app\'s built-in key',
