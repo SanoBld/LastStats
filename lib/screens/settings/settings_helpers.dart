@@ -35,26 +35,26 @@ const kSettingsAccentOptions = [
 ];
 
 /// Cartes de statistiques — dupliqué ici pour être accessible hors du part-of.
-/// Tuple: (id, emoji). Labels live in lib/l10n (see statCardLabel).
+/// Tuple: (id, icon). Labels live in lib/l10n (see statCardLabel).
 const kAllStatCards = [
-  ('top_artist', '🎤'),
-  ('top_album', '💿'),
-  ('top_track', '🎵'),
-  ('last_track', '⏱️'),
-  ('total', '🎯'),
-  ('avg_day', '⚡'),
-  ('avg_week', '📅'),
-  ('favorites_count', '❤️'),
-  ('days_active', '🗓️'),
-  ('since', '📆'),
-  ('country', '🌍'),
-  ('top_artist_week', '🎤'),
-  ('top_album_week', '💿'),
-  ('top_track_week', '🎵'),
-  ('artist_count', '🎸'),
-  ('track_count', '🎼'),
-  ('album_count', '💽'),
-  ('scrobbles_week', '📊'),
+  ('top_artist', Icons.mic_rounded),
+  ('top_album', Icons.album_rounded),
+  ('top_track', Icons.music_note_rounded),
+  ('last_track', Icons.history_rounded),
+  ('total', Icons.graphic_eq_rounded),
+  ('avg_day', Icons.bolt_rounded),
+  ('avg_week', Icons.date_range_rounded),
+  ('favorites_count', Icons.favorite_rounded),
+  ('days_active', Icons.today_rounded),
+  ('since', Icons.calendar_month_rounded),
+  ('country', Icons.public_rounded),
+  ('top_artist_week', Icons.mic_rounded),
+  ('top_album_week', Icons.album_rounded),
+  ('top_track_week', Icons.music_note_rounded),
+  ('artist_count', Icons.groups_rounded),
+  ('track_count', Icons.library_music_rounded),
+  ('album_count', Icons.collections_bookmark_rounded),
+  ('scrobbles_week', Icons.bar_chart_rounded),
 ];
 const kDefaultStatCards = ['top_artist', 'top_album', 'top_track', 'last_track', 'favorites_count'];
 
@@ -657,14 +657,14 @@ class _CardReorderSheetState extends State<CardReorderSheet> {
             }),
             children: _items.map((id) {
               final card = kAllStatCards.firstWhere((c) => c.$1 == id,
-                  orElse: () => (id, '📋'));
+                  orElse: () => (id, Icons.dashboard_rounded));
               return Card(key: ValueKey(id), elevation: 0,
                 color: scheme.surfaceContainerHighest,
                 margin: const EdgeInsets.symmetric(vertical: 4),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12),
                     side: BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.4))),
                 child: ListTile(
-                  leading: Text(card.$2, style: const TextStyle(fontSize: 20)),
+                  leading: Icon(card.$2, color: scheme.primary),
                   title: Text(statCardLabel(id),
                       style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
                   trailing: Icon(Icons.drag_handle_rounded, color: scheme.onSurfaceVariant),

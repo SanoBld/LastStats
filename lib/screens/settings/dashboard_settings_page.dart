@@ -179,7 +179,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
         title: L.dashStatCardsSectionLabel,
         items: [
           for (final c in kAllStatCards)
-            PickItem(c.$1, statCardLabel(c.$1), emoji: c.$2, hint: _kTappableStatCards.contains(c.$1)),
+            PickItem(c.$1, statCardLabel(c.$1), icon: c.$2, hint: _kTappableStatCards.contains(c.$1)),
         ],
         selected: _statCards,
       ),

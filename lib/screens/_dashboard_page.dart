@@ -1471,7 +1471,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     switch (id) {
       case 'top_artist':
         return _DashStatCard(
-          emoji: '🎤',
+          icon: Icons.mic_rounded,
           value: topArtist != null ? (topArtist['name'] ?? '—').toString() : '—',
           label: L.dashArtist1,
           sub:   topArtist != null
@@ -1482,7 +1482,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         );
       case 'top_album':
         return _DashStatCard(
-          emoji: '💿',
+          icon: Icons.album_rounded,
           value: topAlbum != null ? (topAlbum['name'] ?? '—').toString() : '—',
           label: L.dashAlbum1,
           sub:   topAlbum != null ? (topAlbum['artist']?['name'] ?? '').toString() : null,
@@ -1491,7 +1491,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         );
       case 'top_track':
         return _DashStatCard(
-          emoji: '🎵',
+          icon: Icons.music_note_rounded,
           value: topTrack != null ? (topTrack['name'] ?? '—').toString() : '—',
           label: L.dashTrack1,
           sub:   topTrack != null
@@ -1502,7 +1502,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         );
       case 'last_track':
         return _DashStatCard(
-          emoji: '⏱️',
+          icon: Icons.history_rounded,
           value: lastTrack != null ? (lastTrack['name'] ?? '—').toString() : '—',
           label: L.dashLastTrack,
           sub:   lastTrack != null ? _fmtTrackDateLocal(lastTrack) : null,
@@ -1511,7 +1511,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         );
       case 'total':
         return _DashStatCard(
-          emoji:      '🎯',
+          icon: Icons.graphic_eq_rounded,
           value:      _fmtFull(total),
           label:      L.dashTotalScrobblesLabel,
           sub:        null,
@@ -1520,7 +1520,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         );
       case 'avg_day':
         return _DashStatCard(
-          emoji:      '⚡',
+          icon: Icons.bolt_rounded,
           value:      '~${_fmt(avg.round())}',
           label:      L.dashScrobblesPerDay,
           sub:        null,
@@ -1529,7 +1529,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         );
       case 'avg_week':
         return _DashStatCard(
-          emoji:      '📅',
+          icon: Icons.date_range_rounded,
           value:      '~${_fmt(weekly)}',
           label:      L.dashPerWeek,
           sub:        null,
@@ -1539,7 +1539,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
       case 'favorites_count':
         if (!favoritesEnabled) return null;
         return _DashStatCard(
-          emoji:  '❤️',
+          icon: Icons.favorite_rounded,
           value:  _fmtFull(_lovedCount),
           label:  L.favSectionTitle,
           sub:    null,
@@ -1550,7 +1550,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         );
       case 'days_active':
         return _DashStatCard(
-          emoji:      '🗓️',
+          icon: Icons.today_rounded,
           value:      '$days j',
           label:      L.dashDaysActive,
           sub:        null,
@@ -1559,21 +1559,21 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         );
       case 'since':
         return _DashStatCard(
-          emoji: '📆',
+          icon: Icons.calendar_month_rounded,
           value: regStr.isNotEmpty ? regStr : '—',
           label: L.dashMemberSinceLabel,
           sub:   null,
         );
       case 'country':
         return _DashStatCard(
-          emoji: '🌍',
+          icon: Icons.public_rounded,
           value: (country.isNotEmpty && country != 'None') ? country : '—',
           label: L.dashCountryLabel,
           sub:   null,
         );
       case 'top_artist_week':
         return _DashStatCard(
-          emoji: '🎤',
+          icon: Icons.mic_rounded,
           value: topArtistWeek != null ? (topArtistWeek['name'] ?? '—').toString() : '—',
           label: L.dashArtistWeekLabel,
           sub:   topArtistWeek != null
@@ -1584,7 +1584,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         );
       case 'top_album_week':
         return _DashStatCard(
-          emoji: '💿',
+          icon: Icons.album_rounded,
           value: topAlbumWeek != null ? (topAlbumWeek['name'] ?? '—').toString() : '—',
           label: L.dashAlbumWeekLabel,
           sub:   topAlbumWeek != null ? (topAlbumWeek['artist']?['name'] ?? '').toString() : null,
@@ -1593,7 +1593,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         );
       case 'top_track_week':
         return _DashStatCard(
-          emoji: '🎵',
+          icon: Icons.music_note_rounded,
           value: topTrackWeek != null ? (topTrackWeek['name'] ?? '—').toString() : '—',
           label: L.dashTrackWeekLabel,
           sub:   topTrackWeek != null
@@ -1605,7 +1605,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
       case 'artist_count':
         final n = int.tryParse((_userInfo?['artist_count'] ?? '0').toString()) ?? 0;
         return _DashStatCard(
-          emoji: '🎸', rawInt: n > 0 ? n : null,
+          icon: Icons.groups_rounded, rawInt: n > 0 ? n : null,
           value: n > 0 ? _fmtFull(n) : '—',
           label: L.dashUniqueArtistsLabel,
           sub: null,
@@ -1613,7 +1613,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
       case 'track_count':
         final n = int.tryParse((_userInfo?['track_count'] ?? '0').toString()) ?? 0;
         return _DashStatCard(
-          emoji: '🎼', rawInt: n > 0 ? n : null,
+          icon: Icons.library_music_rounded, rawInt: n > 0 ? n : null,
           value: n > 0 ? _fmtFull(n) : '—',
           label: L.dashUniqueTracksLabel,
           sub: null,
@@ -1621,7 +1621,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
       case 'album_count':
         final n = int.tryParse((_userInfo?['album_count'] ?? '0').toString()) ?? 0;
         return _DashStatCard(
-          emoji: '💽', rawInt: n > 0 ? n : null,
+          icon: Icons.collections_bookmark_rounded, rawInt: n > 0 ? n : null,
           value: n > 0 ? _fmtFull(n) : '—',
           label: L.dashUniqueAlbumsLabel,
           sub: null,
@@ -1629,7 +1629,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
       case 'scrobbles_week':
         final val = _thisWeekCount > 0 ? _thisWeekCount : weekly;
         return _DashStatCard(
-          emoji: '📊', rawInt: val,
+          icon: Icons.bar_chart_rounded, rawInt: val,
           value: _thisWeekCount > 0 ? _fmtFull(_thisWeekCount) : '~${_fmt(weekly)}',
           label: L.dashThisWeekLabel,
           sub: _thisWeekCount > 0 && _lastWeekCount > 0
@@ -2937,7 +2937,8 @@ class _StatTone extends InheritedWidget {
 // ── Secondary stat card (uniform height via IntrinsicHeight in _StatGrid) ─────
 
 class _DashStatCard extends StatelessWidget {
-  final String  emoji, value, label;
+  final String  value, label;
+  final IconData icon;
   final String? sub;
   final int?    rawInt;
   final String  rollPrefix;
@@ -2945,7 +2946,7 @@ class _DashStatCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   const _DashStatCard({
-    required this.emoji,
+    required this.icon,
     required this.value,
     required this.label,
     this.sub,
@@ -2987,7 +2988,7 @@ class _DashStatCard extends StatelessWidget {
             M3CookieBadge(
               size: 40,
               color: scheme.surface.withValues(alpha: 0.6),
-              child: Text(emoji, style: const TextStyle(fontSize: 20)),
+              child: Icon(icon, size: 22, color: fg),
             ),
             const SizedBox(height: 10),
             if (rawInt != null)
@@ -3321,7 +3322,11 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
         : null;
     final countStr = isEstimate ? '~${_fmt(scrobbles)}' : _fmt(scrobbles);
 
-    return IntrinsicHeight(
+    // Side padding keeps tiles of neighbouring pages from touching
+    // while the pages slide.
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -3360,6 +3365,7 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
             percent: pct,
           )),
         ],
+      ),
       ),
     );
   }
