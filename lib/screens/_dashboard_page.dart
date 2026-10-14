@@ -1928,18 +1928,14 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                           clipBehavior: Clip.none,
                           children: [
                             Container(
-                              width: 30, height: 30,
+                              width: 34, height: 34,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.black.withValues(alpha: 0.28),
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.15),
-                                  width: 0.8,
-                                ),
+                                color: scheme.primaryContainer.withValues(alpha: 0.78),
                               ),
                               child: Icon(Icons.notifications_rounded,
-                                  size: 15,
-                                  color: Colors.white.withValues(alpha: 0.75)),
+                                  size: 17,
+                                  color: scheme.onPrimaryContainer),
                             ),
                             ValueListenableBuilder<bool>(
                               valueListenable: showNewsBadgeNotifier,
@@ -1951,16 +1947,18 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                                   right: -2, top: -2,
                                   child: Container(
                                     padding: const EdgeInsets.all(2.5),
-                                    decoration: const BoxDecoration(
+                                    decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: Color(0xFFE53935),
+                                      color: scheme.primary,
+                                      border: Border.all(
+                                          color: scheme.primaryContainer, width: 1.5),
                                     ),
                                     constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
                                     child: Text(
                                       _unreadCount > 9 ? '9+' : '$_unreadCount',
                                       textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        color: Colors.white,
+                                      style: TextStyle(
+                                        color: scheme.onPrimary,
                                         fontSize: 8,
                                         fontWeight: FontWeight.w800,
                                         height: 1,
@@ -1986,18 +1984,14 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                           _showSettingsMenu();
                         },
                         child: Container(
-                          width: 30, height: 30,
+                          width: 34, height: 34,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.black.withValues(alpha: 0.28),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.15),
-                              width: 0.8,
-                            ),
+                            color: scheme.primaryContainer.withValues(alpha: 0.78),
                           ),
                           child: Icon(Icons.settings_rounded,
-                              size: 15,
-                              color: Colors.white.withValues(alpha: 0.75)),
+                              size: 17,
+                              color: scheme.onPrimaryContainer),
                         ),
                       ),
                     ],
@@ -3765,7 +3759,8 @@ class _NewsPage extends StatefulWidget {
     'feature' => (Icons.auto_awesome_rounded,  s.primary),
     'fix'     => (Icons.build_circle_outlined, s.tertiary),
     'update'  => (Icons.system_update_rounded, s.secondary),
-    'alert'   => (Icons.warning_amber_rounded, s.error),
+    'alert'   => (Icons.warning_amber_rounded,
+                  Color.lerp(s.secondary, s.tertiary, 0.5)!),
     _         => (Icons.info_outline_rounded,
                   Color.lerp(s.primary, s.tertiary, 0.5)!),
   };
@@ -4011,7 +4006,7 @@ class _NewsListTileState extends State<_NewsListTile> {
           // Same grouped-tile shape as the settings rows: big outer
           // corners, small inner corners, no border, no accent strip.
           decoration: BoxDecoration(
-            color:        scheme.surfaceContainerLow,
+            color:        scheme.secondaryContainer.withValues(alpha: 0.45),
             borderRadius: m3SegmentRadius(widget.index, widget.count),
           ),
           child: Row(
