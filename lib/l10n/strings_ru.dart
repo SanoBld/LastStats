@@ -125,7 +125,7 @@ class AppStringsRu implements AppStrings {
   @override String get settingsDayNightDayStart        => 'День начинается в';
   @override String get settingsDayNightNightStart      => 'Ночь начинается в';
   @override String get settingsMaterialYou => 'Material You';
-  @override String get settingsMaterialYouSub => 'Использовать цвет обоев Android';
+  @override String get settingsMaterialYouSub => 'Использует цвета обоев Android (Android 12 и новее)';
   @override String get settingsMusicColor => 'Цвет из музыки';
   @override String get settingsMusicColorSub => 'Извлекает цвет из обложки текущего альбома';
   @override String get settingsMusicColorNote => 'Основной цвет текущей обложки альбома заменяет акцентный цвет.';
@@ -169,10 +169,10 @@ class AppStringsRu implements AppStrings {
   @override String get settingsBackupInfo => 'Включает: тему, цвета, ключ API, имя пользователя, заголовок, избранное. Совместимо между версиями.';
   @override String get settingsUpdates => 'Обновления';
   @override String get settingsAutoUpdate => 'Автоматическая проверка';
-  @override String get settingsAutoUpdateSub => 'Раз в день';
+  @override String get settingsAutoUpdateSub => 'Раз в день проверяет наличие новой версии в фоновом режиме.';
   @override String get settingsCheckNow => 'Проверить сейчас';
   @override String get settingsUpToDate => 'Обновлено';
-  @override String get settingsCheckFailed => 'Проверка не удалась.';
+  @override String get settingsCheckFailed => 'Не удалось проверить обновления. Проверьте подключение к интернету и повторите попытку.';
   @override String get settingsDownload => 'Скачать';
   @override String get settingsViewRelease => 'Просмотреть';
   @override String get settingsAbout => 'О приложении';
@@ -214,7 +214,7 @@ class AppStringsRu implements AppStrings {
   @override String get exportCopied => 'Скопировано!';
   @override String get importTitle => 'Восстановить резервную копию';
   @override String get importHintLabel => 'Вставьте сюда резервную копию LastStats.';
-  @override String get importEmpty => 'Поле пусто.';
+  @override String get importEmpty => 'Нечего импортировать: поле пустое. Вставьте JSON, экспортированный из LastStats.';
   @override String get importInvalidJson => 'Неверный JSON.';
   @override String get importUnknownFile => 'Файл не распознан.';
   @override String get importInvalidFormat => 'Неверный формат.';
@@ -380,7 +380,7 @@ class AppStringsRu implements AppStrings {
   @override String get syncLastSyncLabel => 'Последняя синхронизация';
   @override String get syncNeverLabel => 'Никогда';
   @override String get syncTotalScrobblesLabel => 'Скробблов в кэше';
-  @override String get syncUpToDateMsg => 'История актуальна';
+  @override String get syncUpToDateMsg => 'История актуальна: новых скробблов для загрузки нет';
   @override String get syncNotifNote => 'Во время полной синхронизации появляется уведомление о ходе выполнения.';
   @override String get pcModeLayout => 'Макет';
   @override String get pcModeNavLayout => 'Макет навигации';
@@ -404,7 +404,7 @@ class AppStringsRu implements AppStrings {
   @override String get backupDownloadFile => 'Скачивает файл .json';
   @override String get backupChooseFile => 'Выбрать файл резервной копии';
   @override String get backupFileSaved => 'Резервная копия сохранена';
-  @override String get backupFileSaveFailed => 'Не удалось сохранить файл';
+  @override String get backupFileSaveFailed => 'Не удалось сохранить файл резервной копии. Проверьте, что достаточно свободного места и у приложения есть доступ к папке, затем повторите попытку.';
   @override String get setupRestoreBackup => 'Восстановить резервную копию';
   @override String get setupRestoreBackupSub => 'Восстановите аккаунт и настройки из файла резервной копии в формате .json.';
   @override String get backupRestoreKeysTitle => 'Восстановить ключи API';
@@ -501,10 +501,10 @@ class AppStringsRu implements AppStrings {
   @override String get notifSyncDetailSubtitle => 'Показывать прогресс в реальном времени (текущий год, счётчик) во время синхронизации';
   @override String get notifNewsSubtitle => 'Получайте уведомления о новых функциях, исправлениях и анонсах';
   @override String get notifBadgeOnDashboard => 'Значок на обзоре';
-  @override String get notifBadgeSubtitle => 'Показывать точку непрочитанного на значке колокольчика новостей';
+  @override String get notifBadgeSubtitle => 'Показывает точку на колокольчике новостей, если есть непрочитанные объявления';
   @override String get notifTestLabel => 'Тест';
   @override String get notifPermissionDisabledTitle => 'Уведомления отключены';
-  @override String get notifPermissionDisabledBody => 'Предоставьте разрешение, чтобы LastStats мог отправлять вам оповещения.';
+  @override String get notifPermissionDisabledBody => 'Разрешите уведомления в настройках системы, чтобы LastStats мог присылать итоги, достижения и новости.';
   @override String get notifGrantPermission => 'Предоставить разрешение';
   @override String get notifThresholdIntro => 'Вы получите особое уведомление на каждом из этих рубежей:';
   @override String get notifIntervalDescription => 'Отправлять уведомление каждые X скробблов';
@@ -581,7 +581,7 @@ class AppStringsRu implements AppStrings {
   @override String get favConnectDialogBody      => 'Авторизуйте приложение на странице Last.fm, открытой в браузере, затем вернитесь сюда и подтвердите.';
   @override String get favConnectDialogConfirm   => 'Я авторизовал(а)';
   @override String get favConnectSuccess         => 'Избранное успешно включено!';
-  @override String get favConnectError           => 'Не удалось включить избранное. Проверьте секретный ключ.';
+  @override String get favConnectError           => 'Не удалось включить избранное. Проверьте, что секретный ключ указан верно и вы разрешили доступ LastStats в Last.fm, затем повторите попытку.';
   @override String get acctApiKeysSection        => 'Ключи API';
   @override String get acctSecretKeyLabel        => 'Секретный ключ';
   @override String get acctSecretKeyNotSet       => 'Не задан';
@@ -927,7 +927,7 @@ const Map<String, String> kTxRu = {
   'font_import': 'Импортировать шрифт',
   'font_import_s': 'Файл .ttf или .otf (до 3 МБ)',
   'font_remove': 'Удалить импортированный шрифт',
-  'font_bad': 'Неверный или слишком большой шрифт',
+  'font_bad': 'Этот шрифт нельзя использовать: файл повреждён или больше 3 МБ',
   'qs_l8_t': 'Шрифт',
   'art_popular': 'Популярные',
   'art_recent': 'Новые',
@@ -956,7 +956,7 @@ const Map<String, String> kTxRu = {
   'cache_video_t': 'Анимированные обложки (Apple Music)',
   'cache_video_s': 'Видеопамять: {mem} · активных плееров: {players} · ссылок в кэше: {links}',
   'cache_video_short': 'Анимации',
-  'cache_video_cleared': 'Видеопамять освобождена',
+  'cache_video_cleared': 'Видео анимированных обложек удалены из памяти',
   'cache_memory_section': 'Память',
   'cache_storage_section': 'Хранилище',
   'lvl': 'Уровень {n}',
@@ -1008,9 +1008,9 @@ const Map<String, String> kTxRu = {
   'ui_which_period': 'Какой период?',
   'ui_all_time': 'За всё время',
   'ui_exporting': 'Экспорт…',
-  'ui_chart_not_available_fo': 'График недоступен за этот период',
-  'ui_could_not_generate_the': 'Не удалось создать изображение',
-  'ui_error': 'Ошибка',
+  'ui_chart_not_available_fo': 'Этот график недоступен для выбранного периода',
+  'ui_could_not_generate_the': 'Не удалось создать изображение. Повторите попытку.',
+  'ui_error': 'Что-то пошло не так',
   'ui_loading_history': 'Загрузка истории{yearLabel}… {pct}%',
   'ui_charts_will_be_more_ac': 'После загрузки графики станут точнее.',
   'ui_load_the_full_history_': 'Загрузите полную историю, чтобы увидеть все годы.',
@@ -1044,7 +1044,7 @@ const Map<String, String> kTxRu = {
   'ui_current_streak': 'Текущая серия',
   'ui_d': 'д',
   'ui_best_streak': 'Лучшая серия',
-  'ui_best_streak_started_on': 'Лучшая серия с {bestStart}',
+  'ui_best_streak_started_on': 'Лучшая серия началась {bestStart}',
   'ui_no_data_for_this_perio': 'Нет данных за этот период',
   'ui_load_history_to_displa': 'Загрузите историю, чтобы показать {what}',
   'ui_less': 'Меньше',
@@ -1130,7 +1130,7 @@ const Map<String, String> kTxRu = {
   'ui_daily': 'Каждый день',
   'ui_resync_everyone': 'Синхронизировать всех заново',
   'ui_version_history': 'История версий',
-  'ui_could_not_load_release': 'Не удалось загрузить историю.',
+  'ui_could_not_load_release': 'Не удалось загрузить историю версий. Проверьте подключение и повторите попытку.',
   'ui_installed_dev_build_un': 'Установлена: dev-сборка (версия неизвестна)',
   'ui_installed': 'Установлена: {displayVer}',
   'ui_search_a_version_or_ch': 'Поиск версии или списка изменений…',
@@ -1138,14 +1138,14 @@ const Map<String, String> kTxRu = {
   'ui_no_release_matches_you': 'Нет версий, соответствующих поиску.',
   'ui_latest': 'ПОСЛЕДНЯЯ',
   'ui_installed_2': 'УСТАНОВЛЕНА',
-  'ui_no_description': 'Нет описания.',
+  'ui_no_description': 'Для этой версии нет описания.',
   'ui_download': 'Скачать',
   'ui_view_release': 'Открыть релиз',
   'ui_details': 'Подробнее',
   'ui_all_past_releases_chan': 'Все прошлые версии, списки изменений и загрузки',
-  'ui_please_fill_both_field': 'Заполните оба поля.',
+  'ui_please_fill_both_field': 'Заполните оба поля, чтобы продолжить.',
   'ui_api_key_must_be_32_cha': 'Ключ API должен состоять ровно из 32 символов.',
-  'ui_profile_not_found': 'Профиль не найден.',
+  'ui_profile_not_found': 'Профиль не найден. Проверьте имя пользователя и повторите попытку.',
   'ui_chart_monthly': 'Столбцы по месяцам',
   'ui_chart_cumul': 'Динамика',
   'ui_chart_genres': 'Музыкальные жанры',
@@ -1159,15 +1159,15 @@ const Map<String, String> kTxRu = {
   'ui_band_afternoon': 'День',
   'ui_band_evening': 'Вечер',
   'qs_t1_t': 'Режим OLED',
-  'qs_t1_s': 'Чисто чёрный фон',
+  'qs_t1_s': 'Чисто чёрный фон, экономит заряд на OLED-экранах',
   'qs_t2_t': 'Режим энергосбережения',
-  'qs_t2_s': 'Снижает расход батареи',
+  'qs_t2_s': 'Меньше анимаций и фоновых обновлений для экономии заряда',
   'qs_t3_t': 'Уведомления о новостях',
-  'qs_t3_s': 'Оповещения о новостях Last.fm',
+  'qs_t3_s': 'Оповещения о новых функциях, исправлениях и объявлениях',
   'qs_t4_t': 'Тактильная отдача',
-  'qs_t4_s': 'Вибрация при взаимодействии',
+  'qs_t4_s': 'Короткая вибрация при нажатиях, выборе и смахивании',
   'qs_t5_t': 'Достижения',
-  'qs_t5_s': 'Показывает открытые достижения',
+  'qs_t5_s': 'Показывает полученные достижения и ваш уровень',
   'qs_l1_t': 'Акцентный цвет',
   'qs_l2_t': 'Тема',
   'qs_l3_t': 'Язык',

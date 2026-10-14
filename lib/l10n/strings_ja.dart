@@ -125,7 +125,7 @@ class AppStringsJa implements AppStrings {
   @override String get settingsDayNightDayStart        => '昼の開始時刻';
   @override String get settingsDayNightNightStart      => '夜の開始時刻';
   @override String get settingsMaterialYou => 'Material You';
-  @override String get settingsMaterialYouSub => 'Androidの壁紙の色を使用';
+  @override String get settingsMaterialYouSub => 'Android の壁紙の色を使用します（Android 12 以降）';
   @override String get settingsMusicColor => '楽曲から色を取得';
   @override String get settingsMusicColorSub => '再生中のアルバムアートから色を抽出';
   @override String get settingsMusicColorNote => '再生中のアルバムアートの主要色がアクセントカラーになります。';
@@ -169,10 +169,10 @@ class AppStringsJa implements AppStrings {
   @override String get settingsBackupInfo => '含まれる内容：テーマ、色、APIキー、ユーザー名、ヘッダー、お気に入り。バージョン間で互換性があります。';
   @override String get settingsUpdates => 'アップデート';
   @override String get settingsAutoUpdate => '自動チェック';
-  @override String get settingsAutoUpdateSub => '1日1回';
+  @override String get settingsAutoUpdateSub => '1日1回、バックグラウンドで新しいバージョンを確認します。';
   @override String get settingsCheckNow => '今すぐ確認';
   @override String get settingsUpToDate => '最新です';
-  @override String get settingsCheckFailed => '確認に失敗しました。';
+  @override String get settingsCheckFailed => 'アップデートを確認できませんでした。インターネット接続を確認して、もう一度お試しください。';
   @override String get settingsDownload => 'ダウンロード';
   @override String get settingsViewRelease => '表示';
   @override String get settingsAbout => 'アプリ情報';
@@ -214,7 +214,7 @@ class AppStringsJa implements AppStrings {
   @override String get exportCopied => 'コピーしました！';
   @override String get importTitle => 'バックアップを復元';
   @override String get importHintLabel => 'LastStatsのバックアップをここに貼り付けてください。';
-  @override String get importEmpty => '入力欄が空です。';
+  @override String get importEmpty => 'インポートするデータがありません。入力欄が空です。LastStats でエクスポートした JSON を貼り付けてください。';
   @override String get importInvalidJson => '無効なJSONです。';
   @override String get importUnknownFile => '認識できないファイルです。';
   @override String get importInvalidFormat => '無効な形式です。';
@@ -380,7 +380,7 @@ class AppStringsJa implements AppStrings {
   @override String get syncLastSyncLabel => '前回の同期';
   @override String get syncNeverLabel => 'なし';
   @override String get syncTotalScrobblesLabel => 'キャッシュ済みスクロブル数';
-  @override String get syncUpToDateMsg => '履歴は最新です';
+  @override String get syncUpToDateMsg => '履歴は最新です。ダウンロードする新しいスクロブルはありません';
   @override String get syncNotifNote => '完全同期中は進捗通知が表示されます。';
   @override String get pcModeLayout => 'レイアウト';
   @override String get pcModeNavLayout => 'ナビゲーションレイアウト';
@@ -404,7 +404,7 @@ class AppStringsJa implements AppStrings {
   @override String get backupDownloadFile => '.jsonファイルをダウンロードします';
   @override String get backupChooseFile => 'バックアップファイルを選択';
   @override String get backupFileSaved => 'バックアップを保存しました';
-  @override String get backupFileSaveFailed => 'ファイルの保存に失敗しました';
+  @override String get backupFileSaveFailed => 'バックアップファイルを保存できませんでした。空き容量と、アプリがフォルダに書き込めるかを確認して、もう一度お試しください。';
   @override String get setupRestoreBackup => 'バックアップを復元';
   @override String get setupRestoreBackupSub => 'JSON 形式のバックアップファイルから、アカウントと設定を復元します。';
   @override String get backupRestoreKeysTitle => 'APIキーを復元';
@@ -501,10 +501,10 @@ class AppStringsJa implements AppStrings {
   @override String get notifSyncDetailSubtitle => '同期中にライブ進捗（現在の年、カウンター）を表示します';
   @override String get notifNewsSubtitle => '新機能、修正、お知らせについて通知を受け取ります';
   @override String get notifBadgeOnDashboard => 'ダッシュボードのバッジ';
-  @override String get notifBadgeSubtitle => 'お知らせベルアイコンに未読の点を表示します';
+  @override String get notifBadgeSubtitle => '未読のお知らせがあるとき、ニュースのベルアイコンにバッジを表示します';
   @override String get notifTestLabel => 'テスト';
   @override String get notifPermissionDisabledTitle => '通知が無効です';
-  @override String get notifPermissionDisabledBody => 'LastStatsが通知を送信できるように権限を許可してください。';
+  @override String get notifPermissionDisabledBody => 'システム設定で通知を許可すると、LastStats からまとめや節目、お知らせを受け取れます。';
   @override String get notifGrantPermission => '権限を許可';
   @override String get notifThresholdIntro => '次の節目ごとに特別な通知を受け取ります：';
   @override String get notifIntervalDescription => 'スクロブルX回ごとに通知を送信します';
@@ -581,7 +581,7 @@ class AppStringsJa implements AppStrings {
   @override String get favConnectDialogBody      => 'ブラウザで開いたLast.fmのページでアプリを許可してから、ここに戻って確認してください。';
   @override String get favConnectDialogConfirm   => '許可しました';
   @override String get favConnectSuccess         => 'お気に入り機能が有効になりました！';
-  @override String get favConnectError           => 'お気に入り機能を有効にできませんでした。シークレットキーを確認してください。';
+  @override String get favConnectError           => 'お気に入りを有効にできませんでした。シークレットキーが正しいこと、Last.fm で LastStats を許可したことを確認して、もう一度お試しください。';
   @override String get acctApiKeysSection        => 'APIキー';
   @override String get acctSecretKeyLabel        => 'シークレットキー';
   @override String get acctSecretKeyNotSet       => '未設定';
@@ -926,7 +926,7 @@ const Map<String, String> kTxJa = {
   'font_import': 'フォントをインポート',
   'font_import_s': '.ttf または .otf ファイル（最大3MB）',
   'font_remove': 'インポートしたフォントを削除',
-  'font_bad': 'フォントが無効、またはサイズが大きすぎます',
+  'font_bad': 'このフォントは使用できません。ファイルが無効か、3 MB を超えています',
   'qs_l8_t': 'フォント',
   'art_popular': '人気',
   'art_recent': '最新',
@@ -955,7 +955,7 @@ const Map<String, String> kTxJa = {
   'cache_video_t': 'アニメーションカバー (Apple Music)',
   'cache_video_s': '使用中のビデオメモリ:{mem} · アクティブなプレーヤー {players} · キャッシュ済みリンク {links}',
   'cache_video_short': 'アニメカバー',
-  'cache_video_cleared': 'ビデオメモリを解放しました',
+  'cache_video_cleared': '動くカバーの動画をメモリから解放しました',
   'cache_memory_section': 'メモリ',
   'cache_storage_section': 'ストレージ',
   'lvl': 'レベル {n}',
@@ -1007,9 +1007,9 @@ const Map<String, String> kTxJa = {
   'ui_which_period': 'どの期間？',
   'ui_all_time': '全期間',
   'ui_exporting': 'エクスポート中…',
-  'ui_chart_not_available_fo': 'この期間のグラフは利用できません',
-  'ui_could_not_generate_the': '画像を生成できませんでした',
-  'ui_error': 'エラー',
+  'ui_chart_not_available_fo': 'このグラフは選択した期間では利用できません',
+  'ui_could_not_generate_the': '画像を生成できませんでした。もう一度お試しください。',
+  'ui_error': '問題が発生しました',
   'ui_loading_history': '履歴{yearLabel}を読み込み中… {pct}%',
   'ui_charts_will_be_more_ac': '読み込み後、グラフはより正確になります。',
   'ui_load_the_full_history_': '全期間を見るには完全な履歴を読み込んでください。',
@@ -1043,7 +1043,7 @@ const Map<String, String> kTxJa = {
   'ui_current_streak': '現在の連続記録',
   'ui_d': '日',
   'ui_best_streak': '最長の連続記録',
-  'ui_best_streak_started_on': '最長の連続記録は {bestStart} から',
+  'ui_best_streak_started_on': '最長記録は {bestStart} に開始',
   'ui_no_data_for_this_perio': 'この期間のデータはありません',
   'ui_load_history_to_displa': '{what} を表示するには履歴を読み込んでください',
   'ui_less': '少ない',
@@ -1129,7 +1129,7 @@ const Map<String, String> kTxJa = {
   'ui_daily': '毎日',
   'ui_resync_everyone': 'すべて再同期',
   'ui_version_history': 'バージョン履歴',
-  'ui_could_not_load_release': '履歴を読み込めませんでした。',
+  'ui_could_not_load_release': 'バージョン履歴を読み込めませんでした。接続を確認して、もう一度お試しください。',
   'ui_installed_dev_build_un': 'インストール済み：開発ビルド（バージョン不明）',
   'ui_installed': 'インストール済み：{displayVer}',
   'ui_search_a_version_or_ch': 'バージョンまたは変更履歴を検索…',
@@ -1137,14 +1137,14 @@ const Map<String, String> kTxJa = {
   'ui_no_release_matches_you': '検索に一致するバージョンはありません。',
   'ui_latest': '最新',
   'ui_installed_2': 'インストール済み',
-  'ui_no_description': '説明はありません。',
+  'ui_no_description': 'このバージョンには説明がありません。',
   'ui_download': 'ダウンロード',
   'ui_view_release': 'リリースを見る',
   'ui_details': '詳細',
   'ui_all_past_releases_chan': '過去のすべてのバージョン、変更履歴、ダウンロード',
-  'ui_please_fill_both_field': '両方の欄を入力してください。',
+  'ui_please_fill_both_field': '続行するには、両方の項目を入力してください。',
   'ui_api_key_must_be_32_cha': 'API キーはちょうど 32 文字で入力してください。',
-  'ui_profile_not_found': 'プロフィールが見つかりません。',
+  'ui_profile_not_found': 'プロフィールが見つかりません。ユーザー名を確認して、もう一度お試しください。',
   'ui_chart_monthly': '月別の棒グラフ',
   'ui_chart_cumul': '推移',
   'ui_chart_genres': '音楽ジャンル',
@@ -1158,15 +1158,15 @@ const Map<String, String> kTxJa = {
   'ui_band_afternoon': '午後',
   'ui_band_evening': '夜（夕方）',
   'qs_t1_t': 'OLED モード',
-  'qs_t1_s': '純黒の背景',
+  'qs_t1_s': '完全な黒の背景で、OLED 画面の消費電力を抑えます',
   'qs_t2_t': '省電力モード',
-  'qs_t2_s': 'バッテリー消費を抑えます',
+  'qs_t2_s': 'アニメーションとバックグラウンド更新を減らして電池を節約します',
   'qs_t3_t': 'ニュース通知',
-  'qs_t3_s': 'Last.fm の最新情報の通知',
+  'qs_t3_s': '新機能、修正、お知らせを通知します',
   'qs_t4_t': '触覚フィードバック',
-  'qs_t4_s': '操作時に振動します',
+  'qs_t4_s': 'タップ、選択、スワイプ時に短く振動します',
   'qs_t5_t': '実績',
-  'qs_t5_s': '解除した実績を表示します',
+  'qs_t5_s': '解除した実績とレベルを表示します',
   'qs_l1_t': 'アクセントカラー',
   'qs_l2_t': 'テーマ',
   'qs_l3_t': '言語',

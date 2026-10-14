@@ -150,7 +150,7 @@ class AppStringsPt implements AppStrings {
   @override String get settingsDayNightDayStart        => 'O dia começa às';
   @override String get settingsDayNightNightStart      => 'A noite começa às';
   @override String get settingsMaterialYou       => 'Material You';
-  @override String get settingsMaterialYouSub    => 'Usa a cor do papel de parede do Android';
+  @override String get settingsMaterialYouSub    => 'Usa as cores do papel de parede do Android (Android 12 ou superior)';
   @override String get settingsMusicColor        => 'Cor a partir da música';
   @override String get settingsMusicColorSub     => 'Extrai a cor da capa atual';
   @override String get settingsMusicColorNote    => 'A cor dominante da capa atual substitui o destaque.';
@@ -194,11 +194,11 @@ class AppStringsPt implements AppStrings {
   @override String get settingsBackupInfo        => 'Inclui: tema, cores, chave de API, usuário, cabeçalho, favoritos. Compatível entre versões.';
   @override String get settingsUpdates           => 'Atualizações';
   @override String get settingsAutoUpdate        => 'Verificação automática';
-  @override String get settingsAutoUpdateSub     => 'Uma vez por dia';
+  @override String get settingsAutoUpdateSub     => 'Procura uma nova versão em segundo plano, uma vez por dia.';
   @override String get settingsCheckNow          => 'Verificar agora';
   @override String get settingsUpToDate          => 'Atualizado';
   @override String settingsUpdateAvailable(String v) => 'v$v disponível';
-  @override String get settingsCheckFailed       => 'Falha na verificação.';
+  @override String get settingsCheckFailed       => 'Não foi possível verificar atualizações. Verifique sua conexão com a internet e tente novamente.';
   @override String settingsUpdateBanner(String v) => 'Atualização v$v';
   @override String get settingsDownload          => 'Baixar';
   @override String get settingsViewRelease       => 'Ver';
@@ -244,7 +244,7 @@ class AppStringsPt implements AppStrings {
   @override String get exportCopied     => 'Copiado!';
   @override String get importTitle      => 'Restaurar um backup';
   @override String get importHintLabel  => 'Cole aqui seu backup do LastStats.';
-  @override String get importEmpty      => 'Campo vazio.';
+  @override String get importEmpty      => 'Nada para importar: o campo está vazio. Cole o JSON que você exportou do LastStats.';
   @override String get importInvalidJson  => 'JSON inválido.';
   @override String get importUnknownFile  => 'Arquivo não reconhecido.';
   @override String get importInvalidFormat => 'Formato inválido.';
@@ -425,7 +425,7 @@ class AppStringsPt implements AppStrings {
   @override String get syncNeverLabel          => 'Nunca';
   @override String get syncTotalScrobblesLabel => 'Scrobbles em cache';
   @override String syncNewScrobblesFound(int n) => n == 0 ? 'Nenhum scrobble novo' : '$n scrobble(s) novo(s) encontrado(s)';
-  @override String get syncUpToDateMsg         => 'Histórico atualizado';
+  @override String get syncUpToDateMsg         => 'Histórico em dia: nenhum scrobble novo para baixar';
   @override String get syncNotifNote           => 'Uma notificação com progresso aparece durante uma sincronização completa.';
   @override String get pcModeLayout      => 'Layout';
   @override String get pcModeNavLayout   => 'Layout de navegação';
@@ -452,7 +452,7 @@ class AppStringsPt implements AppStrings {
   @override String get backupDownloadFile          => 'Baixe um arquivo .json';
   @override String get backupChooseFile            => 'Escolher um arquivo de backup';
   @override String get backupFileSaved             => 'Backup salvo';
-  @override String get backupFileSaveFailed        => 'Falha ao salvar o arquivo';
+  @override String get backupFileSaveFailed        => 'Não foi possível salvar o arquivo de backup. Verifique se há espaço livre e se o app pode gravar na pasta e tente novamente.';
   @override String get setupRestoreBackup          => 'Restaurar um backup';
   @override String get setupRestoreBackupSub       => 'Recupere sua conta e suas configurações a partir de um arquivo de backup no formato .json.';
   @override String get backupRestoreKeysTitle => 'Restaurar chaves de API';
@@ -553,10 +553,10 @@ class AppStringsPt implements AppStrings {
   @override String get notifSyncDetailSubtitle  => 'Mostrar o andamento (ano atual, contador) durante a sincronização';
   @override String get notifNewsSubtitle        => 'Receba avisos de novos recursos, correções e anúncios';
   @override String get notifBadgeOnDashboard    => 'Emblema no painel';
-  @override String get notifBadgeSubtitle       => 'Mostrar o ponto de não lido no sino de novidades';
+  @override String get notifBadgeSubtitle       => 'Mostra um ponto no sino de novidades quando há anúncios não lidos';
   @override String get notifTestLabel           => 'Teste';
   @override String get notifPermissionDisabledTitle => 'Notificações desativadas';
-  @override String get notifPermissionDisabledBody  => 'Conceda a permissão para que o LastStats possa enviar avisos.';
+  @override String get notifPermissionDisabledBody  => 'Permita as notificações nas configurações do sistema para que o LastStats possa enviar resumos, marcos e novidades.';
   @override String get notifGrantPermission     => 'Conceder permissão';
   @override String get notifThresholdIntro      => 'Você receberá uma notificação especial em cada um destes marcos:';
   @override List<String> get notifThresholdMessages => const [
@@ -647,7 +647,7 @@ class AppStringsPt implements AppStrings {
   @override String get favConnectDialogBody      => 'Autorize o app na página do Last.fm aberta no navegador e depois volte aqui para confirmar.';
   @override String get favConnectDialogConfirm   => 'Já autorizei';
   @override String get favConnectSuccess         => 'Favoritos ativados com sucesso!';
-  @override String get favConnectError           => 'Não foi possível ativar os favoritos. Verifique sua chave secreta.';
+  @override String get favConnectError           => 'Não foi possível ativar os favoritos. Verifique se a chave secreta está correta e se você autorizou o LastStats no Last.fm e tente novamente.';
   @override String get acctApiKeysSection        => 'Chaves de API';
   @override String get acctSecretKeyLabel        => 'Chave secreta';
   @override String get acctSecretKeyNotSet       => 'Não definida';
@@ -956,7 +956,7 @@ const Map<String, String> kTxPt = {
   'font_import': 'Importar uma fonte',
   'font_import_s': 'Arquivo .ttf ou .otf (máx. 3 MB)',
   'font_remove': 'Remover a fonte importada',
-  'font_bad': 'Fonte inválida ou muito grande',
+  'font_bad': 'Não é possível usar esta fonte: o arquivo é inválido ou maior que 3 MB',
   'qs_l8_t': 'Fonte',
   'art_popular': 'Populares',
   'art_recent': 'Recentes',
@@ -985,7 +985,7 @@ const Map<String, String> kTxPt = {
   'cache_video_t': 'Capas animadas (Apple Music)',
   'cache_video_s': 'Memória de vídeo em uso: {mem} · {players} player(s) ativo(s) · {links} link(s) em cache',
   'cache_video_short': 'Capas animadas',
-  'cache_video_cleared': 'Memória de vídeo liberada',
+  'cache_video_cleared': 'Vídeos das capas animadas liberados da memória',
   'cache_memory_section': 'Memória',
   'cache_storage_section': 'Armazenamento',
   'lvl': 'Nível {n}',
@@ -1037,9 +1037,9 @@ const Map<String, String> kTxPt = {
   'ui_which_period': 'Qual período?',
   'ui_all_time': 'Todo período',
   'ui_exporting': 'Exportando…',
-  'ui_chart_not_available_fo': 'Gráfico indisponível para este período',
-  'ui_could_not_generate_the': 'Não foi possível gerar a imagem',
-  'ui_error': 'Erro',
+  'ui_chart_not_available_fo': 'Este gráfico não está disponível para o período selecionado',
+  'ui_could_not_generate_the': 'Não foi possível gerar a imagem. Tente novamente.',
+  'ui_error': 'Algo deu errado',
   'ui_loading_history': 'Carregando histórico{yearLabel}… {pct}%',
   'ui_charts_will_be_more_ac': 'Os gráficos ficarão mais precisos depois de carregado.',
   'ui_load_the_full_history_': 'Carregue o histórico completo para acessar todos os anos.',
@@ -1073,7 +1073,7 @@ const Map<String, String> kTxPt = {
   'ui_current_streak': 'Sequência atual',
   'ui_d': 'd',
   'ui_best_streak': 'Melhor sequência',
-  'ui_best_streak_started_on': 'Melhor sequência desde {bestStart}',
+  'ui_best_streak_started_on': 'Melhor sequência iniciada em {bestStart}',
   'ui_no_data_for_this_perio': 'Sem dados para este período',
   'ui_load_history_to_displa': 'Carregue o histórico para exibir {what}',
   'ui_less': 'Menos',
@@ -1159,7 +1159,7 @@ const Map<String, String> kTxPt = {
   'ui_daily': 'Todos os dias',
   'ui_resync_everyone': 'Ressincronizar tudo',
   'ui_version_history': 'Histórico de versões',
-  'ui_could_not_load_release': 'Não foi possível carregar o histórico.',
+  'ui_could_not_load_release': 'Não foi possível carregar o histórico de versões. Verifique sua conexão e tente novamente.',
   'ui_installed_dev_build_un': 'Instalada: build de desenvolvimento (versão desconhecida)',
   'ui_installed': 'Instalada: {displayVer}',
   'ui_search_a_version_or_ch': 'Buscar uma versão ou changelog…',
@@ -1167,14 +1167,14 @@ const Map<String, String> kTxPt = {
   'ui_no_release_matches_you': 'Nenhuma versão corresponde à sua busca.',
   'ui_latest': 'ÚLTIMA',
   'ui_installed_2': 'INSTALADA',
-  'ui_no_description': 'Sem descrição.',
+  'ui_no_description': 'Esta versão não tem descrição.',
   'ui_download': 'Baixar',
   'ui_view_release': 'Ver release',
   'ui_details': 'Detalhes',
   'ui_all_past_releases_chan': 'Todas as versões anteriores, changelogs e downloads',
-  'ui_please_fill_both_field': 'Preencha os dois campos.',
+  'ui_please_fill_both_field': 'Preencha os dois campos para continuar.',
   'ui_api_key_must_be_32_cha': 'A chave de API deve ter exatamente 32 caracteres.',
-  'ui_profile_not_found': 'Perfil não encontrado.',
+  'ui_profile_not_found': 'Perfil não encontrado. Verifique o nome de usuário e tente novamente.',
   'ui_chart_monthly': 'Barras mensais',
   'ui_chart_cumul': 'Progressão',
   'ui_chart_genres': 'Gêneros musicais',
@@ -1188,15 +1188,15 @@ const Map<String, String> kTxPt = {
   'ui_band_afternoon': 'Tarde',
   'ui_band_evening': 'Noite',
   'qs_t1_t': 'Modo OLED',
-  'qs_t1_s': 'Fundo preto puro',
+  'qs_t1_s': 'Fundo preto puro, economiza energia em telas OLED',
   'qs_t2_t': 'Modo de economia de energia',
-  'qs_t2_s': 'Reduz o uso da bateria',
+  'qs_t2_s': 'Menos animações e atualizações em segundo plano para economizar bateria',
   'qs_t3_t': 'Notificações de notícias',
-  'qs_t3_s': 'Alertas sobre novidades do Last.fm',
+  'qs_t3_s': 'Avisos de novidades, correções e anúncios',
   'qs_t4_t': 'Feedback tátil',
-  'qs_t4_s': 'Vibrações nas interações',
+  'qs_t4_s': 'Vibrações curtas ao tocar, selecionar ou deslizar',
   'qs_t5_t': 'Conquistas',
-  'qs_t5_s': 'Mostra as conquistas desbloqueadas',
+  'qs_t5_s': 'Mostra as conquistas desbloqueadas e seu nível',
   'qs_l1_t': 'Cor de destaque',
   'qs_l2_t': 'Tema',
   'qs_l3_t': 'Idioma',

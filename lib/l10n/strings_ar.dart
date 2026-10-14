@@ -125,7 +125,7 @@ class AppStringsAr implements AppStrings {
   @override String get settingsDayNightDayStart        => 'يبدأ النهار في';
   @override String get settingsDayNightNightStart      => 'يبدأ الليل في';
   @override String get settingsMaterialYou => 'Material You';
-  @override String get settingsMaterialYouSub => 'استخدام لون خلفية أندرويد';
+  @override String get settingsMaterialYouSub => 'يستخدم ألوان خلفية Android (Android 12 أو أحدث)';
   @override String get settingsMusicColor => 'لون من الموسيقى';
   @override String get settingsMusicColorSub => 'يستخرج اللون من غلاف الألبوم الحالي';
   @override String get settingsMusicColorNote => 'يستبدل اللون السائد في غلاف الألبوم الحالي لون التمييز.';
@@ -169,10 +169,10 @@ class AppStringsAr implements AppStrings {
   @override String get settingsBackupInfo => 'يشمل: السمة، الألوان، مفتاح API، اسم المستخدم، الرأس، المفضلة. متوافق بين الإصدارات.';
   @override String get settingsUpdates => 'التحديثات';
   @override String get settingsAutoUpdate => 'فحص تلقائي';
-  @override String get settingsAutoUpdateSub => 'مرة واحدة يوميًا';
+  @override String get settingsAutoUpdateSub => 'يتحقق من وجود إصدار جديد في الخلفية مرة واحدة يوميًا.';
   @override String get settingsCheckNow => 'فحص الآن';
   @override String get settingsUpToDate => 'محدّث';
-  @override String get settingsCheckFailed => 'فشل الفحص.';
+  @override String get settingsCheckFailed => 'تعذّر التحقق من التحديثات. تحقّق من اتصالك بالإنترنت وحاول مرة أخرى.';
   @override String get settingsDownload => 'تنزيل';
   @override String get settingsViewRelease => 'عرض';
   @override String get settingsAbout => 'حول';
@@ -214,7 +214,7 @@ class AppStringsAr implements AppStrings {
   @override String get exportCopied => 'تم النسخ!';
   @override String get importTitle => 'استعادة نسخة احتياطية';
   @override String get importHintLabel => 'الصق نسخة LastStats الاحتياطية هنا.';
-  @override String get importEmpty => 'الحقل فارغ.';
+  @override String get importEmpty => 'لا يوجد ما يمكن استيراده: الحقل فارغ. الصق ملف JSON الذي صدّرته من LastStats.';
   @override String get importInvalidJson => 'JSON غير صالح.';
   @override String get importUnknownFile => 'ملف غير معروف.';
   @override String get importInvalidFormat => 'تنسيق غير صالح.';
@@ -380,7 +380,7 @@ class AppStringsAr implements AppStrings {
   @override String get syncLastSyncLabel => 'آخر مزامنة';
   @override String get syncNeverLabel => 'أبدًا';
   @override String get syncTotalScrobblesLabel => 'التشغيلات المخزنة';
-  @override String get syncUpToDateMsg => 'السجل محدّث';
+  @override String get syncUpToDateMsg => 'السجل محدّث: لا توجد scrobbles جديدة للتنزيل';
   @override String get syncNotifNote => 'يظهر إشعار بالتقدم أثناء المزامنة الكاملة.';
   @override String get pcModeLayout => 'التخطيط';
   @override String get pcModeNavLayout => 'تخطيط التنقل';
@@ -404,7 +404,7 @@ class AppStringsAr implements AppStrings {
   @override String get backupDownloadFile => 'يُنزّل ملف .json';
   @override String get backupChooseFile => 'اختر ملف نسخة احتياطية';
   @override String get backupFileSaved => 'تم حفظ النسخة الاحتياطية';
-  @override String get backupFileSaveFailed => 'فشل حفظ الملف';
+  @override String get backupFileSaveFailed => 'تعذّر حفظ ملف النسخة الاحتياطية. تأكّد من وجود مساحة كافية ومن أن التطبيق يستطيع الكتابة في المجلد، ثم حاول مجددًا.';
   @override String get setupRestoreBackup => 'استعادة نسخة احتياطية';
   @override String get setupRestoreBackupSub => 'استعد حسابك وإعداداتك من ملف نسخة احتياطية بصيغة .json.';
   @override String get backupRestoreKeysTitle => 'استعادة مفاتيح API';
@@ -501,10 +501,10 @@ class AppStringsAr implements AppStrings {
   @override String get notifSyncDetailSubtitle => 'عرض التقدم المباشر (السنة الحالية، العداد) أثناء المزامنة';
   @override String get notifNewsSubtitle => 'تلقَّ إشعارات حول الميزات الجديدة والإصلاحات والإعلانات';
   @override String get notifBadgeOnDashboard => 'شارة على الشاشة الرئيسية';
-  @override String get notifBadgeSubtitle => 'إظهار نقطة غير مقروء على أيقونة جرس الأخبار';
+  @override String get notifBadgeSubtitle => 'يعرض نقطة على جرس الأخبار عند وجود إعلانات لم تقرأها';
   @override String get notifTestLabel => 'اختبار';
   @override String get notifPermissionDisabledTitle => 'الإشعارات معطّلة';
-  @override String get notifPermissionDisabledBody => 'امنح الإذن حتى يتمكن LastStats من إرسال التنبيهات لك.';
+  @override String get notifPermissionDisabledBody => 'اسمح بالإشعارات في إعدادات النظام ليتمكن LastStats من إرسال الملخصات والإنجازات والأخبار إليك.';
   @override String get notifGrantPermission => 'منح الإذن';
   @override String get notifThresholdIntro => 'ستتلقى إشعارًا خاصًا عند كل محطة من هذه المحطات:';
   @override String get notifIntervalDescription => 'إرسال إشعار كل X من التشغيلات';
@@ -581,7 +581,7 @@ class AppStringsAr implements AppStrings {
   @override String get favConnectDialogBody      => 'فوّض التطبيق في صفحة Last.fm المفتوحة في المتصفح، ثم عد إلى هنا للتأكيد.';
   @override String get favConnectDialogConfirm   => 'لقد قمت بالتفويض';
   @override String get favConnectSuccess         => 'تم تفعيل المفضلة بنجاح!';
-  @override String get favConnectError           => 'تعذّر تفعيل المفضلة. تحقق من المفتاح السري.';
+  @override String get favConnectError           => 'تعذّر تفعيل المفضلة. تأكّد من صحة المفتاح السري ومن أنك منحت LastStats الإذن على Last.fm، ثم حاول مجددًا.';
   @override String get acctApiKeysSection        => 'مفاتيح API';
   @override String get acctSecretKeyLabel        => 'المفتاح السري';
   @override String get acctSecretKeyNotSet       => 'غير محدد';
@@ -927,7 +927,7 @@ const Map<String, String> kTxAr = {
   'font_import': 'استيراد خط',
   'font_import_s': 'ملف ‏.ttf أو ‏.otf (بحد أقصى 3 ميغابايت)',
   'font_remove': 'إزالة الخط المستورد',
-  'font_bad': 'الخط غير صالح أو كبير جدًا',
+  'font_bad': 'لا يمكن استخدام هذا الخط: الملف غير صالح أو يتجاوز 3 ميغابايت',
   'qs_l8_t': 'الخط',
   'art_popular': 'الأشهر',
   'art_recent': 'الأحدث',
@@ -956,7 +956,7 @@ const Map<String, String> kTxAr = {
   'cache_video_t': 'أغلفة متحركة (Apple Music)',
   'cache_video_s': 'ذاكرة الفيديو المستخدمة: {mem} · {players} مشغّل نشط · {links} رابط في الذاكرة',
   'cache_video_short': 'أغلفة متحركة',
-  'cache_video_cleared': 'تم تحرير ذاكرة الفيديو',
+  'cache_video_cleared': 'تم تحرير فيديوهات الأغلفة المتحركة من الذاكرة',
   'cache_memory_section': 'الذاكرة',
   'cache_storage_section': 'التخزين',
   'lvl': 'المستوى {n}',
@@ -1008,9 +1008,9 @@ const Map<String, String> kTxAr = {
   'ui_which_period': 'أي فترة؟',
   'ui_all_time': 'كل الأوقات',
   'ui_exporting': 'جارٍ التصدير…',
-  'ui_chart_not_available_fo': 'الرسم البياني غير متاح لهذه الفترة',
-  'ui_could_not_generate_the': 'تعذّر إنشاء الصورة',
-  'ui_error': 'خطأ',
+  'ui_chart_not_available_fo': 'هذا الرسم البياني غير متاح للفترة المحددة',
+  'ui_could_not_generate_the': 'تعذّر إنشاء الصورة. حاول مرة أخرى.',
+  'ui_error': 'حدث خطأ ما',
   'ui_loading_history': 'جارٍ تحميل السجل{yearLabel}… {pct}%',
   'ui_charts_will_be_more_ac': 'ستكون الرسوم أدق بعد اكتمال التحميل.',
   'ui_load_the_full_history_': 'حمّل السجل الكامل للوصول إلى كل السنوات.',
@@ -1044,7 +1044,7 @@ const Map<String, String> kTxAr = {
   'ui_current_streak': 'السلسلة الحالية',
   'ui_d': 'ي',
   'ui_best_streak': 'أفضل سلسلة',
-  'ui_best_streak_started_on': 'أفضل سلسلة منذ {bestStart}',
+  'ui_best_streak_started_on': 'بدأت أفضل سلسلة في {bestStart}',
   'ui_no_data_for_this_perio': 'لا توجد بيانات لهذه الفترة',
   'ui_load_history_to_displa': 'حمّل السجل لعرض {what}',
   'ui_less': 'أقل',
@@ -1130,7 +1130,7 @@ const Map<String, String> kTxAr = {
   'ui_daily': 'يوميًا',
   'ui_resync_everyone': 'إعادة مزامنة الجميع',
   'ui_version_history': 'سجل الإصدارات',
-  'ui_could_not_load_release': 'تعذّر تحميل السجل.',
+  'ui_could_not_load_release': 'تعذّر تحميل سجل الإصدارات. تحقّق من اتصالك وحاول مرة أخرى.',
   'ui_installed_dev_build_un': 'المثبّتة: نسخة تطوير (الإصدار غير معروف)',
   'ui_installed': 'المثبّتة: {displayVer}',
   'ui_search_a_version_or_ch': 'ابحث عن إصدار أو سجل تغييرات…',
@@ -1138,14 +1138,14 @@ const Map<String, String> kTxAr = {
   'ui_no_release_matches_you': 'لا يوجد إصدار مطابق لبحثك.',
   'ui_latest': 'الأحدث',
   'ui_installed_2': 'مثبّتة',
-  'ui_no_description': 'لا يوجد وصف.',
+  'ui_no_description': 'لا يوجد وصف لهذا الإصدار.',
   'ui_download': 'تنزيل',
   'ui_view_release': 'عرض الإصدار',
   'ui_details': 'التفاصيل',
   'ui_all_past_releases_chan': 'جميع الإصدارات السابقة وسجلات التغييرات والتنزيلات',
-  'ui_please_fill_both_field': 'يرجى ملء الحقلين.',
+  'ui_please_fill_both_field': 'املأ الحقلين للمتابعة.',
   'ui_api_key_must_be_32_cha': 'يجب أن يتكون مفتاح API من 32 حرفًا بالضبط.',
-  'ui_profile_not_found': 'لم يتم العثور على الملف الشخصي.',
+  'ui_profile_not_found': 'لم يتم العثور على الملف الشخصي. تحقّق من اسم المستخدم وحاول مرة أخرى.',
   'ui_chart_monthly': 'أعمدة شهرية',
   'ui_chart_cumul': 'التطور',
   'ui_chart_genres': 'الأنواع الموسيقية',
@@ -1159,15 +1159,15 @@ const Map<String, String> kTxAr = {
   'ui_band_afternoon': 'ظهر',
   'ui_band_evening': 'مساء',
   'qs_t1_t': 'وضع OLED',
-  'qs_t1_s': 'خلفية سوداء خالصة',
+  'qs_t1_s': 'خلفية سوداء نقية توفّر الطاقة على شاشات OLED',
   'qs_t2_t': 'وضع توفير الطاقة',
-  'qs_t2_s': 'يقلل استهلاك البطارية',
+  'qs_t2_s': 'رسوم متحركة وتحديثات خلفية أقل لتوفير البطارية',
   'qs_t3_t': 'إشعارات الأخبار',
-  'qs_t3_s': 'تنبيهات حول أخبار Last.fm',
+  'qs_t3_s': 'تنبيهات بالميزات الجديدة والإصلاحات والإعلانات',
   'qs_t4_t': 'الاستجابة اللمسية',
-  'qs_t4_s': 'اهتزاز عند التفاعل',
+  'qs_t4_s': 'اهتزازات قصيرة عند اللمس أو التحديد أو السحب',
   'qs_t5_t': 'الإنجازات',
-  'qs_t5_s': 'يعرض الإنجازات المفتوحة',
+  'qs_t5_s': 'يعرض الإنجازات المفتوحة ومستواك',
   'qs_l1_t': 'لون التمييز',
   'qs_l2_t': 'المظهر',
   'qs_l3_t': 'اللغة',

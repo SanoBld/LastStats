@@ -147,7 +147,7 @@ class AppStringsZh implements AppStrings {
   @override String get settingsDayNightDayStart        => '白天开始于';
   @override String get settingsDayNightNightStart      => '夜晚开始于';
   @override String get settingsMaterialYou       => 'Material You';
-  @override String get settingsMaterialYouSub    => '使用 Android 壁纸取色';
+  @override String get settingsMaterialYouSub    => '使用 Android 壁纸的颜色（需要 Android 12 及以上）';
   @override String get settingsMusicColor        => '取色自音乐';
   @override String get settingsMusicColorSub     => '从当前专辑封面提取颜色';
   @override String get settingsMusicColorNote    => '当前封面的主色调将替代强调色。';
@@ -191,11 +191,11 @@ class AppStringsZh implements AppStrings {
   @override String get settingsBackupInfo        => '包含：主题、颜色、API 密钥、用户名、头图、收藏。各版本间兼容。';
   @override String get settingsUpdates           => '更新';
   @override String get settingsAutoUpdate        => '自动检查';
-  @override String get settingsAutoUpdateSub     => '每天一次';
+  @override String get settingsAutoUpdateSub     => '每天在后台检查一次是否有新版本。';
   @override String get settingsCheckNow          => '立即检查';
   @override String get settingsUpToDate          => '已是最新';
   @override String settingsUpdateAvailable(String v) => 'v$v 可用';
-  @override String get settingsCheckFailed       => '检查失败。';
+  @override String get settingsCheckFailed       => '无法检查更新。请检查网络连接后重试。';
   @override String settingsUpdateBanner(String v) => '更新 v$v';
   @override String get settingsDownload          => '下载';
   @override String get settingsViewRelease       => '查看';
@@ -241,7 +241,7 @@ class AppStringsZh implements AppStrings {
   @override String get exportCopied     => '已复制！';
   @override String get importTitle      => '恢复备份';
   @override String get importHintLabel  => '在此粘贴您的 LastStats 备份。';
-  @override String get importEmpty      => '内容为空。';
+  @override String get importEmpty      => '没有可导入的内容：输入框为空。请粘贴从 LastStats 导出的 JSON。';
   @override String get importInvalidJson  => 'JSON 无效。';
   @override String get importUnknownFile  => '无法识别的文件。';
   @override String get importInvalidFormat => '格式无效。';
@@ -422,7 +422,7 @@ class AppStringsZh implements AppStrings {
   @override String get syncNeverLabel          => '从未';
   @override String get syncTotalScrobblesLabel => '已缓存的 scrobble';
   @override String syncNewScrobblesFound(int n) => n == 0 ? '没有新的 scrobble' : '发现 $n 条新 scrobble';
-  @override String get syncUpToDateMsg         => '历史记录已是最新';
+  @override String get syncUpToDateMsg         => '历史记录已是最新：没有需要下载的新 scrobble';
   @override String get syncNotifNote           => '完整同步期间会显示带进度条的通知。';
   @override String get pcModeLayout      => '布局';
   @override String get pcModeNavLayout   => '导航布局';
@@ -449,7 +449,7 @@ class AppStringsZh implements AppStrings {
   @override String get backupDownloadFile          => '下载 .json 文件';
   @override String get backupChooseFile            => '选择备份文件';
   @override String get backupFileSaved             => '备份已保存';
-  @override String get backupFileSaveFailed        => '保存失败';
+  @override String get backupFileSaveFailed        => '无法保存备份文件。请确认存储空间充足且应用有权写入该文件夹，然后重试。';
   @override String get setupRestoreBackup          => '恢复备份';
   @override String get setupRestoreBackupSub       => '从 .json 格式的备份文件中恢复你的账号和设置。';
   @override String get backupRestoreKeysTitle => '恢复 API 密钥';
@@ -550,10 +550,10 @@ class AppStringsZh implements AppStrings {
   @override String get notifSyncDetailSubtitle  => '同步期间显示实时进度（当前年份、计数）';
   @override String get notifNewsSubtitle        => '获取新功能、修复和公告的通知';
   @override String get notifBadgeOnDashboard    => '仪表盘上的徽章';
-  @override String get notifBadgeSubtitle       => '在资讯铃铛图标上显示未读红点';
+  @override String get notifBadgeSubtitle       => '有未读公告时，在资讯铃铛图标上显示提示点';
   @override String get notifTestLabel           => '测试';
   @override String get notifPermissionDisabledTitle => '通知已禁用';
-  @override String get notifPermissionDisabledBody  => '授予权限，以便 LastStats 可以向您发送提醒。';
+  @override String get notifPermissionDisabledBody  => '请在系统设置中允许通知，这样 LastStats 才能向你发送回顾、里程碑和资讯。';
   @override String get notifGrantPermission     => '授予权限';
   @override String get notifThresholdIntro      => '达到以下每个节点时，您都会收到一条特别通知：';
   @override List<String> get notifThresholdMessages => const [
@@ -644,7 +644,7 @@ class AppStringsZh implements AppStrings {
   @override String get favConnectDialogBody      => '请在浏览器打开的 Last.fm 页面上授权本应用，然后返回此处确认。';
   @override String get favConnectDialogConfirm   => '我已授权';
   @override String get favConnectSuccess         => '收藏功能已成功启用！';
-  @override String get favConnectError           => '无法启用收藏功能，请检查您的密钥。';
+  @override String get favConnectError           => '无法启用收藏。请确认密钥正确，并已在 Last.fm 上授权 LastStats，然后重试。';
   @override String get acctApiKeysSection        => 'API 密钥';
   @override String get acctSecretKeyLabel        => '密钥';
   @override String get acctSecretKeyNotSet       => '未设置';
@@ -953,7 +953,7 @@ const Map<String, String> kTxZh = {
   'font_import': '导入字体',
   'font_import_s': '.ttf 或 .otf 文件（最大 3 MB）',
   'font_remove': '删除已导入的字体',
-  'font_bad': '字体无效或过大',
+  'font_bad': '无法使用此字体：文件无效或超过 3 MB',
   'qs_l8_t': '字体',
   'art_popular': '热门',
   'art_recent': '最新',
@@ -982,7 +982,7 @@ const Map<String, String> kTxZh = {
   'cache_video_t': '动态封面 (Apple Music)',
   'cache_video_s': '视频内存占用:{mem} · {players} 个活动播放器 · 已缓存 {links} 个链接',
   'cache_video_short': '动态封面',
-  'cache_video_cleared': '已释放视频内存',
+  'cache_video_cleared': '已从内存中释放动态封面视频',
   'cache_memory_section': '内存',
   'cache_storage_section': '存储',
   'lvl': '等级 {n}',
@@ -1034,9 +1034,9 @@ const Map<String, String> kTxZh = {
   'ui_which_period': '选择时间段',
   'ui_all_time': '全部时间',
   'ui_exporting': '正在导出…',
-  'ui_chart_not_available_fo': '此时间段没有可用图表',
-  'ui_could_not_generate_the': '无法生成图片',
-  'ui_error': '错误',
+  'ui_chart_not_available_fo': '所选时间段无法显示此图表',
+  'ui_could_not_generate_the': '无法生成图片，请重试。',
+  'ui_error': '出了点问题',
   'ui_loading_history': '正在加载历史记录{yearLabel}… {pct}%',
   'ui_charts_will_be_more_ac': '加载完成后图表会更准确。',
   'ui_load_the_full_history_': '加载完整历史记录以查看所有年份。',
@@ -1070,7 +1070,7 @@ const Map<String, String> kTxZh = {
   'ui_current_streak': '当前连续天数',
   'ui_d': '天',
   'ui_best_streak': '最长连续天数',
-  'ui_best_streak_started_on': '最佳连续记录始于 {bestStart}',
+  'ui_best_streak_started_on': '最长连续记录始于 {bestStart}',
   'ui_no_data_for_this_perio': '该时段无数据',
   'ui_load_history_to_displa': '加载历史记录以显示{what}',
   'ui_less': '少',
@@ -1156,7 +1156,7 @@ const Map<String, String> kTxZh = {
   'ui_daily': '每天',
   'ui_resync_everyone': '全部重新同步',
   'ui_version_history': '版本历史',
-  'ui_could_not_load_release': '无法加载版本历史。',
+  'ui_could_not_load_release': '无法加载版本历史。请检查网络连接后重试。',
   'ui_installed_dev_build_un': '已安装：开发版本（版本未知）',
   'ui_installed': '已安装：{displayVer}',
   'ui_search_a_version_or_ch': '搜索版本或更新日志…',
@@ -1164,14 +1164,14 @@ const Map<String, String> kTxZh = {
   'ui_no_release_matches_you': '没有符合搜索的版本。',
   'ui_latest': '最新',
   'ui_installed_2': '已安装',
-  'ui_no_description': '暂无描述。',
+  'ui_no_description': '此版本没有说明。',
   'ui_download': '下载',
   'ui_view_release': '查看发布页',
   'ui_details': '详情',
   'ui_all_past_releases_chan': '所有历史版本、更新日志和下载',
-  'ui_please_fill_both_field': '请填写两个字段。',
+  'ui_please_fill_both_field': '请填写两个输入框后再继续。',
   'ui_api_key_must_be_32_cha': 'API 密钥必须正好是 32 个字符。',
-  'ui_profile_not_found': '找不到个人资料。',
+  'ui_profile_not_found': '找不到该用户资料。请检查用户名后重试。',
   'ui_chart_monthly': '月度柱状图',
   'ui_chart_cumul': '进度趋势',
   'ui_chart_genres': '音乐风格',
@@ -1185,15 +1185,15 @@ const Map<String, String> kTxZh = {
   'ui_band_afternoon': '下午',
   'ui_band_evening': '晚上',
   'qs_t1_t': 'OLED 模式',
-  'qs_t1_s': '纯黑背景',
+  'qs_t1_s': '纯黑背景，可在 OLED 屏幕上省电',
   'qs_t2_t': '省电模式',
-  'qs_t2_s': '降低电池消耗',
+  'qs_t2_s': '减少动画和后台更新以节省电量',
   'qs_t3_t': '新闻通知',
-  'qs_t3_s': 'Last.fm 最新动态提醒',
+  'qs_t3_s': '推送新功能、修复和公告',
   'qs_t4_t': '触觉反馈',
-  'qs_t4_s': '操作时振动',
+  'qs_t4_s': '点按、选择或滑动时轻微震动',
   'qs_t5_t': '成就',
-  'qs_t5_s': '显示已解锁的成就',
+  'qs_t5_s': '显示已解锁的成就和你的等级',
   'qs_l1_t': '强调色',
   'qs_l2_t': '主题',
   'qs_l3_t': '语言',

@@ -150,7 +150,7 @@ class AppStringsEn implements AppStrings {
   @override String get settingsDayNightDayStart        => 'Day starts at';
   @override String get settingsDayNightNightStart      => 'Night starts at';
   @override String get settingsMaterialYou       => 'Material You';
-  @override String get settingsMaterialYouSub    => 'Use Android wallpaper color';
+  @override String get settingsMaterialYouSub    => 'Uses the colors of your Android wallpaper (Android 12 and later)';
   @override String get settingsMusicColor        => 'Color from music';
   @override String get settingsMusicColorSub     => 'Extracts color from the current album art';
   @override String get settingsMusicColorNote    => 'The dominant color of the current album art replaces the accent.';
@@ -194,11 +194,11 @@ class AppStringsEn implements AppStrings {
   @override String get settingsBackupInfo        => 'Includes: theme, colors, API key, username, header, favourites. Compatible across versions.';
   @override String get settingsUpdates           => 'Updates';
   @override String get settingsAutoUpdate        => 'Automatic check';
-  @override String get settingsAutoUpdateSub     => 'Once a day';
+  @override String get settingsAutoUpdateSub     => 'Checks for a new version in the background, once a day.';
   @override String get settingsCheckNow          => 'Check now';
   @override String get settingsUpToDate          => 'Up to date';
   @override String settingsUpdateAvailable(String v) => 'v$v available';
-  @override String get settingsCheckFailed       => 'Check failed.';
+  @override String get settingsCheckFailed       => 'Couldn\'t check for updates. Check your internet connection and try again.';
   @override String settingsUpdateBanner(String v) => 'Update v$v';
   @override String get settingsDownload          => 'Download';
   @override String get settingsViewRelease       => 'View';
@@ -244,7 +244,7 @@ class AppStringsEn implements AppStrings {
   @override String get exportCopied      => 'Copied!';
   @override String get importTitle       => 'Restore a backup';
   @override String get importHintLabel   => 'Paste your LastStats backup here.';
-  @override String get importEmpty       => 'Field is empty.';
+  @override String get importEmpty       => 'Nothing to import: the field is empty. Paste the JSON you exported from LastStats.';
   @override String get importInvalidJson  => 'Invalid JSON.';
   @override String get importUnknownFile  => 'Unrecognised file.';
   @override String get importInvalidFormat => 'Invalid format.';
@@ -425,7 +425,7 @@ class AppStringsEn implements AppStrings {
   @override String get syncNeverLabel          => 'Never';
   @override String get syncTotalScrobblesLabel => 'Cached scrobbles';
   @override String syncNewScrobblesFound(int n) => n == 0 ? 'No new scrobbles' : '$n new scrobble(s) found';
-  @override String get syncUpToDateMsg         => 'History up to date';
+  @override String get syncUpToDateMsg         => 'History up to date: no new scrobbles to download';
   @override String get syncNotifNote           => 'A progress notification shows up during a full sync.';
   @override String get pcModeLayout      => 'Layout';
   @override String get pcModeNavLayout   => 'Navigation layout';
@@ -452,7 +452,7 @@ class AppStringsEn implements AppStrings {
   @override String get backupDownloadFile          => 'Downloads a .json file';
   @override String get backupChooseFile            => 'Choose a backup file';
   @override String get backupFileSaved             => 'Backup saved';
-  @override String get backupFileSaveFailed        => 'Failed to save the file';
+  @override String get backupFileSaveFailed        => 'Couldn\'t save the backup file. Check that there is enough free space and that the app can write to the folder, then try again.';
   @override String get setupRestoreBackup          => 'Restore a backup';
   @override String get setupRestoreBackupSub       => 'Get your account and settings back from a backup file in .json format.';
   @override String get backupRestoreKeysTitle => 'Restore API keys';
@@ -553,10 +553,10 @@ class AppStringsEn implements AppStrings {
   @override String get notifSyncDetailSubtitle  => 'Show live progress (current year, counter) during sync';
   @override String get notifNewsSubtitle        => 'Get notified for new features, fixes and announcements';
   @override String get notifBadgeOnDashboard    => 'Badge on the dashboard';
-  @override String get notifBadgeSubtitle       => 'Show the unread dot on the news bell icon';
+  @override String get notifBadgeSubtitle       => 'Show a dot on the news bell when there are announcements you haven\'t read';
   @override String get notifTestLabel           => 'Test';
   @override String get notifPermissionDisabledTitle => 'Notifications disabled';
-  @override String get notifPermissionDisabledBody  => 'Grant permission so LastStats can send you alerts.';
+  @override String get notifPermissionDisabledBody  => 'Allow notifications in the system settings so LastStats can send you recaps, milestones and news.';
   @override String get notifGrantPermission     => 'Grant permission';
   @override String get notifThresholdIntro      => "You'll get a special notification at each of these thresholds:";
   @override List<String> get notifThresholdMessages => const [
@@ -647,7 +647,7 @@ class AppStringsEn implements AppStrings {
   @override String get favConnectDialogBody      => 'Authorize the app on the Last.fm page opened in your browser, then come back here and confirm.';
   @override String get favConnectDialogConfirm   => 'I authorized it';
   @override String get favConnectSuccess         => 'Favorites enabled successfully!';
-  @override String get favConnectError           => 'Could not enable favorites. Check your secret key.';
+  @override String get favConnectError           => 'Couldn\'t enable favorites. Check that your secret key is correct and that you authorized LastStats on Last.fm, then try again.';
   @override String get acctApiKeysSection        => 'API keys';
   @override String get acctSecretKeyLabel        => 'Secret key';
   @override String get acctSecretKeyNotSet       => 'Not set';
@@ -956,7 +956,7 @@ const Map<String, String> kTxEn = {
   'font_import': 'Import a font',
   'font_import_s': '.ttf or .otf file (3 MB max)',
   'font_remove': 'Remove imported font',
-  'font_bad': 'Invalid or too large font',
+  'font_bad': 'This font can\'t be used: the file is invalid or larger than 3 MB',
   'qs_l8_t': 'Font',
   'art_popular': 'Popular',
   'art_recent': 'Recent',
@@ -985,7 +985,7 @@ const Map<String, String> kTxEn = {
   'cache_video_t': 'Animated covers (Apple Music)',
   'cache_video_s': 'Video memory in use: {mem} · {players} active player(s) · {links} link(s) cached',
   'cache_video_short': 'Animated covers',
-  'cache_video_cleared': 'Video memory released',
+  'cache_video_cleared': 'Animated cover videos removed from memory',
   'cache_memory_section': 'Memory',
   'cache_storage_section': 'Storage',
   'lvl': 'Level {n}',
@@ -1037,9 +1037,9 @@ const Map<String, String> kTxEn = {
   'ui_which_period': 'Which period?',
   'ui_all_time': 'All time',
   'ui_exporting': 'Exporting…',
-  'ui_chart_not_available_fo': 'Chart not available for this period',
-  'ui_could_not_generate_the': 'Could not generate the image',
-  'ui_error': 'Error',
+  'ui_chart_not_available_fo': 'This chart isn\'t available for the selected period',
+  'ui_could_not_generate_the': 'Couldn\'t generate the image. Please try again.',
+  'ui_error': 'Something went wrong',
   'ui_loading_history': 'Loading history{yearLabel}… {pct}%',
   'ui_charts_will_be_more_ac': 'Charts will be more accurate once loaded.',
   'ui_load_the_full_history_': 'Load the full history to access all years.',
@@ -1159,7 +1159,7 @@ const Map<String, String> kTxEn = {
   'ui_daily': 'Daily',
   'ui_resync_everyone': 'Resync everyone',
   'ui_version_history': 'Version history',
-  'ui_could_not_load_release': 'Could not load release history.',
+  'ui_could_not_load_release': 'Couldn\'t load the version history. Check your connection and try again.',
   'ui_installed_dev_build_un': 'Installed: dev build (unknown version)',
   'ui_installed': 'Installed: {displayVer}',
   'ui_search_a_version_or_ch': 'Search a version or changelog…',
@@ -1167,14 +1167,14 @@ const Map<String, String> kTxEn = {
   'ui_no_release_matches_you': 'No release matches your search.',
   'ui_latest': 'LATEST',
   'ui_installed_2': 'INSTALLED',
-  'ui_no_description': 'No description.',
+  'ui_no_description': 'No description provided for this version.',
   'ui_download': 'Download',
   'ui_view_release': 'View release',
   'ui_details': 'Details',
   'ui_all_past_releases_chan': 'All past releases, changelogs and downloads',
-  'ui_please_fill_both_field': 'Please fill both fields.',
+  'ui_please_fill_both_field': 'Please fill in both fields to continue.',
   'ui_api_key_must_be_32_cha': 'The API key must contain exactly 32 characters.',
-  'ui_profile_not_found': 'Profile not found.',
+  'ui_profile_not_found': 'Profile not found. Check the username and try again.',
   'ui_chart_monthly': 'Monthly bars',
   'ui_chart_cumul': 'Progression',
   'ui_chart_genres': 'Musical genres',
@@ -1188,15 +1188,15 @@ const Map<String, String> kTxEn = {
   'ui_band_afternoon': 'Afternoon',
   'ui_band_evening': 'Evening',
   'qs_t1_t': 'OLED mode',
-  'qs_t1_s': 'Pure black background',
+  'qs_t1_s': 'Pure black background, saves power on OLED screens',
   'qs_t2_t': 'Power saving mode',
-  'qs_t2_s': 'Cuts battery use',
+  'qs_t2_s': 'Fewer animations and background updates to save battery',
   'qs_t3_t': 'News notifications',
-  'qs_t3_s': 'Alerts about Last.fm news',
+  'qs_t3_s': 'Alerts for new features, fixes and announcements',
   'qs_t4_t': 'Haptic feedback',
-  'qs_t4_s': 'Vibrations on interactions',
+  'qs_t4_s': 'Short vibrations when you tap, select or swipe',
   'qs_t5_t': 'Achievements',
-  'qs_t5_s': 'Shows unlocked achievements',
+  'qs_t5_s': 'Show unlocked achievements and your level',
   'qs_l1_t': 'Accent color',
   'qs_l2_t': 'Theme',
   'qs_l3_t': 'Language',

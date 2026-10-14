@@ -30,6 +30,17 @@
 -->
 
 
+## v4.1.1
+
+**Theme harmonisation and clearer translations**
+- Favorites: the heart and star buttons and icons (dashboard stats, artist and profile pages, search, account settings) now use the Material You accent color instead of fixed red, pink or yellow
+- Charts: "Weekdays vs weekend" now has a gap between the two bars, like "Time of day"
+- Dashboard: the news bell and settings buttons now use a discreet tonal Material You style (no more dark translucent circles with a white border)
+- Dashboard: the unread news badge follows the theme accent instead of fixed red
+- News: the "alert" type no longer uses the error red, and news cards use a tonal theme background
+- Translations (all 10 languages): reviewed and rewrote texts that were too short or vague, mainly error messages (update check, import, backup save, favorites, image export, profile not found, version history, font import) and several setting descriptions (auto-update, Material You, notification permission and badge, quick settings tiles)
+- Translations: fixed wording that no longer matched the app (the news badge was described as a red dot, "News notifications" was described as Last.fm news, French "best streak" and chart titles)
+
 ## v4.1.0
 
 **Search tab and Charts tab redesign**
