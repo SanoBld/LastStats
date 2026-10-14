@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-14T20:31:41Z",
+  "updated": "2026-10-14T20:35:29Z",
   "commits": [
+    {
+      "sha": "286405ca8ffb0d33b641c3e806f7f9a4c2c717d6",
+      "message": "Refactor localization strings for multiple languages, enhancing clarity and consistency in notifications and FAQs. Update Italian, Japanese, Portuguese, Russian, and Chinese translations. Improve source logo handling in the fullscreen image viewer and add Deezer icon asset. Adjust home screen imports to include brand icons.",
+      "date": "2026-10-14T20:35:09Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/286405ca8ffb0d33b641c3e806f7f9a4c2c717d6",
+      "tags": []
+    },
     {
       "sha": "ffa89e0061e456dc4984932991d80eda94f492d1",
       "message": "Update localization strings for multiple languages:\n- Italian (strings_it.dart): Improved clarity and specificity in various phrases related to scrobbles, settings, and user prompts.\n- Japanese (strings_ja.dart): Enhanced descriptions for settings and user interactions, ensuring better understanding for users.\n- Portuguese (strings_pt.dart): Refined translations for music-related features and user guidance, improving overall user experience.\n- Russian (strings_ru.dart): Clarified phrases regarding music history and settings, making them more user-friendly.\n- Chinese (strings_zh.dart): Updated translations to provide clearer instructions and descriptions for app functionalities.",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/2f75319347434ffb90478ef81d34346078a61a9e",
-      "tags": []
-    },
-    {
-      "sha": "561211c46cd3038c8980fd9e00e987afb1c9ff85",
-      "message": "feat: améliorer l'affichage du QR code en le rendant plus grand et en le positionnant dans le coin inférieur droit",
-      "date": "2026-08-11T20:13:32Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/561211c46cd3038c8980fd9e00e987afb1c9ff85",
       "tags": []
     }
   ]
