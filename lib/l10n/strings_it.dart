@@ -30,7 +30,7 @@ class AppStringsIt implements AppStrings {
   @override String get cacheApiData => 'Dati API';
   @override String get cacheApiDataSubtitle => 'Artisti principali, album, brani recenti…';
   @override String get cacheScrobbles => 'Cronologia scrobble';
-  @override String get cacheScrobblesSubtitle => 'Tutti gli scrobble scaricati';
+  @override String get cacheScrobblesSubtitle => 'Tutta la tua cronologia di ascolto scaricata da Last.fm';
   @override String get cacheClearBtn => 'Svuota';
   @override String get cacheConfirmScrobblesTitle => 'Cancellare la cronologia scrobble?';
   @override String get cacheConfirmScrobblesBody => 'L\'intera cronologia verrà eliminata e riscaricata al prossimo avvio.';
@@ -127,7 +127,7 @@ class AppStringsIt implements AppStrings {
   @override String get settingsMaterialYou => 'Material You';
   @override String get settingsMaterialYouSub => 'Usa i colori dello sfondo di Android (Android 12 o successivo)';
   @override String get settingsMusicColor => 'Colore dalla musica';
-  @override String get settingsMusicColorSub => 'Estrae il colore dalla copertina dell\'album attuale';
+  @override String get settingsMusicColorSub => 'Prende il colore d\'accento dalla copertina del brano in riproduzione';
   @override String get settingsMusicColorNote => 'Il colore dominante della copertina attuale sostituisce l\'accento.';
   @override String get settingsMusicColorLocked => 'Disattivi prima Material You';
   @override String get settingsStartupPage => 'Pagina di avvio';
@@ -146,7 +146,7 @@ class AppStringsIt implements AppStrings {
   @override String get settingsHeaderCustomUrlSub => 'Incolli l\'URL diretto di un\'immagine (jpg, png, webp…).';
   @override String get settingsHeaderApply => 'Applica';
   @override String get settingsHeaderFallback => 'Immagine predefinita';
-  @override String get settingsHeaderFallbackSub => 'Mostrata quando non c\'è musica in riproduzione.';
+  @override String get settingsHeaderFallbackSub => 'Immagine mostrata nell\'intestazione quando non è in riproduzione nulla.';
   @override String get settingsHeaderFallbackUrlLabel => 'URL immagine predefinita';
   @override String get settingsVisibleSections => 'Sezioni visibili';
   @override String get settingsNowPlayingSection => 'In riproduzione';
@@ -163,9 +163,9 @@ class AppStringsIt implements AppStrings {
   @override String get settingsLogoutConfirm => 'Disconnetti';
   @override String get settingsBackup => 'Backup e ripristino';
   @override String get settingsExport => 'Esporta impostazioni';
-  @override String get settingsExportSub => 'Copia un JSON negli appunti';
+  @override String get settingsExportSub => 'Copia le tue impostazioni in JSON negli appunti, per conservarle o condividerle';
   @override String get settingsImport => 'Ripristina un backup';
-  @override String get settingsImportSub => 'Incolli un JSON esportato in precedenza';
+  @override String get settingsImportSub => 'Ripristina le tue impostazioni da un JSON esportato in precedenza';
   @override String get settingsBackupInfo => 'Include: tema, colori, chiave API, nome utente, intestazione, preferiti. Compatibile tra le versioni.';
   @override String get settingsUpdates => 'Aggiornamenti';
   @override String get settingsAutoUpdate => 'Verifica automatica';
@@ -278,7 +278,7 @@ class AppStringsIt implements AppStrings {
   @override String get platformYtMusic => 'YouTube Music';
   @override String get platformOther => 'Altro / mostra tutto';
   @override String get settingsMusicPlatform => 'Piattaforma musicale';
-  @override String get settingsMusicPlatformSub => 'Filtra i link mostrati nelle pagine di dettaglio';
+  @override String get settingsMusicPlatformSub => 'Mostra solo i link del tuo servizio musicale nelle pagine di artista, album e brano';
   @override String get settingsShowAllPlatformLinks => 'Mostra sempre tutto';
   @override String get settingsShowAllPlatformLinksSub => 'Ignora il filtro e mostra ogni link (Last.fm, Spotify, YT Music, Web)';
   @override String get onboardUpdatesTitle => 'Aggiornamenti';
@@ -391,9 +391,9 @@ class AppStringsIt implements AppStrings {
   @override String get pcModeHintOn => 'Usa sempre la barra di navigazione laterale, indipendentemente dalle dimensioni dello schermo.';
   @override String get pcModeHintOff => 'Usa sempre la barra di navigazione inferiore, indipendentemente dalle dimensioni dello schermo.';
   @override String get aboutTagline => 'Il suo compagno per le statistiche Last.fm';
-  @override String get aboutAppInfo => 'Info app';
+  @override String get aboutAppInfo => 'Informazioni sull\'app';
   @override String get aboutScrobbleDownloader => 'Downloader scrobble';
-  @override String get aboutScrobbleDownloaderSub => 'Esporta tutti i suoi scrobble in un file';
+  @override String get aboutScrobbleDownloaderSub => 'Scarica tutta la tua cronologia di scrobble e salvala in un file';
   @override String get aboutPoweredBy => 'Basato su';
   @override String get aboutImageDisclaimer => 'Le immagini di artisti, album e brani vengono recuperate automaticamente da queste fonti e a volte potrebbero essere errate o non corrispondere al contenuto reale.';
   @override String get aboutFooter => 'Fatto con ❤️ · Non affiliato con Last.fm / CBS';
@@ -595,7 +595,7 @@ class AppStringsIt implements AppStrings {
   @override String get commonSeeMore             => 'Vedi altro';
   @override String get favPageTitle              => 'I miei preferiti';
   @override String get favSearchHint             => 'Cerchi un brano o un artista';
-  @override String get favEmpty                  => 'Ancora nessun preferito.';
+  @override String get favEmpty                  => 'Ancora nessun preferito. Tocca il cuore di un brano per aggiungerlo.';
   @override String get settingsLovedBadgeTitle => 'Icona cuore discreta';
   @override String get settingsLovedBadgeSub   => 'Mostra un piccolo cuore sui brani preferiti in ascolti recenti, cronologia e ricerca';
   @override String get favSortRecent   => 'Recenti';
@@ -618,7 +618,7 @@ class AppStringsIt implements AppStrings {
   @override String get favFolderEmoji => 'Emoji';
   @override String get favFolderColor => 'Colore';
   @override String get favFolderSave => 'Salva';
-  @override String get favFolderEmpty => 'Nessun brano in questa cartella';
+  @override String get favFolderEmpty => 'Questa cartella è vuota. Tieni premuto il cuore di un brano per aggiungerlo qui.';
   @override String get rankingsWholeYear       => 'Anno intero';
   @override String get chartsExportGeneratedOn => 'generato il';
   @override String get faqQ1 => 'LastStats fa lo scrobble della mia musica?';
@@ -877,7 +877,7 @@ const Map<String, String> kTxIt = {
   'eco_trig': 'Quando attivarlo',
   'eco_sys_t': 'Quando il risparmio batteria del dispositivo è attivo',
   'eco_sys_s': 'Segue il risparmio energetico integrato del telefono e si disattiva con esso.',
-  'eco_sys_na': 'Non disponibile su questo dispositivo.',
+  'eco_sys_na': 'Non disponibile su questo dispositivo (nessun risparmio energetico di sistema rilevato).',
   'eco_chg': 'Cosa cambia',
   'eco_chg1': 'Il parallasse al movimento viene disattivato',
   'eco_chg2': 'La frequenza dello schermo è limitata a circa 60 Hz',
@@ -1059,7 +1059,7 @@ const Map<String, String> kTxIt = {
   'ui_compare_music_taste': 'Confronta i gusti musicali',
   'ui_syncing_full_library': 'Sincronizzazione dei dati…',
   'ui_see_more': 'Mostra altro',
-  'ui_no_achievements_unlock': 'Nessun traguardo sbloccato per ora',
+  'ui_no_achievements_unlock': 'Nessun traguardo sbloccato per ora. Continua ad ascoltare per ottenere il primo!',
   'ui_no_animated_cover_for_': 'Nessuna copertina animata per questo album',
   'ui_source': 'Fonte: {source}',
   'ui_view_on_last_fm': 'Vedi su Last.fm',
@@ -1071,7 +1071,7 @@ const Map<String, String> kTxIt = {
   'ui_colored_widgets': 'Widget colorati',
   'ui_tint_home_screen_widge': 'Colora i widget con il colore d\'accento',
   'ui_search_settings': 'Cerca un\'impostazione…',
-  'ui_no_settings_found': 'Nessuna impostazione trovata',
+  'ui_no_settings_found': 'Nessuna impostazione corrisponde alla ricerca',
   'ui_all': 'Tutte',
   'ui_battery_saver': 'Risparmio batteria',
   'ui_save_battery_fewer_eff': 'Risparmia batteria, meno effetti',
@@ -1278,7 +1278,7 @@ const Map<String, String> kTxIt = {
   'sp_t': 'Spotify (Canvas)',
   'sp_on': 'Connesso',
   'sp_off': 'Non connesso',
-  'sp_off_s': 'Disconnesso da Spotify',
+  'sp_off_s': 'Hai effettuato il logout da Spotify. Accedi di nuovo per ottenere le copertine animate Canvas.',
   'sp_need': 'Spotify richiede l\'accesso: Profilo > Pagina di connessione.',
   'conn_title': 'Connessioni',
   'conn_btn_t': 'Pagina di connessione',

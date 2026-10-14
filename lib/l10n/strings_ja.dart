@@ -30,7 +30,7 @@ class AppStringsJa implements AppStrings {
   @override String get cacheApiData => 'APIデータ';
   @override String get cacheApiDataSubtitle => 'トップアーティスト、アルバム、最近のトラックなど';
   @override String get cacheScrobbles => 'スクロブル履歴';
-  @override String get cacheScrobblesSubtitle => 'ダウンロード済みの全スクロブル記録';
+  @override String get cacheScrobblesSubtitle => 'Last.fm からダウンロードした再生履歴のすべて';
   @override String get cacheClearBtn => '消去';
   @override String get cacheConfirmScrobblesTitle => 'スクロブル履歴を消去しますか？';
   @override String get cacheConfirmScrobblesBody => '履歴全体が削除され、次回起動時に再ダウンロードされます。';
@@ -127,7 +127,7 @@ class AppStringsJa implements AppStrings {
   @override String get settingsMaterialYou => 'Material You';
   @override String get settingsMaterialYouSub => 'Android の壁紙の色を使用します（Android 12 以降）';
   @override String get settingsMusicColor => '楽曲から色を取得';
-  @override String get settingsMusicColorSub => '再生中のアルバムアートから色を抽出';
+  @override String get settingsMusicColorSub => '再生中の曲のジャケットからアクセントカラーを取得します';
   @override String get settingsMusicColorNote => '再生中のアルバムアートの主要色がアクセントカラーになります。';
   @override String get settingsMusicColorLocked => '先にMaterial Youを無効にしてください';
   @override String get settingsStartupPage => '起動ページ';
@@ -146,7 +146,7 @@ class AppStringsJa implements AppStrings {
   @override String get settingsHeaderCustomUrlSub => '画像の直接URLを貼り付けてください（jpg、png、webpなど）。';
   @override String get settingsHeaderApply => '適用';
   @override String get settingsHeaderFallback => 'デフォルト画像';
-  @override String get settingsHeaderFallbackSub => '音楽が再生されていないときに表示されます。';
+  @override String get settingsHeaderFallbackSub => '音楽が再生されていないときにヘッダーに表示する画像です。';
   @override String get settingsHeaderFallbackUrlLabel => 'デフォルト画像URL';
   @override String get settingsVisibleSections => '表示するセクション';
   @override String get settingsNowPlayingSection => '再生中';
@@ -163,9 +163,9 @@ class AppStringsJa implements AppStrings {
   @override String get settingsLogoutConfirm => 'サインアウト';
   @override String get settingsBackup => 'バックアップと復元';
   @override String get settingsExport => '設定をエクスポート';
-  @override String get settingsExportSub => 'JSONをクリップボードにコピー';
+  @override String get settingsExportSub => '設定を JSON 形式でクリップボードにコピーします。保存や共有に使えます';
   @override String get settingsImport => 'バックアップを復元';
-  @override String get settingsImportSub => '以前エクスポートしたJSONを貼り付け';
+  @override String get settingsImportSub => '以前にエクスポートした JSON から設定を復元します';
   @override String get settingsBackupInfo => '含まれる内容：テーマ、色、APIキー、ユーザー名、ヘッダー、お気に入り。バージョン間で互換性があります。';
   @override String get settingsUpdates => 'アップデート';
   @override String get settingsAutoUpdate => '自動チェック';
@@ -278,7 +278,7 @@ class AppStringsJa implements AppStrings {
   @override String get platformYtMusic => 'YouTube Music';
   @override String get platformOther => 'その他 / すべて表示';
   @override String get settingsMusicPlatform => '音楽プラットフォーム';
-  @override String get settingsMusicPlatformSub => '詳細ページに表示するリンクをフィルタリングします';
+  @override String get settingsMusicPlatformSub => 'アーティスト、アルバム、曲のページには、選んだ音楽サービスのリンクだけを表示します';
   @override String get settingsShowAllPlatformLinks => '常にすべて表示';
   @override String get settingsShowAllPlatformLinksSub => 'フィルターを無視してすべてのリンクを表示（Last.fm、Spotify、YT Music、Web）';
   @override String get onboardUpdatesTitle => 'アップデート';
@@ -393,7 +393,7 @@ class AppStringsJa implements AppStrings {
   @override String get aboutTagline => 'あなたのLast.fm統計パートナー';
   @override String get aboutAppInfo => 'アプリ情報';
   @override String get aboutScrobbleDownloader => 'スクロブルダウンローダー';
-  @override String get aboutScrobbleDownloaderSub => 'すべてのスクロブルをファイルにエクスポート';
+  @override String get aboutScrobbleDownloaderSub => 'すべてのスクロブル履歴をダウンロードして、ファイルとして保存します';
   @override String get aboutPoweredBy => '提供元';
   @override String get aboutImageDisclaimer => 'アーティスト、アルバム、トラックの画像はこれらのソースから自動的に取得されており、実際の内容と一致しない場合があります。';
   @override String get aboutFooter => '❤️を込めて制作 · Last.fm / CBSとは提携していません';
@@ -595,7 +595,7 @@ class AppStringsJa implements AppStrings {
   @override String get commonSeeMore             => 'もっと見る';
   @override String get favPageTitle              => 'マイお気に入り';
   @override String get favSearchHint             => '曲名やアーティストを検索';
-  @override String get favEmpty                  => 'お気に入りはまだありません。';
+  @override String get favEmpty                  => 'お気に入りはまだありません。曲のハートをタップして追加しましょう。';
   @override String get settingsLovedBadgeTitle => '控えめなハートバッジ';
   @override String get settingsLovedBadgeSub   => '最近の再生履歴、履歴、検索でお気に入りの曲に小さなハートを表示します';
   @override String get favSortRecent   => '最近';
@@ -618,7 +618,7 @@ class AppStringsJa implements AppStrings {
   @override String get favFolderEmoji => '絵文字';
   @override String get favFolderColor => '色';
   @override String get favFolderSave => '保存';
-  @override String get favFolderEmpty => 'このフォルダに曲はありません';
+  @override String get favFolderEmpty => 'このフォルダは空です。曲のハートを長押しすると、ここに追加できます。';
   @override String get rankingsWholeYear       => '通年';
   @override String get chartsExportGeneratedOn => '生成日';
   @override String get faqQ1 => 'LastStatsは自分の音楽をスクロブリングしますか？';
@@ -876,7 +876,7 @@ const Map<String, String> kTxJa = {
   'eco_trig': 'オンにするタイミング',
   'eco_sys_t': '端末のバッテリーセーバーがオンのとき',
   'eco_sys_s': 'スマートフォン標準の省電力モードに連動し、解除されると一緒にオフになります。',
-  'eco_sys_na': 'この端末では利用できません。',
+  'eco_sys_na': 'このデバイスでは利用できません（システムの省電力モードを検出できません）。',
   'eco_chg': '変わること',
   'eco_chg1': '傾きパララックスをオフにします',
   'eco_chg2': '画面のリフレッシュレートを約 60 Hz に制限します',
@@ -1058,7 +1058,7 @@ const Map<String, String> kTxJa = {
   'ui_compare_music_taste': '音楽の好みを比較',
   'ui_syncing_full_library': 'データを同期中…',
   'ui_see_more': 'もっと見る',
-  'ui_no_achievements_unlock': 'まだ実績は解除されていません',
+  'ui_no_achievements_unlock': 'まだ実績は解除されていません。聴き続けて最初の実績を手に入れましょう！',
   'ui_no_animated_cover_for_': 'このアルバムにはアニメーションカバーがありません',
   'ui_source': '提供元: {source}',
   'ui_view_on_last_fm': 'Last.fm で見る',
@@ -1070,7 +1070,7 @@ const Map<String, String> kTxJa = {
   'ui_colored_widgets': 'カラーウィジェット',
   'ui_tint_home_screen_widge': 'ウィジェットにアクセントカラーを適用',
   'ui_search_settings': '設定を検索…',
-  'ui_no_settings_found': '設定が見つかりません',
+  'ui_no_settings_found': '検索に一致する設定がありません',
   'ui_all': 'すべて',
   'ui_battery_saver': 'バッテリーセーバー',
   'ui_save_battery_fewer_eff': 'バッテリーを節約、エフェクト控えめ',
@@ -1277,7 +1277,7 @@ const Map<String, String> kTxJa = {
   'sp_t': 'Spotify (Canvas)',
   'sp_on': '接続済み',
   'sp_off': '未接続',
-  'sp_off_s': 'Spotify からログアウトしました',
+  'sp_off_s': 'Spotify からログアウトしています。Canvas のアニメーションカバーを使うには、もう一度ログインしてください。',
   'sp_need': 'Spotify のログインが必要です：プロフィール > 接続ページ。',
   'conn_title': '接続',
   'conn_btn_t': '接続ページ',

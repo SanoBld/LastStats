@@ -30,7 +30,7 @@ class AppStringsRu implements AppStrings {
   @override String get cacheApiData => 'Данные API';
   @override String get cacheApiDataSubtitle => 'Топ исполнителей, альбомов, недавние треки…';
   @override String get cacheScrobbles => 'История скробблов';
-  @override String get cacheScrobblesSubtitle => 'Все загруженные записи скробблов';
+  @override String get cacheScrobblesSubtitle => 'Вся ваша история прослушиваний, загруженная из Last.fm';
   @override String get cacheClearBtn => 'Очистить';
   @override String get cacheConfirmScrobblesTitle => 'Очистить историю скробблов?';
   @override String get cacheConfirmScrobblesBody => 'Вся история будет удалена и загружена заново при следующем запуске.';
@@ -127,7 +127,7 @@ class AppStringsRu implements AppStrings {
   @override String get settingsMaterialYou => 'Material You';
   @override String get settingsMaterialYouSub => 'Использует цвета обоев Android (Android 12 и новее)';
   @override String get settingsMusicColor => 'Цвет из музыки';
-  @override String get settingsMusicColorSub => 'Извлекает цвет из обложки текущего альбома';
+  @override String get settingsMusicColorSub => 'Берёт акцентный цвет с обложки воспроизводимого трека';
   @override String get settingsMusicColorNote => 'Основной цвет текущей обложки альбома заменяет акцентный цвет.';
   @override String get settingsMusicColorLocked => 'Сначала отключите Material You';
   @override String get settingsStartupPage => 'Начальная страница';
@@ -146,7 +146,7 @@ class AppStringsRu implements AppStrings {
   @override String get settingsHeaderCustomUrlSub => 'Вставьте прямую ссылку на изображение (jpg, png, webp…).';
   @override String get settingsHeaderApply => 'Применить';
   @override String get settingsHeaderFallback => 'Изображение по умолчанию';
-  @override String get settingsHeaderFallbackSub => 'Отображается, когда музыка не играет.';
+  @override String get settingsHeaderFallbackSub => 'Изображение в шапке, когда ничего не воспроизводится.';
   @override String get settingsHeaderFallbackUrlLabel => 'URL изображения по умолчанию';
   @override String get settingsVisibleSections => 'Видимые разделы';
   @override String get settingsNowPlayingSection => 'Сейчас играет';
@@ -163,9 +163,9 @@ class AppStringsRu implements AppStrings {
   @override String get settingsLogoutConfirm => 'Выйти';
   @override String get settingsBackup => 'Резервное копирование и восстановление';
   @override String get settingsExport => 'Экспорт настроек';
-  @override String get settingsExportSub => 'Копирует JSON в буфер обмена';
+  @override String get settingsExportSub => 'Копирует ваши настройки в формате JSON в буфер обмена, чтобы сохранить или поделиться';
   @override String get settingsImport => 'Восстановить резервную копию';
-  @override String get settingsImportSub => 'Вставьте ранее экспортированный JSON';
+  @override String get settingsImportSub => 'Восстанавливает настройки из ранее экспортированного JSON';
   @override String get settingsBackupInfo => 'Включает: тему, цвета, ключ API, имя пользователя, заголовок, избранное. Совместимо между версиями.';
   @override String get settingsUpdates => 'Обновления';
   @override String get settingsAutoUpdate => 'Автоматическая проверка';
@@ -278,7 +278,7 @@ class AppStringsRu implements AppStrings {
   @override String get platformYtMusic => 'YouTube Music';
   @override String get platformOther => 'Другое / показать всё';
   @override String get settingsMusicPlatform => 'Музыкальная платформа';
-  @override String get settingsMusicPlatformSub => 'Фильтрует ссылки, показанные на страницах деталей';
+  @override String get settingsMusicPlatformSub => 'Показывает на страницах артиста, альбома и трека только ссылки выбранного музыкального сервиса';
   @override String get settingsShowAllPlatformLinks => 'Всегда показывать всё';
   @override String get settingsShowAllPlatformLinksSub => 'Игнорировать фильтр и показывать все ссылки (Last.fm, Spotify, YT Music, Web)';
   @override String get onboardUpdatesTitle => 'Обновления';
@@ -393,7 +393,7 @@ class AppStringsRu implements AppStrings {
   @override String get aboutTagline => 'Ваш спутник по статистике Last.fm';
   @override String get aboutAppInfo => 'Информация о приложении';
   @override String get aboutScrobbleDownloader => 'Загрузчик скробблов';
-  @override String get aboutScrobbleDownloaderSub => 'Экспортируйте все ваши скробблы в файл';
+  @override String get aboutScrobbleDownloaderSub => 'Скачайте всю историю скробблов и сохраните её в файл';
   @override String get aboutPoweredBy => 'Работает на';
   @override String get aboutImageDisclaimer => 'Изображения исполнителей, альбомов и треков автоматически загружаются из этих источников и иногда могут быть неверными или не соответствовать содержимому.';
   @override String get aboutFooter => 'Сделано с ❤️ · Не связано с Last.fm / CBS';
@@ -595,7 +595,7 @@ class AppStringsRu implements AppStrings {
   @override String get commonSeeMore             => 'Показать больше';
   @override String get favPageTitle              => 'Мои избранные';
   @override String get favSearchHint             => 'Поиск трека или исполнителя';
-  @override String get favEmpty                  => 'Пока нет избранного.';
+  @override String get favEmpty                  => 'Избранного пока нет. Нажмите на сердце у трека, чтобы добавить его.';
   @override String get settingsLovedBadgeTitle => 'Скромный значок сердца';
   @override String get settingsLovedBadgeSub   => 'Показывает маленькое сердце у избранных треков в недавних, истории и поиске';
   @override String get favSortRecent   => 'Недавние';
@@ -618,7 +618,7 @@ class AppStringsRu implements AppStrings {
   @override String get favFolderEmoji => 'Эмодзи';
   @override String get favFolderColor => 'Цвет';
   @override String get favFolderSave => 'Сохранить';
-  @override String get favFolderEmpty => 'В этой папке нет треков';
+  @override String get favFolderEmpty => 'Эта папка пуста. Удерживайте сердце у трека, чтобы добавить его сюда.';
   @override String get rankingsWholeYear       => 'Весь год';
   @override String get chartsExportGeneratedOn => 'создано';
   @override String get faqQ1 => 'Скробблит ли LastStats мою музыку?';
@@ -877,7 +877,7 @@ const Map<String, String> kTxRu = {
   'eco_trig': 'Когда включать',
   'eco_sys_t': 'Когда на устройстве включён режим экономии заряда',
   'eco_sys_s': 'Следует встроенному режиму энергосбережения телефона и выключается вместе с ним.',
-  'eco_sys_na': 'Недоступно на этом устройстве.',
+  'eco_sys_na': 'Недоступно на этом устройстве (системный режим экономии заряда не обнаружен).',
   'eco_chg': 'Что меняется',
   'eco_chg1': 'Параллакс при наклоне отключается',
   'eco_chg2': 'Частота обновления экрана ограничивается примерно 60 Гц',
@@ -1059,7 +1059,7 @@ const Map<String, String> kTxRu = {
   'ui_compare_music_taste': 'Сравнить музыкальные вкусы',
   'ui_syncing_full_library': 'Синхронизация данных…',
   'ui_see_more': 'Показать ещё',
-  'ui_no_achievements_unlock': 'Пока нет открытых достижений',
+  'ui_no_achievements_unlock': 'Достижений пока нет. Продолжайте слушать, чтобы получить первое!',
   'ui_no_animated_cover_for_': 'У этого альбома нет анимированной обложки',
   'ui_source': 'Источник: {source}',
   'ui_view_on_last_fm': 'Смотреть на Last.fm',
@@ -1071,7 +1071,7 @@ const Map<String, String> kTxRu = {
   'ui_colored_widgets': 'Цветные виджеты',
   'ui_tint_home_screen_widge': 'Окрашивает виджеты акцентным цветом',
   'ui_search_settings': 'Поиск настройки…',
-  'ui_no_settings_found': 'Настройки не найдены',
+  'ui_no_settings_found': 'Нет настроек, подходящих под ваш запрос',
   'ui_all': 'Все',
   'ui_battery_saver': 'Экономия заряда',
   'ui_save_battery_fewer_eff': 'Экономия заряда, меньше эффектов',
@@ -1278,7 +1278,7 @@ const Map<String, String> kTxRu = {
   'sp_t': 'Spotify (Canvas)',
   'sp_on': 'Подключено',
   'sp_off': 'Не подключено',
-  'sp_off_s': 'Выход из Spotify выполнен',
+  'sp_off_s': 'Вы вышли из Spotify. Войдите снова, чтобы получать анимированные обложки Canvas.',
   'sp_need': 'Для Spotify нужен вход: Профиль > Страница подключений.',
   'conn_title': 'Подключения',
   'conn_btn_t': 'Страница подключений',

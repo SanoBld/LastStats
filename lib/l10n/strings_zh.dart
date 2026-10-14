@@ -32,7 +32,7 @@ class AppStringsZh implements AppStrings {
   @override String get cacheApiData                => 'API 数据';
   @override String get cacheApiDataSubtitle        => '热门艺术家、专辑、最近播放…';
   @override String get cacheScrobbles              => 'Scrobble 历史记录';
-  @override String get cacheScrobblesSubtitle      => '所有已下载的播放记录';
+  @override String get cacheScrobblesSubtitle      => '从 Last.fm 下载的完整收听记录';
   @override String get cacheClearBtn               => '清空';
   @override String get cacheConfirmScrobblesTitle  => '删除历史记录？';
   @override String get cacheConfirmScrobblesBody   => '完整历史记录将被删除，下次启动时重新下载。';
@@ -149,7 +149,7 @@ class AppStringsZh implements AppStrings {
   @override String get settingsMaterialYou       => 'Material You';
   @override String get settingsMaterialYouSub    => '使用 Android 壁纸的颜色（需要 Android 12 及以上）';
   @override String get settingsMusicColor        => '取色自音乐';
-  @override String get settingsMusicColorSub     => '从当前专辑封面提取颜色';
+  @override String get settingsMusicColorSub     => '从当前播放曲目的封面提取强调色';
   @override String get settingsMusicColorNote    => '当前封面的主色调将替代强调色。';
   @override String get settingsMusicColorLocked  => '请先关闭 Material You';
   @override String get settingsStartupPage       => '启动页面';
@@ -168,7 +168,7 @@ class AppStringsZh implements AppStrings {
   @override String get settingsHeaderCustomUrlSub  => '粘贴图片的直接链接（jpg、png、webp 等）。';
   @override String get settingsHeaderApply       => '应用';
   @override String get settingsHeaderFallback    => '默认图片';
-  @override String get settingsHeaderFallbackSub => '无音乐播放时显示。';
+  @override String get settingsHeaderFallbackSub => '没有播放音乐时，顶部显示的图片。';
   @override String get settingsHeaderFallbackUrlLabel => '默认图片链接';
   @override String get settingsVisibleSections   => '显示的板块';
   @override String get settingsNowPlayingSection => '正在播放';
@@ -185,9 +185,9 @@ class AppStringsZh implements AppStrings {
   @override String get settingsLogoutConfirm     => '退出登录';
   @override String get settingsBackup            => '备份与恢复';
   @override String get settingsExport            => '导出设置';
-  @override String get settingsExportSub         => '将 JSON 复制到剪贴板';
+  @override String get settingsExportSub         => '将设置以 JSON 格式复制到剪贴板，便于保存或分享';
   @override String get settingsImport            => '恢复备份';
-  @override String get settingsImportSub         => '粘贴之前导出的 JSON';
+  @override String get settingsImportSub         => '从之前导出的 JSON 恢复设置';
   @override String get settingsBackupInfo        => '包含：主题、颜色、API 密钥、用户名、头图、收藏。各版本间兼容。';
   @override String get settingsUpdates           => '更新';
   @override String get settingsAutoUpdate        => '自动检查';
@@ -308,7 +308,7 @@ class AppStringsZh implements AppStrings {
   @override String get platformYtMusic         => 'YouTube Music';
   @override String get platformOther           => '其他 / 全部显示';
   @override String get settingsMusicPlatform          => '音乐平台';
-  @override String get settingsMusicPlatformSub       => '过滤详情页显示的链接';
+  @override String get settingsMusicPlatformSub       => '在艺术家、专辑和曲目页面中，仅显示所选音乐服务的链接';
   @override String get settingsShowAllPlatformLinks    => '始终显示全部';
   @override String get settingsShowAllPlatformLinksSub => '忽略过滤，显示所有链接（Last.fm、Spotify、YT Music、网页）';
   @override String get onboardUpdatesTitle     => '更新';
@@ -435,7 +435,7 @@ class AppStringsZh implements AppStrings {
   @override String get aboutTagline               => '您的 Last.fm 统计伴侣';
   @override String get aboutAppInfo                => '应用信息';
   @override String get aboutScrobbleDownloader     => 'Scrobble 下载器';
-  @override String get aboutScrobbleDownloaderSub  => '将您所有的 scrobble 导出为文件';
+  @override String get aboutScrobbleDownloaderSub  => '下载全部 scrobble 历史并保存为文件';
   @override String get aboutPoweredBy              => '技术支持';
   @override String get aboutImageDisclaimer        => '艺术家、专辑和歌曲的图片会自动从这些来源获取，有时可能不准确或与实际内容不符。';
   @override String get aboutFooter                 => '用 ❤️ 制作 · 与 Last.fm / CBS 无关联';
@@ -658,7 +658,7 @@ class AppStringsZh implements AppStrings {
   @override String get commonSeeMore             => '查看更多';
   @override String get favPageTitle              => '我的收藏';
   @override String get favSearchHint             => '搜索歌曲或艺人';
-  @override String get favEmpty                  => '暂无收藏。';
+  @override String get favEmpty                  => '还没有收藏。点按曲目上的爱心即可添加。';
   @override String get settingsLovedBadgeTitle => '低调的爱心标记';
   @override String get settingsLovedBadgeSub   => '在最近播放、历史记录和搜索中为收藏的歌曲显示一个小爱心';
   @override String get favSortRecent   => '最近';
@@ -681,7 +681,7 @@ class AppStringsZh implements AppStrings {
   @override String get favFolderEmoji => '表情符号';
   @override String get favFolderColor => '颜色';
   @override String get favFolderSave => '保存';
-  @override String get favFolderEmpty => '此文件夹中没有歌曲';
+  @override String get favFolderEmpty => '此文件夹为空。长按曲目上的爱心即可添加到这里。';
   @override String get rankingsWholeYear       => '全年';
   @override String get chartsExportGeneratedOn => '生成于';
   @override String get faqQ1 => 'LastStats 会记录我的音乐播放记录吗？';
@@ -903,7 +903,7 @@ const Map<String, String> kTxZh = {
   'eco_trig': '何时开启',
   'eco_sys_t': '设备省电模式开启时',
   'eco_sys_s': '跟随手机自带的省电模式，并随其关闭而关闭。',
-  'eco_sys_na': '此设备不支持。',
+  'eco_sys_na': '此设备不可用（未检测到系统省电模式）。',
   'eco_chg': '会有哪些变化',
   'eco_chg1': '关闭倾斜视差',
   'eco_chg2': '屏幕刷新率限制在约 60 Hz',
@@ -1085,7 +1085,7 @@ const Map<String, String> kTxZh = {
   'ui_compare_music_taste': '比较音乐品味',
   'ui_syncing_full_library': '正在同步数据…',
   'ui_see_more': '查看更多',
-  'ui_no_achievements_unlock': '尚未解锁任何成就',
+  'ui_no_achievements_unlock': '还没有解锁任何成就。继续听歌，解锁第一个吧！',
   'ui_no_animated_cover_for_': '此专辑没有动态封面',
   'ui_source': '来源：{source}',
   'ui_view_on_last_fm': '在 Last.fm 上查看',
@@ -1097,7 +1097,7 @@ const Map<String, String> kTxZh = {
   'ui_colored_widgets': '彩色小组件',
   'ui_tint_home_screen_widge': '用强调色为小组件着色',
   'ui_search_settings': '搜索设置…',
-  'ui_no_settings_found': '未找到设置',
+  'ui_no_settings_found': '没有与搜索匹配的设置',
   'ui_all': '全部',
   'ui_battery_saver': '省电模式',
   'ui_save_battery_fewer_eff': '省电，减少特效',
@@ -1304,7 +1304,7 @@ const Map<String, String> kTxZh = {
   'sp_t': 'Spotify (Canvas)',
   'sp_on': '已连接',
   'sp_off': '未连接',
-  'sp_off_s': '已退出 Spotify',
+  'sp_off_s': '你已退出 Spotify。重新登录后才能获取 Canvas 动态封面。',
   'sp_need': 'Spotify 需要登录：个人资料 > 连接页面。',
   'conn_title': '连接',
   'conn_btn_t': '连接页面',
