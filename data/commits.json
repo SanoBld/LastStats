@@ -1,6 +1,24 @@
 {
-  "updated": "2026-10-14T20:23:11Z",
+  "updated": "2026-10-14T20:31:41Z",
   "commits": [
+    {
+      "sha": "ffa89e0061e456dc4984932991d80eda94f492d1",
+      "message": "Update localization strings for multiple languages:\n- Italian (strings_it.dart): Improved clarity and specificity in various phrases related to scrobbles, settings, and user prompts.\n- Japanese (strings_ja.dart): Enhanced descriptions for settings and user interactions, ensuring better understanding for users.\n- Portuguese (strings_pt.dart): Refined translations for music-related features and user guidance, improving overall user experience.\n- Russian (strings_ru.dart): Clarified phrases regarding music history and settings, making them more user-friendly.\n- Chinese (strings_zh.dart): Updated translations to provide clearer instructions and descriptions for app functionalities.",
+      "date": "2026-10-14T20:29:06Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/ffa89e0061e456dc4984932991d80eda94f492d1",
+      "tags": []
+    },
+    {
+      "sha": "ae2afbba9884a95d54d0f409bdc2be37ceb053e7",
+      "message": "Update localization strings for Portuguese, Russian, and Chinese\n\n- Enhanced descriptions for Material You settings in Portuguese, Russian, and Chinese.\n- Clarified automatic update settings in all three languages.\n- Improved error messages for update checks and backup imports to provide better user guidance.\n- Updated various UI strings to enhance clarity and user experience across all languages.",
+      "date": "2026-10-14T20:26:25Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/ae2afbba9884a95d54d0f409bdc2be37ceb053e7",
+      "tags": []
+    },
     {
       "sha": "63f0f9554f0c513077bd9dd288c8294dee8d4197",
       "message": "fix: ajuster la taille et les couleurs des icônes pour une meilleure intégration visuelle",
@@ -2693,24 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/561211c46cd3038c8980fd9e00e987afb1c9ff85",
-      "tags": []
-    },
-    {
-      "sha": "3d4f072df2712855d299df13ce181d355261fcf2",
-      "message": "feat: améliorer l'affichage des QR codes en augmentant leur taille et en ajustant les marges",
-      "date": "2026-08-11T17:26:42Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/3d4f072df2712855d299df13ce181d355261fcf2",
-      "tags": []
-    },
-    {
-      "sha": "86d5b992a31ab0b73c8ab7f5c216e1f237f57de4",
-      "message": "feat: ajouter le support du plugin AppLinks pour les plateformes Windows, macOS et Linux",
-      "date": "2026-08-11T17:07:41Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/86d5b992a31ab0b73c8ab7f5c216e1f237f57de4",
       "tags": []
     }
   ]
