@@ -1,6 +1,24 @@
 {
-  "updated": "2026-10-14T17:39:32Z",
+  "updated": "2026-10-14T17:49:14Z",
   "commits": [
+    {
+      "sha": "ea5b04c39322a89c2cfc484427b354a5dc49aa34",
+      "message": "fix: ajouter une mention de remerciement pour la traduction des nouveaux textes dans le changelog",
+      "date": "2026-10-14T17:48:36Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/ea5b04c39322a89c2cfc484427b354a5dc49aa34",
+      "tags": []
+    },
+    {
+      "sha": "b61bb1499d78d34a8de2ae4df952940e29effcc8",
+      "message": "fix: mettre à jour la police d'application par défaut à GoogleSansFlex",
+      "date": "2026-10-14T17:46:36Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/b61bb1499d78d34a8de2ae4df952940e29effcc8",
+      "tags": []
+    },
     {
       "sha": "102bc402412f3f22777bcb043f5e301e0e3071e7",
       "message": "fix: remplacer les emojis par des icônes Material pour les cartes de statistiques",
@@ -2693,24 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/d097b1b6d9d698c47c877a8553afbfddf18af072",
-      "tags": []
-    },
-    {
-      "sha": "7d752356295135c30ebfe4e6c41919e12c2a8c11",
-      "message": "feat: ajouter un système de partage pour les badges d'achievements avec rendu hors écran",
-      "date": "2026-08-11T10:48:59Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/7d752356295135c30ebfe4e6c41919e12c2a8c11",
-      "tags": []
-    },
-    {
-      "sha": "0a48914eb4835c1ea7980e092d6d88c5c9b0d91c",
-      "message": "feat: mettre à jour pubspec.lock avec de nouvelles dépendances pour le scanner QR et les liens profonds",
-      "date": "2026-08-11T10:26:08Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/0a48914eb4835c1ea7980e092d6d88c5c9b0d91c",
       "tags": []
     }
   ]
