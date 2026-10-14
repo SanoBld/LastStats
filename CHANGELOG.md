@@ -45,7 +45,7 @@
 - Charts: 3 new charts: time of day, day intensity (tap a bar) and busiest days
 - Theme: all accent colors (secondary, tertiary, charts, posters) now use the same hue as the chosen theme, only the intensity changes
 - Settings: new "Color style" option in Appearance (Monochrome, Classic, Vivid, Soft); it is saved in backups and translated in all 10 languages
-- All new texts are translated in all 10 languages
+- All new texts are translated in all 10 languages (Thanks Claude :)
 
 **Welcome setup**
 - The first-launch sync screen is gone: data and scrobbles now sync in the background while you set up the app, with a live percentage at the top left
