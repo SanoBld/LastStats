@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-14T17:57:45Z",
+  "updated": "2026-10-14T20:13:21Z",
   "commits": [
+    {
+      "sha": "cb2af379c355c71197872801c10889fe9fa16e06",
+      "message": "fix: mettre à jour les couleurs des icônes pour une meilleure cohérence visuelle",
+      "date": "2026-10-14T20:12:57Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/cb2af379c355c71197872801c10889fe9fa16e06",
+      "tags": []
+    },
     {
       "sha": "ea5b04c39322a89c2cfc484427b354a5dc49aa34",
       "message": "fix: ajouter une mention de remerciement pour la traduction des nouveaux textes dans le changelog",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/eae8418ee5b2447beb5e4f4d3c7ea53329e3885e",
-      "tags": []
-    },
-    {
-      "sha": "d097b1b6d9d698c47c877a8553afbfddf18af072",
-      "message": "feat: ajouter un menu contextuel pour accéder au profil et améliorer l'affichage du QR code",
-      "date": "2026-08-11T10:49:51Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/d097b1b6d9d698c47c877a8553afbfddf18af072",
       "tags": []
     }
   ]
