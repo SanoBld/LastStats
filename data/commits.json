@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-14T16:43:32Z",
+  "updated": "2026-10-14T17:16:34Z",
   "commits": [
+    {
+      "sha": "a4e426ce0d5c2ec8f372ee47d7afc1f813a7aa2e",
+      "message": "fix: améliorer le style et la présentation des cartes de statistiques et des éléments de l'interface utilisateur",
+      "date": "2026-10-14T17:16:16Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/a4e426ce0d5c2ec8f372ee47d7afc1f813a7aa2e",
+      "tags": []
+    },
     {
       "sha": "532e1ef00e8d2b4e3964121940079cb1ec05030e",
       "message": "fix: ajuster la largeur maximale des colonnes pour une meilleure adaptabilité sur différents écrans",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/84de98d295ab02b3e71b3274b0256476284110e7",
-      "tags": []
-    },
-    {
-      "sha": "a665bbe5ec2977cd3c35d9bfcf092a342e57dfb4",
-      "message": "feat: ajouter des catégories d'achievements pour l'assiduité et le marathon avec des descriptions",
-      "date": "2026-08-10T20:03:06Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/a665bbe5ec2977cd3c35d9bfcf092a342e57dfb4",
       "tags": []
     }
   ]
