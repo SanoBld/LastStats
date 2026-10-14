@@ -475,7 +475,7 @@ class _SearchPageState extends State<_SearchPage> {
           IconButton(
             visualDensity: VisualDensity.compact,
             icon: Icon(isFav ? Icons.star_rounded : Icons.star_outline_rounded,
-                color: isFav ? Colors.amber.shade400 : scheme.onSurfaceVariant),
+                color: isFav ? scheme.primary : scheme.onSurfaceVariant),
             onPressed: () => _toggleFavProfile(uname, !isFav),
           ),
         ]),

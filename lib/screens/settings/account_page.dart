@@ -412,7 +412,7 @@ class _AccountPageState extends State<AccountPage> {
                 valueListenable: secretKeyNotifier,
                 builder: (_, secret, _) => SettingTile(
                   leading: Icon(Icons.favorite_rounded,
-                      color: secret.isNotEmpty ? Colors.redAccent : scheme.onSurfaceVariant,
+                      color: secret.isNotEmpty ? scheme.primary : scheme.onSurfaceVariant,
                       size: 20),
                   title: Text(L.acctSecretKeyLabel),
                   subtitle: Text(

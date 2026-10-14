@@ -3580,7 +3580,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
         child: btn(
           Icon(
             _localIsFav ? Icons.star_rounded : Icons.star_outline_rounded,
-            color: _localIsFav ? Colors.amber.shade400 : scheme.onSecondaryContainer,
+            color: _localIsFav ? scheme.primary : scheme.onSecondaryContainer,
             size: 22,
           ),
           () {

@@ -2800,7 +2800,7 @@ class _HeroStatCard extends StatelessWidget {
           if (showLoved) ...[
             const SizedBox(width: 6),
             tile(_MiniMetric(icon: Icons.favorite_rounded, label: L.favSectionTitle,
-                color: on, iconColor: scheme.error, rawInt: lovedCount, onTap: onFavoritesTap)),
+                color: on, iconColor: scheme.primary, rawInt: lovedCount, onTap: onFavoritesTap)),
           ],
         ]),
         if (regStr.isNotEmpty) ...[

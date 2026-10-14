@@ -1153,7 +1153,10 @@ class _WeekendCardState extends State<_WeekendCard> {
                 flex: math.max((parts[i].$2 * 1000 / total).round(), 1),
                 child: GestureDetector(
                   onTap: () { _haptic(_HapticImpact.selection); setState(() => _sel = _sel == i ? -1 : i); },
-                  child: Container(color: parts[i].$4.withValues(alpha: _sel == -1 || _sel == i ? 1 : 0.4)),
+                  child: Container(
+                    margin: EdgeInsets.only(right: i == 0 ? 3 : 0),
+                    color: parts[i].$4.withValues(alpha: _sel == -1 || _sel == i ? 1 : 0.4),
+                  ),
                 ),
               ),
           ])),
