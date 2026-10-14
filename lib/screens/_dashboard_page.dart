@@ -2790,17 +2790,17 @@ class _HeroStatCard extends StatelessWidget {
         const SizedBox(height: 18),
         Row(children: [
           tile(_MiniMetric(icon: Icons.bolt_rounded, label: L.dashScrobblesPerDay,
-              color: on, rawInt: avg, prefix: '~')),
+              color: on, iconColor: scheme.primary, rawInt: avg, prefix: '~')),
           const SizedBox(width: 6),
           tile(_MiniMetric(icon: Icons.date_range_rounded, label: L.dashPerWeek,
-              color: on, rawInt: weekly, prefix: '~')),
+              color: on, iconColor: scheme.primary, rawInt: weekly, prefix: '~')),
           const SizedBox(width: 6),
           tile(_MiniMetric(icon: Icons.today_rounded, label: L.dashDaysActive,
-              color: on, rawInt: days, suffix: ' ${L.dashDayUnitShort}')),
+              color: on, iconColor: scheme.primary, rawInt: days, suffix: ' ${L.dashDayUnitShort}')),
           if (showLoved) ...[
             const SizedBox(width: 6),
             tile(_MiniMetric(icon: Icons.favorite_rounded, label: L.favSectionTitle,
-                color: on, rawInt: lovedCount, onTap: onFavoritesTap)),
+                color: on, iconColor: scheme.error, rawInt: lovedCount, onTap: onFavoritesTap)),
           ],
         ]),
         if (regStr.isNotEmpty) ...[
@@ -2842,7 +2842,10 @@ class _MiniMetric extends StatelessWidget {
     this.prefix = '',
     this.suffix = '',
     this.onTap,
+    this.iconColor,
   });
+
+  final Color? iconColor;
 
   @override
   Widget build(BuildContext context) {
@@ -2851,7 +2854,7 @@ class _MiniMetric extends StatelessWidget {
         fontWeight: FontWeight.w800, color: color);
 
     final content = Column(mainAxisSize: MainAxisSize.min, children: [
-      Icon(icon, size: 16, color: color.withValues(alpha: 0.7)),
+      Icon(icon, size: 18, color: iconColor ?? color.withValues(alpha: 0.7)),
       const SizedBox(height: 3),
       if (rawInt != null)
         _RollingNumber(
@@ -2890,10 +2893,13 @@ class _StatGrid extends StatelessWidget {
   // cascade one after another instead of all jumping in at once.
   // Skipped after the dashboard has already played its entrance once,
   // same rule as the rest of the page.
-  Widget _stagger(Widget child, int index) => _FadeSlideIn(
-    skipAnimation: _dashboardEntrancePlayed,
-    delay: Duration(milliseconds: 40 * index),
-    child: child,
+  Widget _stagger(Widget child, int index) => _StatTone(
+    tone: (index % 2 + index ~/ 2) % 3,
+    child: _FadeSlideIn(
+      skipAnimation: _dashboardEntrancePlayed,
+      delay: Duration(milliseconds: 40 * index),
+      child: child,
+    ),
   );
 
   @override
@@ -2914,6 +2920,19 @@ class _StatGrid extends StatelessWidget {
   }
 }
 
+
+// Tells a stat card which accent (0 primary, 1 secondary, 2 tertiary) to use,
+// so neighbours in the grid get different colours.
+class _StatTone extends InheritedWidget {
+  final int tone;
+  const _StatTone({required this.tone, required super.child});
+
+  static int of(BuildContext c) =>
+      c.dependOnInheritedWidgetOfExactType<_StatTone>()?.tone ?? 0;
+
+  @override
+  bool updateShouldNotify(_StatTone old) => old.tone != tone;
+}
 
 // ── Secondary stat card (uniform height via IntrinsicHeight in _StatGrid) ─────
 
@@ -2940,8 +2959,13 @@ class _DashStatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme     = Theme.of(context).colorScheme;
     final text       = Theme.of(context).textTheme;
+    final tone = _StatTone.of(context);
+    final bg = [scheme.primaryContainer, scheme.secondaryContainer,
+                scheme.tertiaryContainer][tone];
+    final fg = [scheme.onPrimaryContainer, scheme.onSecondaryContainer,
+                scheme.onTertiaryContainer][tone];
     final valueStyle = text.bodyLarge?.copyWith(
-        fontWeight: FontWeight.w800, color: scheme.onSurface);
+        fontWeight: FontWeight.w800, color: fg);
 
     // SizedBox.expand fills the height provided by IntrinsicHeight in _StatGrid,
     // making all cards the same height regardless of content length
@@ -2950,18 +2974,22 @@ class _DashStatCard extends StatelessWidget {
       onTap: onTap,
       child: Card(
         elevation: 0,
-        color: scheme.surfaceContainerHigh,
+        color: bg,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(28),
         ),
         child: InkWell(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(28),
           onTap: onTap,
           child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(emoji, style: const TextStyle(fontSize: 22)),
-            const SizedBox(height: 6),
+            M3CookieBadge(
+              size: 40,
+              color: scheme.surface.withValues(alpha: 0.6),
+              child: Text(emoji, style: const TextStyle(fontSize: 20)),
+            ),
+            const SizedBox(height: 10),
             if (rawInt != null)
               _RollingNumber(
                 key:      ValueKey('dash_${rawInt}_$rollPrefix$rollSuffix'),
@@ -2983,10 +3011,10 @@ class _DashStatCard extends StatelessWidget {
                 ),
               ),
             Text(label, style: text.bodySmall?.copyWith(
-                color: scheme.primary, fontWeight: FontWeight.w600)),
+                color: fg.withValues(alpha: 0.85), fontWeight: FontWeight.w600)),
             if (sub != null)
               Text(sub!, maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                  style: text.bodySmall?.copyWith(color: fg.withValues(alpha: 0.65))),
           ]),
           ),
         ),
@@ -3187,23 +3215,20 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
 
     final labels = [L.dashWeekLabel, L.dashMonthLabel, L.dashYearLabel];
 
-    return Container(
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: scheme.outlineVariant.withValues(alpha: 0.4),
-          width: 1,
-        ),
-      ),
+    return M3ShapeMorph(
+      radius: BorderRadius.circular(32),
+      color: scheme.surfaceContainerLow,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
           // Header row – period label (bigger) + swipe dots
           Row(children: [
-            Icon(Icons.trending_up_rounded, size: 16, color: scheme.primary),
-            const SizedBox(width: 6),
+            M3CookieBadge(
+              size: 32, color: scheme.primary,
+              child: Icon(Icons.trending_up_rounded, size: 16, color: scheme.onPrimary),
+            ),
+            const SizedBox(width: 10),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
               child: Text(
@@ -3229,13 +3254,13 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   margin: const EdgeInsets.symmetric(horizontal: 3),
-                  width:  _page == i ? 18 : 6,
-                  height: 6,
+                  width:  _page == i ? 22 : 8,
+                  height: 8,
                   decoration: BoxDecoration(
                     color: _page == i
                         ? scheme.primary
                         : scheme.primary.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(3),
+                    borderRadius: BorderRadius.circular(4),
                   ),
                 ),
               ),
@@ -3246,7 +3271,7 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
 
           // Swipeable pages
           SizedBox(
-            height: 100,
+            height: 122,
             child: PageView(
               controller: _ctrl,
               onPageChanged: (p) => setState(() => _page = p),
@@ -3302,6 +3327,7 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
         children: [
           Expanded(child: _WeekTile(
             icon:  Icons.mic_rounded,
+            bg: scheme.primaryContainer, fg: scheme.onPrimaryContainer,
             label: L.dashTopArtistLabel,
             value: topArtist != null ? (topArtist['name'] ?? '—').toString() : '—',
             plays: topArtist != null
@@ -3311,12 +3337,10 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
                 ? () => showDetailSheet(context, Map<String, dynamic>.from(topArtist), 'artists', widget.service)
                 : null,
           )),
-          Container(
-            width: 1, margin: const EdgeInsets.symmetric(horizontal: 10),
-            color: scheme.outlineVariant.withValues(alpha: 0.35),
-          ),
+          const SizedBox(width: 8),
           Expanded(child: _WeekTile(
             icon:  Icons.music_note_rounded,
+            bg: scheme.secondaryContainer, fg: scheme.onSecondaryContainer,
             label: L.dashTopTrackLabel,
             value: topTrack != null ? (topTrack['name'] ?? '—').toString() : '—',
             plays: topTrack != null
@@ -3326,12 +3350,10 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
                 ? () => showDetailSheet(context, Map<String, dynamic>.from(topTrack), 'tracks', widget.service)
                 : null,
           )),
-          Container(
-            width: 1, margin: const EdgeInsets.symmetric(horizontal: 10),
-            color: scheme.outlineVariant.withValues(alpha: 0.35),
-          ),
+          const SizedBox(width: 8),
           Expanded(child: _WeekTile(
             icon:    Icons.headphones_rounded,
+            bg: scheme.tertiaryContainer, fg: scheme.onTertiaryContainer,
             label:   L.dashScrobblesLabel,
             value:   scrobbles > 0 ? countStr : '—',
             plays:   null,
@@ -3353,9 +3375,13 @@ class _WeekTile extends StatelessWidget {
   final int?          plays;
   final double?       percent;
   final VoidCallback? onTap;
+  final Color         bg;
+  final Color         fg;
 
   const _WeekTile({
     required this.icon,
+    required this.bg,
+    required this.fg,
     required this.label,
     required this.value,
     this.plays,
@@ -3371,22 +3397,28 @@ class _WeekTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap != null ? () { _haptic(_HapticImpact.selection); onTap!(); } : null,
       behavior: HitTestBehavior.opaque,
+      child: M3ShapeMorph(
+      radius: BorderRadius.circular(22),
+      color: bg,
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
       child: Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Icon(icon, size: 13, color: scheme.primary),
+          Icon(icon, size: 14, color: fg),
           const SizedBox(width: 4),
-          Text(
+          Flexible(child: Text(
             label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: text.labelSmall?.copyWith(
-              color:      scheme.onSurfaceVariant,
+              color:      fg.withValues(alpha: 0.8),
               fontSize:   11,
               fontWeight: FontWeight.w600,
             ),
-          ),
+          )),
         ]),
         const SizedBox(height: 6),
         Text(
@@ -3396,7 +3428,7 @@ class _WeekTile extends StatelessWidget {
           textAlign: TextAlign.center,
           style: text.bodyLarge?.copyWith(
             fontWeight: FontWeight.w800,
-            color: scheme.onSurface,
+            color: fg,
             height: 1.2,
           ),
         ),
@@ -3406,14 +3438,18 @@ class _WeekTile extends StatelessWidget {
             '${_fmt(plays!)} ${L.commonPlays}',
             textAlign: TextAlign.center,
             style: text.labelSmall?.copyWith(
-              color:    scheme.onSurfaceVariant,
+              color:    fg.withValues(alpha: 0.7),
               fontSize: 11,
             ),
           ),
         ],
         if (percent != null) ...[
           const SizedBox(height: 3),
-          Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
+          M3ShapeMorph(
+            radius: BorderRadius.circular(100),
+            color: scheme.surface.withValues(alpha: 0.6),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
             Icon(
               percent! >= 0 ? Icons.trending_up_rounded : Icons.trending_down_rounded,
               size:  12,
@@ -3429,9 +3465,11 @@ class _WeekTile extends StatelessWidget {
               ),
             ),
           ]),
+          ),
         ],
       ],
       ), // Column
+      ), // M3ShapeMorph
     ); // GestureDetector
   }
 }
@@ -3526,8 +3564,8 @@ class _RecentTrackRowState extends State<_RecentTrackRow> {
               child: Row(children: [
 
                 _SmartImage(
-                  size: 44,
-                  borderRadius: 8,
+                  size: 48,
+                  borderRadius: 14,
                   initialUrl: rawUrl,
                   resolver: () => ImageService.resolveTrack(title, artist,
                       lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null),
@@ -3556,11 +3594,19 @@ class _RecentTrackRowState extends State<_RecentTrackRow> {
 
                 const SizedBox(width: 8),
 
-                Text(
-                  dateStr,
-                  style: text.labelSmall?.copyWith(
-                    color:    scheme.onSurfaceVariant,
-                    fontSize: 10,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: scheme.secondaryContainer,
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  child: Text(
+                    dateStr,
+                    style: text.labelSmall?.copyWith(
+                      color:      scheme.onSecondaryContainer,
+                      fontSize:   10,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
 
