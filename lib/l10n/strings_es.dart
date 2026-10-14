@@ -383,8 +383,8 @@ class AppStringsEs implements AppStrings {
   @override String get dashWeekLabel               => 'ESTA SEMANA';
   @override String get dashMonthLabel              => 'ESTE MES';
   @override String get dashYearLabel               => 'ESTE AÑO';
-  @override String get dashTopArtistLabel          => 'Artista top';
-  @override String get dashTopTrackLabel           => 'Canción top';
+  @override String get dashTopArtistLabel          => 'Artista más escuchado';
+  @override String get dashTopTrackLabel           => 'Canción más escuchada';
   @override String get dashScrobblesLabel          => 'Scrobbles';
   @override String get newsTypeFeatures            => 'Funciones';
   @override String get newsTypeFixes               => 'Correcciones';
@@ -757,9 +757,9 @@ class AppStringsEs implements AppStrings {
   @override String get recapScrobbles => 'escuchas';
   @override String get recapArtists => 'Artistas';
   @override String get recapTracks => 'Canciones';
-  @override String get recapTopArtist => 'Artista top';
-  @override String get recapTopTrack => 'Canción top';
-  @override String get recapTopAlbum => 'Álbum top';
+  @override String get recapTopArtist => 'Artista';
+  @override String get recapTopTrack => 'Canción';
+  @override String get recapTopAlbum => 'Álbum';
   @override String get recapAvgDay => 'Prom/día';
   @override String get recapNoData => 'Sin escuchas en este período.';
   @override String get recapSeeFull => 'Ver resumen completo';
@@ -1292,7 +1292,7 @@ const Map<String, String> kTxEs = {
   'ntf_recap_body': '{n} scrobbles · Top: {a}',
   'ntf_n_today': '{n} scrobbles hoy',
   'ntf_n_week': '{n} scrobbles esta semana',
-  'ntf_top_artist': 'Artista top: {a}',
+  'ntf_top_artist': 'Artista más escuchado: {a}',
   'ntf_update_avail': '🆕 Actualización disponible',
   'ntf_update_ready': 'LastStats {v} está lista: toca para verla.',
   'ntf_sync_title': '🔄 Sincronizando scrobbles…',

@@ -212,9 +212,9 @@ class AppStringsZh implements AppStrings {
   @override String get settingsFaq               => '常见问题';
 
   @override String get headerNowPlaying  => '正在播放';
-  @override String get headerTopTrack    => '第一歌曲';
-  @override String get headerTopAlbum    => '第一专辑';
-  @override String get headerTopArtist   => '第一艺术家';
+  @override String get headerTopTrack    => '第1名歌曲';
+  @override String get headerTopAlbum    => '第1名专辑';
+  @override String get headerTopArtist   => '第1名艺术家';
   @override String get headerCustomImage => '自定义图片';
   @override String get headerThemeColor  => '主题色';
   @override String get headerAnimNone    => '无';
@@ -380,8 +380,8 @@ class AppStringsZh implements AppStrings {
   @override String get dashWeekLabel               => '本周';
   @override String get dashMonthLabel              => '本月';
   @override String get dashYearLabel               => '今年';
-  @override String get dashTopArtistLabel          => '热门艺术家';
-  @override String get dashTopTrackLabel           => '热门歌曲';
+  @override String get dashTopArtistLabel          => '最常听的艺术家';
+  @override String get dashTopTrackLabel           => '最常听的歌曲';
   @override String get dashScrobblesLabel          => 'Scrobbles';
   @override String get newsTypeFeatures            => '新功能';
   @override String get newsTypeFixes               => '修复';
@@ -505,9 +505,9 @@ class AppStringsZh implements AppStrings {
   @override String get fallbackPeriod1Month      => '1 个月';
   @override String get fallbackPeriodAllTime     => '全部时间';
   @override String get fallbackTypeNothing       => '无';
-  @override String get fallbackTypeTopTrack      => '第一歌曲';
-  @override String get fallbackTypeTopAlbum      => '第一专辑';
-  @override String get fallbackTypeTopArtist     => '第一艺术家';
+  @override String get fallbackTypeTopTrack      => '第1名歌曲';
+  @override String get fallbackTypeTopAlbum      => '第1名专辑';
+  @override String get fallbackTypeTopArtist     => '第1名艺术家';
   @override String get fallbackTypeCustomImage   => '自定义图片';
   @override String fallbackWillShow(String detail) => '将显示：$detail';
   @override String get fallbackWillShowCustomUrl => '将显示：自定义图片链接';
@@ -754,9 +754,9 @@ class AppStringsZh implements AppStrings {
   @override String get recapScrobbles => '播放次数';
   @override String get recapArtists => '艺术家';
   @override String get recapTracks => '歌曲';
-  @override String get recapTopArtist => '最多艺术家';
-  @override String get recapTopTrack => '最多歌曲';
-  @override String get recapTopAlbum => '最多专辑';
+  @override String get recapTopArtist => '艺术家';
+  @override String get recapTopTrack => '歌曲';
+  @override String get recapTopAlbum => '专辑';
   @override String get recapAvgDay => '日均';
   @override String get recapNoData => '此时段暂无播放记录。';
   @override String get recapSeeFull => '查看完整回顾';

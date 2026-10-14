@@ -383,8 +383,8 @@ class AppStringsPt implements AppStrings {
   @override String get dashWeekLabel               => 'ESTA SEMANA';
   @override String get dashMonthLabel              => 'ESTE MÊS';
   @override String get dashYearLabel               => 'ESTE ANO';
-  @override String get dashTopArtistLabel          => 'Artista top';
-  @override String get dashTopTrackLabel           => 'Faixa top';
+  @override String get dashTopArtistLabel          => 'Artista mais ouvido';
+  @override String get dashTopTrackLabel           => 'Faixa mais ouvida';
   @override String get dashScrobblesLabel          => 'Scrobbles';
   @override String get newsTypeFeatures            => 'Novidades';
   @override String get newsTypeFixes               => 'Correções';
@@ -757,9 +757,9 @@ class AppStringsPt implements AppStrings {
   @override String get recapScrobbles => 'faixas ouvidas';
   @override String get recapArtists => 'Artistas';
   @override String get recapTracks => 'Faixas';
-  @override String get recapTopArtist => 'Artista top';
-  @override String get recapTopTrack => 'Faixa top';
-  @override String get recapTopAlbum => 'Álbum top';
+  @override String get recapTopArtist => 'Artista';
+  @override String get recapTopTrack => 'Faixa';
+  @override String get recapTopAlbum => 'Álbum';
   @override String get recapAvgDay => 'Média/dia';
   @override String get recapNoData => 'Sem escutas neste período.';
   @override String get recapSeeFull => 'Ver resumo completo';
@@ -908,7 +908,7 @@ const Map<String, String> kTxPt = {
   'eco_sys_s': 'Acompanha o modo de economia de energia nativo do telefone e desativa junto com ele.',
   'eco_sys_na': 'Indisponível neste dispositivo.',
   'eco_chg': 'O que muda',
-  'eco_chg1': 'O paralaxe de movimento é desativado',
+  'eco_chg1': 'A paralaxe de movimento é desativado',
   'eco_chg2': 'A taxa de atualização da tela é limitada a cerca de 60 Hz',
   'eco_chg3': 'As atualizações em segundo plano ficam menos frequentes',
   'eco_chg4': 'As capas animadas e o brilho dos emblemas ficam em pausa',
@@ -1145,7 +1145,7 @@ const Map<String, String> kTxPt = {
   'ui_official_flutter_packa': 'Pacote oficial do Flutter para layouts adaptativos.',
   'ui_android_widgets': 'Widgets do Android',
   'ui_applies_the_accent_col': 'Aplica a cor de destaque ao fundo dos widgets da tela inicial. Desativado: branco ou preto puro.',
-  'ui_turns_off_tilt_paralla': 'Desativa o paralaxe de movimento, limita a taxa de atualização da tela e desacelera as atualizações em segundo plano — o resto mantém a qualidade total (imagens, exportações, cartões de compartilhamento).',
+  'ui_turns_off_tilt_paralla': 'Desativa a paralaxe de movimento, limita a taxa de atualização da tela e desacelera as atualizações em segundo plano — o resto mantém a qualidade total (imagens, exportações, cartões de compartilhamento).',
   'ui_always_on': 'Sempre ativado',
   'ui_force_eco_mode_on_rega': 'Força o modo de economia, independentemente do nível da bateria.',
   'ui_auto_activate': 'Ativação automática',
@@ -1292,7 +1292,7 @@ const Map<String, String> kTxPt = {
   'ntf_recap_body': '{n} scrobbles · Top: {a}',
   'ntf_n_today': '{n} scrobbles hoje',
   'ntf_n_week': '{n} scrobbles esta semana',
-  'ntf_top_artist': 'Artista top: {a}',
+  'ntf_top_artist': 'Artista mais ouvido: {a}',
   'ntf_update_avail': '🆕 Atualização disponível',
   'ntf_update_ready': 'LastStats {v} está pronto — toque para ver.',
   'ntf_sync_title': '🔄 Sincronizando scrobbles…',

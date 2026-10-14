@@ -341,8 +341,8 @@ class AppStringsRu implements AppStrings {
   @override String get dashWeekLabel => 'ЭТА НЕДЕЛЯ';
   @override String get dashMonthLabel => 'ЭТОТ МЕСЯЦ';
   @override String get dashYearLabel => 'ЭТОТ ГОД';
-  @override String get dashTopArtistLabel => 'Топ исполнитель';
-  @override String get dashTopTrackLabel => 'Топ трек';
+  @override String get dashTopArtistLabel => 'Лучший исполнитель';
+  @override String get dashTopTrackLabel => 'Лучший трек';
   @override String get dashScrobblesLabel => 'Скробблы';
   @override String get newsTypeFeatures => 'Функции';
   @override String get newsTypeFixes => 'Исправления';
@@ -459,9 +459,9 @@ class AppStringsRu implements AppStrings {
   @override String get fallbackPeriod1Month => '1 месяц';
   @override String get fallbackPeriodAllTime => 'Всё время';
   @override String get fallbackTypeNothing => 'Ничего';
-  @override String get fallbackTypeTopTrack => 'Топ трек';
-  @override String get fallbackTypeTopAlbum => 'Топ альбом';
-  @override String get fallbackTypeTopArtist => 'Топ исполнитель';
+  @override String get fallbackTypeTopTrack => 'Лучший трек';
+  @override String get fallbackTypeTopAlbum => 'Лучший альбом';
+  @override String get fallbackTypeTopArtist => 'Лучший исполнитель';
   @override String get fallbackTypeCustomImage => 'Своё изображение';
   @override String get fallbackWillShowCustomUrl => 'Будет показано: URL своего изображения';
   @override String get dashAnimationBlurSection => 'Анимация и размытие';
@@ -728,9 +728,9 @@ class AppStringsRu implements AppStrings {
   @override String get recapScrobbles => 'скробблов';
   @override String get recapArtists => 'Исполнители';
   @override String get recapTracks => 'Треки';
-  @override String get recapTopArtist => 'Топ исполнитель';
-  @override String get recapTopTrack => 'Топ трек';
-  @override String get recapTopAlbum => 'Топ альбом';
+  @override String get recapTopArtist => 'Исполнитель';
+  @override String get recapTopTrack => 'Трек';
+  @override String get recapTopAlbum => 'Альбом';
   @override String get recapAvgDay => 'Ср/день';
   @override String get recapNoData => 'За этот период прослушиваний нет.';
   @override String get recapSeeFull => 'Смотреть полные итоги';

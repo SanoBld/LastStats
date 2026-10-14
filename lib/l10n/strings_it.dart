@@ -341,8 +341,8 @@ class AppStringsIt implements AppStrings {
   @override String get dashWeekLabel => 'QUESTA SETTIMANA';
   @override String get dashMonthLabel => 'QUESTO MESE';
   @override String get dashYearLabel => 'QUEST\'ANNO';
-  @override String get dashTopArtistLabel => 'Artista principale';
-  @override String get dashTopTrackLabel => 'Brano principale';
+  @override String get dashTopArtistLabel => 'Artista più ascoltato';
+  @override String get dashTopTrackLabel => 'Brano più ascoltato';
   @override String get dashScrobblesLabel => 'Scrobble';
   @override String get newsTypeFeatures => 'Funzionalità';
   @override String get newsTypeFixes => 'Correzioni';
@@ -459,9 +459,9 @@ class AppStringsIt implements AppStrings {
   @override String get fallbackPeriod1Month => '1 mese';
   @override String get fallbackPeriodAllTime => 'Sempre';
   @override String get fallbackTypeNothing => 'Niente';
-  @override String get fallbackTypeTopTrack => 'Brano principale';
-  @override String get fallbackTypeTopAlbum => 'Album principale';
-  @override String get fallbackTypeTopArtist => 'Artista principale';
+  @override String get fallbackTypeTopTrack => 'Brano più ascoltato';
+  @override String get fallbackTypeTopAlbum => 'Album più ascoltato';
+  @override String get fallbackTypeTopArtist => 'Artista più ascoltato';
   @override String get fallbackTypeCustomImage => 'Immagine personalizzata';
   @override String get fallbackWillShowCustomUrl => 'Verrà mostrato: URL immagine personalizzata';
   @override String get dashAnimationBlurSection => 'Animazione e sfocatura';
@@ -728,9 +728,9 @@ class AppStringsIt implements AppStrings {
   @override String get recapScrobbles => 'ascolti';
   @override String get recapArtists => 'Artisti';
   @override String get recapTracks => 'Brani';
-  @override String get recapTopArtist => 'Artista top';
-  @override String get recapTopTrack => 'Brano top';
-  @override String get recapTopAlbum => 'Album top';
+  @override String get recapTopArtist => 'Artista';
+  @override String get recapTopTrack => 'Brano';
+  @override String get recapTopAlbum => 'Album';
   @override String get recapAvgDay => 'Media/giorno';
   @override String get recapNoData => 'Nessun ascolto in questo periodo.';
   @override String get recapSeeFull => 'Vedi riepilogo completo';
@@ -1263,7 +1263,7 @@ const Map<String, String> kTxIt = {
   'ntf_recap_body': '{n} scrobble · Top: {a}',
   'ntf_n_today': '{n} scrobble oggi',
   'ntf_n_week': '{n} scrobble questa settimana',
-  'ntf_top_artist': 'Artista top: {a}',
+  'ntf_top_artist': 'Artista più ascoltato: {a}',
   'ntf_update_avail': '🆕 Aggiornamento disponibile',
   'ntf_update_ready': 'LastStats {v} è pronto: tocca per vedere.',
   'ntf_sync_title': '🔄 Sincronizzazione scrobble…',

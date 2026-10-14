@@ -15,7 +15,7 @@ class AppStringsFr implements AppStrings {
   @override String get period12month  => 'Année';
   @override String get periodOverall  => 'Tout';
 
-  @override String get navDashboard => 'Dashboard';
+  @override String get navDashboard => 'Accueil';
   @override String get navSearch    => 'Recherche';
   @override String get navRankings  => 'Classements';
   @override String get navCharts    => 'Graphiques';
@@ -28,10 +28,10 @@ class AppStringsFr implements AppStrings {
   @override String get cacheLimitHint              => 'Quand la limite est atteinte, les images les moins récentes sont supprimées automatiquement.';
   @override String get cacheClearSection           => 'Nettoyer';
   @override String get cacheImages                 => 'Images';
-  @override String get cacheImagesSubtitle         => 'Artwork artistes, albums, titres';
+  @override String get cacheImagesSubtitle         => 'Pochettes des artistes, albums et titres';
   @override String get cacheApiData                => 'Données API';
-  @override String get cacheApiDataSubtitle        => 'Top artistes, albums, écoutes récentes…';
-  @override String get cacheScrobbles              => 'Historique scrobbles';
+  @override String get cacheApiDataSubtitle        => 'Artistes et albums les plus écoutés, écoutes récentes…';
+  @override String get cacheScrobbles              => 'Historique des scrobbles';
   @override String get cacheScrobblesSubtitle      => 'Toutes les écoutes téléchargées';
   @override String get cacheClearBtn               => 'Vider';
   @override String get cacheConfirmScrobblesTitle  => "Supprimer l'historique ?";
@@ -53,7 +53,7 @@ class AppStringsFr implements AppStrings {
   @override String get commonNowPlayingLong   => "En cours d'écoute";
   @override String get commonRecentTracks     => 'Écoutes récentes';
   @override String get commonNoRecentTracks   => 'Aucune écoute récente';
-  @override String get commonTopArtists       => 'Top Artistes';
+  @override String get commonTopArtists       => 'Artistes les plus écoutés';
 
   @override String get rankingsTitle     => 'Classements';
   @override String get rankingsPodium    => 'Podium';
@@ -62,7 +62,7 @@ class AppStringsFr implements AppStrings {
 
   @override String get chartsTitle             => 'Graphiques';
   @override String get chartsMonthly           => 'Scrobbles (12 mois)';
-  @override String get chartsArtistDist        => 'Top artistes (distribution)';
+  @override String get chartsArtistDist        => 'Répartition des artistes';
   @override String get chartsMainstreamTitle   => 'Mainstream vs Pépites';
   @override String get chartsMainstreamSubtitle => 'Popularité mondiale de vos artistes favoris.';
   @override String get chartsCompute           => 'Calculer';
@@ -82,9 +82,9 @@ class AppStringsFr implements AppStrings {
   @override String historyScrobbles(int n)   => '$n scrobbles';
   @override String historyArtistsCount(int n) => '$n artistes';
   @override String historyAlbumsCount(int n)  => '$n albums';
-  @override String get historyTopArtists     => 'Top artistes';
-  @override String get historyTopAlbums      => 'Top albums';
-  @override String get historyTopTracks      => 'Top titres';
+  @override String get historyTopArtists     => 'Artistes les plus écoutés';
+  @override String get historyTopAlbums      => 'Albums les plus écoutés';
+  @override String get historyTopTracks      => 'Titres les plus écoutés';
   @override String get historyHourTracks     => 'titre';
   @override List<String> get months => const [
     '', 'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin',
@@ -113,7 +113,7 @@ class AppStringsFr implements AppStrings {
   @override String get activityDays       => 'jours actifs';
 
   @override String get dashStats           => 'Statistiques';
-  @override String get dashTopTracks       => 'Top Titres';
+  @override String get dashTopTracks       => 'Titres les plus écoutés';
   @override String get dashFriends         => 'Amis';
   @override String get dashRefresh         => 'Actualiser';
   @override String get dashRefreshFriends  => 'Actualiser les amis';
@@ -157,7 +157,7 @@ class AppStringsFr implements AppStrings {
   @override String get settingsMusicColorLocked  => "Désactiver Material You d'abord";
   @override String get settingsStartupPage       => 'Page de démarrage';
   @override String get settingsStartupTab        => "Onglet à l'ouverture";
-  @override String get settingsDashboardSection  => 'Dashboard';
+  @override String get settingsDashboardSection  => 'Tableau de bord';
   @override String get settingsHeaderImage       => "Image d'en-tête";
   @override String get settingsHeaderImageSub    => "La pochette choisie s'affiche en fond de l'accueil.";
   @override String get settingsHeaderSource      => 'Source';
@@ -176,8 +176,8 @@ class AppStringsFr implements AppStrings {
   @override String get settingsVisibleSections   => 'Sections visibles';
   @override String get settingsNowPlayingSection => 'En cours de lecture';
   @override String get settingsStatsSection      => 'Statistiques';
-  @override String get settingsTopArtistsSection => 'Top Artistes';
-  @override String get settingsTopTracksSection  => 'Top Titres';
+  @override String get settingsTopArtistsSection => 'Artistes les plus écoutés';
+  @override String get settingsTopTracksSection  => 'Titres les plus écoutés';
   @override String get settingsFriendsSection    => 'Amis';
   @override String get settingsFriendsSectionSub => 'Activité de vos amis Last.fm';
   @override String get settingsAccount           => 'Compte';
@@ -377,14 +377,14 @@ class AppStringsFr implements AppStrings {
   @override String get setupWelcomeBanner          => 'Bienvenue sur LastStats\u00a0!';
   @override String get setupOneTimeImportNote      => 'Import unique, les prochains lancements seront instantanés.';
 
-  @override String get dashTapToDownload           => 'Appuyez pour télécharger.';
+  @override String get dashTapToDownload           => 'Touchez pour télécharger.';
   @override String dashUpdateTitle(String version, bool isBeta) =>
       '${isBeta ? "Bêta" : "Nouvelle"} mise à jour : v$version';
   @override String get dashWeekLabel               => 'CETTE SEMAINE';
   @override String get dashMonthLabel              => 'CE MOIS';
   @override String get dashYearLabel               => 'CETTE ANNÉE';
-  @override String get dashTopArtistLabel          => 'Artiste top';
-  @override String get dashTopTrackLabel           => 'Titre top';
+  @override String get dashTopArtistLabel          => 'Artiste le plus écouté';
+  @override String get dashTopTrackLabel           => 'Titre le plus écouté';
   @override String get dashScrobblesLabel          => 'Scrobbles';
   @override String get newsTypeFeatures            => 'Fonctions';
   @override String get newsTypeFixes               => 'Correctifs';
@@ -520,12 +520,12 @@ class AppStringsFr implements AppStrings {
   @override String get dashMusicAnimationSub     => "Quand une musique joue, l'image se floute et bouge doucement, comme dans Apple Music.";
   @override String get dashMusicAnimationInfo    => "Le flou est appliqué automatiquement dans ce mode. Le curseur de flou ci-dessus n'a aucun effet pendant la lecture.";
 
-  @override String get settingsTopAlbumsSection  => 'Top Albums';
+  @override String get settingsTopAlbumsSection  => 'Albums les plus écoutés';
   @override String get dashRecentPlaysLabel      => 'Écoutes récentes';
   @override String get dashStatCardsSectionLabel => 'Cartes de statistiques';
   @override String get dashStatCardsHeading      => 'Cartes de stats';
   @override String get dashStatCardsSub          => 'Choisissez les cartes affichées dans le bloc statistiques.';
-  @override String get settingsDashboardChartSection => 'Graphique du dashboard';
+  @override String get settingsDashboardChartSection => 'Graphique de l\'accueil';
   @override String get dashChartCalendarLabel => 'Calendrier musical';
   @override String get dashChartMonthlyLabel => 'Barres mensuelles';
   @override String get settingsDisplayNameSection => 'Nom personnalisé';
@@ -595,9 +595,9 @@ class AppStringsFr implements AppStrings {
   @override String get apKeepLastArtworkTitle    => 'Garder la dernière couleur';
   @override String get apKeepLastArtworkSub      => 'Conserver la couleur de la dernière pochette plutôt qu\'une image de secours';
   @override String get apDetailPagesSection      => 'Fiches détail';
-  @override String get apArtworkColorTheme       => "Thème couleur de l'affiche";
+  @override String get apArtworkColorTheme       => "Thème couleur de la pochette";
   @override String get apBeta                    => 'BÊTA';
-  @override String get apArtworkColorThemeSub    => "Les fiches adaptent leurs couleurs à la couleur dominante de l'affiche";
+  @override String get apArtworkColorThemeSub    => "Les fiches adaptent leurs couleurs à la couleur dominante de la pochette";
   @override String get apNavBarSection           => 'Barre de navigation';
   @override String get apShowTabLabels           => 'Afficher les libellés';
   @override String get apShowTabLabelsSub        => 'Afficher les noms des onglets sous les icônes';
@@ -628,7 +628,7 @@ class AppStringsFr implements AppStrings {
   @override String get acctApiKeyLabel          => 'Clé API';
   @override String get acctAdd                  => 'Ajouter';
   @override String get languageChangeNote => "La langue change immédiatement dans toute l'application.";
-  @override String get dashTotalScrobblesLabel  => 'Total scrobbles';
+  @override String get dashTotalScrobblesLabel  => 'Total de scrobbles';
   @override String get dashMemberSinceLabel     => 'Membre depuis';
   @override String get dashCountryLabel         => 'Pays';
   @override String get dashArtistWeekLabel      => 'Artiste #1 (semaine)';
@@ -757,9 +757,9 @@ class AppStringsFr implements AppStrings {
   @override String get recapScrobbles => 'écoutes';
   @override String get recapArtists => 'Artistes';
   @override String get recapTracks => 'Titres';
-  @override String get recapTopArtist => 'Artiste top';
-  @override String get recapTopTrack => 'Titre top';
-  @override String get recapTopAlbum => 'Album top';
+  @override String get recapTopArtist => 'Artiste';
+  @override String get recapTopTrack => 'Titre';
+  @override String get recapTopAlbum => 'Album';
   @override String get recapAvgDay => 'Moy/jour';
   @override String get recapNoData => 'Aucune écoute pour cette période.';
   @override String get recapSeeFull => 'Voir le récap complet';
@@ -908,7 +908,7 @@ const Map<String, String> kTxFr = {
   'eco_sys_s': 'Suit le mode économie d\'énergie natif de votre téléphone et se désactive avec lui.',
   'eco_sys_na': 'Indisponible sur cet appareil.',
   'eco_chg': 'Ce qui change',
-  'eco_chg1': 'Le parallaxe au mouvement est désactivé',
+  'eco_chg1': 'L\'effet de parallaxe au mouvement est désactivé',
   'eco_chg2': 'La fréquence de l\'écran est limitée à environ 60 Hz',
   'eco_chg3': 'Les mises à jour en arrière-plan sont moins fréquentes',
   'eco_chg4': 'Les pochettes animées et les reflets des badges sont en pause',
@@ -962,7 +962,7 @@ const Map<String, String> kTxFr = {
   'art_recent': 'Récents',
   'bio_src_wiki': 'Source : Wikipédia',
   'bio_src_wiki_orig': 'Texte original · Wikipédia',
-  'dash_motion_t': 'Pochette animée sur le dashboard',
+  'dash_motion_t': 'Pochette animée sur l\'accueil',
   'dash_motion_s': 'Joue la vidéo du titre en cours sur la carte de lecture et dans l\'en-tête. Nécessite les pochettes vidéo.',
   'onb_cov_t': 'Pochettes et images',
   'onb_cov_s': 'Choisissez la forme des images et la façon dont les pochettes s\'affichent.',
@@ -1035,13 +1035,13 @@ const Map<String, String> kTxFr = {
   'ui_fetching': 'Récupération de {currentYea}… ({yearIndex}/{totalYears})',
   'ui_which_chart': 'Quel graphique ?',
   'ui_which_period': 'Quelle période ?',
-  'ui_all_time': 'Tout le temps',
+  'ui_all_time': 'Depuis toujours',
   'ui_exporting': 'Export en cours…',
   'ui_chart_not_available_fo': 'Graphique non disponible pour cette période',
   'ui_could_not_generate_the': 'Impossible de générer l\'image',
   'ui_error': 'Erreur',
   'ui_loading_history': 'Chargement de l\'historique{yearLabel}… {pct} %',
-  'ui_charts_will_be_more_ac': 'Les graphiques seront plus précis une fois chargé.',
+  'ui_charts_will_be_more_ac': 'Les graphiques seront plus précis une fois l\'historique chargé.',
   'ui_load_the_full_history_': 'Chargez l\'historique complet pour accéder à toutes les années.',
   'ui_load': 'Charger',
   'ui_based_on_scrobbles_all': 'Basé sur {v_hourlyCou} scrobbles (toutes les années)',
@@ -1049,12 +1049,12 @@ const Map<String, String> kTxFr = {
   'ui_based_on_scrobbles_fro': 'Basé sur {v_hourlyCou} scrobbles de {v_selectedY}',
   'ui_based_on_recent_scrobb': 'Basé sur {v_hourlyCou} scrobbles récents',
   'ui_analysing_your_last_20': 'Analyse vos ~200 derniers scrobbles',
-  'ui_all_time_loading': 'All-time (données {v_selectedY} en cours)',
-  'ui_all_time_2': 'All-time',
+  'ui_all_time_loading': 'Depuis toujours (données {v_selectedY} en cours)',
+  'ui_all_time_2': 'Depuis toujours',
   'ui_export_a_chart': 'Exporter un graphique',
   'ui_scrobble_progression': 'Progression des scrobbles',
   'ui_your_musical_genres': 'Vos genres musicaux',
-  'ui_based_on_your_top_arti': 'Basé sur vos top artistes (all-time)',
+  'ui_based_on_your_top_arti': 'Basé sur vos artistes les plus écoutés (depuis toujours)',
   'ui_listening_habits': 'Habitudes d\'écoute',
   'ui_album_distribution': 'Répartition par album',
   'ui_listening_calendar': 'Calendrier musical',
@@ -1104,16 +1104,16 @@ const Map<String, String> kTxFr = {
   'ui_all': 'Toutes',
   'ui_battery_saver': 'Mode économie d\'énergie',
   'ui_save_battery_fewer_eff': 'Économiser la batterie, moins d\'effets',
-  'ui_musical_soulmates': 'Âmes musicales sœurs',
+  'ui_musical_soulmates': 'Âmes sœurs musicales',
   'ui_great_compatibility': 'Très belle compatibilité',
   'ui_some_common_ground': 'Quelques points communs',
   'ui_fairly_different_taste': 'Goûts plutôt différents',
   'ui_worlds_apart_musically': 'Univers musicaux opposés',
   'ui_this_is_your_own_profi': 'C\'est votre propre profil !',
   'ui_artists_from_your_hist': '{uniqueArti} artistes de votre historique · bibliothèque complète de {targetUser}',
-  'ui_artists_from_your_hist_2': '{uniqueArti} artistes de votre historique · top 200 de {targetUser}',
+  'ui_artists_from_your_hist_2': '{uniqueArti} artistes de votre historique · les 200 principaux de {targetUser}',
   'ui_full_library_api': 'Bibliothèque complète (API)',
-  'ui_top_200_artists_tracks': 'Top 200 artistes & titres (API)',
+  'ui_top_200_artists_tracks': 'Vos 200 artistes et titres les plus écoutés (API)',
   'ui_could_not_work_out_the': 'Impossible de calculer la compatibilité.',
   'ui_music_compatibility': 'Compatibilité musicale',
   'ui_analyzing_musical_tast': 'Analyse des goûts musicaux…',
@@ -1135,7 +1135,7 @@ const Map<String, String> kTxFr = {
   'ui_achievements': 'Succès',
   'ui_qr_not_recognized_not_': 'QR non reconnu — pas un profil LastStats/Last.fm',
   'ui_scan_a_profile_s_qr_co': 'Scannez un QR code de profil',
-  'ui_favorites': 'Coups de cœur',
+  'ui_favorites': 'Favoris',
   'ui_advanced_youtube_music': 'Client YouTube Music avancé.',
   'ui_syncs_the_glyphs_of_no': 'Synchronise les Glyphs des téléphones Nothing à la musique.',
   'ui_sources': 'Sources',
@@ -1145,7 +1145,7 @@ const Map<String, String> kTxFr = {
   'ui_official_flutter_packa': 'Package Flutter officiel pour les layouts adaptatifs.',
   'ui_android_widgets': 'Widgets Android',
   'ui_applies_the_accent_col': 'Applique la couleur d\'accent au fond des widgets de l\'écran d\'accueil. Désactivé : blanc ou noir pur.',
-  'ui_turns_off_tilt_paralla': 'Désactive le parallaxe au mouvement, plafonne le taux de rafraîchissement de l\'écran, et ralentit les mises à jour en arrière-plan — le reste garde sa pleine qualité (images, exports, cartes de partage).',
+  'ui_turns_off_tilt_paralla': 'Désactive la parallaxe au mouvement, plafonne le taux de rafraîchissement de l\'écran, et ralentit les mises à jour en arrière-plan — le reste garde sa pleine qualité (images, exports, cartes de partage).',
   'ui_always_on': 'Toujours activé',
   'ui_force_eco_mode_on_rega': 'Force le mode économie d\'énergie, quel que soit le niveau de batterie.',
   'ui_auto_activate': 'Activation automatique',
@@ -1179,8 +1179,8 @@ const Map<String, String> kTxFr = {
   'ui_chart_cumul': 'Progression',
   'ui_chart_genres': 'Genres musicaux',
   'ui_chart_habits': 'Habitudes d\'écoute',
-  'ui_chart_artists': 'Top artistes',
-  'ui_chart_albums': 'Top albums',
+  'ui_chart_artists': 'Artistes',
+  'ui_chart_albums': 'Albums',
   'ui_chart_calendar': 'Calendrier musical',
   'ui_chart_streaks': 'Séries d\'écoute',
   'ui_band_night': 'Nuit',
@@ -1215,9 +1215,9 @@ const Map<String, String> kTxFr = {
   'ds_type_album': 'Album',
   'ds_type_track': 'Titre',
   'pf_1': '👤 Profil utilisateur',
-  'pf_2': '🎤 Top artistes — Global',
-  'pf_3': '💿 Top albums — Global',
-  'pf_4': '🎵 Top titres — Global',
+  'pf_2': '🎤 Artistes les plus écoutés — Depuis toujours',
+  'pf_3': '💿 Albums les plus écoutés — Depuis toujours',
+  'pf_4': '🎵 Titres les plus écoutés — Depuis toujours',
   'pf_5': '⏱️ Écoutes récentes',
   'pf_6': '🗓️ Cette semaine',
   'pf_7': '📅 Ce mois-ci',
@@ -1226,7 +1226,7 @@ const Map<String, String> kTxFr = {
   'pf_10': '📅 12 derniers mois',
   'pf_11': '📊 Historique mensuel',
   'pf_12': '❤️ Titres aimés',
-  'pf_13': '🗓️ Top artistes — Semaine',
+  'pf_13': '🗓️ Artistes les plus écoutés — Semaine',
   'pf_14': '🗓️ Albums & titres — Semaine',
   'ds_tier_next': '{n} / {next} pour le palier suivant',
   'ds_tier_max': 'Palier maximum atteint 🎉',
@@ -1289,10 +1289,10 @@ const Map<String, String> kTxFr = {
   'ntf_milestone_body': 'Vous venez d’atteindre {n} scrobbles sur Last.fm 🎶',
   'ntf_daily_title': '📊 Récap du jour · {d}',
   'ntf_weekly_title': '📅 Récap de la semaine · {w}',
-  'ntf_recap_body': '{n} scrobbles · Top : {a}',
+  'ntf_recap_body': '{n} scrobbles · Favori : {a}',
   'ntf_n_today': '{n} scrobbles aujourd’hui',
   'ntf_n_week': '{n} scrobbles cette semaine',
-  'ntf_top_artist': 'Artiste top : {a}',
+  'ntf_top_artist': 'Artiste n°1 : {a}',
   'ntf_update_avail': '🆕 Mise à jour disponible',
   'ntf_update_ready': 'LastStats {v} est prête — touchez pour voir.',
   'ntf_sync_title': '🔄 Synchronisation des scrobbles…',
@@ -1355,7 +1355,7 @@ const Map<String, String> kTxFr = {
   'cx_active_days': 'Jours actifs',
   'cx_peak_hour': 'Heure de pointe',
   'cx_top_artist': 'Artiste n°1',
-  'cx_top_artists': 'Top artistes',
+  'cx_top_artists': 'Artistes les plus écoutés',
   'cx_by_month': 'Par mois',
   'cx_cumulative': 'Cumulé',
   'cx_clock': 'Horloge d\'écoute',

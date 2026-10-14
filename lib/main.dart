@@ -159,7 +159,7 @@ Future<void> _mainImpl() async {
   motionArtworkNotifier.value = prefs.getBool('ls_motion_artwork') ?? true;
   dashMotionNotifier.value = prefs.getBool('ls_dash_motion') ?? true;
   textScaleNotifier.value  = prefs.getDouble('ls_text_scale') ?? 1.1;
-  appFontNotifier.value    = prefs.getString('ls_app_font') ?? '';
+  appFontNotifier.value    = prefs.getString('ls_app_font') ?? 'GoogleSansFlex';
   await CustomFontService.load(prefs);
   mergeVersionsNotifier.value = prefs.getBool('ls_merge_versions') ?? false;
   splitCollabsNotifier.value  = prefs.getBool('ls_split_collabs')  ?? false;
