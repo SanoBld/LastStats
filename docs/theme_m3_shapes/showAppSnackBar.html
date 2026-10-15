@@ -80,9 +80,10 @@ replaces the one currently on screen instead of queueing behind it.</p>
     bar,
     snackBarAnimationStyle: AnimationStyle(
       duration: const Duration(milliseconds: 420),
-      reverseDuration: const Duration(milliseconds: 220),
+      &#47;&#47; Longer, softer exit: fade + slide out instead of a sudden pop.
+      reverseDuration: const Duration(milliseconds: 380),
       curve: M3Motion.emphasizedDecelerate,
-      reverseCurve: M3Motion.emphasizedAccelerate,
+      reverseCurve: Curves.easeInOutCubic,
     ),
   );
 }</code></pre>
