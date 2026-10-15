@@ -4244,48 +4244,24 @@ class _NewsDetailSheetState extends State<_NewsDetailSheet> {
     final emoji = (item['emoji'] ?? '').toString();
     final (_, color) = _NewsPage._typeStyle(type, scheme);
 
-    const width = 900.0;
-    const pad   = 32.0;
+    const width = 1080.0;
 
-    // Built as a real widget tree (not manually drawn) so the body's
-    // markdown (**bold**, # headers…) renders exactly like it does
-    // on-screen — reuses MarkdownLite instead of a hand-rolled parser —
-    // and colors follow the app's actual theme (pure black/white on OLED,
-    // light theme included) instead of a hardcoded dark background.
-    final card = Container(
+    // Real widget tree so the markdown body renders like on-screen and
+    // the colours follow the app's Material theme.
+    final card = ShareCardFrame(
       width: width,
-      color: scheme.surface,
-      padding: const EdgeInsets.all(pad),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(height: 6, width: width, color: color,
-              margin: const EdgeInsets.only(bottom: pad - 6)),
-          Row(children: [
-            Text('LastStats', style: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.w800,
-                color: scheme.onSurfaceVariant)),
-            const Spacer(),
-            Text(emoji.isNotEmpty ? emoji : '📢', style: const TextStyle(fontSize: 30)),
-          ]),
-          const SizedBox(height: 22),
-          Text(title, style: TextStyle(
-              fontSize: 32, fontWeight: FontWeight.w800, color: scheme.onSurface)),
-          if (body.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            MarkdownLite(
+      title: title,
+      badge: '${emoji.isNotEmpty ? '$emoji ' : ''}${type.toUpperCase()}',
+      accent: color,
+      footer: date.isNotEmpty ? 'LastStats  ·  $date' : 'LastStats',
+      child: body.isEmpty
+          ? const SizedBox.shrink()
+          : MarkdownLite(
               text: body,
-              style: TextStyle(fontSize: 18, height: 1.5, color: scheme.onSurface.withValues(alpha: 0.8)),
+              style: TextStyle(fontSize: 26, height: 1.5,
+                  color: scheme.onSurface.withValues(alpha: 0.85)),
               linkColor: color,
             ),
-          ],
-          if (date.isNotEmpty) ...[
-            const SizedBox(height: 24),
-            Text(date, style: TextStyle(fontSize: 13, color: scheme.onSurfaceVariant.withValues(alpha: 0.7))),
-          ],
-        ],
-      ),
     );
 
     final img = await _renderShareCardOffscreen(context, card, width: width);

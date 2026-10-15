@@ -770,91 +770,36 @@ class _ChartsPageState extends State<_ChartsPage>
     final now = DateTime.now();
     final dateStr = '${now.day.toString().padLeft(2, '0')}/'
         '${now.month.toString().padLeft(2, '0')}/${now.year}';
+    // Chart was captured at pixelRatio 3: show it at its real logical size
+    // so text stays sharp, and widen the card for very wide charts.
+    final chartW = chartImage.width / 3.0;
+    final chartH = chartImage.height / 3.0;
+    final width  = (chartW + 2 * (28 + 36 + 14)).clamp(1080.0, 9000.0);
+    final k      = width / 1080;
+    final inner  = width - 2 * (28 + 36) * k;
 
-    return Container(
-      width: 1080,
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft, end: Alignment.bottomRight,
-          colors: [scheme.primary.withValues(alpha: 0.10), scheme.surface],
-        ),
-      ),
+    return ShareCardFrame(
+      width: width,
+      title: title,
+      badge: yearLabel,
+      footer: 'LastStats  ·  ${L.chartsExportGeneratedOn} $dateStr',
       child: Container(
-        padding: const EdgeInsets.all(32),
+        width: double.infinity,
+        padding: EdgeInsets.all(14 * k),
         decoration: BoxDecoration(
-          color: scheme.surfaceContainer,
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
-          boxShadow: [BoxShadow(
-              color: scheme.shadow.withValues(alpha: 0.14),
-              blurRadius: 24, offset: const Offset(0, 10))],
+          color: scheme.surface,
+          borderRadius: BorderRadius.circular(28 * k),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(children: [
-              Container(
-                width: 36, height: 36,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(11),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft, end: Alignment.bottomRight,
-                    colors: [scheme.primary, scheme.tertiary]),
-                ),
-                padding: const EdgeInsets.all(5),
-                child: SvgPicture.asset('assets/icons/app_logo.svg',
-                    colorFilter: ColorFilter.mode(scheme.onPrimary, BlendMode.srcIn)),
-              ),
-              const SizedBox(width: 12),
-              Text('LastStats', style: TextStyle(
-                  fontSize: 19, fontWeight: FontWeight.w800, letterSpacing: -0.2,
-                  color: scheme.onSurface)),
-              const Spacer(),
-              // Year shown clearly, top-right — always visible at a glance.
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                decoration: BoxDecoration(
-                  color: scheme.primaryContainer,
-                  borderRadius: AppRadius.xlR,
-                ),
-                child: Text(yearLabel, style: TextStyle(
-                    fontSize: 14, fontWeight: FontWeight.w800,
-                    color: scheme.onPrimaryContainer)),
-              ),
-            ]),
-            const SizedBox(height: 22),
-            Text(title, style: TextStyle(
-                fontSize: 30, fontWeight: FontWeight.w800, height: 1.05,
-                letterSpacing: -0.4, color: scheme.onSurface)),
-            const SizedBox(height: 24),
-            // The captured chart, laid out at its natural aspect ratio, in
-            // its own light frame so it reads clearly against the card.
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: scheme.surface,
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: AspectRatio(
-                aspectRatio: chartImage.width / chartImage.height,
-                child: RawImage(
-                  image: chartImage,
-                  fit: BoxFit.contain,
-                  filterQuality: FilterQuality.high,
-                ),
-              ),
+        child: SizedBox(
+          width: inner - 28 * k,
+          child: AspectRatio(
+            aspectRatio: chartW / chartH,
+            child: RawImage(
+              image: chartImage,
+              fit: BoxFit.contain,
+              filterQuality: FilterQuality.high,
             ),
-            const SizedBox(height: 18),
-            Divider(height: 1, color: scheme.outlineVariant.withValues(alpha: 0.35)),
-            const SizedBox(height: 14),
-            Text('LastStats  ·  ${L.chartsExportGeneratedOn} $dateStr', style: TextStyle(
-                fontSize: 12.5, fontWeight: FontWeight.w600,
-                color: scheme.onSurfaceVariant)),
-          ],
+          ),
         ),
       ),
     );
@@ -1217,29 +1162,19 @@ class _ChartsPageState extends State<_ChartsPage>
           borderRadius: BorderRadius.circular(24),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            SizedBox(
-              width: 13, height: 13,
-              child: M3Spinner(color: s.primary),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                tx('ui_loading_history', {'yearLabel': yearLabel, 'pct': '$pct'}),
-                style: t.bodySmall?.copyWith(
-                    color: s.onPrimaryContainer, fontWeight: FontWeight.w600),
-              ),
-            ),
-          ]),
+          Text(
+            tx('ui_loading_history', {'yearLabel': yearLabel, 'pct': '$pct'}),
+            style: t.bodySmall?.copyWith(
+                color: s.onPrimaryContainer, fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(100),
-            child: LinearProgressIndicator(
-              value: p.fraction,
-              minHeight: 6,
-              backgroundColor: s.onPrimaryContainer.withValues(alpha: 0.15),
-              valueColor: AlwaysStoppedAnimation<Color>(s.primary),
-            ),
+          // Same wavy bar as the dashboard sync.
+          M3WavyProgress(
+            value: p.fraction,
+            height: 8,
+            stroke: 3,
+            color: s.primary,
+            trackColor: s.onPrimaryContainer.withValues(alpha: 0.18),
           ),
           const SizedBox(height: 5),
           Text(

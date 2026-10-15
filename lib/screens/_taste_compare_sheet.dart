@@ -1391,7 +1391,7 @@ class _DuoAvatars extends StatelessWidget {
                   color: scheme.primary,
                   border: Border.all(color: scheme.surface, width: 2),
                 ),
-                child: Icon(Icons.graphic_eq_rounded, size: 13, color: scheme.onPrimary),
+                child: AppLogo(size: 13, color: scheme.onPrimary),
               ),
             ),
           ],

@@ -2842,7 +2842,7 @@ class _ShareCardArt extends StatelessWidget {
                         ],
                         const SizedBox(height: 14),
                         Row(children: [
-                          const Icon(Icons.graphic_eq_rounded, color: Colors.white38, size: 14),
+                          const AppLogo(size: 14, color: Colors.white38),
                           const SizedBox(width: 6),
                           Text('LastStats · $source',
                               style: const TextStyle(color: Colors.white38, fontSize: 11)),
