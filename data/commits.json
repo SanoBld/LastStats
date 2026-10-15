@@ -1,6 +1,17 @@
 {
-  "updated": "2026-10-15T19:34:55Z",
+  "updated": "2026-10-15T19:42:55Z",
   "commits": [
+    {
+      "sha": "d7a75148fe06a1799d3302d15438d90de50e1b13",
+      "message": "feat: améliorer le flux d'onboarding et la gestion des apparences avec des options de forme d'image unifiées, corriger les erreurs de connexion et optimiser les notifications",
+      "date": "2026-10-15T19:37:31Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/d7a75148fe06a1799d3302d15438d90de50e1b13",
+      "tags": [
+        "v4.1.0"
+      ]
+    },
     {
       "sha": "096cd261f4dd1f459677d509d4c7dfc79c6d1727",
       "message": "feat: ajouter des composants de carte de partage et remplacer les icônes par le logo de l'application pour une cohérence visuelle",
@@ -2702,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/a149f76131b4984a425665a05842acca0a83684e",
-      "tags": []
-    },
-    {
-      "sha": "34ea6a4dc8367e5eea911aa5b8572c724d829fe1",
-      "message": "feat: ajouter la gestion du mode éco pour optimiser la consommation de batterie",
-      "date": "2026-08-12T10:48:37Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/34ea6a4dc8367e5eea911aa5b8572c724d829fe1",
       "tags": []
     }
   ]
