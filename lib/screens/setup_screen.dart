@@ -325,7 +325,7 @@ class _SetupScreenState extends State<SetupScreen>
         ),
       );
     } catch (e) {
-      setState(() => _errorMessage = e.toString().replaceFirst('Exception: ', ''));
+      if (mounted) setState(() => _errorMessage = e.toString().replaceFirst('Exception: ', ''));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

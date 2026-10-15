@@ -32,6 +32,21 @@
 
 ## v4.1.0
 
+**Charts, sharing and notifications**
+- Charts: sharing is now reliable for every chart (the "unable to load" error no longer shows when it works), the loading dialog always closes
+- Charts: the history loading banner now uses the same wavy progress bar as the dashboard sync, without the spinner
+- Share images (charts and news) share one Material You design with the real LastStats logo, any chart size stays readable
+- Real LastStats logo instead of generic icons on share cards, badge cards and the avatar badge
+- Notification bar: smoother fade and slide out, and every settings message uses it
+- Memory: removed a scroll controller leak in the settings sheets
+
+**Settings and welcome setup**
+- Appearance and welcome setup: image shapes are now a single "Mix" switch; turn it off to pick one shape (square and circle are in the list)
+- Welcome setup: the system back button goes to the previous step, and connection errors no longer crash if you leave the screen
+
+**Website**
+- Fixed the tiny help button in the top bar
+
 **Search tab and Charts tab redesign**
 - Search: recent searches, "From your recent searches" carousel, live suggestions with a recommended result, category chips and a "Best results" card once you validate
 - Search: Last.fm profiles are now plain rows (avatar, name, plays, star) like artists, and titles and albums are aligned to the left

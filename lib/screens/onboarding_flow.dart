@@ -113,7 +113,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
-    return Scaffold(
+    // System back goes to the previous step instead of closing the app.
+    return PopScope(
+      canPop: _page == 0,
+      onPopInvokedWithResult: (didPop, _) { if (!didPop) _goTo(_page - 1); },
+      child: Scaffold(
       body: SafeArea(
         child: Column(children: [
           // ── Top bar: progress dots + skip ──────────────────────────────
@@ -188,7 +192,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           ),
         ]),
       ),
-    );
+    ));
   }
 }
 
@@ -869,16 +873,38 @@ class _CoversStepState extends State<_CoversStep> {
         ValueListenableBuilder<String>(
           valueListenable: imageShapeNotifier,
           builder: (_, cur, _) {
+            final scheme = Theme.of(context).colorScheme;
             final isMix = cur == 'mix';
-            final isSq = cur == 'square';
-            final isCi = cur == 'circle';
-            return Column(children: [
-              _OnbChoice(leading: const Icon(Icons.auto_awesome_mosaic_rounded),
-                  title: tx('shape_mix'), selected: isMix, onTap: () => _shape('mix')),
-              _OnbChoice(leading: const Icon(Icons.crop_square_rounded),
-                  title: tx('shape_square'), selected: isSq, onTap: () => _shape('square')),
-              _OnbChoice(leading: const Icon(Icons.circle_outlined),
-                  title: tx('shape_circle'), selected: isCi, onTap: () => _shape('circle')),
+            return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              _OnbSwitch(
+                secondary: Icon(Icons.auto_awesome_mosaic_rounded, color: scheme.primary),
+                title: Text(tx('shape_mix'),
+                    style: const TextStyle(fontWeight: FontWeight.w700)),
+                subtitle: Text(tx('shape_covers'),
+                    style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+                value: isMix,
+                onChanged: (v) => _shape(v ? 'mix' : 'shape:0'),
+              ),
+              if (!isMix) Padding(
+                padding: const EdgeInsets.fromLTRB(4, 8, 4, 0),
+                child: Wrap(spacing: 10, runSpacing: 10, children: [
+                  for (var i = 0; i < kM3ImageShapeCount; i++)
+                    GestureDetector(
+                      onTap: () => _shape('shape:$i'),
+                      child: AnimatedContainer(
+                        duration: M3Motion.spatialFastDuration,
+                        curve: M3Motion.spatialFast,
+                        width: cur == 'shape:$i' ? 56 : 48,
+                        height: cur == 'shape:$i' ? 56 : 48,
+                        decoration: ShapeDecoration(
+                          color: cur == 'shape:$i'
+                              ? scheme.primary : scheme.secondaryContainer,
+                          shape: m3ImageShape(i, 48),
+                        ),
+                      ),
+                    ),
+                ]),
+              ),
             ]);
           },
         ),

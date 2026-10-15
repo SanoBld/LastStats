@@ -1579,22 +1579,21 @@ class _ImageShapeSection extends StatelessWidget {
       children: [
         ValueListenableBuilder<String>(
           valueListenable: imageShapeNotifier,
-          builder: (_, mode, _) => SettingChoiceRow(
-            icon: Icons.image_outlined,
-            title: tx('shape_covers'),
-            options: [
-              ('mix',    tx('shape_mix'), Icons.auto_awesome_rounded),
-              ('square', tx('shape_square'), Icons.crop_square_rounded),
-              ('circle', tx('shape_circle'), Icons.circle_outlined),
-              ('custom', L.apShapeSingle, Icons.interests_rounded),
-            ],
-            value: mode.startsWith('shape:') ? 'custom' : mode,
-            onChanged: (v) => _pick(v == 'custom' ? 'shape:0' : v),
+          builder: (_, mode, _) => SettingSwitchRow(
+            icon: Icons.auto_awesome_rounded,
+            title: tx('shape_mix'),
+            subtitle: tx('shape_covers'),
+            value: mode == 'mix',
+            // Off = one single shape (picked below); square and circle are
+            // part of that list.
+            onChanged: (v) => _pick(v ? 'mix' : 'shape:0'),
           ),
         ),
         ValueListenableBuilder<String>(
           valueListenable: imageShapeNotifier,
-          builder: (_, mode, _) => Padding(
+          builder: (_, mode, _) => mode == 'mix'
+              ? const SizedBox.shrink()
+              : Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(
