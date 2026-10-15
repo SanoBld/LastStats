@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-15T19:27:29Z",
+  "updated": "2026-10-15T19:32:17Z",
   "commits": [
+    {
+      "sha": "096cd261f4dd1f459677d509d4c7dfc79c6d1727",
+      "message": "feat: ajouter des composants de carte de partage et remplacer les icônes par le logo de l'application pour une cohérence visuelle",
+      "date": "2026-10-15T19:32:03Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/096cd261f4dd1f459677d509d4c7dfc79c6d1727",
+      "tags": []
+    },
     {
       "sha": "d753e27932b2df036757c8e3685d4bd9e307c1e4",
       "message": "Refactor snack bar handling to use showAppSnackBar for consistency across settings pages. Update HTML files to remove unnecessary inline styles for better readability.",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/34ea6a4dc8367e5eea911aa5b8572c724d829fe1",
-      "tags": []
-    },
-    {
-      "sha": "8d4eb5feda28b5cc39674b8a63eb504b0c3f0463",
-      "message": "feat: ajouter la gestion des cycles de vie pour les timers et optimiser le rendu des badges d'accomplissement",
-      "date": "2026-08-12T10:42:29Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/8d4eb5feda28b5cc39674b8a63eb504b0c3f0463",
       "tags": []
     }
   ]
