@@ -1,7 +1,161 @@
 {
-  "updated": "2026-10-15T19:50:40Z",
+  "updated": "2026-10-15T19:57:04Z",
   "stars": 2,
   "releases": [
+    {
+      "tag_name": "v4.1.0",
+      "name": "LastStats v4.1.0",
+      "published_at": "2026-10-15T19:55:48Z",
+      "prerelease": false,
+      "draft": false,
+      "body": "## LastStats v4.1.0\n\n**Charts, sharing and notifications**\n- Charts: sharing is now reliable for every chart (the \"unable to load\" error no longer shows when it works), the loading dialog always closes\n- Charts: the history loading banner now uses the same wavy progress bar as the dashboard sync, without the spinner\n- Share images (charts and news) share one Material You design with the real LastStats logo, any chart size stays readable\n- Real LastStats logo instead of generic icons on share cards, badge cards and the avatar badge\n- Notification bar: smoother fade and slide out, and every settings message uses it\n- Memory: removed a scroll controller leak in the settings sheets\n\n**Settings and welcome setup**\n- Appearance and welcome setup: image shapes are now a single \"Mix\" switch; turn it off to pick one shape (square and circle are in the list)\n- Welcome setup: the system back button goes to the previous step, and connection errors no longer crash if you leave the screen\n\n**Website**\n- Fixed the tiny help button in the top bar\n\n**Search tab and Charts tab redesign**\n- Search: recent searches, \"From your recent searches\" carousel, live suggestions with a recommended result, category chips and a \"Best results\" card once you validate\n- Search: Last.fm profiles are now plain rows (avatar, name, plays, star) like artists, and titles and albums are aligned to the left\n- Search: the photo now follows the result (the old picture no longer stays when the suggestion changes)\n- Charts: tab rebuilt around real charts: a smooth area chart (monthly or cumulative, touch to inspect), a 24-hour listening clock, a week bar chart, donut charts for artists and albums and a genre radar, all in the app theme; large collapsing app bar with pinned year chips\n- Charts: the title is back in the fixed header like every other tab, and changing the year no longer scrolls back to the top\n- Charts: pinch to zoom (or use the zoom buttons) on the progression chart, drag to move when zoomed, double tap to reset\n- Charts: artist and album breakdown share the same title style, with a bigger donut and clearer theme colors\n- Charts: more accent colors (filled containers, tinted cards and chips from the theme)\n- Charts: tap the listening clock to inspect any hour (scrobbles and share)\n- Charts: 3 new charts: time of day, day intensity (tap a bar) and busiest days\n- Theme: all accent colors (secondary, tertiary, charts, posters) now use the same hue as the chosen theme, only the intensity changes\n- Settings: new \"Color style\" option in Appearance (Monochrome, Classic, Vivid, Soft); it is saved in backups and translated in all 10 languages\n- All new texts are translated in all 10 languages (Thanks Claude :)\n\n**Welcome setup**\n- The first-launch sync screen is gone: data and scrobbles now sync in the background while you set up the app, with a live percentage at the top left\n- New setup pages: covers and images (shape, animated covers, motion covers, tab labels) and sync and battery (automatic sync, battery saver)\n- Notification switches now ask for the system permission and schedule the tasks, like the Notifications settings\n\n**Material You details**\n- Biography, lyrics, top tracks, top albums, tracklist, track info, stats and the Last.fm discussion now sit in accent cards with expressive shapes (leaf, arch, squircle)\n- Play, favourite, period and filter buttons use the accent colour on a soft tonal background instead of white on a coloured one\n\n**Biographies and history**\n- Biographies fall back to Wikipedia (your language first, then English) when Last.fm has none, with the source shown\n- History: every track sits in its own rounded accent card, hour headers and the stat pills use the dark accent\n\n**Artists, text and fixes**\n- Artist page: popular and recent tracks with covers, in the right order, swipe left / right to switch\n- Settings > Appearance: text size slider (default a bit bigger) and font choice\n- History list: fixed track cards drawing over the header\n\n**Search and status bar**\n- Search fully redone in Material You: pill search bar, category pills, results in rounded cards, sections ordered by best match instead of a fixed order\n- Status bar icons now follow the app theme (no more white on white)\n- Folder cards are more readable (stronger tint, solid badge and counter)\n\n**Loading bars**\n- New wavy progress bar (Material You) used wherever a loading has real progress: history sync chip on the dashboard (now shows loaded/total scrobbles; the wavy bar only appears for big syncs, 200+ scrobbles), Sync settings and the Spotify / Last.fm login pages\n- The round loader now morphs between soft rounded shapes of the app (squircle, oval), like the Material 3 Expressive loading indicator\n- Dashboard: when \"motion covers\" is on, the animated cover of the track now playing plays on the now-playing card and in the top header (profile / level area) (new switch in Settings > Dashboard > Header image to turn it on or off)\n\n**Spotify Canvas**\n- New video cover source: Spotify Canvas (tracks and albums), with in-app Spotify login in Settings > Appearance > Video covers\n- Video sources can now be chosen and sorted freely (Apple Music, Spotify, YouTube Music)\n\n**Theme harmonisation and clearer translations**\n- Favorites: the heart and star buttons and icons (dashboard stats, artist and profile pages, search, account settings) now use the Material You accent color instead of fixed red, pink or yellow\n- Charts: \"Weekdays vs weekend\" now has a gap between the two bars, like \"Time of day\"\n- Dashboard: the news bell and settings buttons now use a discreet tonal Material You style (no more dark translucent circles with a white border)\n- Dashboard: the unread news badge follows the theme accent instead of fixed red\n- News: the \"alert\" type no longer uses the error red, and news cards use a tonal theme background\n- Translations (all 10 languages): reviewed and rewrote texts that were too short or vague, mainly error messages (update check, import, backup save, favorites, image export, profile not found, version history, font import) and several setting descriptions (auto-update, Material You, notification permission and badge, quick settings tiles), plus empty states (favorites, folders, achievements, settings search) and the export/import, music platform and header descriptions, the onboarding and notification texts and the power saving FAQ answer (now describes what the mode really changes)\n- Sources: the \"Sources\" sheet now shows the real platform logos (Last.fm, YouTube Music, Apple Music, Spotify, Deezer) instead of generic icons, and animated covers from Spotify Canvas are no longer labelled \"Apple Music\"\n- Translations: the animated covers cache is no longer described as \"Apple Music\" only (it also covers Spotify Canvas and YouTube)\n- Translations: fixed wording that no longer matched the app (the news badge was described as a red dot, also in the welcome setup, \"News notifications\" was described as Last.fm news, French \"best streak\" and chart titles)\n\n### Android\n| File | Use case |\n|------|----------|\n| `app-universal-release.apk` | Works on any phone (biggest file) |\n| `app-arm64-v8a-release.apk` | Most modern phones (2018+) |\n| `app-armeabi-v7a-release.apk` | Older 32-bit phones |\n| `app-x86_64-release.apk` | Emulators / x86 tablets |\n\n### iOS\n| File | Use case |\n|------|----------|\n| `LastStats-ios.ipa` | Unsigned: install with AltStore / Sideloadly / TrollStore (or re-sign it yourself) |\n\n### Desktop\n| File | Platform |\n|------|----------|\n| `LastStats-Setup-x64.exe` | **Windows (x64) — recommended installer** |\n| `LastStats-Setup-arm64.exe` | **Windows on ARM (Snapdragon) — recommended installer** |\n| `laststats-windows.zip` | Windows (x64), portable / no install |\n| `laststats-windows-arm64.zip` | Windows on ARM, portable / no install |\n| `LastStats-linux-x64.deb` | **Linux x64 (Debian/Ubuntu/Mint) — recommended installer** |\n| `LastStats-linux-arm64.deb` | **Linux ARM64 (Debian/Ubuntu, Raspberry Pi...) — recommended installer** |\n| `LastStats-linux-x64.rpm` | **Linux x64 (Fedora/openSUSE/RHEL) — recommended installer** |\n| `LastStats-linux-arm64.rpm` | **Linux ARM64 (Fedora/openSUSE) — recommended installer** |\n| `install-linux.sh` | Linux, any CPU: picks the right package for your distro |\n| `LastStats-linux-x64.AppImage` | Linux x64, any distro (portable) |\n| `LastStats-linux-arm64.AppImage` | Linux ARM64, any distro (portable) |\n| `laststats-linux.zip`   | Linux x64, manual install |\n| `laststats-linux-arm64.zip` | Linux ARM64, manual install |\n| `LastStats-macos-arm64.dmg` | **macOS Apple Silicon (M1 and later) — recommended installer** (drag to Applications) |\n| `LastStats-macos-x64.dmg` | **macOS Intel — recommended installer** (drag to Applications) |\n| `LastStats-macos.dmg`   | macOS universal (Intel + Apple Silicon) installer |\n| `laststats-macos-arm64.zip` | macOS Apple Silicon, manual install |\n| `laststats-macos-x64.zip` | macOS Intel, manual install |\n| `laststats-macos.zip`   | macOS universal, manual install |\n**Full Changelog**: https://github.com/SanoBld/LastStats/compare/v4.0.0...v4.1.0",
+      "assets": [
+        {
+          "name": "app-arm64-v8a-release.apk",
+          "size": 47397418,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/app-arm64-v8a-release.apk"
+        },
+        {
+          "name": "app-armeabi-v7a-release.apk",
+          "size": 43982306,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/app-armeabi-v7a-release.apk"
+        },
+        {
+          "name": "app-universal-release.apk",
+          "size": 103825728,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/app-universal-release.apk"
+        },
+        {
+          "name": "app-x86_64-release.apk",
+          "size": 50183552,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/app-x86_64-release.apk"
+        },
+        {
+          "name": "install-linux.sh",
+          "size": 1940,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/install-linux.sh"
+        },
+        {
+          "name": "LastStats-ios.ipa",
+          "size": 25144981,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-ios.ipa"
+        },
+        {
+          "name": "LastStats-linux-arm64.AppImage",
+          "size": 17496584,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-linux-arm64.AppImage"
+        },
+        {
+          "name": "LastStats-linux-arm64.deb",
+          "size": 14098758,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-linux-arm64.deb"
+        },
+        {
+          "name": "LastStats-linux-arm64.rpm",
+          "size": 18219725,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-linux-arm64.rpm"
+        },
+        {
+          "name": "laststats-linux-arm64.zip",
+          "size": 18482956,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/laststats-linux-arm64.zip"
+        },
+        {
+          "name": "LastStats-linux-x64.AppImage",
+          "size": 17951224,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-linux-x64.AppImage"
+        },
+        {
+          "name": "LastStats-linux-x64.deb",
+          "size": 14450744,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-linux-x64.deb"
+        },
+        {
+          "name": "LastStats-linux-x64.rpm",
+          "size": 18625664,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-linux-x64.rpm"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 18941036,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/laststats-linux.zip"
+        },
+        {
+          "name": "LastStats-macos-arm64.dmg",
+          "size": 22280248,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-macos-arm64.dmg"
+        },
+        {
+          "name": "laststats-macos-arm64.zip",
+          "size": 227435365,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/laststats-macos-arm64.zip"
+        },
+        {
+          "name": "LastStats-macos-x64.dmg",
+          "size": 23631326,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-macos-x64.dmg"
+        },
+        {
+          "name": "laststats-macos-x64.zip",
+          "size": 228559691,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/laststats-macos-x64.zip"
+        },
+        {
+          "name": "LastStats-macos.dmg",
+          "size": 37604283,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-macos.dmg"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 240600941,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/laststats-macos.zip"
+        },
+        {
+          "name": "LastStats-Setup-arm64.exe",
+          "size": 15962777,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-Setup-arm64.exe"
+        },
+        {
+          "name": "LastStats-Setup-x64.exe",
+          "size": 16787670,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-Setup-x64.exe"
+        },
+        {
+          "name": "laststats-windows-arm64.zip",
+          "size": 21145104,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/laststats-windows-arm64.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 22087012,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/laststats-windows.zip"
+        }
+      ]
+    },
     {
       "tag_name": "v4.0.0",
       "name": "LastStats v4.0.0",
