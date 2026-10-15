@@ -631,8 +631,6 @@ class _CardReorderSheetState extends State<CardReorderSheet> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final ctrl   = ScrollController();
-
     return DraggableScrollableSheet(
       initialChildSize: 0.6, minChildSize: 0.4, maxChildSize: 0.9, expand: false,
       builder: (ctx, sc) => ClipRRect(
@@ -649,7 +647,7 @@ class _CardReorderSheetState extends State<CardReorderSheet> {
                 child: Text(L.commonSave)),
           ])),
           Expanded(child: ReorderableListView(
-            scrollController: ctrl,
+            scrollController: sc,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             onReorderItem: (oldIdx, newIdx) => setState(() {
               final item = _items.removeAt(oldIdx);
@@ -696,8 +694,6 @@ class _SectionOrderSheetState extends State<SectionOrderSheet> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final ctrl   = ScrollController();
-
     return DraggableScrollableSheet(
       initialChildSize: 0.55, minChildSize: 0.35, maxChildSize: 0.85, expand: false,
       builder: (ctx, sc) => ClipRRect(
@@ -714,7 +710,7 @@ class _SectionOrderSheetState extends State<SectionOrderSheet> {
                 child: Text(L.commonSave)),
           ])),
           Expanded(child: ReorderableListView(
-            scrollController: ctrl,
+            scrollController: sc,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             onReorderItem: (oldIdx, newIdx) => setState(() {
               final item = _items.removeAt(oldIdx);

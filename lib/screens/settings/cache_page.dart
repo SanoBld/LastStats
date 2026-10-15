@@ -111,7 +111,7 @@ class _CachePageState extends State<CachePage> {
     await _loadStats();
     if (!mounted) return;
     setState(() => _clearing = false);
-    ScaffoldMessenger.of(context).showSnackBar(
+    showAppSnackBar(context, 
         SnackBar(content: Text(tx('cache_video_cleared'))));
   }
 

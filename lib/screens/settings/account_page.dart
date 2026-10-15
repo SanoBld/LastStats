@@ -99,9 +99,7 @@ class _AccountPageState extends State<AccountPage> {
   Future<void> _copyKey(String value) async {
     await Clipboard.setData(ClipboardData(text: value));
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(
+    showAppSnackBar(context, SnackBar(
           content: Text(L.exportCopied), duration: const Duration(seconds: 1)));
   }
 

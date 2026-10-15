@@ -1,5 +1,6 @@
 // Profile > Connection page: one card per service, with its status and
 // big buttons for each action.
+import '../../theme/m3_shapes.dart';
 import 'package:flutter/foundation.dart'
     show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
@@ -42,8 +43,7 @@ class _ConnectionsPageState extends State<ConnectionsPage> {
     if (mounted) setState(() => _sp = on);
   }
 
-  void _snack(String msg) => ScaffoldMessenger.of(context)
-      .showSnackBar(SnackBar(content: Text(msg)));
+  void _snack(String msg) => showAppSnackBar(context, SnackBar(content: Text(msg)));
 
   Future<void> _spTap() async {
     if (_sp) {

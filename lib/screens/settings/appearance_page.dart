@@ -511,8 +511,7 @@ class _AppearancePageState extends State<AppearancePage> {
                   final p = await SharedPreferences.getInstance();
                   await p.setString('ls_app_font', CustomFontService.family);
                 } else if (err != 'cancel' && context.mounted) {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text(tx('font_bad'))));
+                  showAppSnackBar(context, SnackBar(content: Text(tx('font_bad'))));
                 }
               },
             ),
@@ -1287,8 +1286,7 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
     await _mvSaveOrder(List.of(res.selected));
     // Spotify chosen but not logged in: tell where to log in.
     if (res.selected.contains('spotify') && !_spOn && mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(tx('sp_need'))));
+      showAppSnackBar(context, SnackBar(content: Text(tx('sp_need'))));
     }
   }
 

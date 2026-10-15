@@ -195,9 +195,10 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showAppSnackBar(
     bar,
     snackBarAnimationStyle: AnimationStyle(
       duration: const Duration(milliseconds: 420),
-      reverseDuration: const Duration(milliseconds: 220),
+      // Longer, softer exit: fade + slide out instead of a sudden pop.
+      reverseDuration: const Duration(milliseconds: 380),
       curve: M3Motion.emphasizedDecelerate,
-      reverseCurve: M3Motion.emphasizedAccelerate,
+      reverseCurve: Curves.easeInOutCubic,
     ),
   );
 }

@@ -879,21 +879,31 @@ class _ChartsPageState extends State<_ChartsPage>
     var rb = find();
     if (rb != null && !rb.size.isEmpty) return rb;
 
-    // Retry a handful of times: force full layout by jumping to the bottom
-    // of the list (virtualized slivers off-screen have no layout yet), then
-    // give the tree extra frames to settle — a single pass isn't always
-    // enough when the chart is also waiting on an async setState.
-    for (var attempt = 0; attempt < 6; attempt++) {
+    // ListView is lazy: only visible charts are built. Scroll step by step
+    // until the chart exists, then bring it into view.
+    for (var attempt = 0; attempt < 3; attempt++) {
       if (_mainScroll.hasClients) {
-        _mainScroll.jumpTo(_mainScroll.position.maxScrollExtent);
+        final pos = _mainScroll.position;
+        if (find() == null) {
+          _mainScroll.jumpTo(0);
+          await _nextFrame();
+          final step = (pos.viewportDimension * 0.7).clamp(200.0, 2000.0);
+          while (find() == null && _mainScroll.offset < pos.maxScrollExtent) {
+            _mainScroll.jumpTo(
+                (_mainScroll.offset + step).clamp(0.0, pos.maxScrollExtent));
+            await _nextFrame();
+          }
+        }
+        final c = _xkeys[chartId]?.currentContext;
+        if (c != null && c.mounted) {
+          await Scrollable.ensureVisible(c, duration: Duration.zero);
+        }
       }
       await _nextFrame();
       await _nextFrame();
       rb = find();
       if (rb != null && !rb.size.isEmpty) return rb;
-      // Small grace delay before the next attempt — lets any in-flight
-      // setState from year-switching land.
-      await Future.delayed(const Duration(milliseconds: 80));
+      await Future.delayed(const Duration(milliseconds: 120));
     }
     return find();
   }
@@ -984,8 +994,13 @@ class _ChartsPageState extends State<_ChartsPage>
       ),
     );
 
+    // Close the loading dialog once, on the same (root) navigator that opened it.
+    final nav = Navigator.of(ctx, rootNavigator: true);
+    var dialogOpen = true;
     void closeDialog() {
-      if (ctx.mounted && Navigator.of(ctx).canPop()) Navigator.of(ctx).pop();
+      if (!dialogOpen) return;
+      dialogOpen = false;
+      if (nav.mounted && nav.canPop()) nav.pop();
     }
 
     try {
@@ -1082,7 +1097,14 @@ class _ChartsPageState extends State<_ChartsPage>
         }
         // Let entry animations (bars, donut, radar…) finish before capture.
         await Future.delayed(const Duration(milliseconds: 1300));
-        if (!rb.attached) { closeDialog(); return; }
+        if (!rb.attached || rb.size.isEmpty) {
+          closeDialog();
+          if (ctx.mounted) {
+            showAppSnackBar(ctx, SnackBar(content: Text(
+                tx('ui_chart_not_available_fo'))));
+          }
+          return;
+        }
         chartImg = await rb.toImage(pixelRatio: 3.0);
       }
 
@@ -1128,7 +1150,8 @@ class _ChartsPageState extends State<_ChartsPage>
             SnackBar(content: Text('${tx('ui_error')}: $e')));
       }
     } finally {
-      statusText.dispose();
+      closeDialog();
+      Future.delayed(const Duration(milliseconds: 500), statusText.dispose);
       // Restore original year
       if (switched && mounted) {
         setState(() {

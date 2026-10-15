@@ -1,6 +1,7 @@
 // lib/screens/settings/api_page.dart
 // Settings → API: every external service the app uses, its documented limit,
 // the ceiling the app imposes on itself, and live consumption.
+import '../../theme/m3_shapes.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -422,7 +423,6 @@ class _ApiPageState extends State<ApiPage> {
     await ApiUsage.reset();
     if (!mounted) return;
     setState(() {});
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(L.apiResetDone)));
+    showAppSnackBar(context, SnackBar(content: Text(L.apiResetDone)));
   }
 }
