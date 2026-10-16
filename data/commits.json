@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-16T16:13:55Z",
+  "updated": "2026-10-16T20:00:06Z",
   "commits": [
+    {
+      "sha": "5444b2fbbcc33fb8342d8e363cccb0f3faad29db",
+      "message": "Add legal notices and privacy information to the About page\n\n- Updated localization files for Portuguese, Russian, and Chinese to include legal notices, privacy information, and licenses.\n- Enhanced the About page with new sections for legal notices, licenses, and contact information.\n- Updated links to the GitHub repository and adjusted references to the LastStats project.\n- Improved the footer and navigation links across various site pages to reflect the new repository structure.",
+      "date": "2026-10-16T19:58:00Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/5444b2fbbcc33fb8342d8e363cccb0f3faad29db",
+      "tags": []
+    },
     {
       "sha": "d7a75148fe06a1799d3302d15438d90de50e1b13",
       "message": "feat: améliorer le flux d'onboarding et la gestion des apparences avec des options de forme d'image unifiées, corriger les erreurs de connexion et optimiser les notifications",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/9cbe07cd5b7a33e7dbf87406bf6daa7bd7e24abe",
-      "tags": []
-    },
-    {
-      "sha": "a149f76131b4984a425665a05842acca0a83684e",
-      "message": "feat: ajouter une page d'historique des versions avec les changelogs et les téléchargements",
-      "date": "2026-08-12T10:53:34Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/a149f76131b4984a425665a05842acca0a83684e",
       "tags": []
     }
   ]
