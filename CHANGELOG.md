@@ -30,77 +30,14 @@
 -->
 
 
-## v4.1.0
+## v4.2.0
 
-**Charts, sharing and notifications**
-- Charts: sharing is now reliable for every chart (the "unable to load" error no longer shows when it works), the loading dialog always closes
-- Charts: the history loading banner now uses the same wavy progress bar as the dashboard sync, without the spinner
-- Share images (charts and news) share one Material You design with the real LastStats logo, any chart size stays readable
-- Real LastStats logo instead of generic icons on share cards, badge cards and the avatar badge
-- Notification bar: smoother fade and slide out, and every settings message uses it
-- Memory: removed a scroll controller leak in the settings sheets
+**Legal notice, links and README**
+- About: new "Legal" section with a link to the legal notice and privacy page, publisher and contact, a short data and privacy summary, and the non-affiliation notice for all third-party services
+- About: Flutter and open-source package licenses are now available in the app
+- About: "Powered by" now lists every service the app uses (ListenBrainz, LRCLIB, lyrics.ovh, Google Translate, Spotify, Apple Music, GitHub)
+- New legal texts translated in all 10 languages
+- Fixed the license link in About (it pointed to a missing page)
+- All links now point to the main repository, SanoBld/LastStats, in the website and the deploy workflow
+- README rewritten with a more human tone, a clearer structure and a Legal section
 
-**Settings and welcome setup**
-- Appearance and welcome setup: image shapes are now a single "Mix" switch; turn it off to pick one shape (square and circle are in the list)
-- Welcome setup: the system back button goes to the previous step, and connection errors no longer crash if you leave the screen
-
-**Website**
-- Fixed the tiny help button in the top bar
-
-**Search tab and Charts tab redesign**
-- Search: recent searches, "From your recent searches" carousel, live suggestions with a recommended result, category chips and a "Best results" card once you validate
-- Search: Last.fm profiles are now plain rows (avatar, name, plays, star) like artists, and titles and albums are aligned to the left
-- Search: the photo now follows the result (the old picture no longer stays when the suggestion changes)
-- Charts: tab rebuilt around real charts: a smooth area chart (monthly or cumulative, touch to inspect), a 24-hour listening clock, a week bar chart, donut charts for artists and albums and a genre radar, all in the app theme; large collapsing app bar with pinned year chips
-- Charts: the title is back in the fixed header like every other tab, and changing the year no longer scrolls back to the top
-- Charts: pinch to zoom (or use the zoom buttons) on the progression chart, drag to move when zoomed, double tap to reset
-- Charts: artist and album breakdown share the same title style, with a bigger donut and clearer theme colors
-- Charts: more accent colors (filled containers, tinted cards and chips from the theme)
-- Charts: tap the listening clock to inspect any hour (scrobbles and share)
-- Charts: 3 new charts: time of day, day intensity (tap a bar) and busiest days
-- Theme: all accent colors (secondary, tertiary, charts, posters) now use the same hue as the chosen theme, only the intensity changes
-- Settings: new "Color style" option in Appearance (Monochrome, Classic, Vivid, Soft); it is saved in backups and translated in all 10 languages
-- All new texts are translated in all 10 languages (Thanks Claude :)
-
-**Welcome setup**
-- The first-launch sync screen is gone: data and scrobbles now sync in the background while you set up the app, with a live percentage at the top left
-- New setup pages: covers and images (shape, animated covers, motion covers, tab labels) and sync and battery (automatic sync, battery saver)
-- Notification switches now ask for the system permission and schedule the tasks, like the Notifications settings
-
-**Material You details**
-- Biography, lyrics, top tracks, top albums, tracklist, track info, stats and the Last.fm discussion now sit in accent cards with expressive shapes (leaf, arch, squircle)
-- Play, favourite, period and filter buttons use the accent colour on a soft tonal background instead of white on a coloured one
-
-**Biographies and history**
-- Biographies fall back to Wikipedia (your language first, then English) when Last.fm has none, with the source shown
-- History: every track sits in its own rounded accent card, hour headers and the stat pills use the dark accent
-
-**Artists, text and fixes**
-- Artist page: popular and recent tracks with covers, in the right order, swipe left / right to switch
-- Settings > Appearance: text size slider (default a bit bigger) and font choice
-- History list: fixed track cards drawing over the header
-
-**Search and status bar**
-- Search fully redone in Material You: pill search bar, category pills, results in rounded cards, sections ordered by best match instead of a fixed order
-- Status bar icons now follow the app theme (no more white on white)
-- Folder cards are more readable (stronger tint, solid badge and counter)
-
-**Loading bars**
-- New wavy progress bar (Material You) used wherever a loading has real progress: history sync chip on the dashboard (now shows loaded/total scrobbles; the wavy bar only appears for big syncs, 200+ scrobbles), Sync settings and the Spotify / Last.fm login pages
-- The round loader now morphs between soft rounded shapes of the app (squircle, oval), like the Material 3 Expressive loading indicator
-- Dashboard: when "motion covers" is on, the animated cover of the track now playing plays on the now-playing card and in the top header (profile / level area) (new switch in Settings > Dashboard > Header image to turn it on or off)
-
-**Spotify Canvas**
-- New video cover source: Spotify Canvas (tracks and albums), with in-app Spotify login in Settings > Appearance > Video covers
-- Video sources can now be chosen and sorted freely (Apple Music, Spotify, YouTube Music)
-
-**Theme harmonisation and clearer translations**
-- Favorites: the heart and star buttons and icons (dashboard stats, artist and profile pages, search, account settings) now use the Material You accent color instead of fixed red, pink or yellow
-- Charts: "Weekdays vs weekend" now has a gap between the two bars, like "Time of day"
-- Dashboard: the news bell and settings buttons now use a discreet tonal Material You style (no more dark translucent circles with a white border)
-- Dashboard: the unread news badge follows the theme accent instead of fixed red
-- News: the "alert" type no longer uses the error red, and news cards use a tonal theme background
-- Translations (all 10 languages): reviewed and rewrote texts that were too short or vague, mainly error messages (update check, import, backup save, favorites, image export, profile not found, version history, font import) and several setting descriptions (auto-update, Material You, notification permission and badge, quick settings tiles), plus empty states (favorites, folders, achievements, settings search) and the export/import, music platform and header descriptions, the onboarding and notification texts and the power saving FAQ answer (now describes what the mode really changes)
-- Sources: the "Sources" sheet now shows the real platform logos (Last.fm, YouTube Music, Apple Music, Spotify, Deezer) instead of generic icons, and animated covers from Spotify Canvas are no longer labelled "Apple Music"
-- Translations: the animated covers cache is no longer described as "Apple Music" only (it also covers Spotify Canvas and YouTube)
-- Translations: fixed wording that no longer matched the app (the news badge was described as a red dot, also in the welcome setup, "News notifications" was described as Last.fm news, French "best streak" and chart titles)

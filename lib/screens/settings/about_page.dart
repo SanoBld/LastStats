@@ -236,8 +236,43 @@ class AboutPage extends StatelessWidget {
                 style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
             subtitle: const Text('MIT License'),
             trailing: const Icon(Icons.open_in_new_rounded, size: 16),
-            onTap: () => _open('https://github.com/SanoBld/LastStats/blob/main/LICENSE'),
+            onTap: () => _open('https://github.com/SanoBld/LastStats/blob/master/LICENSE'),
           ),
+        ]),
+
+        const SizedBox(height: 16),
+
+        // ── Legal notice ─────────────────────────────────────────────────
+        SettingsSection(label: tx('about_legal_t'), children: [
+          ListTile(
+            leading: const Icon(Icons.policy_outlined),
+            title: Text(tx('about_legal_site_t'),
+                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            subtitle: Text(tx('about_legal_site_s'),
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            trailing: const Icon(Icons.open_in_new_rounded, size: 16),
+            onTap: () => _open('https://sanobld.github.io/LastStats/legal.html'),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          ListTile(
+            leading: const Icon(Icons.article_outlined),
+            title: Text(tx('about_licenses_t'),
+                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            subtitle: Text(tx('about_licenses_s'),
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () => showLicensePage(
+                context: context,
+                applicationName: 'LastStats',
+                applicationVersion: UpdateService.displayVersion),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          for (final key in const ['about_legal_editor', 'about_legal_privacy', 'about_legal_marks'])
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+              child: Text(tx(key),
+                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+            ),
         ]),
 
         const SizedBox(height: 16),
@@ -360,6 +395,48 @@ class AboutPage extends StatelessWidget {
             icon: Icons.flutter_dash_rounded,
             label: 'Flutter',
             url: 'https://flutter.dev',
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          _PoweredByTile(
+            icon: Icons.queue_music_rounded,
+            label: 'ListenBrainz',
+            url: 'https://listenbrainz.org',
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          _PoweredByTile(
+            icon: Icons.lyrics_rounded,
+            label: 'LRCLIB',
+            url: 'https://lrclib.net',
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          _PoweredByTile(
+            icon: Icons.lyrics_rounded,
+            label: 'lyrics.ovh',
+            url: 'https://lyrics.ovh',
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          _PoweredByTile(
+            icon: Icons.translate_rounded,
+            label: 'Google Translate',
+            url: 'https://translate.google.com',
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          _PoweredByTile(
+            icon: Icons.headphones_rounded,
+            label: 'Spotify',
+            url: 'https://open.spotify.com',
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          _PoweredByTile(
+            icon: Icons.apple_rounded,
+            label: 'Apple Music',
+            url: 'https://music.apple.com',
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          _PoweredByTile(
+            icon: Icons.code_rounded,
+            label: 'GitHub',
+            url: 'https://github.com',
           ),
         ]),
 

@@ -27,7 +27,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  APP_REPO: SanoBld/LastStats-App
+  APP_REPO: SanoBld/LastStats
 
 jobs:
   deploy:
