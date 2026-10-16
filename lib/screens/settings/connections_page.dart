@@ -125,6 +125,9 @@ class _ConnectionsPageState extends State<ConnectionsPage> {
           description: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(tx('conn_sp_desc'), style: body),
             const SizedBox(height: 6),
+            Text(tx('sp_risk_note'),
+                style: text.bodySmall?.copyWith(color: scheme.error)),
+            const SizedBox(height: 6),
             Text(tx('conn_q_note'),
                 style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
           ]),

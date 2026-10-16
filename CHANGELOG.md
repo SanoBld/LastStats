@@ -41,5 +41,6 @@
 - All links now point to the main repository, SanoBld/LastStats, in the website and the deploy workflow
 - Website: the "last updated" date on the legal page now updates by itself from the repository history
 - Website and README: the web version is now described as a preview (it has bugs, missing images and broken features), no more "beta" label
+- Website: the legal notice is now complete and translated in all 10 languages (lyrics, Apple Music and YouTube Music posters, Google Translate for biographies, optional Spotify Canvas login, no ads or trackers in the app, AI use)
 - README rewritten with a more human tone, a clearer structure and a Legal section
 

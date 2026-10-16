@@ -1309,6 +1309,7 @@ const Map<String, String> kTxZh = {
   'reorder': '调整顺序',
   'sp_login_t': '登录 Spotify',
   'sp_login_hint': '请使用您的 Spotify 邮箱和密码登录。登录成功后此窗口会自动关闭。',
+  'sp_risk_note': '注意：此功能依赖 Spotify 的非官方调用，而非官方 API。Spotify 可能随时更改或封锁它，它可能停止工作，使用它也可能违反 Spotify 的使用条款，从而可能导致你的 Spotify 账号受到限制。使用风险自负。',
   'sp_t': 'Spotify (Canvas)',
   'sp_on': '已连接',
   'sp_off': '未连接',

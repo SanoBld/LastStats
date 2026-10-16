@@ -1283,6 +1283,7 @@ const Map<String, String> kTxDe = {
   'reorder': 'Neu anordnen',
   'sp_login_t': 'Spotify-Anmeldung',
   'sp_login_hint': 'Melden Sie sich mit Ihrer Spotify-E-Mail und Ihrem Passwort an. Das Fenster schließt sich nach der Anmeldung von selbst.',
+  'sp_risk_note': 'Achtung: Diese Funktion nutzt inoffizielle Spotify-Aufrufe, keine offizielle API. Spotify kann sie jederzeit ändern oder sperren, sie kann ausfallen, und ihre Nutzung kann gegen die Nutzungsbedingungen von Spotify verstoßen, was zu Einschränkungen deines Spotify-Kontos führen könnte. Die Nutzung erfolgt auf eigenes Risiko.',
   'sp_t': 'Spotify (Canvas)',
   'sp_on': 'Verbunden',
   'sp_off': 'Nicht verbunden',

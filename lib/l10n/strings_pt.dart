@@ -1312,6 +1312,7 @@ const Map<String, String> kTxPt = {
   'reorder': 'Reordenar',
   'sp_login_t': 'Login no Spotify',
   'sp_login_hint': 'Entre com o seu e-mail e a sua senha do Spotify. A janela fecha sozinha quando o login terminar.',
+  'sp_risk_note': 'Atenção: esta função baseia-se em chamadas não oficiais do Spotify, não numa API oficial. O Spotify pode alterá-la ou bloqueá-la a qualquer momento, pode deixar de funcionar, e a sua utilização pode ir contra os termos de utilização do Spotify, o que poderá levar a restrições na sua conta Spotify. Utilize por sua conta e risco.',
   'sp_t': 'Spotify (Canvas)',
   'sp_on': 'Conectado',
   'sp_off': 'Não conectado',

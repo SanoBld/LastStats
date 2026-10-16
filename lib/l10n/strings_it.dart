@@ -1283,6 +1283,7 @@ const Map<String, String> kTxIt = {
   'reorder': 'Riordina',
   'sp_login_t': 'Accesso a Spotify',
   'sp_login_hint': 'Acceda con la sua e-mail e la sua password di Spotify. La finestra si chiude da sola al termine.',
+  'sp_risk_note': 'Attenzione: questa funzione si basa su chiamate non ufficiali di Spotify, non su un\'API ufficiale. Spotify può modificarla o bloccarla in qualsiasi momento, può smettere di funzionare e il suo uso può violare i termini di utilizzo di Spotify, con possibili limitazioni al tuo account Spotify. Usala a tuo rischio.',
   'sp_t': 'Spotify (Canvas)',
   'sp_on': 'Connesso',
   'sp_off': 'Non connesso',
