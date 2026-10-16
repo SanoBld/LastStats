@@ -19,7 +19,7 @@ LastStats is a free app that shows what you really listen to. It reads your Last
 
 We make it independently, in our free time. If you like it, a star on the repo helps a lot.
 
-🌐 [Website](https://sanobld.github.io/LastStats/) · 🧪 [Web version (beta)](https://sanobld.github.io/LastStats/app/) · 💬 [Discord](https://discord.gg/JjqmkQgZBs)
+🌐 [Website](https://sanobld.github.io/LastStats/) · 🧪 [Web preview](https://sanobld.github.io/LastStats/app/) · 💬 [Discord](https://discord.gg/JjqmkQgZBs)
 
 ---
 
@@ -86,7 +86,7 @@ Every build is on the [releases page](https://github.com/SanoBld/LastStats/relea
 
 Builds from [GitHub Actions](https://github.com/SanoBld/LastStats/actions) follow the latest code and can still have bugs.
 
-Don't want to install anything? Try the [web version (beta)](https://sanobld.github.io/LastStats/app/).
+Don't want to install anything? There's a [web preview](https://sanobld.github.io/LastStats/app/) where you can see what the app looks like. It's only a preview: it most likely has bugs, missing images and features that don't work. For the real experience, use the native app.
 
 ---
 
