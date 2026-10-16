@@ -1,4 +1,4 @@
-// Web version button: shows a beta warning, then opens the Flutter Web build
+// Web version button: shows a preview notice, then opens the Flutter Web build
 // in a new tab. Reuses the .dl-modal look from download-modal.js.
 (function () {
   const trigger = document.getElementById('web-trigger');
@@ -18,8 +18,8 @@
       <div class="web-warn-icon" aria-hidden="true">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
       </div>
-      <h3 class="dl-modal-title" id="web-modal-title">${t('webWarnTitle', 'Version web (bêta)')}</h3>
-      <p class="web-warn-body">${t('webWarnBody', "La version web est expérimentale : elle peut contenir des bugs ou des incompatibilités.")}</p>
+      <h3 class="dl-modal-title" id="web-modal-title">${t('webWarnTitle', 'Aperçu web')}</h3>
+      <p class="web-warn-body">${t('webWarnBody', "Cette version web n'est qu'un aperçu. Elle contient sûrement des bugs et des images manquantes.")}</p>
       <div class="web-warn-actions">
         <button type="button" class="web-warn-cancel md-ripple" id="web-cancel">${t('webCancel', 'Annuler')}</button>
         <a class="web-warn-open md-ripple" href="${webUrl}" target="_blank" rel="noopener" id="web-open">${t('webOpen', 'Ouvrir la version web')}</a>

@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-16T20:00:06Z",
+  "updated": "2026-10-16T20:04:50Z",
   "commits": [
+    {
+      "sha": "560f32d3aef45326e480f4074f7da6d56eacf3a9",
+      "message": "feat: update website to show dynamic \"last updated\" date and improve web version messaging\n\n- Added a step in the GitHub Actions workflow to generate a JSON file with the last updated dates from git history.\n- Updated the legal page to display the last updated date dynamically.\n- Changed references from \"beta\" to \"preview\" in the web version messaging across multiple languages.\n- Updated README and CHANGELOG to reflect the new features and changes.\n- Modified translation files for various languages to align with the new preview terminology.",
+      "date": "2026-10-16T20:04:34Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/560f32d3aef45326e480f4074f7da6d56eacf3a9",
+      "tags": []
+    },
     {
       "sha": "5444b2fbbcc33fb8342d8e363cccb0f3faad29db",
       "message": "Add legal notices and privacy information to the About page\n\n- Updated localization files for Portuguese, Russian, and Chinese to include legal notices, privacy information, and licenses.\n- Enhanced the About page with new sections for legal notices, licenses, and contact information.\n- Updated links to the GitHub repository and adjusted references to the LastStats project.\n- Improved the footer and navigation links across various site pages to reflect the new repository structure.",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/7f6b22748c9163c9da866ae70c64d2e0abc3c0bd",
-      "tags": []
-    },
-    {
-      "sha": "9cbe07cd5b7a33e7dbf87406bf6daa7bd7e24abe",
-      "message": "feat: add additional FAQ entries for scrobble and achievements\n\n- Added new FAQ questions and answers regarding 'scrobble' and how levels and achievements work in multiple languages (Arabic, German, English, Spanish, French, Italian, Japanese, Portuguese, Russian, Chinese).\n- Updated the settings and FAQ pages to include the new entries.\n- Improved the settings page to display the current version without indicating development status.\n- Enhanced the update history page with animated transitions for better user experience.\n- Integrated battery_plus plugin for improved battery management on macOS and Windows platforms.",
-      "date": "2026-08-12T11:14:08Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/9cbe07cd5b7a33e7dbf87406bf6daa7bd7e24abe",
       "tags": []
     }
   ]

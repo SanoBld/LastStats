@@ -55,9 +55,9 @@ window.I18N.en = {
   dlFmtIpa: "Unsigned: install with AltStore, Sideloadly or TrollStore",
   dlIosNote: "This iOS app is unsigned: install the .ipa file with AltStore, Sideloadly or TrollStore (or re-sign it with your own Apple account).",
   webBtn: "Web version",
-  webBetaChip: "Beta",
-  webWarnTitle: "Web version (beta)",
-  webWarnBody: "The web version is experimental: it is still being tested and may contain bugs or incompatibilities. Some app features (widgets, notifications, automatic backups, offline cache…) may be unavailable or behave differently. For the full and stable experience, use the native app.",
+  webBetaChip: "Preview",
+  webWarnTitle: "Web preview",
+  webWarnBody: "This web version is only a preview, to see what the app looks like. It most likely has bugs, missing images and features that don't work. For the real experience, use the native app.",
   webOpen: "Open the web version",
   webCancel: "Cancel",
   webClose: "Close",
@@ -211,7 +211,7 @@ window.I18N.en = {
   "legal.laststats_is_an_independent_app": "LastStats is an independent app, not affiliated with or endorsed by Last.fm, Spotify, YouTube, Apple, Deezer, TheAudioDB, MusicBrainz, Wikipedia or GitHub. Names and logos belong to their owners. Covers, images and metadata belong to their rightsholders and come from the sources listed above; Wikipedia text is under CC BY-SA. Open-source components used (Flutter, pub.dev packages) remain under their own licenses, available in the app and the repository.",
   "legal.changes": "Changes",
   "legal.this_page_may_be_updated": "This page may be updated as the app evolves; the last update date is shown below.",
-  "legal.last_updated_october_2026": "Last updated: October 2026.",
+  "legal.last_updated": "Last updated: {date}.",
   "legal.umami_analytics": "Audience measurement: the site uses Umami (Umami Software, Inc.), a privacy-friendly analytics tool. It uses no cookies, sets no persistent identifier on your device and does not track you across sites. It only collects anonymous, aggregated visit data (page views, referrer, country, device type, browser, language, screen size); your IP address is not stored and nothing allows the publisher to identify you. Legal basis: legitimate interest (GDPR art. 6.1.f) in knowing how the site is used. You can object at any time by blocking the script with a content blocker.",
 
   // ---- about ----
