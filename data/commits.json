@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-16T20:09:35Z",
+  "updated": "2026-10-16T20:28:56Z",
   "commits": [
+    {
+      "sha": "c52370dcf11085ae846b25d4442d7a9d30f95576",
+      "message": "Add legal information regarding data usage and AI assistance in translations\n\n- Updated French, Italian, Japanese, Portuguese, Russian, and Chinese translations to include new legal statements about Spotify session data, app data usage, and AI involvement in translations.\n- Enhanced legal HTML page to reflect these updates, including new sections for AI and additional data sources.",
+      "date": "2026-10-16T20:26:17Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/c52370dcf11085ae846b25d4442d7a9d30f95576",
+      "tags": []
+    },
     {
       "sha": "560f32d3aef45326e480f4074f7da6d56eacf3a9",
       "message": "feat: update website to show dynamic \"last updated\" date and improve web version messaging\n\n- Added a step in the GitHub Actions workflow to generate a JSON file with the last updated dates from git history.\n- Updated the legal page to display the last updated date dynamically.\n- Changed references from \"beta\" to \"preview\" in the web version messaging across multiple languages.\n- Updated README and CHANGELOG to reflect the new features and changes.\n- Modified translation files for various languages to align with the new preview terminology.",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/9ccc899e7c3cd3b6d059a557e41cce88048b31ba",
-      "tags": []
-    },
-    {
-      "sha": "7f6b22748c9163c9da866ae70c64d2e0abc3c0bd",
-      "message": "Update localization strings and improve settings UI\n\n- Updated Japanese, Portuguese, Russian, and Chinese localization strings for consistency and clarity.\n- Added new FAQ entries regarding power-saving mode, data backup, offline usage, account switching, and notification settings.\n- Enhanced the settings page to display the current version with a \"dev\" label for development builds.\n- Improved the update history page with a search feature and filtering options for beta and official releases.\n- Refactored the update service to distinguish between development and official builds.",
-      "date": "2026-08-13T04:24:13Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/7f6b22748c9163c9da866ae70c64d2e0abc3c0bd",
       "tags": []
     }
   ]
