@@ -313,8 +313,43 @@ Widget build(BuildContext context) {
               style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
           subtitle: const Text(&#39;MIT License&#39;),
           trailing: const Icon(Icons.open_in_new_rounded, size: 16),
-          onTap: () =&gt; _open(&#39;https:&#47;&#47;github.com&#47;SanoBld&#47;LastStats&#47;blob&#47;main&#47;LICENSE&#39;),
+          onTap: () =&gt; _open(&#39;https:&#47;&#47;github.com&#47;SanoBld&#47;LastStats&#47;blob&#47;master&#47;LICENSE&#39;),
         ),
+      ]),
+
+      const SizedBox(height: 16),
+
+      &#47;&#47; ── Legal notice ─────────────────────────────────────────────────
+      SettingsSection(label: tx(&#39;about_legal_t&#39;), children: [
+        ListTile(
+          leading: const Icon(Icons.policy_outlined),
+          title: Text(tx(&#39;about_legal_site_t&#39;),
+              style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+          subtitle: Text(tx(&#39;about_legal_site_s&#39;),
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+          trailing: const Icon(Icons.open_in_new_rounded, size: 16),
+          onTap: () =&gt; _open(&#39;https:&#47;&#47;sanobld.github.io&#47;LastStats&#47;legal.html&#39;),
+        ),
+        const Divider(height: 1, indent: 16, endIndent: 16),
+        ListTile(
+          leading: const Icon(Icons.article_outlined),
+          title: Text(tx(&#39;about_licenses_t&#39;),
+              style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+          subtitle: Text(tx(&#39;about_licenses_s&#39;),
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+          trailing: const Icon(Icons.chevron_right_rounded),
+          onTap: () =&gt; showLicensePage(
+              context: context,
+              applicationName: &#39;LastStats&#39;,
+              applicationVersion: UpdateService.displayVersion),
+        ),
+        const Divider(height: 1, indent: 16, endIndent: 16),
+        for (final key in const [&#39;about_legal_editor&#39;, &#39;about_legal_privacy&#39;, &#39;about_legal_marks&#39;])
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+            child: Text(tx(key),
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+          ),
       ]),
 
       const SizedBox(height: 16),
@@ -437,6 +472,48 @@ Widget build(BuildContext context) {
           icon: Icons.flutter_dash_rounded,
           label: &#39;Flutter&#39;,
           url: &#39;https:&#47;&#47;flutter.dev&#39;,
+        ),
+        const Divider(height: 1, indent: 16, endIndent: 16),
+        _PoweredByTile(
+          icon: Icons.queue_music_rounded,
+          label: &#39;ListenBrainz&#39;,
+          url: &#39;https:&#47;&#47;listenbrainz.org&#39;,
+        ),
+        const Divider(height: 1, indent: 16, endIndent: 16),
+        _PoweredByTile(
+          icon: Icons.lyrics_rounded,
+          label: &#39;LRCLIB&#39;,
+          url: &#39;https:&#47;&#47;lrclib.net&#39;,
+        ),
+        const Divider(height: 1, indent: 16, endIndent: 16),
+        _PoweredByTile(
+          icon: Icons.lyrics_rounded,
+          label: &#39;lyrics.ovh&#39;,
+          url: &#39;https:&#47;&#47;lyrics.ovh&#39;,
+        ),
+        const Divider(height: 1, indent: 16, endIndent: 16),
+        _PoweredByTile(
+          icon: Icons.translate_rounded,
+          label: &#39;Google Translate&#39;,
+          url: &#39;https:&#47;&#47;translate.google.com&#39;,
+        ),
+        const Divider(height: 1, indent: 16, endIndent: 16),
+        _PoweredByTile(
+          icon: Icons.headphones_rounded,
+          label: &#39;Spotify&#39;,
+          url: &#39;https:&#47;&#47;open.spotify.com&#39;,
+        ),
+        const Divider(height: 1, indent: 16, endIndent: 16),
+        _PoweredByTile(
+          icon: Icons.apple_rounded,
+          label: &#39;Apple Music&#39;,
+          url: &#39;https:&#47;&#47;music.apple.com&#39;,
+        ),
+        const Divider(height: 1, indent: 16, endIndent: 16),
+        _PoweredByTile(
+          icon: Icons.code_rounded,
+          label: &#39;GitHub&#39;,
+          url: &#39;https:&#47;&#47;github.com&#39;,
         ),
       ]),
 
