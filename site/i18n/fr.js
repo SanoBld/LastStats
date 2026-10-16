@@ -55,9 +55,9 @@ window.I18N.fr = {
   dlFmtIpa: "Non signé : à installer avec AltStore, Sideloadly ou TrollStore",
   dlIosNote: "Cette app iOS n'est pas signée : installez le fichier .ipa avec AltStore, Sideloadly ou TrollStore (ou re-signez-le avec votre compte Apple).",
   webBtn: "Version web",
-  webBetaChip: "Bêta",
-  webWarnTitle: "Version web (bêta)",
-  webWarnBody: "La version web est expérimentale : elle est en cours de test et peut contenir des bugs ou des incompatibilités. Certaines fonctionnalités de l'application (widgets, notifications, sauvegardes automatiques, cache hors ligne…) peuvent être indisponibles ou se comporter différemment. Pour une expérience complète et stable, utilisez l'application native.",
+  webBetaChip: "Aperçu",
+  webWarnTitle: "Aperçu web",
+  webWarnBody: "Cette version web n'est qu'un aperçu, pour voir à quoi ressemble l'application. Elle contient sûrement des bugs, des images manquantes et des fonctionnalités qui ne marchent pas. Pour une vraie expérience, utilisez l'application native.",
   webOpen: "Ouvrir la version web",
   webCancel: "Annuler",
   webClose: "Fermer",
@@ -211,7 +211,7 @@ window.I18N.fr = {
   "legal.laststats_is_an_independent_app": "LastStats est une application indépendante, non affiliée, ni approuvée par Last.fm, Spotify, YouTube, Apple, Deezer, TheAudioDB, MusicBrainz, Wikipedia ou GitHub. Les noms et logos appartiennent à leurs propriétaires. Les pochettes, images et métadonnées appartiennent à leurs ayants droit et proviennent des sources citées ci-dessus ; les textes Wikipedia sont sous licence CC BY-SA. Les composants open source utilisés (Flutter, packages pub.dev) restent sous leurs licences respectives, consultables dans l'application et le dépôt.",
   "legal.changes": "Modifications",
   "legal.this_page_may_be_updated": "Cette page peut être mise à jour lorsque l'application évolue ; la date de dernière mise à jour est indiquée ci-dessous.",
-  "legal.last_updated_october_2026": "Dernière mise à jour : octobre 2026.",
+  "legal.last_updated": "Dernière mise à jour : {date}.",
   "legal.umami_analytics": "Mesure d'audience : le site utilise Umami (Umami Software, Inc.), un outil de statistiques respectueux de la vie privée. Il n'utilise aucun cookie, ne dépose aucun identifiant persistant sur votre appareil et ne vous suit pas d'un site à l'autre. Il ne collecte que des données de visite anonymes et agrégées (pages vues, site référent, pays, type d'appareil, navigateur, langue, taille d'écran) ; votre adresse IP n'est pas conservée et aucune donnée ne permet à l'éditeur de vous identifier. Base légale : intérêt légitime (art. 6.1.f RGPD) à connaître la fréquentation du site. Vous pouvez vous y opposer à tout moment en bloquant le script avec un bloqueur de contenu.",
 
   // ---- about ----

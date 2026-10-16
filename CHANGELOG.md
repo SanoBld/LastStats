@@ -39,5 +39,7 @@
 - New legal texts translated in all 10 languages
 - Fixed the license link in About (it pointed to a missing page)
 - All links now point to the main repository, SanoBld/LastStats, in the website and the deploy workflow
+- Website: the "last updated" date on the legal page now updates by itself from the repository history
+- Website and README: the web version is now described as a preview (it has bugs, missing images and broken features), no more "beta" label
 - README rewritten with a more human tone, a clearer structure and a Legal section
 

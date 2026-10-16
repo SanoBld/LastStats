@@ -34,6 +34,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0   # full history, needed for the "last updated" dates
 
       # The site reads this file instead of calling the GitHub API (60 requests/hour
       # limit per visitor). It only exists in the published site, it is NOT committed,
@@ -79,6 +81,16 @@ jobs:
           jq -n --arg branch "$branch" --rawfile md /tmp/readme.md \
             '{updated: (now | todate), branch: $branch, markdown: $md}' > site/data/readme.json
           jq '{updated, branch, chars: (.markdown | length)}' site/data/readme.json
+
+      # "Last updated" dates shown on the site, taken from git history.
+      # legal = last change of legal.html or of any "legal.*" translation line.
+      - name: Generate site meta
+        run: |
+          mkdir -p site/data
+          legal=$( { git log -1 --format=%cI -- site/legal.html; git log -1 --format=%cI -G'legal\.' -- site/i18n; } | sort | tail -1 )
+          site=$(git log -1 --format=%cI -- site)
+          jq -n --arg legal "$legal" --arg site "$site" '{legal: $legal, site: $site}' > site/data/meta.json
+          cat site/data/meta.json
 
       # Publish the static site to the root of gh-pages.
       # keep_files protects the /app subfolder (Flutter web build).
