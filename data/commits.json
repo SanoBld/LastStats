@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-17T08:52:43Z",
+  "updated": "2026-10-17T08:59:52Z",
   "commits": [
+    {
+      "sha": "108bee502089795bdfa81e9b979449a3b6607e7d",
+      "message": "Refine legal text for clarity and accuracy in French translation",
+      "date": "2026-10-17T08:59:32Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/108bee502089795bdfa81e9b979449a3b6607e7d",
+      "tags": []
+    },
     {
       "sha": "f1ef1b1e71ab4adcce04bab01c9a77df9b55e8e1",
       "message": "Refactor legal page content for clarity and conciseness in French translation",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/55bab3ee5ff987d77fa678a722e5cf8bf5395020",
-      "tags": []
-    },
-    {
-      "sha": "926a7957220774e140592d38e383ea487a91fdba",
-      "message": "Merge branch 'master' of https://github.com/SanoBld/LastStats",
-      "date": "2026-08-13T10:52:40Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/926a7957220774e140592d38e383ea487a91fdba",
       "tags": []
     }
   ]
