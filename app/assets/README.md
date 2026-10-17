@@ -8,10 +8,10 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/v/release/SanoBld/LastStats?style=flat-square&color=7C3AED&label=Version" alt="Latest release">
-  <img src="https://img.shields.io/github/downloads/SanoBld/LastStats/total?style=flat-square&color=7C3AED&label=Downloads" alt="Total downloads">
-  <img src="https://img.shields.io/github/stars/SanoBld/LastStats?style=flat-square&color=7C3AED&label=Stars" alt="Stars">
-  <img src="https://img.shields.io/github/license/SanoBld/LastStats?style=flat-square&color=7C3AED&label=License" alt="License">
+  <a href="https://github.com/SanoBld/LastStats/releases"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fsanobld.github.io%2FLastStats%2Fdata%2Fbadge-version.json&style=flat-square" alt="Latest release"></a>
+  <a href="https://github.com/SanoBld/LastStats/releases"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fsanobld.github.io%2FLastStats%2Fdata%2Fbadge-downloads.json&style=flat-square" alt="Total downloads"></a>
+  <a href="https://github.com/SanoBld/LastStats/stargazers"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fsanobld.github.io%2FLastStats%2Fdata%2Fbadge-stars.json&style=flat-square" alt="Stars"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-7C3AED?style=flat-square" alt="License"></a>
   <a href="https://discord.gg/JjqmkQgZBs"><img src="https://img.shields.io/badge/Discord-Join-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord"></a>
 </p>
 
