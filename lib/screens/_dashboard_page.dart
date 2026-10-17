@@ -3782,6 +3782,9 @@ class _NewsPageState extends State<_NewsPage> {
   static final Map<String, Map<String, String>> _translationCache = {};
   bool _translateNews = true;
   bool _translatingNews = false;
+  // Language picked with a long-press; null = app language.
+  String? _newsLang;
+  String get _lang => _newsLang ?? localeNotifier.value;
 
   @override
   void initState() {
@@ -3796,11 +3799,41 @@ class _NewsPageState extends State<_NewsPage> {
     super.dispose();
   }
 
+  // Long-press on the translate button: choose the target language
+  // (same list as the biography picker).
+  void _pickNewsLanguage() {
+    showModalBottomSheet(
+      sheetAnimationStyle: kM3SheetAnimation,
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (ctx) => SafeArea(
+        child: ConstrainedBox(
+          constraints:
+              BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.6),
+          child: ListView(
+            shrinkWrap: true,
+            children: kTranslationLangNames.entries.map((e) => ListTile(
+              title: Text(e.value),
+              trailing: _lang == e.key && _translateNews
+                  ? const Icon(Icons.check_rounded) : null,
+              onTap: () {
+                Navigator.pop(ctx);
+                setState(() { _newsLang = e.key; _translateNews = true; });
+                _translateAll();
+              },
+            )).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+
   String _cacheKey(Map<String, dynamic> e, String lang) =>
       '$lang|${(e['id'] ?? e['title'] ?? '').toString()}';
 
   Future<void> _translateAll() async {
-    final lang = localeNotifier.value;
+    final lang = _lang;
     final pending = widget.items
         .where((e) => !_translationCache.containsKey(_cacheKey(e, lang)))
         .toList();
@@ -3821,7 +3854,7 @@ class _NewsPageState extends State<_NewsPage> {
   // Item as displayed: translated copy when the toggle is on and a result exists.
   Map<String, dynamic> _shown(Map<String, dynamic> e) {
     if (!_translateNews) return e;
-    final t = _translationCache[_cacheKey(e, localeNotifier.value)];
+    final t = _translationCache[_cacheKey(e, _lang)];
     if (t == null) return e;
     return {...e, 'title': t['title'], 'body': t['body']};
   }
@@ -3902,7 +3935,9 @@ class _NewsPageState extends State<_NewsPage> {
                   padding: EdgeInsets.symmetric(horizontal: 12),
                   child: SizedBox(width: 24, height: 24, child: M3Spinner()),
                 )
-              : IconButton(
+              : GestureDetector(
+                  onLongPress: _pickNewsLanguage,
+                  child: IconButton(
                   isSelected: _translateNews,
                   icon: const Icon(Icons.translate_rounded),
                   selectedIcon: const Icon(Icons.translate_rounded),
@@ -3917,7 +3952,7 @@ class _NewsPageState extends State<_NewsPage> {
                     setState(() => _translateNews = !_translateNews);
                     if (_translateNews) _translateAll();
                   },
-                ),
+                )),
           if (_type != null || _customRange != null)
             IconButton.filledTonal(
               icon: const Icon(Icons.filter_alt_off_rounded),

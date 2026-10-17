@@ -32,6 +32,13 @@
 
 ## v4.2.0
 
+**News translation and website fixes**
+- News: items are now translated automatically into the app language, with a compact translate button in the top bar to switch back to the original text
+- News: long-press the translate button to pick another target language (same list as the biography translation)
+- Website: the table of contents dots of the help and legal pages are now all aligned on the same line
+- Website: reworded the awkward "fiche artiste / fiche titre" wording to "page artiste / page titre" in French, and the matching Spanish, Italian and Portuguese texts
+- Website: fixed the mixed "tu/vous" in two French titles on the home page
+
 **Legal notice, links and README**
 - About: new "Legal" section with a link to the legal notice and privacy page, publisher and contact, a short data and privacy summary, and the non-affiliation notice for all third-party services
 - About: Flutter and open-source package licenses are now available in the app
