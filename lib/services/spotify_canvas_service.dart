@@ -146,6 +146,8 @@ class SpotifyCanvasService {
   static Future<String?> _withRetry(
       Future<String?> Function(_Sess) fn) async {
     try {
+      // Not logged in to Spotify: do nothing (no request, no background task).
+      if (!await isConnected()) return null;
       var s = await _session();
       if (s == null) return null;
       try {
@@ -310,9 +312,81 @@ class SpotifyCanvasService {
     return (res.statusCode, utf8.decode(res.bodyBytes));
   }
 
-  static Future<String?> _canvas(_Sess s, String trackUri) async {
+  // ── Automatic repair of the canvas query hash ──────────────────────────
+  // Spotify changes the hash each time it updates its web player. When the
+  // canvas call says the hash is unknown, the player's own scripts are read
+  // and the new hash is taken from them (at most once every 6 hours).
+  static const _kHashAt = 'ls_spotify_canvas_hash_at';
+  static Future<bool>? _hashFixing;
+
+  static Future<bool> _refreshHash() =>
+      _hashFixing ??= _doRefreshHash().whenComplete(() => _hashFixing = null);
+
+  static Future<bool> _doRefreshHash() async {
+    try {
+      if (!await isConnected()) return false;
+      final p = await SharedPreferences.getInstance();
+      final last = p.getInt(_kHashAt) ?? 0;
+      final now = DateTime.now().millisecondsSinceEpoch;
+      if (now - last < const Duration(hours: 6).inMilliseconds) return false;
+      await p.setInt(_kHashAt, now);
+
+      final hdr = {'User-Agent': SpotifyWebSession.ua, 'Accept': '*/*'};
+      Future<String?> get(String u) async {
+        try {
+          final r = await http.get(Uri.parse(u), headers: hdr).timeout(_timeout);
+          return r.statusCode == 200 ? utf8.decode(r.bodyBytes, allowMalformed: true) : null;
+        } catch (_) {
+          return null;
+        }
+      }
+
+      final home = await get('https://open.spotify.com/');
+      if (home == null) return false;
+      final queue = <String>[
+        for (final m in RegExp(r'<script[^>]+src="([^"]+\.js)"').allMatches(home))
+          Uri.parse('https://open.spotify.com/').resolve(m.group(1)!).toString()
+      ];
+      final seen = <String>{};
+      final patterns = [
+        RegExp(r'"canvas"\s*,\s*"query"\s*,\s*"([0-9a-f]{64})"'),
+        RegExp(r'''operationName["']?\s*[:=]\s*["']canvas["'][\s\S]{0,240}?([0-9a-f]{64})'''),
+      ];
+      while (queue.isNotEmpty && seen.length < 16) {
+        final u = queue.removeAt(0);
+        if (!seen.add(u)) continue;
+        final js = await get(u);
+        if (js == null) continue;
+        for (final re in patterns) {
+          final m = re.firstMatch(js);
+          if (m != null) {
+            final h = m.group(1)!;
+            final cur = p.getString(_kHash) ?? defaultHash;
+            if (h == cur) return false;
+            await p.setString(_kHash, h);
+            return true;
+          }
+        }
+        // Other chunks of the same player may hold it.
+        for (final m in RegExp(
+                r'https://open\.spotifycdn\.com/cdn/build/web-player/[A-Za-z0-9_.\-]+\.js')
+            .allMatches(js)) {
+          if (queue.length < 24) queue.add(m.group(0)!);
+        }
+      }
+    } catch (_) {}
+    return false;
+  }
+
+  static Future<String?> _canvas(_Sess s, String trackUri,
+      {bool retry = true}) async {
     final (code, body) = await _canvasRaw(s, trackUri);
     if (code == 401) throw _Expired();
+    // Unknown hash (or a refused request): try to repair it, once.
+    if (retry &&
+        (body.contains('PersistedQueryNotFound') || code == 400 || code == 404)) {
+      if (await _refreshHash()) return _canvas(s, trackUri, retry: false);
+    }
     if (code != 200) {
       lastError = 'canvas $code';
       return null;
@@ -352,7 +426,10 @@ class SpotifyCanvasService {
       final (code, body) = await _canvasRaw(s, 'spotify:track:3OHfY25tqY28d16oZczHc8');
       final mp4 = code == 200 ? _findMp4(jsonDecode(body)) : null;
       out.add('4. Canvas: HTTP $code, ${mp4 != null ? tx('dg_found') : tx('dg_nofound')}');
-      if (mp4 == null) {
+      if (mp4 == null && body.contains('PersistedQueryNotFound')) {
+        await (await SharedPreferences.getInstance()).remove(_kHashAt);
+        out.add('5. Hash: ${await _refreshHash() ? tx('dg_ok') : tx('dg_failed')}');
+      } else if (mp4 == null) {
         out.add(body.length > 220 ? body.substring(0, 220) : body);
       }
     } catch (e) {

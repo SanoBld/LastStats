@@ -1317,6 +1317,8 @@ const Map<String, String> kTxEs = {
   'sp_on': 'Conectado',
   'sp_off': 'No conectado',
   'sp_off_s': 'Has cerrado sesión en Spotify. Vuelve a iniciarla para obtener las portadas animadas de Canvas.',
+  'mv_ytdash_t': 'También en el panel',
+  'mv_ytdash_s': 'Usar YouTube para la portada animada de fondo del perfil en el panel (desactivado por defecto)',
   'sp_need': 'Spotify necesita iniciar sesión: Perfil > Página de conexión.',
   'conn_title': 'Conexiones',
   'conn_btn_t': 'Página de conexión',

@@ -1317,6 +1317,8 @@ const Map<String, String> kTxPt = {
   'sp_on': 'Conectado',
   'sp_off': 'Não conectado',
   'sp_off_s': 'Você saiu do Spotify. Entre novamente para obter as capas animadas do Canvas.',
+  'mv_ytdash_t': 'Também no painel',
+  'mv_ytdash_s': 'Usar o YouTube para a capa animada ao fundo do perfil no painel (desativado por padrão)',
   'sp_need': 'O Spotify precisa de login: Perfil > Página de conexão.',
   'conn_title': 'Conexões',
   'conn_btn_t': 'Página de conexão',

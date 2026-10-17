@@ -78,7 +78,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     _npMotionKey = key;
     if (_npMotionUrl != null && mounted) setState(() => _npMotionUrl = null);
     final url = await MotionArtworkService.find(
-        artist: artist, album: album, track: title);
+        artist: artist, album: album, track: title, dashboard: true);
     if (!mounted || _npMotionKey != key) return;
     setState(() => _npMotionUrl = url);
   }

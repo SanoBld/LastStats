@@ -1317,6 +1317,8 @@ const Map<String, String> kTxFr = {
   'sp_on': 'Connecté',
   'sp_off': 'Non connecté',
   'sp_off_s': 'Vous êtes déconnecté de Spotify. Reconnectez-vous pour obtenir les pochettes animées Canvas.',
+  'mv_ytdash_t': 'Aussi sur le dashboard',
+  'mv_ytdash_s': 'Utiliser YouTube pour le canevas animé en fond du profil sur le dashboard (désactivé par défaut)',
   'sp_need': 'Spotify demande une connexion : Profil > Page de connexion.',
   'conn_title': 'Connexions',
   'conn_btn_t': 'Page de connexion',

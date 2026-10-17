@@ -1233,6 +1233,7 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
   String _mvQuality = 'auto';
   bool _spOn = false; // logged in to Spotify
   bool _mvTracks = true, _mvAlbums = true, _mvArtists = true;
+  bool _mvYtDash = false; // YouTube also allowed for the dashboard cover
 
   // Saves one video-cover setting.
   Future<void> _mvSet(String key, Object v) async {
@@ -1357,6 +1358,7 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
           _mvTracks = p.getBool('ls_motion_tracks') ?? true;
           _mvAlbums = p.getBool('ls_motion_albums') ?? true;
           _mvArtists = p.getBool('ls_motion_artists') ?? true;
+          _mvYtDash = p.getBool('ls_motion_yt_dash') ?? false;
         });
       }
     });
@@ -1436,6 +1438,18 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
             subtitle: [for (final k in _mvOrder) _mvLabel(k)].join(' → '),
             onTap: _pickMvSources,
           ),
+          // Only relevant when YouTube is a source. Off by default.
+          if (_mvOrder.contains('youtube'))
+            SwitchListTile(
+              secondary: Icon(Icons.dashboard_customize_rounded, color: scheme.primary),
+              title: Text(tx('mv_ytdash_t')),
+              subtitle: Text(tx('mv_ytdash_s')),
+              value: _mvYtDash,
+              onChanged: (v) {
+                _mvSet('ls_motion_yt_dash', v);
+                setState(() => _mvYtDash = v);
+              },
+            ),
           _mvBlock(context, L.mvQualityT, Icons.high_quality_rounded, [
             for (final (key, label) in [
               ('auto', L.mvQAuto),

@@ -1287,6 +1287,8 @@ const Map<String, String> kTxJa = {
   'sp_on': '接続済み',
   'sp_off': '未接続',
   'sp_off_s': 'Spotify からログアウトしています。Canvas のアニメーションカバーを使うには、もう一度ログインしてください。',
+  'mv_ytdash_t': 'ダッシュボードでも使う',
+  'mv_ytdash_s': 'ダッシュボードのプロフィール背景のアニメーションカバーにもYouTubeを使います（初期設定はオフ）',
   'sp_need': 'Spotify のログインが必要です：プロフィール > 接続ページ。',
   'conn_title': '接続',
   'conn_btn_t': '接続ページ',

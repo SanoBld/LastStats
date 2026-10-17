@@ -40,8 +40,9 @@ class MotionPrefs {
   final String quality;  // 'auto' | '360' | '480' | '720' | '1080'
   final bool tracks, albums, artists;
   final bool spotifyOn;  // the user is logged in to Spotify
+  final bool ytDash;     // allow YouTube for the dashboard cover (off by default)
   const MotionPrefs(this.order, this.quality, this.tracks, this.albums,
-      this.artists, this.spotifyOn);
+      this.artists, this.spotifyOn, [this.ytDash = false]);
 
   static Future<MotionPrefs> load() async {
     final p = await SharedPreferences.getInstance();
@@ -52,6 +53,7 @@ class MotionPrefs {
       p.getBool('ls_motion_albums') ?? true,
       p.getBool('ls_motion_artists') ?? true,
       (p.getString(SpotifyCanvasService.kSpDc) ?? '').isNotEmpty,
+      p.getBool('ls_motion_yt_dash') ?? false,
     );
   }
 
@@ -76,7 +78,7 @@ class MotionPrefs {
   // Max video height wanted; 0 = let the player decide (Apple adaptive).
   int get height => int.tryParse(quality) ?? 0;
   // Part of the cache key, so changing a setting gives fresh results.
-  String get sig => '${order.join('-')}$quality${spotifyOn ? 'S' : ''}';
+  String get sig => '${order.join('-')}$quality${spotifyOn ? 'S' : ''}${ytDash ? 'D' : ''}';
 }
 
 class MotionArtworkService {
@@ -151,11 +153,12 @@ class MotionArtworkService {
     required String artist,
     String album = '',
     String track = '',
+    bool dashboard = false, // the cover behind the profile on the dashboard
   }) async {
     final cfg = await MotionPrefs.load();
     // Track lookups follow the "tracks" switch, album lookups the "albums" one.
     if (track.isNotEmpty ? !cfg.tracks : !cfg.albums) return null;
-    final key = '${_norm(artist)}|${_norm(album)}|${_norm(track)}|${cfg.sig}';
+    final key = '${_norm(artist)}|${_norm(album)}|${_norm(track)}|${cfg.sig}${dashboard ? '|dash' : ''}';
     if (_fresh(key)) return _cache[key];
     // Bounded: the oldest lookups are dropped so the map never grows forever.
     if (_cache.length >= _maxEntries) _cache.remove(_cache.keys.first);
@@ -191,7 +194,8 @@ class MotionArtworkService {
       }
 
       // YouTube only has videos of songs (never albums or artists).
-      final ytOk = cfg.useYoutube && track.isNotEmpty;
+      // On the dashboard, YouTube is used only if the user allowed it.
+      final ytOk = cfg.useYoutube && track.isNotEmpty && (!dashboard || cfg.ytDash);
       String? video;
       // Try the sources in the order chosen by the user.
       for (final src in cfg.order) {

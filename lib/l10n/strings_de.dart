@@ -1288,6 +1288,8 @@ const Map<String, String> kTxDe = {
   'sp_on': 'Verbunden',
   'sp_off': 'Nicht verbunden',
   'sp_off_s': 'Du bist bei Spotify abgemeldet. Melde dich erneut an, um die animierten Canvas-Cover zu erhalten.',
+  'mv_ytdash_t': 'Auch im Dashboard',
+  'mv_ytdash_s': 'YouTube für das animierte Cover hinter deinem Profil im Dashboard nutzen (standardmäßig aus)',
   'sp_need': 'Spotify braucht eine Anmeldung: Profil > Verbindungsseite.',
   'conn_title': 'Verbindungen',
   'conn_btn_t': 'Verbindungsseite',

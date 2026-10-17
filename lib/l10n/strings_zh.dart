@@ -1314,6 +1314,8 @@ const Map<String, String> kTxZh = {
   'sp_on': '已连接',
   'sp_off': '未连接',
   'sp_off_s': '你已退出 Spotify。重新登录后才能获取 Canvas 动态封面。',
+  'mv_ytdash_t': '也用于仪表盘',
+  'mv_ytdash_s': '在仪表盘的个人资料背景动画封面中也使用 YouTube（默认关闭）',
   'sp_need': 'Spotify 需要登录：个人资料 > 连接页面。',
   'conn_title': '连接',
   'conn_btn_t': '连接页面',

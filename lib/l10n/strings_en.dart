@@ -1317,6 +1317,8 @@ const Map<String, String> kTxEn = {
   'sp_on': 'Connected',
   'sp_off': 'Not connected',
   'sp_off_s': 'You\'re signed out of Spotify. Sign in again to get Canvas animated covers.',
+  'mv_ytdash_t': 'Also on the dashboard',
+  'mv_ytdash_s': 'Use YouTube for the animated cover shown behind your profile on the dashboard (off by default)',
   'sp_need': 'Spotify needs a login: Profile > Connection page.',
   'conn_title': 'Connections',
   'conn_btn_t': 'Connection page',

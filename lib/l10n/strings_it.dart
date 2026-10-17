@@ -1288,6 +1288,8 @@ const Map<String, String> kTxIt = {
   'sp_on': 'Connesso',
   'sp_off': 'Non connesso',
   'sp_off_s': 'Hai effettuato il logout da Spotify. Accedi di nuovo per ottenere le copertine animate Canvas.',
+  'mv_ytdash_t': 'Anche nella dashboard',
+  'mv_ytdash_s': 'Usa YouTube per la copertina animata dietro il profilo nella dashboard (disattivato di default)',
   'sp_need': 'Spotify richiede l\'accesso: Profilo > Pagina di connessione.',
   'conn_title': 'Connessioni',
   'conn_btn_t': 'Pagina di connessione',
