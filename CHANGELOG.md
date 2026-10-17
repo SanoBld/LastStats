@@ -37,7 +37,7 @@
 - News: long-press the translate button to pick another target language (same list as the biography translation)
 - Spotify Canvas: the app now repairs itself when Spotify changes its private query (it reads the new hash from the web player's scripts, at most once every 6 hours, and retries); the "Test Spotify" button also tries this repair
 - Spotify: when you are not logged in, nothing runs in the background for it (no lookups, no token refresh, no repair)
-- Video covers: new switch "Also on the dashboard" (off by default) to allow YouTube for the animated cover behind your profile on the dashboard; it only shows when YouTube is one of your sources, translated in all 10 languages
+- Video covers: new switch "Also on the dashboard" (off by default) to allow YouTube for the animated cover behind your profile on the dashboard; it works even when YouTube is not one of your sources, translated in all 10 languages
 - Website: the table of contents dots of the help and legal pages are now all aligned on the same line
 - Website: reworded the awkward "fiche artiste / fiche titre" wording to "page artiste / page titre" in French, and the matching Spanish, Italian and Portuguese texts
 - Website: fixed the mixed "tu/vous" in two French titles on the home page

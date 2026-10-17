@@ -1438,9 +1438,9 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
             subtitle: [for (final k in _mvOrder) _mvLabel(k)].join(' → '),
             onTap: _pickMvSources,
           ),
-          // Only relevant when YouTube is a source. Off by default.
-          if (_mvOrder.contains('youtube'))
-            SwitchListTile(
+          // Always shown: lets YouTube be used for the dashboard cover
+          // even when it is not one of the sources. Off by default.
+          SwitchListTile(
               secondary: Icon(Icons.dashboard_customize_rounded, color: scheme.primary),
               title: Text(tx('mv_ytdash_t')),
               subtitle: Text(tx('mv_ytdash_s')),

@@ -194,8 +194,9 @@ class MotionArtworkService {
       }
 
       // YouTube only has videos of songs (never albums or artists).
-      // On the dashboard, YouTube is used only if the user allowed it.
-      final ytOk = cfg.useYoutube && track.isNotEmpty && (!dashboard || cfg.ytDash);
+      // Elsewhere YouTube follows the sources. On the dashboard it follows
+      // the dedicated switch instead, even if YouTube is not a source.
+      final ytOk = track.isNotEmpty && (dashboard ? cfg.ytDash : cfg.useYoutube);
       String? video;
       // Try the sources in the order chosen by the user.
       for (final src in cfg.order) {
@@ -206,6 +207,10 @@ class MotionArtworkService {
           case 'youtube':
             if (ytOk) video = await _youtube(artist, track, cfg.height);
         }
+      }
+      // Dashboard switch on but YouTube not in the sources: last resort.
+      if (video == null && ytOk && !cfg.useYoutube) {
+        video = await _youtube(artist, track, cfg.height);
       }
       _remember(key, video);
       return video;
