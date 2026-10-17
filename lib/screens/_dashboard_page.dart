@@ -3936,8 +3936,11 @@ class _NewsPageState extends State<_NewsPage> {
                   child: SizedBox(width: 24, height: 24, child: M3Spinner()),
                 )
               : GestureDetector(
-                  onLongPress: _pickNewsLanguage,
-                  child: IconButton(
+                  behavior: HitTestBehavior.opaque,
+                  onLongPress: () { _haptic(_HapticImpact.light); _pickNewsLanguage(); },
+                  child: Semantics(
+                    label: _translateNews ? L.detailShowOriginal : L.detailTranslate,
+                    child: IconButton(
                   isSelected: _translateNews,
                   icon: const Icon(Icons.translate_rounded),
                   selectedIcon: const Icon(Icons.translate_rounded),
@@ -3947,12 +3950,13 @@ class _NewsPageState extends State<_NewsPage> {
                           foregroundColor: scheme.onPrimary,
                         )
                       : null,
-                  tooltip: _translateNews ? L.detailShowOriginal : L.detailTranslate,
+                  // No `tooltip` here: its own long-press handler would swallow
+                  // the long-press meant for the language picker.
                   onPressed: () {
                     setState(() => _translateNews = !_translateNews);
                     if (_translateNews) _translateAll();
                   },
-                )),
+                ))),
           if (_type != null || _customRange != null)
             IconButton.filledTonal(
               icon: const Icon(Icons.filter_alt_off_rounded),
