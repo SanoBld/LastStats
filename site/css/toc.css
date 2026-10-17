@@ -28,3 +28,6 @@
   .rel-nav-item.is-sub { display: none; }
   .help-block, .help-card, .legal-block { scroll-margin-top: 8rem; }
 }
+
+/* keep the dots of indented sub-items on the same vertical line as the section dots */
+.rel-nav-item.is-sub::before { left: calc(-1.2rem - .8rem - 1.5px); }

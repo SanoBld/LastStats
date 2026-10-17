@@ -3777,11 +3777,53 @@ class _NewsPageState extends State<_NewsPage> {
   bool _searching = false;
   Timer? _debounce;
 
+  // Auto-translation: on by default, one icon button turns it off.
+  // Results are cached per item id + language so reopening is instant.
+  static final Map<String, Map<String, String>> _translationCache = {};
+  bool _translateNews = true;
+  bool _translatingNews = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _translateAll();
+  }
+
   @override
   void dispose() {
     _debounce?.cancel();
     _searchCtrl.dispose();
     super.dispose();
+  }
+
+  String _cacheKey(Map<String, dynamic> e, String lang) =>
+      '$lang|${(e['id'] ?? e['title'] ?? '').toString()}';
+
+  Future<void> _translateAll() async {
+    final lang = localeNotifier.value;
+    final pending = widget.items
+        .where((e) => !_translationCache.containsKey(_cacheKey(e, lang)))
+        .toList();
+    if (pending.isEmpty) return;
+    setState(() => _translatingNews = true);
+    await Future.wait(pending.map((e) async {
+      final title = await TranslationService.translate((e['title'] ?? '').toString(), lang);
+      final body  = await TranslationService.translate((e['body']  ?? '').toString(), lang);
+      // Empty result means failure: keep the original text for that field.
+      _translationCache[_cacheKey(e, lang)] = {
+        'title': title.isNotEmpty ? title : (e['title'] ?? '').toString(),
+        'body':  body.isNotEmpty  ? body  : (e['body']  ?? '').toString(),
+      };
+    }));
+    if (mounted) setState(() => _translatingNews = false);
+  }
+
+  // Item as displayed: translated copy when the toggle is on and a result exists.
+  Map<String, dynamic> _shown(Map<String, dynamic> e) {
+    if (!_translateNews) return e;
+    final t = _translationCache[_cacheKey(e, localeNotifier.value)];
+    if (t == null) return e;
+    return {...e, 'title': t['title'], 'body': t['body']};
   }
 
   // Debounced so fast typing doesn't re-filter on every keystroke — also
@@ -3821,7 +3863,7 @@ class _NewsPageState extends State<_NewsPage> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
-    final items  = widget.items;
+    final items  = widget.items.map(_shown).toList();
 
     final types = items.map((e) => (e['type'] ?? 'info').toString()).toSet().toList()..sort();
 
@@ -3854,6 +3896,28 @@ class _NewsPageState extends State<_NewsPage> {
       appBar: M3AppBar(
         title: L.newsWhatsNew,
         actions: [
+          // Compact translate toggle (icon only), same idea as the bio button
+          _translatingNews
+              ? const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  child: SizedBox(width: 24, height: 24, child: M3Spinner()),
+                )
+              : IconButton(
+                  isSelected: _translateNews,
+                  icon: const Icon(Icons.translate_rounded),
+                  selectedIcon: const Icon(Icons.translate_rounded),
+                  style: _translateNews
+                      ? IconButton.styleFrom(
+                          backgroundColor: scheme.primary,
+                          foregroundColor: scheme.onPrimary,
+                        )
+                      : null,
+                  tooltip: _translateNews ? L.detailShowOriginal : L.detailTranslate,
+                  onPressed: () {
+                    setState(() => _translateNews = !_translateNews);
+                    if (_translateNews) _translateAll();
+                  },
+                ),
           if (_type != null || _customRange != null)
             IconButton.filledTonal(
               icon: const Icon(Icons.filter_alt_off_rounded),
