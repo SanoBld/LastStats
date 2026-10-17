@@ -396,7 +396,7 @@ class AppStringsAr implements AppStrings {
   @override String get aboutScrobbleDownloaderSub => 'نزّل سجل scrobbles بالكامل واحفظه في ملف';
   @override String get aboutPoweredBy => 'مدعوم بواسطة';
   @override String get aboutImageDisclaimer => 'تُجلب صور الفنانين والألبومات والمقاطع تلقائيًا من هذه المصادر وقد تكون أحيانًا غير صحيحة أو لا تطابق المحتوى الفعلي.';
-  @override String get aboutFooter => 'صُنع بـ ❤️ · غير مرتبط بـ Last.fm / CBS';
+  @override String get aboutFooter => 'صُنع بـ ❤️ · غير مرتبط بـ Last.fm';
   @override String get updatesCurrentVersion => 'الإصدار الحالي';
   @override String get updatesBetaTitle => 'التحديثات التجريبية';
   @override String get updatesBetaSub => 'وصول مبكر إلى الإصدارات التجريبية';

@@ -396,7 +396,7 @@ class AppStringsRu implements AppStrings {
   @override String get aboutScrobbleDownloaderSub => 'Скачайте всю историю скробблов и сохраните её в файл';
   @override String get aboutPoweredBy => 'Работает на';
   @override String get aboutImageDisclaimer => 'Изображения исполнителей, альбомов и треков автоматически загружаются из этих источников и иногда могут быть неверными или не соответствовать содержимому.';
-  @override String get aboutFooter => 'Сделано с ❤️ · Не связано с Last.fm / CBS';
+  @override String get aboutFooter => 'Сделано с ❤️ · Не связано с Last.fm';
   @override String get updatesCurrentVersion => 'Текущая версия';
   @override String get updatesBetaTitle => 'Бета-обновления';
   @override String get updatesBetaSub => 'Ранний доступ к предварительным версиям';

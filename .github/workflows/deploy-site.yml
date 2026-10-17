@@ -91,6 +91,15 @@ jobs:
           site=$(git log -1 --format=%cI -- site)
           jq -n --arg legal "$legal" --arg site "$site" '{legal: $legal, site: $site}' > site/data/meta.json
           cat site/data/meta.json
+          # Badge data for the README (shields.io "endpoint" badges).
+          # They read these files from the site, so no GitHub API token is needed.
+          mk() { jq -n --arg l "$1" --arg m "$2" '{schemaVersion: 1, label: $l, message: $m, color: "7C3AED"}' > "site/data/badge-$3.json"; }
+          ver=$(jq -r '[.releases[] | select(.prerelease | not)][0].tag_name // "none"' site/data/releases.json)
+          dl=$(jq -r 'def k: if . >= 1000000 then ((. / 100000 | floor) / 10 | tostring) + "M" elif . >= 1000 then ((. / 100 | floor) / 10 | tostring) + "k" else tostring end; ([.releases[].assets[].download_count] | add // 0) | k' site/data/releases.json)
+          st=$(jq -r '.stars' site/data/releases.json)
+          mk "Version" "$ver" version
+          mk "Downloads" "$dl" downloads
+          mk "Stars" "$st" stars
 
       # Publish the static site to the root of gh-pages.
       # keep_files protects the /app subfolder (Flutter web build).

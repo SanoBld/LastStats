@@ -441,7 +441,7 @@ class AppStringsFr implements AppStrings {
   @override String get aboutScrobbleDownloaderSub  => 'Téléchargez tout votre historique de scrobbles et enregistrez-le dans un fichier';
   @override String get aboutPoweredBy              => 'Propulsé par';
   @override String get aboutImageDisclaimer        => 'Les images des artistes, albums et titres sont récupérées automatiquement depuis ces sources et peuvent parfois être incorrectes ou ne pas correspondre au contenu réel.';
-  @override String get aboutFooter                 => 'Fait avec ❤️ · Non affilié à Last.fm / CBS';
+  @override String get aboutFooter                 => 'Fait avec ❤️ · Non affilié à Last.fm';
 
   @override String updatesPublishedOn(String date) => 'Publié le $date';
   @override String get updatesCurrentVersion       => 'Version actuelle';

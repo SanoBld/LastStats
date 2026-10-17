@@ -441,7 +441,7 @@ class AppStringsEn implements AppStrings {
   @override String get aboutScrobbleDownloaderSub  => 'Download your whole scrobble history and save it as a file';
   @override String get aboutPoweredBy              => 'Powered by';
   @override String get aboutImageDisclaimer        => 'Artist, album and track images are fetched automatically from these sources and may sometimes be incorrect or not match the actual content.';
-  @override String get aboutFooter                 => 'Made with ❤️ · Not affiliated with Last.fm / CBS';
+  @override String get aboutFooter                 => 'Made with ❤️ · Not affiliated with Last.fm';
 
   @override String updatesPublishedOn(String date) => 'Published on $date';
   @override String get updatesCurrentVersion       => 'Current version';

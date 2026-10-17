@@ -396,7 +396,7 @@ class AppStringsIt implements AppStrings {
   @override String get aboutScrobbleDownloaderSub => 'Scarica tutta la tua cronologia di scrobble e salvala in un file';
   @override String get aboutPoweredBy => 'Basato su';
   @override String get aboutImageDisclaimer => 'Le immagini di artisti, album e brani vengono recuperate automaticamente da queste fonti e a volte potrebbero essere errate o non corrispondere al contenuto reale.';
-  @override String get aboutFooter => 'Fatto con ❤️ · Non affiliato con Last.fm / CBS';
+  @override String get aboutFooter => 'Fatto con ❤️ · Non affiliato con Last.fm';
   @override String get updatesCurrentVersion => 'Versione attuale';
   @override String get updatesBetaTitle => 'Aggiornamenti beta';
   @override String get updatesBetaSub => 'Accesso anticipato alle versioni pre-rilascio';

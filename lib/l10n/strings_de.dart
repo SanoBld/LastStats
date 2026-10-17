@@ -396,7 +396,7 @@ class AppStringsDe implements AppStrings {
   @override String get aboutScrobbleDownloaderSub => 'Lade deinen gesamten Scrobble-Verlauf herunter und speichere ihn als Datei';
   @override String get aboutPoweredBy => 'Unterstützt von';
   @override String get aboutImageDisclaimer => 'Bilder von Künstlern, Alben und Titeln werden automatisch aus diesen Quellen abgerufen und können gelegentlich falsch sein oder nicht zum tatsächlichen Inhalt passen.';
-  @override String get aboutFooter => 'Mit ❤️ gemacht · Nicht mit Last.fm / CBS verbunden';
+  @override String get aboutFooter => 'Mit ❤️ gemacht · Nicht mit Last.fm verbunden';
   @override String get updatesCurrentVersion => 'Aktuelle Version';
   @override String get updatesBetaTitle => 'Beta-Updates';
   @override String get updatesBetaSub => 'Früherer Zugriff auf Vorabversionen';

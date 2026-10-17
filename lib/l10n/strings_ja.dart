@@ -396,7 +396,7 @@ class AppStringsJa implements AppStrings {
   @override String get aboutScrobbleDownloaderSub => 'すべてのスクロブル履歴をダウンロードして、ファイルとして保存します';
   @override String get aboutPoweredBy => '提供元';
   @override String get aboutImageDisclaimer => 'アーティスト、アルバム、トラックの画像はこれらのソースから自動的に取得されており、実際の内容と一致しない場合があります。';
-  @override String get aboutFooter => '❤️を込めて制作 · Last.fm / CBSとは提携していません';
+  @override String get aboutFooter => '❤️を込めて制作 · Last.fmとは提携していません';
   @override String get updatesCurrentVersion => '現在のバージョン';
   @override String get updatesBetaTitle => 'ベータアップデート';
   @override String get updatesBetaSub => '先行リリース版への早期アクセス';

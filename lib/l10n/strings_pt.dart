@@ -441,7 +441,7 @@ class AppStringsPt implements AppStrings {
   @override String get aboutScrobbleDownloaderSub  => 'Baixe todo o seu histórico de scrobbles e salve em um arquivo';
   @override String get aboutPoweredBy              => 'Com tecnologia de';
   @override String get aboutImageDisclaimer        => 'As imagens de artistas, álbuns e faixas são obtidas automaticamente dessas fontes e às vezes podem estar incorretas ou não corresponder ao conteúdo real.';
-  @override String get aboutFooter                 => 'Feito com ❤️ · Sem afiliação com Last.fm / CBS';
+  @override String get aboutFooter                 => 'Feito com ❤️ · Sem afiliação com Last.fm';
 
   @override String updatesPublishedOn(String date) => 'Publicado em $date';
   @override String get updatesCurrentVersion       => 'Versão atual';

@@ -438,7 +438,7 @@ class AppStringsZh implements AppStrings {
   @override String get aboutScrobbleDownloaderSub  => '下载全部 scrobble 历史并保存为文件';
   @override String get aboutPoweredBy              => '技术支持';
   @override String get aboutImageDisclaimer        => '艺术家、专辑和歌曲的图片会自动从这些来源获取，有时可能不准确或与实际内容不符。';
-  @override String get aboutFooter                 => '用 ❤️ 制作 · 与 Last.fm / CBS 无关联';
+  @override String get aboutFooter                 => '用 ❤️ 制作 · 与 Last.fm 无关联';
 
   @override String updatesPublishedOn(String date) => '发布于 $date';
   @override String get updatesCurrentVersion       => '当前版本';
