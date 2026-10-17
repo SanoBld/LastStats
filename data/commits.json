@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-17T10:02:09Z",
+  "updated": "2026-10-17T10:14:35Z",
   "commits": [
+    {
+      "sha": "3ff04b975e76cf555b30e202cf06a4a75893f8cd",
+      "message": "feat: ajouter la prise en charge de YouTube pour la couverture animée sur le tableau de bord et améliorer la gestion des requêtes Spotify",
+      "date": "2026-10-17T10:14:15Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/3ff04b975e76cf555b30e202cf06a4a75893f8cd",
+      "tags": []
+    },
     {
       "sha": "b138fd613bd2fa96e5e90f1a8fcf06e515dfe032",
       "message": "feat: améliorer la sélection de langue pour la traduction des nouvelles avec retour haptique",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/7e3280d4534b535fb6480b6ace14101ca0778ab3",
-      "tags": []
-    },
-    {
-      "sha": "5983826915abd56922c255c61b112870b3aea55a",
-      "message": "refactor: improve context handling and clean up unused code across multiple screens",
-      "date": "2026-08-13T11:08:11Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/5983826915abd56922c255c61b112870b3aea55a",
       "tags": []
     }
   ]
