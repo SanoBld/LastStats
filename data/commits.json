@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-17T10:14:35Z",
+  "updated": "2026-10-17T10:17:03Z",
   "commits": [
+    {
+      "sha": "29639be619914b9161c9e7f3c963ad7c734b99ac",
+      "message": "feat: permettre l'utilisation de YouTube pour la couverture animée sur le tableau de bord, même si ce n'est pas une source",
+      "date": "2026-10-17T10:16:43Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/29639be619914b9161c9e7f3c963ad7c734b99ac",
+      "tags": []
+    },
     {
       "sha": "3ff04b975e76cf555b30e202cf06a4a75893f8cd",
       "message": "feat: ajouter la prise en charge de YouTube pour la couverture animée sur le tableau de bord et améliorer la gestion des requêtes Spotify",
@@ -2705,15 +2714,6 @@
       "tags": [
         "v3.1.0-beta"
       ]
-    },
-    {
-      "sha": "7e3280d4534b535fb6480b6ace14101ca0778ab3",
-      "message": "fix(living_artwork): adjust pinch-to-zoom limits for better user experience",
-      "date": "2026-08-13T11:15:30Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/7e3280d4534b535fb6480b6ace14101ca0778ab3",
-      "tags": []
     }
   ]
 }
