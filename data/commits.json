@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-17T09:02:34Z",
+  "updated": "2026-10-17T09:23:40Z",
   "commits": [
+    {
+      "sha": "cc2c25d00953d7466499aeb652f7e853c2a03ecb",
+      "message": "feat: ajouter la traduction automatique des nouvelles et améliorer l'affichage des éléments traduits",
+      "date": "2026-10-17T09:19:19Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/cc2c25d00953d7466499aeb652f7e853c2a03ecb",
+      "tags": []
+    },
     {
       "sha": "108bee502089795bdfa81e9b979449a3b6607e7d",
       "message": "Refine legal text for clarity and accuracy in French translation",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/f2bd9d216c073346bc34a71bc8c39728102d7191",
-      "tags": []
-    },
-    {
-      "sha": "55bab3ee5ff987d77fa678a722e5cf8bf5395020",
-      "message": "feat(localization): update Portuguese, Russian, and Chinese strings for clarity and consistency\n\nfix(localization): improve phrasing in various strings across languages\nfeat(settings): enhance version display logic to differentiate between dev and official builds\nfeat(update): add search and filter functionality to update history page\nfix(living_artwork): adjust pinch-to-zoom range for better user experience",
-      "date": "2026-08-13T10:53:49Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/55bab3ee5ff987d77fa678a722e5cf8bf5395020",
       "tags": []
     }
   ]
