@@ -58,6 +58,7 @@
 <span class="name ">find</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="find-param-artist"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">artist</span>, </span></li>
 <li><span class="parameter" id="find-param-album"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">album</span> = <span class="default-value">&#39;&#39;</span>, </span></li>
 <li><span class="parameter" id="find-param-track"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">track</span> = <span class="default-value">&#39;&#39;</span>, </span></li>
+<li><span class="parameter" id="find-param-dashboard"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">dashboard</span> = <span class="default-value">false</span>, </span></li>
 </ol>})
 
       
@@ -73,11 +74,12 @@
   required String artist,
   String album = &#39;&#39;,
   String track = &#39;&#39;,
+  bool dashboard = false, &#47;&#47; the cover behind the profile on the dashboard
 }) async {
   final cfg = await MotionPrefs.load();
   &#47;&#47; Track lookups follow the &quot;tracks&quot; switch, album lookups the &quot;albums&quot; one.
   if (track.isNotEmpty ? !cfg.tracks : !cfg.albums) return null;
-  final key = &#39;${_norm(artist)}|${_norm(album)}|${_norm(track)}|${cfg.sig}&#39;;
+  final key = &#39;${_norm(artist)}|${_norm(album)}|${_norm(track)}|${cfg.sig}${dashboard ? &#39;|dash&#39; : &#39;&#39;}&#39;;
   if (_fresh(key)) return _cache[key];
   &#47;&#47; Bounded: the oldest lookups are dropped so the map never grows forever.
   if (_cache.length &gt;= _maxEntries) _cache.remove(_cache.keys.first);
@@ -113,7 +115,8 @@
     }
 
     &#47;&#47; YouTube only has videos of songs (never albums or artists).
-    final ytOk = cfg.useYoutube &amp;&amp; track.isNotEmpty;
+    &#47;&#47; On the dashboard, YouTube is used only if the user allowed it.
+    final ytOk = cfg.useYoutube &amp;&amp; track.isNotEmpty &amp;&amp; (!dashboard || cfg.ytDash);
     String? video;
     &#47;&#47; Try the sources in the order chosen by the user.
     for (final src in cfg.order) {

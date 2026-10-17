@@ -91,7 +91,10 @@ the language files (dg_* keys).</p>
     final (code, body) = await _canvasRaw(s, &#39;spotify:track:3OHfY25tqY28d16oZczHc8&#39;);
     final mp4 = code == 200 ? _findMp4(jsonDecode(body)) : null;
     out.add(&#39;4. Canvas: HTTP $code, ${mp4 != null ? tx(&#39;dg_found&#39;) : tx(&#39;dg_nofound&#39;)}&#39;);
-    if (mp4 == null) {
+    if (mp4 == null &amp;&amp; body.contains(&#39;PersistedQueryNotFound&#39;)) {
+      await (await SharedPreferences.getInstance()).remove(_kHashAt);
+      out.add(&#39;5. Hash: ${await _refreshHash() ? tx(&#39;dg_ok&#39;) : tx(&#39;dg_failed&#39;)}&#39;);
+    } else if (mp4 == null) {
       out.add(body.length &gt; 220 ? body.substring(0, 220) : body);
     }
   } catch (e) {
