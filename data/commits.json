@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-18T15:31:00Z",
+  "updated": "2026-10-18T18:48:38Z",
   "commits": [
+    {
+      "sha": "90c274d44acf1c0182b084434e91c2568ac90013",
+      "message": "feat: ajouter des sélecteurs de date localisés et améliorer l'interface utilisateur des dialogues de calendrier",
+      "date": "2026-10-18T18:45:50Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/90c274d44acf1c0182b084434e91c2568ac90013",
+      "tags": []
+    },
     {
       "sha": "4b64f7faf8a44ffd8b9170e0a2cc937101116876",
       "message": "feat: améliorer la fonctionnalité de récapitulatif annuel avec des restrictions d'accès et un nouveau design d'image partagée",
@@ -2700,15 +2709,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/1f204e2e345fe4c5d1d2544d7e52751dc9b45dcd",
-      "tags": []
-    },
-    {
-      "sha": "2336acc68299528251304035e30caffa0618178e",
-      "message": "fix: ajouter l'importation manquante de R dans WidgetTheme.kt",
-      "date": "2026-08-20T19:00:40Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/2336acc68299528251304035e30caffa0618178e",
       "tags": []
     }
   ]
