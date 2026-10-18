@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-18T08:59:04Z",
+  "updated": "2026-10-18T09:15:25Z",
   "commits": [
+    {
+      "sha": "d84204c990e4cbbafc88eaa43ce7ddf426584d83",
+      "message": "feat: add Year in Review feature with detailed recap and sharing options\n\n- Introduced a new \"Year in Review\" section in the profile menu, providing a comprehensive recap of the user's listening habits over the year.\n- Added various metrics including total scrobbles, estimated listening hours, top artists, tracks, albums, monthly charts, and more.\n- Implemented a shareable summary card with visual elements and friend comparisons.\n- Updated localization files for multiple languages to support new strings related to the Year in Review feature.\n- Refactored related classes and methods to accommodate the new feature, ensuring a cohesive integration within the existing app structure.",
+      "date": "2026-10-18T09:04:23Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/d84204c990e4cbbafc88eaa43ce7ddf426584d83",
+      "tags": []
+    },
     {
       "sha": "8d38f0f5a2de167585cfbac35889d4228d732fdf",
       "message": "feat: améliorer la page de récapitulatif de l'année avec une présentation optimisée des artistes, titres et albums",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/55edc494a3e5e2f4f4ba5353d654f690b34f58f1",
-      "tags": []
-    },
-    {
-      "sha": "ecc0a6eea6865c7902214941edf2557367591a90",
-      "message": "Merge branch 'master' of https://github.com/SanoBld/LastStats",
-      "date": "2026-08-14T05:07:01Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/ecc0a6eea6865c7902214941edf2557367591a90",
       "tags": []
     }
   ]
