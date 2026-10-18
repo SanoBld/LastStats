@@ -1332,6 +1332,7 @@ const Map<String, String> kTxIt = {
   'yr_cal_h': 'Il tuo anno in un calendario',
   'yr_share_h': 'Dove vanno i tuoi ascolti',
   'yr_share_err': 'Impossibile creare l\'immagine. Riprova.',
+  'yr_share_profile': 'Usa i colori della mia foto profilo',
   'yr_months_full': 'gennaio,febbraio,marzo,aprile,maggio,giugno,luglio,agosto,settembre,ottobre,novembre,dicembre',
   'yr_months_gen': 'gennaio,febbraio,marzo,aprile,maggio,giugno,luglio,agosto,settembre,ottobre,novembre,dicembre',
   'yr_day_fmt': '{d} {m}',

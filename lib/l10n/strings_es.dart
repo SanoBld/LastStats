@@ -1361,6 +1361,7 @@ const Map<String, String> kTxEs = {
   'yr_cal_h': 'Tu año en un calendario',
   'yr_share_h': 'A dónde van tus reproducciones',
   'yr_share_err': 'No se pudo crear la imagen. Inténtalo de nuevo.',
+  'yr_share_profile': 'Usar los colores de mi foto de perfil',
   'yr_months_full': 'enero,febrero,marzo,abril,mayo,junio,julio,agosto,septiembre,octubre,noviembre,diciembre',
   'yr_months_gen': 'enero,febrero,marzo,abril,mayo,junio,julio,agosto,septiembre,octubre,noviembre,diciembre',
   'yr_day_fmt': '{d} de {m}',

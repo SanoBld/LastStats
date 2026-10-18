@@ -1332,6 +1332,7 @@ const Map<String, String> kTxDe = {
   'yr_cal_h': 'Dein Jahr im Kalender',
   'yr_share_h': 'Wohin deine Wiedergaben gehen',
   'yr_share_err': 'Das Bild konnte nicht erstellt werden. Versuche es erneut.',
+  'yr_share_profile': 'Farben meines Profilbilds verwenden',
   'yr_months_full': 'Januar,Februar,März,April,Mai,Juni,Juli,August,September,Oktober,November,Dezember',
   'yr_months_gen': 'Januar,Februar,März,April,Mai,Juni,Juli,August,September,Oktober,November,Dezember',
   'yr_day_fmt': '{d}. {m}',

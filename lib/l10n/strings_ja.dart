@@ -1331,6 +1331,7 @@ const Map<String, String> kTxJa = {
   'yr_cal_h': 'カレンダーで見る1年',
   'yr_share_h': '再生の内訳',
   'yr_share_err': '画像を作成できませんでした。もう一度お試しください。',
+  'yr_share_profile': 'プロフィール画像の色を使う',
   'yr_months_full': '1月,2月,3月,4月,5月,6月,7月,8月,9月,10月,11月,12月',
   'yr_months_gen': '1月,2月,3月,4月,5月,6月,7月,8月,9月,10月,11月,12月',
   'yr_day_fmt': '{m}{d}日',

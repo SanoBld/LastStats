@@ -71,6 +71,9 @@ class _YearRecapPageState extends State<YearRecapPage> {
   final PageController _pages = PageController();
   final GlobalKey _shareKey = GlobalKey();
   bool _sharing = false;
+  // Share card colour from the profile picture (null = no picture / not loaded)
+  final ValueNotifier<Color?> _tint = ValueNotifier(null);
+  final ValueNotifier<bool> _profileOn = ValueNotifier(true);
   final ValueNotifier<bool> _sharingN = ValueNotifier(false);
   _YrFriends? _friendsData;
   int _token = 0;
@@ -79,11 +82,34 @@ class _YearRecapPageState extends State<YearRecapPage> {
   void initState() {
     super.initState();
     _load();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      _profileOn.value = p.getBool('ls_year_share_profile') ?? true;
+      final me = await widget.service.getUserInfo();
+      final imgs = me?['image'];
+      var url = '';
+      if (imgs is List && imgs.isNotEmpty) {
+        final e = imgs.lastWhere((i) => i is Map && i['size'] == 'extralarge', orElse: () => imgs.last);
+        url = (e is Map ? e['#text'] ?? '' : '').toString();
+      }
+      // Empty or default Last.fm picture: keep the theme gradient
+      if (url.isEmpty || url.contains('2a96cbd8b46e442fc41c2b86b821562f')) return;
+      final r = await OfflineImageCache.responseFor(url).timeout(const Duration(seconds: 8));
+      if (r.statusCode != 200 || r.bodyBytes.isEmpty) return;
+      final argb = await _extractDominantColorArgb(r.bodyBytes);
+      if (argb != null && mounted) _tint.value = Color(argb);
+    } catch (_) {}
   }
 
   @override
   void dispose() {
     _sharingN.dispose();
+    _tint.dispose();
+    _profileOn.dispose();
     _pages.dispose();
     super.dispose();
   }
@@ -373,6 +399,19 @@ class _YearRecapPageState extends State<YearRecapPage> {
 
   int get _slideCount => _buildSlides(Theme.of(context).colorScheme).length;
 
+  // Same prev/next button as the week/month recap
+  Widget _navBtn(ColorScheme scheme, IconData icon, bool enabled, VoidCallback onTap) {
+    return M3TonalButton(
+      width: 72,
+      height: 52,
+      padding: EdgeInsets.zero,
+      color: scheme.secondaryContainer,
+      radius: BorderRadius.circular(26),
+      onTap: enabled ? onTap : null,
+      child: Icon(icon, color: scheme.onSecondaryContainer, size: 28),
+    );
+  }
+
   // ── Build ────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
@@ -448,19 +487,13 @@ class _YearRecapPageState extends State<YearRecapPage> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 4, 20, 10),
                 child: Row(children: [
-                  IconButton.filledTonal(
-                    icon: const Icon(Icons.chevron_left_rounded),
-                    onPressed: _slide > 0 ? _prev : null,
-                  ),
+                  _navBtn(scheme, Icons.chevron_left_rounded, _slide > 0, _prev),
                   Expanded(
                     child: Text('${_slide + 1} / ${slides.length}',
                         textAlign: TextAlign.center,
                         style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13, fontWeight: FontWeight.w800)),
                   ),
-                  IconButton.filledTonal(
-                    icon: const Icon(Icons.chevron_right_rounded),
-                    onPressed: _slide < slides.length - 1 ? _next : null,
-                  ),
+                  _navBtn(scheme, Icons.chevron_right_rounded, _slide < slides.length - 1, _next),
                 ]),
               ),
           ]),
@@ -802,10 +835,38 @@ class _YearRecapPageState extends State<YearRecapPage> {
           width: cardW,
           child: FittedBox(
             fit: BoxFit.fitWidth,
-            child: RepaintBoundary(key: _shareKey, child: _YrShareCard(scheme: s, year: _year, username: widget.username, data: d, hours: hours, fmt: _fmt, rankLine: rankLine)),
+            child: ValueListenableBuilder<Color?>(
+              valueListenable: _tint,
+              builder: (_, tint, __) => ValueListenableBuilder<bool>(
+                valueListenable: _profileOn,
+                builder: (_, on, __) => RepaintBoundary(
+                  key: _shareKey,
+                  child: _YrShareCard(scheme: s, year: _year, username: widget.username, data: d, hours: hours, fmt: _fmt, rankLine: rankLine, tint: on ? tint : null),
+                ),
+              ),
+            ),
           ),
         ),
-        const SizedBox(height: 14),
+        // Option: use the profile picture colours for the share image
+        ValueListenableBuilder<Color?>(
+          valueListenable: _tint,
+          builder: (_, tint, __) => tint == null
+              ? const SizedBox(height: 14)
+              : ValueListenableBuilder<bool>(
+                  valueListenable: _profileOn,
+                  builder: (_, on, __) => SwitchListTile(
+                    dense: true,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                    title: Text(tx('yr_share_profile'), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                    value: on,
+                    onChanged: (v) async {
+                      _profileOn.value = v;
+                      final p = await SharedPreferences.getInstance();
+                      await p.setBool('ls_year_share_profile', v);
+                    },
+                  ),
+                ),
+        ),
         ValueListenableBuilder<bool>(
           valueListenable: _sharingN,
           builder: (_, busy, __) => FilledButton.icon(
@@ -963,8 +1024,10 @@ class _YrAvatar extends StatelessWidget {
       child: Text(label.isEmpty ? '?' : label.characters.first.toUpperCase(),
           style: TextStyle(color: s.onPrimaryContainer, fontSize: size * 0.42, fontWeight: FontWeight.w900)),
     );
-    return ClipPath(
-      clipper: ShapeBorderClipper(shape: M3CookieBorder(lobes: 8, amplitude: size > 80 ? 0.10 : 0.07)),
+    // Shape follows the app setting (cookie, circle, square, mix)
+    return M3ShapedBox(
+      size: size,
+      seed: label,
       child: url.isEmpty
           ? fallback
           : ImageService.widgetImage(url: url, width: size, height: size, fit: BoxFit.cover, errorWidget: fallback),
@@ -1124,12 +1187,10 @@ class _YrImgState extends State<_YrImg> {
         size: widget.size * 0.5,
       ),
     );
-    // Artists get the app's cookie shape (M3CookieBorder), covers a soft square.
-    final ShapeBorder shape = widget.round
-        ? M3CookieBorder(lobes: 10, amplitude: widget.size > 120 ? 0.09 : 0.07)
-        : RoundedRectangleBorder(borderRadius: BorderRadius.circular(widget.size * 0.18));
-    return ClipPath(
-      clipper: ShapeBorderClipper(shape: shape),
+    // Shape follows the app setting, same seed rule as the recap tabs
+    return M3ShapedBox(
+      size: widget.size,
+      seed: widget.name,
       child: FutureBuilder<String>(
         future: _future,
         builder: (_, snap) {
@@ -1151,11 +1212,13 @@ class _YrShareCard extends StatelessWidget {
   final int hours;
   final String Function(int) fmt;
   final String? rankLine; // friends ranking, when known
-  const _YrShareCard({required this.scheme, required this.year, required this.username, required this.data, required this.hours, required this.fmt, this.rankLine});
+  final Color? tint; // profile picture colour for the gradient (null = theme)
+  const _YrShareCard({required this.scheme, required this.year, required this.username, required this.data, required this.hours, required this.fmt, this.rankLine, this.tint});
 
   Widget _stat(String label, String value) => Expanded(
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
           decoration: BoxDecoration(color: scheme.surfaceContainerHigh, borderRadius: BorderRadius.circular(14)),
           child: Column(children: [
             Text(value, style: TextStyle(color: scheme.primary, fontSize: 20, fontWeight: FontWeight.w900)),
@@ -1171,13 +1234,22 @@ class _YrShareCard extends StatelessWidget {
       const SizedBox(height: 6),
       for (var i = 0; i < items.length && i < 3; i++)
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 3),
+          padding: const EdgeInsets.symmetric(vertical: 2),
           child: Row(children: [
             SizedBox(width: 20, child: Text('${i + 1}', style: TextStyle(color: scheme.primary, fontSize: 14, fontWeight: FontWeight.w900))),
-            _YrImg(name: items[i].name, artist: items[i].artist, type: type, size: 34, round: type == 'artists'),
+            _YrImg(name: items[i].name, artist: items[i].artist, type: type, size: 36, round: type == 'artists'),
             const SizedBox(width: 10),
             Expanded(
-              child: Text(items[i].name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: scheme.onSurface, fontSize: 13, fontWeight: FontWeight.w800)),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(items[i].name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: scheme.onSurface, fontSize: 13, fontWeight: FontWeight.w800)),
+                // Artist (tracks/albums) + play count
+                Text(
+                  [if (items[i].artist.isNotEmpty) items[i].artist, tx('yr_plays', {'n': fmt(items[i].count)})].join(' · '),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 10.5, fontWeight: FontWeight.w600),
+                ),
+              ]),
             ),
           ]),
         ),
@@ -1191,41 +1263,46 @@ class _YrShareCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(28),
       clipBehavior: Clip.antiAlias,
       child: Container(
-        width: 340,
-        padding: const EdgeInsets.fromLTRB(22, 26, 22, 18),
+        width: 360,
+        height: 640, // 9:16 (story format), exported at 3x = 1080x1920
+        padding: const EdgeInsets.fromLTRB(14, 22, 14, 14),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [scheme.primaryContainer, scheme.surface],
+            colors: [
+              tint == null ? scheme.primaryContainer : ColorScheme.fromSeed(seedColor: tint!, brightness: scheme.brightness).primaryContainer,
+              scheme.surface,
+            ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             stops: const [0, 0.45],
           ),
         ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-          Text('LastStats · $username', style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12, fontWeight: FontWeight.w700)),
+        // FittedBox shrinks the content if it is ever taller than the card
+        child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.topCenter, child: SizedBox(width: 332, child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+          Text(username, style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
-          Text(tx('yr_intro_h', {'year': '$year'}), style: TextStyle(color: scheme.onSurface, fontSize: 24, fontWeight: FontWeight.w900, height: 1.1)),
-          const SizedBox(height: 14),
-          Row(children: [
+          Text(tx('yr_intro_h', {'year': '$year'}), style: TextStyle(color: scheme.onSurface, fontSize: 22, fontWeight: FontWeight.w900, height: 1.1)),
+          const SizedBox(height: 10),
+          IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             _stat(tx('yr_scrobbles'), fmt(data.total)),
             const SizedBox(width: 8),
-            _stat(tx('yr_card_hours'), fmt(hours)),
+            _stat(tx('yr_card_hours').replaceAll(RegExp(r'\s*[\(（][^\)）]*[\)）]'), ''), fmt(hours)),
             const SizedBox(width: 8),
             _stat(tx('yr_card_streak'), '${data.longestStreak}'),
-          ]),
+          ])),
           if (rankLine != null) ...[
             const SizedBox(height: 10),
             Center(child: Text(rankLine!, style: TextStyle(color: scheme.primary, fontSize: 13, fontWeight: FontWeight.w800))),
           ],
-          const SizedBox(height: 14),
+          const SizedBox(height: 10),
           _list(tx('yr_top_artists'), data.artists, 'artists'),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           _list(tx('yr_top_tracks'), data.tracks, 'tracks'),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           _list(tx('yr_top_albums'), data.albums, 'albums'),
-          const SizedBox(height: 18),
+          const SizedBox(height: 14),
           Center(child: Text('LastStats', style: TextStyle(color: scheme.onSurfaceVariant.withValues(alpha: 0.7), fontSize: 11, fontWeight: FontWeight.w700))),
-        ]),
+        ]))),
       ),
     );
   }
