@@ -160,6 +160,21 @@
   <section class="summary offset-anchor" id="static-properties">
     <h2>Static Properties</h2>
     <dl class="properties">
+        <dt id="errorCount" class="property">
+  <span class="name"><a href="../services_spotify_canvas_service/SpotifyCanvasService/errorCount.html">errorCount</a></span>
+  <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
+  
+
+</dt>
+<dd>
+  Counts real failures (no token, network or HTTP error...), NOT the
+normal case "this track has no Canvas". The cover service compares it
+before/after a lookup: after a failure the empty result is not
+remembered, so the lookup is tried again later.
+  <div class="features"><span class="feature">getter/setter pair</span></div>
+
+</dd>
+
         <dt id="lastError" class="property">
   <span class="name"><a href="../services_spotify_canvas_service/SpotifyCanvasService/lastError.html">lastError</a></span>
   <span class="signature">&#8596; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span>
@@ -178,20 +193,6 @@
   <section class="summary offset-anchor" id="static-methods">
     <h2>Static Methods</h2>
     <dl class="callables">
-        <dt id="diagnose" class="callable">
-  <span class="name"><a href="../services_spotify_canvas_service/SpotifyCanvasService/diagnose.html">diagnose</a></span><span class="signature">(<wbr>)
-    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span>
-  </span>
-  
-
-</dt>
-<dd>
-  Step-by-step test (for the "Test Spotify" button). Texts come from
-the language files (dg_* keys).
-  
-
-</dd>
-
         <dt id="disconnect" class="callable">
   <span class="name"><a href="../services_spotify_canvas_service/SpotifyCanvasService/disconnect.html">disconnect</a></span><span class="signature">(<wbr>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>

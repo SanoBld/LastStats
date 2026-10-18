@@ -119,6 +119,7 @@
     &#47;&#47; the dedicated switch instead, even if YouTube is not a source.
     final ytOk = track.isNotEmpty &amp;&amp; (dashboard ? cfg.ytDash : cfg.useYoutube);
     String? video;
+    final spErrors = SpotifyCanvasService.errorCount;
     &#47;&#47; Try the sources in the order chosen by the user.
     for (final src in cfg.order) {
       if (video != null) break;
@@ -132,6 +133,11 @@
     &#47;&#47; Dashboard switch on but YouTube not in the sources: last resort.
     if (video == null &amp;&amp; ytOk &amp;&amp; !cfg.useYoutube) {
       video = await _youtube(artist, track, cfg.height);
+    }
+    &#47;&#47; Spotify failed for a real reason (token, network...): don&#39;t remember
+    &#47;&#47; &quot;no video&quot;, so it is tried again later.
+    if (video == null &amp;&amp; cfg.useSpotify &amp;&amp; SpotifyCanvasService.errorCount != spErrors) {
+      return null;
     }
     _remember(key, video);
     return video;
