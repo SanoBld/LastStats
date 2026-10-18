@@ -1268,6 +1268,8 @@ const Map<String, String> kTxRu = {
   'ntf_milestone_body': 'Вы только что достигли {n} скробблов на Last.fm 🎶',
   'ntf_daily_title': '📊 Итоги дня · {d}',
   'ntf_weekly_title': '📅 Итоги недели · {w}',
+  'ntf_year_title': '👀 Ваш итог {y} года готов',
+  'ntf_year_body': 'Узнайте, как прошёл ваш {y} год в музыке: исполнители, треки, альбомы и многое другое.',
   'ntf_recap_body': '{n} скробблов · Топ: {a}',
   'ntf_n_today': '{n} скробблов сегодня',
   'ntf_n_week': '{n} скробблов за неделю',

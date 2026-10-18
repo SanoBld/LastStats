@@ -27,6 +27,15 @@ class _FriendData {
 }
 
 
+// Year-recap shortcut (👀) in the dashboard header. TEST MODE: always visible.
+// Set to false to only show it from January 1st to January 15th.
+const _kYearRecapAlwaysVisible = true;
+bool _yearRecapSeason() {
+  if (_kYearRecapAlwaysVisible) return true;
+  final n = DateTime.now();
+  return n.month == 1 && n.day <= 15;
+}
+
 const _kDefaultStatCards = ['top_artist', 'top_album', 'top_track', 'last_track', 'favorites_count'];
 
 
@@ -1935,6 +1944,29 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      if (_yearRecapSeason()) ...[
+                        GestureDetector(
+                          onTap: () {
+                            _haptic(_HapticImpact.light);
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (_) => YearRecapPage(
+                                service: widget.service,
+                                username: widget.username,
+                              ),
+                            ));
+                          },
+                          child: Container(
+                            width: 34, height: 34,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: scheme.primaryContainer.withValues(alpha: 0.78),
+                            ),
+                            child: const Text('👀', style: TextStyle(fontSize: 16, height: 1)),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                      ],
                       // News bell with unread badge
                       GestureDetector(
                         key: _newsBtnKey,

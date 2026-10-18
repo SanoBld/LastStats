@@ -5,7 +5,7 @@ part of 'home_screen.dart';
 const double _kYrAvgTrackMinutes = 3.5;
 
 // Accent-tinted soft text colour (instead of a neutral grey), works in light and dark
-Color _yrSoft(ColorScheme s) => Color.lerp(s.onSurface, s.primary, 0.55)!;
+Color _yrSoft(ColorScheme s) => Color.lerp(s.onPrimaryContainer, s.primary, 0.55)!;
 
 // True while a slide is rendered for sharing: animations jump to their final state
 bool _yrInstant = false;
@@ -68,7 +68,10 @@ class YearRecapPage extends StatefulWidget {
 }
 
 class _YearRecapPageState extends State<YearRecapPage> {
-  late int _year = DateTime.now().year;
+  // In the first half of January, open on the year that just ended.
+  late int _year = (DateTime.now().month == 1 && DateTime.now().day <= 15)
+      ? DateTime.now().year - 1
+      : DateTime.now().year;
   _YrData? _data;
   bool _loading = true;
   bool _error = false;
@@ -617,7 +620,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     if (_loading) {
       return Center(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          SizedBox(width: 120, child: LinearProgressIndicator(value: _progress > 0 ? _progress : null, borderRadius: BorderRadius.circular(8))),
+          SizedBox(width: 160, child: M3WavyProgress(value: _progress.clamp(0.0, 1.0).toDouble())),
           const SizedBox(height: 16),
           Text(tx('yr_loading'), style: TextStyle(color: _yrSoft(scheme))),
         ]),
@@ -681,11 +684,11 @@ class _YearRecapPageState extends State<YearRecapPage> {
       scheme: s,
       children: [
         if (_yrInstant)
-          const SizedBox(height: 40)
+          const SizedBox(height: 0)
         else ...[
           Text(tx('yr_intro_h', {'year': '$_year'}),
               textAlign: TextAlign.center,
-              style: TextStyle(color: s.onSurface, fontSize: 28, fontWeight: FontWeight.w900, height: 1.1)),
+              style: TextStyle(color: s.onPrimaryContainer, fontSize: 28, fontWeight: FontWeight.w900, height: 1.1)),
           const SizedBox(height: 28),
         ],
         _YrCountUp(value: d.total, fmt: _fmt, delayMs: 350, durationMs: 1600,
@@ -706,7 +709,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
         if (_yrInstant) ...[
           const SizedBox(height: 28),
           Text(tx('yr_unique', {'a': _fmt(d.uniqueArtists), 't': _fmt(d.uniqueTracks)}),
-              textAlign: TextAlign.center, style: TextStyle(color: s.onSurface, fontSize: 14, fontWeight: FontWeight.w700)),
+              textAlign: TextAlign.center, style: TextStyle(color: s.onPrimaryContainer, fontSize: 14, fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           Text(tx('yr_active', {'n': '${d.activeDays}', 't': '${d.daysInRange}'}),
               textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 14)),
@@ -767,7 +770,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
         ),
         const SizedBox(height: 22),
         Text(tx('yr_best_month', {'m': bestMonth < _monthsFull.length ? _monthsFull[bestMonth] : '', 'n': _fmt(maxM)}),
-            textAlign: TextAlign.center, style: TextStyle(color: s.onSurface, fontSize: 16, fontWeight: FontWeight.w800)),
+            textAlign: TextAlign.center, style: TextStyle(color: s.onPrimaryContainer, fontSize: 16, fontWeight: FontWeight.w800)),
         if (d.busiestDay != null) ...[
           const SizedBox(height: 8),
           Text(tx('yr_best_day', {'d': _dayLabel(d.busiestDay!), 'n': _fmt(d.busiestDayCount)}),
@@ -831,7 +834,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
         ),
         const SizedBox(height: 22),
         Text(tx('yr_peak', {'h': '$peakHour', 'd': favDay < wd.length ? wd[favDay] : ''}),
-            textAlign: TextAlign.center, style: TextStyle(color: s.onSurface, fontSize: 16, fontWeight: FontWeight.w800)),
+            textAlign: TextAlign.center, style: TextStyle(color: s.onPrimaryContainer, fontSize: 16, fontWeight: FontWeight.w800)),
       ],
     ));
 
@@ -845,7 +848,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
             style: TextStyle(color: s.primary, fontSize: 72, fontWeight: FontWeight.w900, height: 1)),
         const SizedBox(height: 6),
         Text(tx('yr_streak', {'n': '${d.longestStreak}'}),
-            textAlign: TextAlign.center, style: TextStyle(color: s.onSurface, fontSize: 16, fontWeight: FontWeight.w800)),
+            textAlign: TextAlign.center, style: TextStyle(color: s.onPrimaryContainer, fontSize: 16, fontWeight: FontWeight.w800)),
         const SizedBox(height: 18),
         Text(tx('yr_active', {'n': '${d.activeDays}', 't': '${d.daysInRange}'}),
             textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 14)),
@@ -860,6 +863,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
           _label(s, tx('yr_share_h')),
           const SizedBox(height: 16),
           _ShareDonut(
+            textColor: s.onPrimaryContainer,
             items: d.artistsWide,
             getLabel: (e) => (e as _YrRanked).name,
             getPlays: (e) => (e as _YrRanked).count,
@@ -878,13 +882,13 @@ class _YearRecapPageState extends State<YearRecapPage> {
           _YrCountUp(value: d.newArtists!, fmt: _fmt, delayMs: 300, durationMs: 1400,
               style: TextStyle(color: s.primary, fontSize: 72, fontWeight: FontWeight.w900, height: 1)),
           const SizedBox(height: 6),
-          Text(tx('yr_new'), textAlign: TextAlign.center, style: TextStyle(color: s.onSurface, fontSize: 16, fontWeight: FontWeight.w800)),
+          Text(tx('yr_new'), textAlign: TextAlign.center, style: TextStyle(color: s.onPrimaryContainer, fontSize: 16, fontWeight: FontWeight.w800)),
           const SizedBox(height: 18),
         ],
         Text(tx('yr_unique', {'a': _fmt(d.uniqueArtists), 't': _fmt(d.uniqueTracks)}),
             textAlign: TextAlign.center,
             style: TextStyle(
-                color: d.newArtists != null ? _yrSoft(s) : s.onSurface,
+                color: d.newArtists != null ? _yrSoft(s) : s.onPrimaryContainer,
                 fontSize: d.newArtists != null ? 14 : 20,
                 fontWeight: d.newArtists != null ? FontWeight.w600 : FontWeight.w800)),
       ],
@@ -933,7 +937,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
           const SizedBox(height: 14),
           _YrReveal(delayMs: 800, child: Text(fr.twin!,
               textAlign: TextAlign.center,
-              style: TextStyle(color: s.onSurface, fontSize: 22, fontWeight: FontWeight.w900))),
+              style: TextStyle(color: s.onPrimaryContainer, fontSize: 22, fontWeight: FontWeight.w900))),
           const SizedBox(height: 6),
           _YrReveal(delayMs: 1100, child: Text(tx('yr_twin_s', {'n': '${fr.sharedCount}'}),
               textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 14))),
@@ -947,7 +951,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                 _YrReveal(
                   delayMs: 1400 + i * 160,
                   child: Chip(
-                    label: Text(fr.shared[i], style: const TextStyle(fontWeight: FontWeight.w700)),
+                    label: Text(fr.shared[i], style: TextStyle(fontWeight: FontWeight.w700, color: s.onPrimaryContainer)),
                     backgroundColor: s.primaryContainer,
                     side: BorderSide.none,
                   ),
@@ -1020,21 +1024,33 @@ class _YearRecapPageState extends State<YearRecapPage> {
       scheme: s,
       compact: true,
       children: [
-        _label(s, label),
-        SizedBox(height: _yrInstant ? 12 : 18),
-        _YrReveal(
-          delayMs: 300,
-          pop: true,
-          child: _YrImg(name: first.name, artist: first.artist, type: type, size: _yrInstant ? 110 : 190, round: type == 'artists'),
-        ),
-        SizedBox(height: _yrInstant ? 12 : 18),
+        if (_yrInstant)
+          Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+            Expanded(
+              child: Text('${label.toUpperCase()} :',
+                  textAlign: TextAlign.left,
+                  style: TextStyle(color: s.primary, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 1.0, height: 1.25)),
+            ),
+            const SizedBox(width: 12),
+            _YrImg(name: first.name, artist: first.artist, type: type, size: 120, round: type == 'artists'),
+          ])
+        else ...[
+          _label(s, label),
+          const SizedBox(height: 18),
+          _YrReveal(
+            delayMs: 300,
+            pop: true,
+            child: _YrImg(name: first.name, artist: first.artist, type: type, size: 190, round: type == 'artists'),
+          ),
+        ],
+        SizedBox(height: _yrInstant ? 14 : 18),
         _YrReveal(
           delayMs: 900,
           child: Text(first.name,
               textAlign: TextAlign.center,
               maxLines: _yrInstant ? 1 : 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: s.onSurface, fontSize: 22, fontWeight: FontWeight.w900)),
+              style: TextStyle(color: s.onPrimaryContainer, fontSize: _yrInstant ? 26 : 22, fontWeight: FontWeight.w900)),
         ),
         if (first.artist.isNotEmpty)
           _YrReveal(
@@ -1076,7 +1092,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
             child: Text(me ? tx('yr_you') : r.name,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: s.onSurface, fontSize: 14, fontWeight: me ? FontWeight.w900 : FontWeight.w700)),
+                style: TextStyle(color: s.onPrimaryContainer, fontSize: 14, fontWeight: me ? FontWeight.w900 : FontWeight.w700)),
           ),
           _YrCountUp(value: r.total, fmt: _fmt, delayMs: delayMs, durationMs: 1100,
               style: TextStyle(color: me ? s.primary : _yrSoft(s), fontSize: 14, fontWeight: FontWeight.w800)),
@@ -1123,7 +1139,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
               const SizedBox(width: 12),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(items[i].name, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppText.itemTitle.copyWith(color: s.onSurface)),
+                  Text(items[i].name, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppText.itemTitle.copyWith(color: s.onPrimaryContainer)),
                   if (items[i].artist.isNotEmpty)
                     Text(items[i].artist, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppText.label.copyWith(color: _yrSoft(s))),
                 ]),
@@ -1278,7 +1294,7 @@ class _YrSlide extends StatelessWidget {
     // Share frame: natural height (the card scales it), small side margins
     if (_yrInstant) {
       return Padding(
-        padding: EdgeInsets.fromLTRB(8, compact ? 0 : 56, 8, 0),
+        padding: EdgeInsets.fromLTRB(8, compact ? 36 : 66, 8, 0),
         child: Column(mainAxisSize: MainAxisSize.min, children: children),
       );
     }
@@ -1440,6 +1456,22 @@ class _YrShareCard extends StatelessWidget {
               ),
             ),
           ),
+        if (photo != null)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 170,
+            child: DecoratedBox(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0x73000000), Color(0x00000000)],
+                ),
+              ),
+            ),
+          ),
         Container(
         width: 360,
         height: 640, // 9:16 (story format), exported at 3x = 1080x1920
@@ -1466,7 +1498,7 @@ class _YrShareCard extends StatelessWidget {
               width: 332,
               child: FittedBox(
                 fit: BoxFit.scaleDown,
-                alignment: Alignment.topCenter,
+                alignment: (slide is _YrSlide && (slide as _YrSlide).compact) ? Alignment.topCenter : Alignment.center,
                 child: SizedBox(width: 332, child: slide),
               ),
             )

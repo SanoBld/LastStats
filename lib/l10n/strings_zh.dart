@@ -1294,6 +1294,8 @@ const Map<String, String> kTxZh = {
   'ntf_milestone_body': '你刚刚在 Last.fm 上达到了 {n} 次 scrobble 🎶',
   'ntf_daily_title': '📊 每日回顾 · {d}',
   'ntf_weekly_title': '📅 每周回顾 · {w}',
+  'ntf_year_title': '👀 你的 {y} 年度回顾已就绪',
+  'ntf_year_body': '回顾你的 {y} 年音乐：艺术家、歌曲、专辑等更多内容。',
   'ntf_recap_body': '{n} 次 scrobble · 最多：{a}',
   'ntf_n_today': '今天 {n} 次 scrobble',
   'ntf_n_week': '本周 {n} 次 scrobble',

@@ -38,6 +38,7 @@ class NotificationDetailPage extends StatelessWidget {
       'grand'     => (Icons.emoji_events_rounded,  const Color(0xFFE65100)),
       'daily'     => (Icons.today_rounded,         const Color(0xFFD51007)),
       'weekly'    => (Icons.date_range_rounded,    const Color(0xFFD51007)),
+      'year'      => (Icons.visibility_rounded,    const Color(0xFFD51007)),
       'update'    => (Icons.system_update_rounded, const Color(0xFF059669)),
       _           => (Icons.notifications_rounded, const Color(0xFFD51007)),
     };

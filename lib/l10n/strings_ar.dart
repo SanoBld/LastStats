@@ -1268,6 +1268,8 @@ const Map<String, String> kTxAr = {
   'ntf_milestone_body': 'لقد بلغت للتو {n} تشغيل على Last.fm 🎶',
   'ntf_daily_title': '📊 ملخص اليوم · {d}',
   'ntf_weekly_title': '📅 ملخص الأسبوع · {w}',
+  'ntf_year_title': '👀 ملخصك لعام {y} جاهز',
+  'ntf_year_body': 'اكتشف عامك {y} في الموسيقى: الفنانون والأغاني والألبومات والمزيد.',
   'ntf_recap_body': '{n} تشغيل · الأعلى: {a}',
   'ntf_n_today': '{n} تشغيل اليوم',
   'ntf_n_week': '{n} تشغيل هذا الأسبوع',

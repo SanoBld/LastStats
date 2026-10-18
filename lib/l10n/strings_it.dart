@@ -1268,6 +1268,8 @@ const Map<String, String> kTxIt = {
   'ntf_milestone_body': 'Hai appena raggiunto {n} scrobble su Last.fm 🎶',
   'ntf_daily_title': '📊 Riepilogo del giorno · {d}',
   'ntf_weekly_title': '📅 Riepilogo settimanale · {w}',
+  'ntf_year_title': '👀 Il tuo riepilogo {y} è pronto',
+  'ntf_year_body': 'Scopri il tuo {y} in musica: artisti, brani, album e molto altro.',
   'ntf_recap_body': '{n} scrobble · Top: {a}',
   'ntf_n_today': '{n} scrobble oggi',
   'ntf_n_week': '{n} scrobble questa settimana',

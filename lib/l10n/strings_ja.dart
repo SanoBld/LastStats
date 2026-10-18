@@ -1267,6 +1267,8 @@ const Map<String, String> kTxJa = {
   'ntf_milestone_body': 'Last.fmで{n}スクロブルに到達しました 🎶',
   'ntf_daily_title': '📊 今日のまとめ · {d}',
   'ntf_weekly_title': '📅 週のまとめ · {w}',
+  'ntf_year_title': '👀 {y}年のまとめが届きました',
+  'ntf_year_body': '{y}年の音楽を振り返ろう：アーティスト、曲、アルバムなど。',
   'ntf_recap_body': '{n}スクロブル · トップ：{a}',
   'ntf_n_today': '今日は{n}スクロブル',
   'ntf_n_week': '今週は{n}スクロブル',

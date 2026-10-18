@@ -40,6 +40,7 @@ class NotificationService {
   static const _idGrand       = 4;
   static const _idUpdate      = 5;
   static const _idSync        = 6;
+  static const _idYearRecap   = 7;
   static const _idTest        = 99;
 
   // News notifications use a stable id derived from the item's own id so
@@ -233,6 +234,30 @@ class NotificationService {
         ),
       ),
       payload: _payload(type: 'milestone', title: title, body: body),
+    );
+  }
+
+  static Future<void> showYearRecap(int year) {
+    final title = tx('ntf_year_title', {'y': '$year'});
+    final body  = tx('ntf_year_body', {'y': '$year'});
+    return _plugin.show(
+      _idYearRecap,
+      title,
+      body,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          _chRecapId, _chRecapName,
+          icon:    '@mipmap/ic_launcher',
+          color:   _kLastFmRed,
+          subText: 'LastStats',
+          styleInformation: BigTextStyleInformation(
+            body,
+            contentTitle: title,
+            summaryText:  'LastStats',
+          ),
+        ),
+      ),
+      payload: _payload(type: 'year', title: title, body: body, emoji: '👀'),
     );
   }
 

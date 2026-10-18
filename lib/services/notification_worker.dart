@@ -55,6 +55,7 @@ const _kDailyMin     = 'ls_notif_daily_min';
 const _kDailyLastDay = 'ls_notif_daily_last_day';
 
 // ── Weekly recap prefs ───────────────────────────────────────────────────────
+const _kYearLast       = 'ls_notif_year_last';
 const _kWeeklyEnabled  = 'ls_notif_weekly_enabled';
 const _kWeeklyDay      = 'ls_notif_weekly_day';
 const _kWeeklyHour     = 'ls_notif_weekly_hour';
@@ -282,7 +283,8 @@ Future<void> _runMilestoneCheck() async {
     final lastCount   = prefs.getInt(_kMilestoneLastCount) ?? 0;
     final lastMultiple = (lastCount ~/ interval) * interval;
     final nowMultiple  = (count     ~/ interval) * interval;
-    if (nowMultiple > lastMultiple) {
+    // lastCount == 0 means first run: just record the baseline, no notification.
+    if (lastCount > 0 && nowMultiple > lastMultiple) {
       await NotificationService.showMilestone(nowMultiple);
     }
   }
@@ -303,9 +305,26 @@ Future<void> _runMilestoneCheck() async {
 
 // ── Recap check ──────────────────────────────────────────────────────────────
 
+// Yearly recap notification: sent only if the user has notifications on
+// (any type), once, on January 1st (from midnight), for the year just ended.
+bool _yearRecapEnabled(SharedPreferences prefs) =>
+    (prefs.getBool(_kGrandEnabled) ?? true) ||
+    (prefs.getBool(_kMilestoneEnabled) ?? false) ||
+    (prefs.getBool(_kDailyEnabled) ?? false) ||
+    (prefs.getBool(_kWeeklyEnabled) ?? false) ||
+    (prefs.getBool(_kNotifNewsEnabled) ?? false);
+
 Future<void> _runRecapCheck() async {
   final prefs = await SharedPreferences.getInstance();
   final now   = DateTime.now();
+
+  if (_yearRecapEnabled(prefs) &&
+      now.month == 1 && now.day == 1 &&
+      (prefs.getInt(_kYearLast) ?? 0) < now.year) {
+    // Mark first so a retry or an overlapping run can never send it twice.
+    await prefs.setInt(_kYearLast, now.year);
+    await NotificationService.showYearRecap(now.year - 1);
+  }
 
   if (prefs.getBool(_kDailyEnabled) ?? false) {
     final targetH = prefs.getInt(_kDailyHour) ?? 21;
@@ -470,7 +489,7 @@ class NotificationWorker {
     await Workmanager().cancelByUniqueName(_kTaskRecap);
     final dailyOn  = prefs.getBool(_kDailyEnabled)  ?? false;
     final weeklyOn = prefs.getBool(_kWeeklyEnabled) ?? false;
-    if (dailyOn || weeklyOn) {
+    if (dailyOn || weeklyOn || _yearRecapEnabled(prefs)) {
       await Workmanager().registerPeriodicTask(
         _kTaskRecap,
         _kTaskRecap,

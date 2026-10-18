@@ -1297,6 +1297,8 @@ const Map<String, String> kTxFr = {
   'ntf_milestone_body': 'Vous venez d’atteindre {n} scrobbles sur Last.fm 🎶',
   'ntf_daily_title': '📊 Récap du jour · {d}',
   'ntf_weekly_title': '📅 Récap de la semaine · {w}',
+  'ntf_year_title': '👀 Votre récap {y} est prêt',
+  'ntf_year_body': 'Découvrez votre année {y} en musique : artistes, titres, albums et bien plus.',
   'ntf_recap_body': '{n} scrobbles · Favori : {a}',
   'ntf_n_today': '{n} scrobbles aujourd’hui',
   'ntf_n_week': '{n} scrobbles cette semaine',

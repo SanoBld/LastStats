@@ -586,8 +586,9 @@ class _ShareDonut extends StatelessWidget {
   final String Function(dynamic) getLabel;
   final int Function(dynamic) getPlays;
   final void Function(dynamic)? onTap;
+  final Color? textColor;
   const _ShareDonut({required this.items, required this.getLabel,
-      required this.getPlays, this.onTap});
+      required this.getPlays, this.onTap, this.textColor});
 
   @override
   Widget build(BuildContext context) {
@@ -615,8 +616,8 @@ class _ShareDonut extends StatelessWidget {
               painter: _DonutShare(values: segs, colors: palette, progress: p,
                   bg: s.surfaceContainerHighest),
               child: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-                Text(_fmt(total), style: t.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
-                Text(L.commonPlays, style: t.labelSmall?.copyWith(color: s.onSurfaceVariant)),
+                Text(_fmt(total), style: t.titleLarge?.copyWith(fontWeight: FontWeight.w900, color: textColor)),
+                Text(L.commonPlays, style: t.labelSmall?.copyWith(color: textColor ?? s.onSurfaceVariant)),
               ])),
             ),
           ),
@@ -634,9 +635,9 @@ class _ShareDonut extends StatelessWidget {
                       decoration: BoxDecoration(color: palette[i], shape: BoxShape.circle)),
                   const SizedBox(width: 8),
                   Expanded(child: Text(getLabel(top[i]), maxLines: 1, overflow: TextOverflow.ellipsis,
-                      style: t.bodySmall?.copyWith(fontWeight: FontWeight.w700))),
+                      style: t.bodySmall?.copyWith(fontWeight: FontWeight.w700, color: textColor))),
                   const SizedBox(width: 6),
-                  Text(pct(vals[i]), style: t.labelSmall?.copyWith(color: s.onSurfaceVariant)),
+                  Text(pct(vals[i]), style: t.labelSmall?.copyWith(color: textColor ?? s.onSurfaceVariant)),
                 ]),
               ),
             ),
