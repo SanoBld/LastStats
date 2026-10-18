@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-18T08:52:14Z",
+  "updated": "2026-10-18T08:56:51Z",
   "commits": [
+    {
+      "sha": "8d38f0f5a2de167585cfbac35889d4228d732fdf",
+      "message": "feat: améliorer la page de récapitulatif de l'année avec une présentation optimisée des artistes, titres et albums",
+      "date": "2026-10-18T08:56:31Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/8d38f0f5a2de167585cfbac35889d4228d732fdf",
+      "tags": []
+    },
     {
       "sha": "95948eee36b819fb6ec3c2d2457fb611fa490afd",
       "message": "feat: ajouter la fonctionnalité \"Récapitulatif de l'année\" avec classement des amis et jumeau musical",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/ecc0a6eea6865c7902214941edf2557367591a90",
-      "tags": []
-    },
-    {
-      "sha": "08b5fa1854c1f5078c9581483267e6dd279d1ead",
-      "message": "feat(achievements): add social and comparison achievements with tracking",
-      "date": "2026-08-14T05:06:53Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/08b5fa1854c1f5078c9581483267e6dd279d1ead",
       "tags": []
     }
   ]
