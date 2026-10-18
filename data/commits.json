@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-18T03:28:01Z",
+  "updated": "2026-10-18T08:42:22Z",
   "commits": [
+    {
+      "sha": "a914b37f9fcb4d2e5716a3c3c8e6e5b401300911",
+      "message": "Add Year Recap feature with localization support\n\n- Implemented Year Recap page to display user's music statistics for the year.\n- Added localization strings for Portuguese, Russian, and Chinese languages.\n- Updated dashboard to include Year Recap option in the popup menu.\n- Created a new YearRecapPage that aggregates and displays yearly listening data.\n- Enhanced user experience with visual statistics including top artists, tracks, albums, and listening habits.",
+      "date": "2026-10-18T08:42:00Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/a914b37f9fcb4d2e5716a3c3c8e6e5b401300911",
+      "tags": []
+    },
     {
       "sha": "29639be619914b9161c9e7f3c963ad7c734b99ac",
       "message": "feat: permettre l'utilisation de YouTube pour la couverture animée sur le tableau de bord, même si ce n'est pas une source",
@@ -2703,17 +2712,6 @@
       "avatar": "https://avatars.githubusercontent.com/in/15368?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/35821a64b5685970913f8229dd0455397f7f466b",
       "tags": []
-    },
-    {
-      "sha": "350b90c3e398063098c8a8e67d3a54d6c0f0b4cc",
-      "message": "fix(changelog): update version to v3.1.0-beta for upcoming release",
-      "date": "2026-08-13T15:47:29Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/350b90c3e398063098c8a8e67d3a54d6c0f0b4cc",
-      "tags": [
-        "v3.1.0-beta"
-      ]
     }
   ]
 }
