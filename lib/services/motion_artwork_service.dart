@@ -198,6 +198,7 @@ class MotionArtworkService {
       // the dedicated switch instead, even if YouTube is not a source.
       final ytOk = track.isNotEmpty && (dashboard ? cfg.ytDash : cfg.useYoutube);
       String? video;
+      final spErrors = SpotifyCanvasService.errorCount;
       // Try the sources in the order chosen by the user.
       for (final src in cfg.order) {
         if (video != null) break;
@@ -211,6 +212,11 @@ class MotionArtworkService {
       // Dashboard switch on but YouTube not in the sources: last resort.
       if (video == null && ytOk && !cfg.useYoutube) {
         video = await _youtube(artist, track, cfg.height);
+      }
+      // Spotify failed for a real reason (token, network...): don't remember
+      // "no video", so it is tried again later.
+      if (video == null && cfg.useSpotify && SpotifyCanvasService.errorCount != spErrors) {
+        return null;
       }
       _remember(key, video);
       return video;

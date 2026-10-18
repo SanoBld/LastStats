@@ -13,7 +13,6 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../l10n/extra_strings.dart';
 import 'api_http.dart';
 import 'spotify_web_session.dart';
 
@@ -45,6 +44,20 @@ class SpotifyCanvasService {
 
   /// Last problem seen (for debugging only).
   static String? lastError;
+
+  /// Counts real failures (no token, network or HTTP error...), NOT the
+  /// normal case "this track has no Canvas". The cover service compares it
+  /// before/after a lookup: after a failure the empty result is not
+  /// remembered, so the lookup is tried again later.
+  static int errorCount = 0;
+  static void _err(String m) {
+    lastError = m;
+    errorCount++;
+  }
+
+  // After a failed login/token refresh, wait before opening the hidden web
+  // player again (otherwise every cover would open one).
+  static DateTime? _failedAt;
 
   static Future<bool> isConnected() async {
     final p = await SharedPreferences.getInstance();
@@ -92,15 +105,22 @@ class SpotifyCanvasService {
         DateTime.now().millisecondsSinceEpoch < exp) {
       return _Sess(tok, ct);
     }
+    final bad = _failedAt;
+    if (!force && bad != null && DateTime.now().difference(bad).inMinutes < 2) {
+      _err('login/token failed recently, waiting');
+      return null;
+    }
     // One refresh at a time, even if many covers ask together.
     return _refreshing ??= () async {
       try {
         _lastRefresh = DateTime.now();
         final r = await SpotifyWebSession.refresh(spDc);
         if (r == null) {
-          lastError = 'no token (login expired?)';
+          _failedAt = DateTime.now();
+          _err('no token (login expired?)');
           return null;
         }
+        _failedAt = null;
         await _saveToken(p, r.token, r.clientToken);
         if (r.search != null) await p.setString(_kTpl, r.search!);
         return _Sess(r.token, r.clientToken);
@@ -123,7 +143,7 @@ class SpotifyCanvasService {
       }
     }
     if (raw == null) {
-      lastError = 'no search template';
+      _err('no search template');
       return null;
     }
     try {
@@ -160,7 +180,7 @@ class SpotifyCanvasService {
     } on _Expired {
       return null;
     } catch (e) {
-      lastError = '$e';
+      _err('$e');
       return null;
     }
   }
@@ -249,7 +269,7 @@ class SpotifyCanvasService {
     }
     if (res.statusCode == 401) throw _Expired();
     if (res.statusCode != 200) {
-      lastError = 'search ${res.statusCode}';
+      _err('search ${res.statusCode}');
       return [];
     }
     final out = <_Cand>[];
@@ -294,7 +314,7 @@ class SpotifyCanvasService {
     }
   }
 
-  // Raw "canvas" call: HTTP status + body (used by _canvas and diagnose).
+  // Raw "canvas" call: HTTP status + body.
   static Future<(int, String)> _canvasRaw(_Sess s, String trackUri) async {
     final p = await SharedPreferences.getInstance();
     final hash = p.getString(_kHash) ?? defaultHash;
@@ -388,11 +408,11 @@ class SpotifyCanvasService {
       if (await _refreshHash()) return _canvas(s, trackUri, retry: false);
     }
     if (code != 200) {
-      lastError = 'canvas $code';
+      _err('canvas $code');
       return null;
     }
     if (body.contains('PersistedQueryNotFound')) {
-      lastError = 'canvas hash outdated';
+      _err('canvas hash outdated');
       return null;
     }
     // The answer's shape may change: look for the MP4 link anywhere.
@@ -401,41 +421,6 @@ class SpotifyCanvasService {
       lastError = 'canvas: no mp4 in answer: ${body.length > 160 ? body.substring(0, 160) : body}';
     }
     return v;
-  }
-
-  /// Step-by-step test (for the "Test Spotify" button). Texts come from
-  /// the language files (dg_* keys).
-  static Future<String> diagnose() async {
-    final out = <String>[];
-    try {
-      final p = await SharedPreferences.getInstance();
-      final spDc = p.getString(kSpDc) ?? '';
-      out.add('1. ${tx('dg_cookie')}: ${spDc.isEmpty ? tx('dg_missing') : tx('dg_ok')}');
-      if (spDc.isEmpty) return out.join('\n');
-      final s = await _session(force: true);
-      out.add('2. ${tx('dg_token')}: ${s == null ? '${tx('dg_failed')} (${lastError ?? '?'})' : tx('dg_ok')}');
-      if (s == null) return out.join('\n');
-      final tpl = await _template();
-      if (tpl == null) {
-        out.add('3. ${tx('dg_search')}: ${tx('dg_notpl')}');
-      } else {
-        lastError = null;
-        final c = await _search(s, 'SZA Kill Bill');
-        out.add('3. ${tx('dg_search')}: ${c.isEmpty ? '${tx('dg_failed')} (${lastError ?? '0'})' : '${c.length} ${tx('dg_results')}'}');
-      }
-      final (code, body) = await _canvasRaw(s, 'spotify:track:3OHfY25tqY28d16oZczHc8');
-      final mp4 = code == 200 ? _findMp4(jsonDecode(body)) : null;
-      out.add('4. Canvas: HTTP $code, ${mp4 != null ? tx('dg_found') : tx('dg_nofound')}');
-      if (mp4 == null && body.contains('PersistedQueryNotFound')) {
-        await (await SharedPreferences.getInstance()).remove(_kHashAt);
-        out.add('5. Hash: ${await _refreshHash() ? tx('dg_ok') : tx('dg_failed')}');
-      } else if (mp4 == null) {
-        out.add(body.length > 220 ? body.substring(0, 220) : body);
-      }
-    } catch (e) {
-      out.add('$e');
-    }
-    return out.join('\n');
   }
 
   static String? _findMp4(dynamic n) {
