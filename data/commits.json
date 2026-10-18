@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-18T09:33:28Z",
+  "updated": "2026-10-18T09:39:43Z",
   "commits": [
+    {
+      "sha": "74b76cad8a9520e2f03836071f9b366ce4f0b917",
+      "message": "feat: ajouter l'option d'utiliser les couleurs de la photo de profil pour le partage dans le récapitulatif de l'année",
+      "date": "2026-10-18T09:36:57Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/74b76cad8a9520e2f03836071f9b366ce4f0b917",
+      "tags": []
+    },
     {
       "sha": "e10d749672aee11f7fa7fdcfbecb9517f69ef06d",
       "message": "Update localization strings for year recap feature across multiple languages\n\n- Enhanced English, Spanish, French, Italian, Japanese, Portuguese, Russian, and Chinese strings for better clarity and consistency.\n- Improved phrasing for music listening statistics, including hours, best month, and best day.\n- Added full month names and weekdays for better formatting in year recap.\n- Adjusted UI components in year recap page for improved user experience, including share button functionality and layout adjustments.",
@@ -2703,15 +2712,6 @@
       "tags": [
         "v3.1.0"
       ]
-    },
-    {
-      "sha": "4ee430b861c625ac9e591787eeb0e9ef858f3649",
-      "message": "feat: add day/night accent color settings and related functionality",
-      "date": "2026-08-14T10:05:34Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/4ee430b861c625ac9e591787eeb0e9ef858f3649",
-      "tags": []
     }
   ]
 }
