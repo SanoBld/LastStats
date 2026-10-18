@@ -5,6 +5,7 @@ import 'dart:math' show Random;
 import 'dart:ui' show PlatformDispatcher;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
@@ -378,6 +379,7 @@ class LastStatsApp extends StatelessWidget {
                                 navigatorKey:               navigatorKey,
                                 title:                      'LastStats',
                                 debugShowCheckedModeBanner: false,
+                                localizationsDelegates:     GlobalMaterialLocalizations.delegates,
                                 theme:     nLightWithNav,
                                 darkTheme: nDarkWithNav,
                                 themeMode: mode,
@@ -494,6 +496,7 @@ class LastStatsApp extends StatelessWidget {
                                       navigatorKey:               navigatorKey,
                                       title:                      'LastStats',
                                       debugShowCheckedModeBanner: false,
+                                localizationsDelegates:     GlobalMaterialLocalizations.delegates,
                                       theme:     lTheme,
                                       darkTheme: dTheme,
                                       themeMode: mode,

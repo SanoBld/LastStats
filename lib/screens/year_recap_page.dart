@@ -154,6 +154,75 @@ class _YearRecapPageState extends State<YearRecapPage> {
     return [for (var y = last; y >= first; y--) y];
   }
 
+  final GlobalKey _yearKey = GlobalKey();
+
+  // Year picker: a small card anchored under the year chip, made of the
+  // app's own M3Chip pills (same look as every other chip selector).
+  Future<void> _pickYear(ColorScheme scheme) async {
+    final box = _yearKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null) return;
+    final pos = box.localToGlobal(Offset.zero);
+    final size = box.size;
+    final screen = MediaQuery.sizeOf(context);
+    final base = Theme.of(context);
+    final y = await showGeneralDialog<int>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: '$_year',
+      barrierColor: Colors.transparent,
+      transitionDuration: const Duration(milliseconds: 220),
+      transitionBuilder: (c, a, a2, child) => FadeTransition(
+        opacity: a,
+        child: ScaleTransition(
+          alignment: Alignment.topRight,
+          scale: Tween<double>(begin: 0.85, end: 1).animate(
+              CurvedAnimation(parent: a, curve: M3Motion.emphasizedDecelerate)),
+          child: child,
+        ),
+      ),
+      pageBuilder: (ctx, a1, a2) => Theme(
+        data: base.copyWith(colorScheme: scheme),
+        child: Stack(children: [
+          Positioned(
+            top: pos.dy + size.height + 6,
+            right: (screen.width - (pos.dx + size.width)).clamp(8.0, screen.width),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: screen.width < 340 ? screen.width - 16 : 320,
+                maxHeight: screen.height - (pos.dy + size.height) - 24,
+              ),
+              child: Material(
+                color: scheme.surfaceContainerHigh,
+                elevation: 3,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+                clipBehavior: Clip.antiAlias,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(12),
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final yr in _years)
+                        M3Chip(
+                          selected: yr == _year,
+                          label: Text('$yr'),
+                          onSelected: (_) => Navigator.pop(ctx, yr),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ]),
+      ),
+    );
+    if (y != null && y != _year) {
+      _year = y;
+      _load();
+    }
+  }
+
   Future<void> _load() async {
     final token = ++_token;
     setState(() {
@@ -529,20 +598,12 @@ class _YearRecapPageState extends State<YearRecapPage> {
                 Expanded(
                   child: Text(tx('yr_title'), style: AppText.title.copyWith(color: scheme.onSurface)),
                 ),
-                PopupMenuButton<int>(
-                  tooltip: '$_year',
-                  initialValue: _year,
-                  shape: RoundedRectangleBorder(borderRadius: AppRadius.lgR),
-                  onSelected: (y) {
-                    if (y == _year) return;
-                    _year = y;
-                    _load();
-                  },
-                  itemBuilder: (_) => [for (final y in _years) PopupMenuItem(value: y, child: Text('$y'))],
-                  child: Chip(
-                    label: Text('$_year', style: const TextStyle(fontWeight: FontWeight.w800)),
-                    avatar: const Icon(Icons.expand_more_rounded, size: 18),
-                  ),
+                M3Chip(
+                  key: _yearKey,
+                  selected: false,
+                  avatar: const Icon(Icons.expand_more_rounded),
+                  label: Text('$_year', style: const TextStyle(fontWeight: FontWeight.w800)),
+                  onSelected: (_) => _pickYear(scheme),
                 ),
                 const SizedBox(width: 8),
               ]),

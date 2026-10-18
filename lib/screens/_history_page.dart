@@ -66,10 +66,10 @@ class _HistoryPageState extends State<_HistoryPage>
   void _goToday() { final n = DateTime.now(); setState(() { _navDirection = 1; _selectedDate = DateTime(n.year, n.month, n.day); }); _load(); }
 
   Future<void> _pickDate() async {
-    final picked = await showDatePicker(
-      context: context, initialDate: _selectedDate,
-      firstDate: DateTime(2000), lastDate: DateTime.now(),
-      helpText: L.historySelectDate, cancelText: L.commonCancel, confirmText: 'OK',
+    final picked = await showM3DatePicker(
+      context, initial: _selectedDate,
+      first: DateTime(2000), last: DateTime.now(),
+      title: L.historySelectDate,
     );
     if (picked != null && mounted) { setState(() => _selectedDate = picked); _load(); }
   }

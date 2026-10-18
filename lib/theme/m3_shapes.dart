@@ -156,6 +156,37 @@ ThemeData applyM3Shapes(ThemeData t) {
         shape: WidgetStatePropertyAll(r20),
       ),
     ),
+    // Calendar dialogs follow the app accent: tonal surface, tinted header,
+    // round selected day, pill buttons.
+    datePickerTheme: DatePickerThemeData(
+      backgroundColor: cs.surfaceContainerHigh,
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+      headerBackgroundColor: cs.primaryContainer,
+      headerForegroundColor: cs.onPrimaryContainer,
+      dividerColor: Colors.transparent,
+      dayForegroundColor: WidgetStateProperty.resolveWith<Color?>((s) =>
+          s.contains(WidgetState.selected)
+              ? cs.onPrimary
+              : s.contains(WidgetState.disabled)
+                  ? cs.onSurface.withValues(alpha: 0.38)
+                  : cs.onSurface),
+      dayBackgroundColor: WidgetStateProperty.resolveWith<Color?>((s) =>
+          s.contains(WidgetState.selected) ? cs.primary : null),
+      todayForegroundColor: WidgetStatePropertyAll(cs.primary),
+      todayBorder: BorderSide(color: cs.primary),
+      yearForegroundColor: WidgetStateProperty.resolveWith<Color?>((s) =>
+          s.contains(WidgetState.selected) ? cs.onPrimary : cs.onSurface),
+      yearBackgroundColor: WidgetStateProperty.resolveWith<Color?>((s) =>
+          s.contains(WidgetState.selected) ? cs.primary : null),
+      rangeSelectionBackgroundColor: cs.primaryContainer,
+      rangeSelectionOverlayColor: const WidgetStatePropertyAll(Colors.transparent),
+      cancelButtonStyle: TextButton.styleFrom(
+          foregroundColor: cs.onSurfaceVariant, shape: const StadiumBorder()),
+      confirmButtonStyle: FilledButton.styleFrom(
+          backgroundColor: cs.primary, foregroundColor: cs.onPrimary,
+          shape: const StadiumBorder()),
+    ),
     filledButtonTheme:   FilledButtonThemeData(style: pill(t.filledButtonTheme.style)),
     elevatedButtonTheme: ElevatedButtonThemeData(style: pill(t.elevatedButtonTheme.style)),
     outlinedButtonTheme: OutlinedButtonThemeData(style: pill(t.outlinedButtonTheme.style)),

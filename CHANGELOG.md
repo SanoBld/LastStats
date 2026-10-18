@@ -45,6 +45,9 @@
 - New: **year-in-review notification** on January 1st (once a year, in your local time, if at least one notification type is enabled), translated in all 10 languages
 - New: a 👀 button next to the bell on the dashboard that opens the year in review, shown only from January 1st to January 15th
 - Notifications: enabling the milestone interval no longer sends a notification right away (the first check only records your current scrobble count)
+- Calendar pickers (history day and news date range) are now translated into the app language
+- Year in review: the year picker is now a bottom sheet of pill chips, like the period chips
+- 🏎️ 🐉 🤖
 - Website: the table of contents dots of the help and legal pages are now all aligned on the same line
 - Website: reworded the awkward "fiche artiste / fiche titre" wording to "page artiste / page titre" in French, and the matching Spanish, Italian and Portuguese texts
 - Website: fixed the mixed "tu/vous" in two French titles on the home page

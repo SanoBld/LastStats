@@ -21,6 +21,7 @@ import 'dart:ui';
 import 'dart:ui' as ui;
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../services/movie_easter_egg.dart';
 import 'package:flutter/gestures.dart' show TapGestureRecognizer;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData, HapticFeedback, rootBundle, LogicalKeyboardKey;
@@ -70,6 +71,7 @@ import '../theme/m3_shapes.dart';
 import '../widgets/skeleton.dart';
 import '../widgets/m3_action_row.dart';
 import '../widgets/m3_components.dart';
+import '../widgets/m3_date_picker.dart';
 import '../services/wiki_bio_service.dart';
 import '../services/artist_tracks_service.dart';
 

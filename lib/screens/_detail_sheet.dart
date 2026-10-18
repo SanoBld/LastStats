@@ -1023,8 +1023,19 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         onTap: onTap,
         child: icon,
       );
+    // Easter egg: songs from Cars / How to Train Your Dragon / WALL·E.
+    final eggAlbum = widget.item['album'];
+    final egg = widget.type == 'tracks'
+        ? movieEasterEgg(
+            title: _name, artist: _artist,
+            album: eggAlbum is Map
+                ? (eggAlbum['title'] ?? eggAlbum['#text'] ?? eggAlbum['name'] ?? '').toString()
+                : (eggAlbum ?? '').toString())
+        : null;
     return Row(mainAxisSize: MainAxisSize.min, children: [
-      btn(Icon(Icons.arrow_back_rounded, color: scheme.onSecondaryContainer, size: 22),
+      btn(egg != null
+              ? Text(egg, style: const TextStyle(fontSize: 22, height: 1))
+              : Icon(Icons.arrow_back_rounded, color: scheme.onSecondaryContainer, size: 22),
           () => Navigator.pop(ctx), r(true, !showToggle)),
       AnimatedSize(
         duration: const Duration(milliseconds: 320),

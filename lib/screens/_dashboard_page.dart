@@ -3930,11 +3930,11 @@ class _NewsPageState extends State<_NewsPage> {
 
   Future<void> _pickCustomRange(BuildContext context) async {
     final now = DateTime.now();
-    final range = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime(now.year - 3),
-      lastDate: now,
-      initialDateRange: _customRange,
+    final range = await showM3DateRangePicker(
+      context,
+      first: DateTime(now.year - 3),
+      last: now,
+      initial: _customRange,
     );
     if (range != null) setState(() => _customRange = range);
   }
