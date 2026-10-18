@@ -9,6 +9,7 @@
 // (LibraryMerge), the artwork resolver (ImageService), the PNG share helper
 // (AppShare) and the current Material You colour scheme.
 
+import 'dart:async';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -18,6 +19,7 @@ import '../theme/story_style.dart';
 import '../services/app_share.dart';
 import '../services/lastfm_service.dart';
 import '../services/library_merge.dart';
+import '../services/friends_library_service.dart';
 import '../services/image_service.dart';
 import '../services/all_scrobbles_service.dart';
 import '../services/scrobbles_file_cache.dart';
@@ -51,6 +53,21 @@ class _YearData {
   int uniqueArtists = 0;
   int uniqueTracks = 0;
   int? newArtists; // null = unknown (older years not cached)
+  List<String> topArtistNames = []; // top 50, lower-case, for taste matching
+}
+
+class _FriendRow {
+  final String name;
+  final int total;
+  const _FriendRow(this.name, this.total);
+}
+
+class _FriendsData {
+  final List<_FriendRow> board; // friends with scrobbles this year
+  final String? twin;           // friend with the most artists in common
+  final List<String> shared;    // shared artists (display names, my rank order)
+  final int sharedCount;
+  const _FriendsData(this.board, this.twin, this.shared, this.sharedCount);
 }
 
 class YearRecapPage extends StatefulWidget {
@@ -72,6 +89,8 @@ class _YearRecapPageState extends State<YearRecapPage> {
   final PageController _pages = PageController();
   final GlobalKey _shareKey = GlobalKey();
   bool _sharing = false;
+  _FriendsData? _friendsData;
+  int _token = 0;
 
   @override
   void initState() {
@@ -92,7 +111,9 @@ class _YearRecapPageState extends State<YearRecapPage> {
   }
 
   Future<void> _load() async {
+    final token = ++_token;
     setState(() {
+      _friendsData = null;
       _loading = true;
       _error = false;
       _progress = 0;
@@ -109,10 +130,12 @@ class _YearRecapPageState extends State<YearRecapPage> {
         },
       );
       if (!mounted) return;
+      final data = _compute(records, _year);
       setState(() {
-        _data = _compute(records, _year);
+        _data = data;
         _loading = false;
       });
+      if (data.total > 0) _loadFriends(_year, data, token);
     } catch (_) {
       if (!mounted) return;
       setState(() {
@@ -171,6 +194,8 @@ class _YearRecapPageState extends State<YearRecapPage> {
     d.artists = top(artistCount, (k, c) => _Ranked(k, '', c));
     d.tracks = top(trackCount, (k, c) => _Ranked(trackRep[k]!.track, trackRep[k]!.artist, c));
     d.albums = top(albumCount, (k, c) => _Ranked(albumRep[k]!.album, albumRep[k]!.artist, c));
+    final ranked = artistCount.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    d.topArtistNames = ranked.take(50).map((e) => e.key).toList();
     d.uniqueArtists = artistCount.length;
     d.uniqueTracks = trackCount.length;
 
@@ -215,6 +240,61 @@ class _YearRecapPageState extends State<YearRecapPage> {
       d.newArtists = artistCount.keys.where((a) => !before.contains(a)).length;
     }
     return d;
+  }
+
+  // ── Friends ──────────────────────────────────────────────────────────────
+  // Yearly totals: one cheap call per friend (limit 1 -> only the total).
+  // Taste twin: overlap between your top artists of the year and the friend
+  // libraries already synced by FriendsLibraryService (no extra requests).
+  Future<void> _loadFriends(int year, _YearData d, int token) async {
+    try {
+      final raw = await widget.service.getFriends(limit: 30, withRecentTrack: false);
+      final names = <String>[
+        for (final f in raw)
+          if (f is Map && (f['name'] ?? '').toString().isNotEmpty) f['name'].toString()
+      ].take(20).toList();
+      if (names.isEmpty) return;
+      final now = DateTime.now();
+      final from = DateTime(year, 1, 1).millisecondsSinceEpoch ~/ 1000;
+      final to = (year == now.year ? now.add(const Duration(minutes: 1)) : DateTime(year + 1, 1, 1))
+              .millisecondsSinceEpoch ~/ 1000;
+
+      final board = <_FriendRow>[];
+      for (var i = 0; i < names.length; i += 5) {
+        final batch = names.skip(i).take(5);
+        final res = await Future.wait(batch.map((n) async {
+          try {
+            final r = await widget.service.getRecentTracks(user: n, from: from, to: to, limit: 1);
+            final t = int.tryParse((r['@attr']?['total'] ?? '0').toString()) ?? 0;
+            return _FriendRow(n, t);
+          } catch (_) {
+            return _FriendRow(n, 0); // private profile / error: skipped below
+          }
+        }));
+        board.addAll(res.where((r) => r.total > 0));
+        if (!mounted || token != _token) return;
+      }
+
+      String? twin;
+      var shared = <String>[];
+      var best = 0;
+      final mine = d.topArtistNames;
+      for (final n in names) {
+        final lib = FriendsLibraryService.get(n);
+        if (lib == null) continue;
+        final theirs = lib.artists.take(150).map((a) => (a['name'] ?? '').toString().toLowerCase()).toSet();
+        final common = mine.where((a) => theirs.contains(a.toLowerCase())).toList();
+        if (common.length > best) {
+          best = common.length;
+          twin = n;
+          shared = common;
+        }
+      }
+      if (!mounted || token != _token) return;
+      setState(() => _friendsData = _FriendsData(board, twin, shared.take(6).toList(), best));
+    } catch (_) {
+      // Friends are a bonus: no friends / network error -> no friend slides.
+    }
   }
 
   // ── Helpers ──────────────────────────────────────────────────────────────
@@ -414,12 +494,13 @@ class _YearRecapPageState extends State<YearRecapPage> {
             textAlign: TextAlign.center,
             style: TextStyle(color: s.onSurface, fontSize: 30, fontWeight: FontWeight.w900, height: 1.1)),
         const SizedBox(height: 28),
-        Text(_fmt(d.total), style: TextStyle(color: s.primary, fontSize: 72, fontWeight: FontWeight.w900, height: 1)),
+        _CountUp(value: d.total, fmt: _fmt, delayMs: 350, durationMs: 1600,
+            style: TextStyle(color: s.primary, fontSize: 72, fontWeight: FontWeight.w900, height: 1)),
         const SizedBox(height: 6),
-        Text(tx('yr_scrobbles'), style: TextStyle(color: s.onSurfaceVariant, fontSize: 18, fontWeight: FontWeight.w700)),
+        _Reveal(delayMs: 500, child: Text(tx('yr_scrobbles'), style: TextStyle(color: s.onSurfaceVariant, fontSize: 18, fontWeight: FontWeight.w700))),
         const SizedBox(height: 20),
-        Text(tx('yr_hours', {'h': _fmt(hours)}),
-            textAlign: TextAlign.center, style: TextStyle(color: s.onSurfaceVariant, fontSize: 14)),
+        _Reveal(delayMs: 1900, child: Text(tx('yr_hours', {'h': _fmt(hours)}),
+            textAlign: TextAlign.center, style: TextStyle(color: s.onSurfaceVariant, fontSize: 14))),
       ],
     ));
 
@@ -431,17 +512,18 @@ class _YearRecapPageState extends State<YearRecapPage> {
         children: [
           _label(s, tx('yr_top_artist')),
           const SizedBox(height: 18),
-          _YImg(name: a.name, artist: '', type: 'artists', size: 190, round: true),
+          _Reveal(delayMs: 300, pop: true, child: _YImg(name: a.name, artist: '', type: 'artists', size: 190, round: true)),
           const SizedBox(height: 18),
-          Text(a.name,
+          _Reveal(delayMs: 900, child: Text(a.name,
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: s.onSurface, fontSize: 30, fontWeight: FontWeight.w900)),
+              style: TextStyle(color: s.onSurface, fontSize: 30, fontWeight: FontWeight.w900))),
           const SizedBox(height: 4),
-          Text(tx('yr_plays', {'n': _fmt(a.count)}), style: TextStyle(color: s.primary, fontSize: 18, fontWeight: FontWeight.w800)),
+          _CountUp(value: a.count, fmt: (n) => tx('yr_plays', {'n': _fmt(n)}), delayMs: 1200, durationMs: 1000,
+              style: TextStyle(color: s.primary, fontSize: 18, fontWeight: FontWeight.w800)),
           const SizedBox(height: 22),
-          _rankList(s, d.artists.skip(1).toList(), 'artists', startAt: 2),
+          _rankList(s, d.artists.skip(1).toList(), 'artists', startAt: 2, baseDelay: 1800),
         ],
       ));
     }
@@ -493,7 +575,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                         alignment: Alignment.bottomCenter,
                         child: TweenAnimationBuilder<double>(
                           tween: Tween(begin: 0, end: f),
-                          duration: const Duration(milliseconds: 700),
+                          duration: Duration(milliseconds: 500 + i * 80),
                           curve: Curves.easeOutCubic,
                           builder: (_, v, __) => FractionallySizedBox(
                             heightFactor: v.clamp(0.02, 1.0),
@@ -592,7 +674,8 @@ class _YearRecapPageState extends State<YearRecapPage> {
       children: [
         _label(s, tx('yr_streak_h')),
         const SizedBox(height: 22),
-        Text('${d.longestStreak}', style: TextStyle(color: s.primary, fontSize: 84, fontWeight: FontWeight.w900, height: 1)),
+        _CountUp(value: d.longestStreak, fmt: _fmt, delayMs: 300, durationMs: 1400,
+            style: TextStyle(color: s.primary, fontSize: 84, fontWeight: FontWeight.w900, height: 1)),
         const SizedBox(height: 6),
         Text(tx('yr_streak', {'n': '${d.longestStreak}'}),
             textAlign: TextAlign.center, style: TextStyle(color: s.onSurface, fontSize: 18, fontWeight: FontWeight.w800)),
@@ -609,7 +692,8 @@ class _YearRecapPageState extends State<YearRecapPage> {
         _label(s, tx('yr_disc_h')),
         const SizedBox(height: 22),
         if (d.newArtists != null) ...[
-          Text(_fmt(d.newArtists!), style: TextStyle(color: s.primary, fontSize: 72, fontWeight: FontWeight.w900, height: 1)),
+          _CountUp(value: d.newArtists!, fmt: _fmt, delayMs: 300, durationMs: 1400,
+              style: TextStyle(color: s.primary, fontSize: 72, fontWeight: FontWeight.w900, height: 1)),
           const SizedBox(height: 6),
           Text(tx('yr_new'), textAlign: TextAlign.center, style: TextStyle(color: s.onSurface, fontSize: 18, fontWeight: FontWeight.w800)),
           const SizedBox(height: 18),
@@ -623,14 +707,87 @@ class _YearRecapPageState extends State<YearRecapPage> {
       ],
     ));
 
-    // 9. Summary + share
+    // 9. Friends: yearly leaderboard
+    final fr = _friendsData;
+    String? rankLine;
+    if (fr != null && fr.board.isNotEmpty) {
+      final rows = [...fr.board, _FriendRow('', d.total)]..sort((a, b) => b.total.compareTo(a.total));
+      final myRank = rows.indexWhere((r) => r.name.isEmpty) + 1;
+      rankLine = tx('yr_rank', {'r': '$myRank', 'n': '${rows.length}'});
+      final shown = rows.take(6).toList();
+      if (!shown.any((r) => r.name.isEmpty)) shown[shown.length - 1] = rows[myRank - 1];
+      final maxT = rows.first.total;
+      out.add(_Slide(
+        scheme: s,
+        children: [
+          _label(s, tx('yr_friends_h')),
+          const SizedBox(height: 10),
+          _Reveal(delayMs: 250, pop: true, child: Text(rankLine,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: s.primary, fontSize: 26, fontWeight: FontWeight.w900))),
+          const SizedBox(height: 20),
+          for (var i = 0; i < shown.length; i++)
+            _Reveal(
+              delayMs: 700 + i * 180,
+              child: _friendBar(s, shown[i], maxT, 900 + i * 180, rows.indexOf(shown[i]) + 1),
+            ),
+        ],
+      ));
+    }
+
+    // 10. Friends: music twin
+    if (fr != null && fr.twin != null) {
+      out.add(_Slide(
+        scheme: s,
+        children: [
+          _label(s, tx('yr_twin_h')),
+          const SizedBox(height: 20),
+          _Reveal(
+            delayMs: 300,
+            pop: true,
+            child: CircleAvatar(
+              radius: 52,
+              backgroundColor: s.primaryContainer,
+              child: Text(fr.twin!.characters.first.toUpperCase(),
+                  style: TextStyle(color: s.onPrimaryContainer, fontSize: 44, fontWeight: FontWeight.w900)),
+            ),
+          ),
+          const SizedBox(height: 14),
+          _Reveal(delayMs: 800, child: Text(fr.twin!,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: s.onSurface, fontSize: 28, fontWeight: FontWeight.w900))),
+          const SizedBox(height: 6),
+          _Reveal(delayMs: 1100, child: Text(tx('yr_twin_s', {'n': '${fr.sharedCount}'}),
+              textAlign: TextAlign.center, style: TextStyle(color: s.onSurfaceVariant, fontSize: 15))),
+          const SizedBox(height: 18),
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (var i = 0; i < fr.shared.length; i++)
+                _Reveal(
+                  delayMs: 1400 + i * 160,
+                  child: Chip(
+                    label: Text(fr.shared[i], style: const TextStyle(fontWeight: FontWeight.w700)),
+                    backgroundColor: s.secondaryContainer,
+                    side: BorderSide.none,
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ));
+    }
+
+    // 11. Summary + share
     out.add(_Slide(
       scheme: s,
       children: [
         Flexible(
           child: FittedBox(
             fit: BoxFit.contain,
-            child: RepaintBoundary(key: _shareKey, child: _ShareCard(scheme: s, year: _year, username: widget.username, data: d, hours: hours, fmt: _fmt)),
+            child: RepaintBoundary(key: _shareKey, child: _ShareCard(scheme: s, year: _year, username: widget.username, data: d, hours: hours, fmt: _fmt, rankLine: rankLine)),
           ),
         ),
         const SizedBox(height: 14),
@@ -650,11 +807,54 @@ class _YearRecapPageState extends State<YearRecapPage> {
       textAlign: TextAlign.center,
       style: TextStyle(color: s.onSurfaceVariant, fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: 1.4));
 
-  Widget _rankList(ColorScheme s, List<_Ranked> items, String type, {int startAt = 1}) {
+  Widget _friendBar(ColorScheme s, _FriendRow r, int maxT, int delayMs, int rank) {
+    final me = r.name.isEmpty;
+    final f = maxT == 0 ? 0.0 : r.total / maxT;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          SizedBox(width: 26, child: Text('$rank', style: TextStyle(color: me ? s.primary : s.onSurfaceVariant, fontSize: 15, fontWeight: FontWeight.w900))),
+          Expanded(
+            child: Text(me ? tx('yr_you') : r.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: s.onSurface, fontSize: 14, fontWeight: me ? FontWeight.w900 : FontWeight.w700)),
+          ),
+          _CountUp(value: r.total, fmt: _fmt, delayMs: delayMs, durationMs: 1100,
+              style: TextStyle(color: me ? s.primary : s.onSurfaceVariant, fontSize: 14, fontWeight: FontWeight.w800)),
+        ]),
+        const SizedBox(height: 4),
+        Padding(
+          padding: const EdgeInsets.only(left: 26),
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: f),
+            duration: Duration(milliseconds: 900 + (delayMs ~/ 4)),
+            curve: Curves.easeOutCubic,
+            builder: (_, v, __) => ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: LinearProgressIndicator(
+                value: v.clamp(0.02, 1.0),
+                minHeight: 10,
+                backgroundColor: s.primary.withValues(alpha: 0.12),
+                color: me ? s.primary : s.primary.withValues(alpha: 0.4),
+              ),
+            ),
+          ),
+        ),
+      ]),
+    );
+  }
+
+  // Rows are revealed from the last to the first, so #1 lands last.
+  Widget _rankList(ColorScheme s, List<_Ranked> items, String type, {int startAt = 1, int baseDelay = 300}) {
     return Column(
       children: [
         for (var i = 0; i < items.length; i++)
-          Padding(
+          _Reveal(
+            delayMs: baseDelay + (items.length - 1 - i) * 240,
+            pop: i == 0 && startAt == 1,
+            child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 5),
             child: Row(children: [
               SizedBox(
@@ -675,7 +875,99 @@ class _YearRecapPageState extends State<YearRecapPage> {
               Text(tx('yr_plays', {'n': _fmt(items[i].count)}), style: AppText.badge.copyWith(color: s.primary)),
             ]),
           ),
+          ),
       ],
+    );
+  }
+}
+
+// Fade + slide + scale-in after a delay. [pop] adds an overshoot (the reveal
+// of a #1). Replays each time its slide is built, i.e. each time it is shown.
+class _Reveal extends StatefulWidget {
+  final Widget child;
+  final int delayMs;
+  final bool pop;
+  const _Reveal({required this.child, this.delayMs = 0, this.pop = false});
+
+  @override
+  State<_Reveal> createState() => _RevealState();
+}
+
+class _RevealState extends State<_Reveal> with SingleTickerProviderStateMixin {
+  late final AnimationController _c =
+      AnimationController(vsync: this, duration: Duration(milliseconds: widget.pop ? 750 : 520));
+  Timer? _t;
+
+  @override
+  void initState() {
+    super.initState();
+    _t = Timer(Duration(milliseconds: widget.delayMs), () {
+      if (mounted) _c.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _t?.cancel();
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final fade = CurvedAnimation(parent: _c, curve: const Interval(0, 0.6, curve: Curves.easeOut));
+    final scale = Tween<double>(begin: widget.pop ? 0.5 : 0.94, end: 1)
+        .animate(CurvedAnimation(parent: _c, curve: widget.pop ? Curves.easeOutBack : Curves.easeOutCubic));
+    final slide = Tween<Offset>(begin: const Offset(0, 0.25), end: Offset.zero)
+        .animate(CurvedAnimation(parent: _c, curve: Curves.easeOutCubic));
+    return FadeTransition(
+      opacity: fade,
+      child: SlideTransition(position: slide, child: ScaleTransition(scale: scale, child: widget.child)),
+    );
+  }
+}
+
+// Number that counts up from 0 after a delay.
+class _CountUp extends StatefulWidget {
+  final int value;
+  final String Function(int) fmt;
+  final TextStyle style;
+  final int delayMs;
+  final int durationMs;
+  const _CountUp({required this.value, required this.fmt, required this.style, this.delayMs = 0, this.durationMs = 1200});
+
+  @override
+  State<_CountUp> createState() => _CountUpState();
+}
+
+class _CountUpState extends State<_CountUp> with SingleTickerProviderStateMixin {
+  late final AnimationController _c =
+      AnimationController(vsync: this, duration: Duration(milliseconds: widget.durationMs));
+  Timer? _t;
+
+  @override
+  void initState() {
+    super.initState();
+    _t = Timer(Duration(milliseconds: widget.delayMs), () {
+      if (mounted) _c.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _t?.cancel();
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _c,
+      builder: (_, __) {
+        final v = Curves.easeOutCubic.transform(_c.value);
+        return Text(widget.fmt((widget.value * v).round()), textAlign: TextAlign.center, style: widget.style);
+      },
     );
   }
 }
@@ -763,7 +1055,8 @@ class _ShareCard extends StatelessWidget {
   final _YearData data;
   final int hours;
   final String Function(int) fmt;
-  const _ShareCard({required this.scheme, required this.year, required this.username, required this.data, required this.hours, required this.fmt});
+  final String? rankLine; // friends ranking, when known
+  const _ShareCard({required this.scheme, required this.year, required this.username, required this.data, required this.hours, required this.fmt, this.rankLine});
 
   Widget _stat(String label, String value) => Expanded(
         child: Container(
@@ -826,7 +1119,11 @@ class _ShareCard extends StatelessWidget {
             const SizedBox(width: 8),
             _stat(tx('yr_card_streak'), '${data.longestStreak}'),
           ]),
-          const SizedBox(height: 16),
+          if (rankLine != null) ...[
+            const SizedBox(height: 10),
+            Center(child: Text(rankLine!, style: TextStyle(color: scheme.primary, fontSize: 13, fontWeight: FontWeight.w800))),
+          ],
+          const SizedBox(height: 14),
           _list(tx('yr_top_artists'), data.artists, 'artists'),
           const SizedBox(height: 12),
           _list(tx('yr_top_tracks'), data.tracks, 'tracks'),
