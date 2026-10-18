@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-18T19:17:07Z",
+  "updated": "2026-10-18T19:19:15Z",
   "commits": [
+    {
+      "sha": "69beb7d21e7e078d10d86554a688db5cfa938fa8",
+      "message": "feat: ajouter cocoapods au Gemfile pour iOS et macOS",
+      "date": "2026-10-18T19:18:58Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/69beb7d21e7e078d10d86554a688db5cfa938fa8",
+      "tags": []
+    },
     {
       "sha": "5244c2563eac5aad3206343c5693ec857406e12d",
       "message": "feat: refactor CI workflows for Android, iOS, Linux, macOS, and Windows; add Fastlane support and streamline build processes",
@@ -2700,15 +2709,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/14c9f6937ee06ce5add3cc4674af92a004438c9c",
-      "tags": []
-    },
-    {
-      "sha": "17866939ab56460bc5682450bf6caca40c14e580",
-      "message": "fix: supprimer une accolade inutile dans NotificationWorker",
-      "date": "2026-08-21T05:14:30Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/17866939ab56460bc5682450bf6caca40c14e580",
       "tags": []
     }
   ]
