@@ -71,6 +71,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
   final PageController _pages = PageController();
   final GlobalKey _shareKey = GlobalKey();
   bool _sharing = false;
+  final ValueNotifier<bool> _sharingN = ValueNotifier(false);
   _YrFriends? _friendsData;
   int _token = 0;
 
@@ -82,6 +83,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
 
   @override
   void dispose() {
+    _sharingN.dispose();
     _pages.dispose();
     super.dispose();
   }
@@ -315,17 +317,29 @@ class _YearRecapPageState extends State<YearRecapPage> {
 
   List<String> get _months => tx('yr_months').split(',');
 
+  List<String> get _monthsFull => tx('yr_months_full').split(',');
+  List<String> get _monthsGen => tx('yr_months_gen').split(',');
+  List<String> get _weekdaysFull => tx('yr_weekdays_full').split(',');
+
+  // "13 octobre" / "October 13" / "10月13日" depending on the language.
   String _dayLabel(String key) {
     final p = key.split('-');
     final m = int.parse(p[1]);
-    final names = _months;
-    return '${int.parse(p[2])} ${m - 1 < names.length ? names[m - 1] : p[1]}';
+    final names = _monthsGen;
+    return tx('yr_day_fmt', {
+      'd': '${int.parse(p[2])}',
+      'm': m - 1 < names.length ? names[m - 1] : p[1],
+    });
   }
 
   Future<void> _share() async {
     if (_sharing) return;
-    setState(() => _sharing = true);
+    // Only the button listens to this: rebuilding the page here would reset
+    // the card's image loaders to their placeholder right before the capture.
+    _sharing = true;
+    _sharingN.value = true;
     try {
+      await Future.delayed(const Duration(milliseconds: 80));
       await WidgetsBinding.instance.endOfFrame;
       final rb = _shareKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
       if (rb == null) throw StateError('no boundary');
@@ -339,7 +353,8 @@ class _YearRecapPageState extends State<YearRecapPage> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tx('yr_share_err'))));
       }
     } finally {
-      if (mounted) setState(() => _sharing = false);
+      _sharing = false;
+      if (mounted) _sharingN.value = false;
     }
   }
 
@@ -429,6 +444,25 @@ class _YearRecapPageState extends State<YearRecapPage> {
               ]),
             ),
             Expanded(child: _content(scheme, slides)),
+            if (ready)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 4, 20, 10),
+                child: Row(children: [
+                  IconButton.filledTonal(
+                    icon: const Icon(Icons.chevron_left_rounded),
+                    onPressed: _slide > 0 ? _prev : null,
+                  ),
+                  Expanded(
+                    child: Text('${_slide + 1} / ${slides.length}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13, fontWeight: FontWeight.w800)),
+                  ),
+                  IconButton.filledTonal(
+                    icon: const Icon(Icons.chevron_right_rounded),
+                    onPressed: _slide < slides.length - 1 ? _next : null,
+                  ),
+                ]),
+              ),
           ]),
         ),
       ),
@@ -496,7 +530,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     final hours = (d.total * _kYrAvgTrackMinutes / 60).round();
     final out = <Widget>[];
     final mq = MediaQuery.of(context);
-    final cardW = math.min(math.min(mq.size.width - 56, 320.0), (mq.size.height - 280) * 340 / 600).clamp(180.0, 320.0).toDouble();
+    final cardW = math.min(mq.size.width - 56, 320.0).clamp(180.0, 320.0).toDouble();
 
     // 1. Intro
     out.add(_YrSlide(
@@ -568,7 +602,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
           ),
         ),
         const SizedBox(height: 22),
-        Text(tx('yr_best_month', {'m': bestMonth < _months.length ? _months[bestMonth] : '', 'n': _fmt(maxM)}),
+        Text(tx('yr_best_month', {'m': bestMonth < _monthsFull.length ? _monthsFull[bestMonth] : '', 'n': _fmt(maxM)}),
             textAlign: TextAlign.center, style: TextStyle(color: s.onSurface, fontSize: 16, fontWeight: FontWeight.w800)),
         if (d.busiestDay != null) ...[
           const SizedBox(height: 8),
@@ -590,7 +624,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     final peakHour = d.hourly.indexOf(maxH);
     final maxW = d.weekday.fold<int>(0, (m, v) => v > m ? v : m);
     final favDay = d.weekday.indexOf(maxW);
-    final wd = L.weekdaysShort;
+    final wd = _weekdaysFull;
     out.add(_YrSlide(
       scheme: s,
       children: [
@@ -766,19 +800,21 @@ class _YearRecapPageState extends State<YearRecapPage> {
       children: [
         SizedBox(
           width: cardW,
-          height: cardW * 600 / 340,
           child: FittedBox(
-            fit: BoxFit.contain,
+            fit: BoxFit.fitWidth,
             child: RepaintBoundary(key: _shareKey, child: _YrShareCard(scheme: s, year: _year, username: widget.username, data: d, hours: hours, fmt: _fmt, rankLine: rankLine)),
           ),
         ),
         const SizedBox(height: 14),
-        FilledButton.icon(
-          onPressed: _sharing ? null : _share,
-          icon: _sharing
-              ? SizedBox(width: 18, height: 18, child: M3Spinner(color: s.onPrimary))
-              : const Icon(Icons.ios_share_rounded),
-          label: Text(L.commonShare),
+        ValueListenableBuilder<bool>(
+          valueListenable: _sharingN,
+          builder: (_, busy, __) => FilledButton.icon(
+            onPressed: busy ? null : _share,
+            icon: busy
+                ? SizedBox(width: 18, height: 18, child: M3Spinner(color: s.onPrimary))
+                : const Icon(Icons.ios_share_rounded),
+            label: Text(L.commonShare),
+          ),
         ),
       ],
     ));
@@ -927,7 +963,8 @@ class _YrAvatar extends StatelessWidget {
       child: Text(label.isEmpty ? '?' : label.characters.first.toUpperCase(),
           style: TextStyle(color: s.onPrimaryContainer, fontSize: size * 0.42, fontWeight: FontWeight.w900)),
     );
-    return ClipOval(
+    return ClipPath(
+      clipper: ShapeBorderClipper(shape: M3CookieBorder(lobes: 8, amplitude: size > 80 ? 0.10 : 0.07)),
       child: url.isEmpty
           ? fallback
           : ImageService.widgetImage(url: url, width: size, height: size, fit: BoxFit.cover, errorWidget: fallback),
@@ -1087,8 +1124,12 @@ class _YrImgState extends State<_YrImg> {
         size: widget.size * 0.5,
       ),
     );
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(widget.round ? widget.size : widget.size * 0.18),
+    // Artists get the app's cookie shape (M3CookieBorder), covers a soft square.
+    final ShapeBorder shape = widget.round
+        ? M3CookieBorder(lobes: 10, amplitude: widget.size > 120 ? 0.09 : 0.07)
+        : RoundedRectangleBorder(borderRadius: BorderRadius.circular(widget.size * 0.18));
+    return ClipPath(
+      clipper: ShapeBorderClipper(shape: shape),
       child: FutureBuilder<String>(
         future: _future,
         builder: (_, snap) {
@@ -1151,7 +1192,6 @@ class _YrShareCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: Container(
         width: 340,
-        height: 600,
         padding: const EdgeInsets.fromLTRB(22, 26, 22, 18),
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -1161,7 +1201,7 @@ class _YrShareCard extends StatelessWidget {
             stops: const [0, 0.45],
           ),
         ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
           Text('LastStats · $username', style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
           Text(tx('yr_intro_h', {'year': '$year'}), style: TextStyle(color: scheme.onSurface, fontSize: 24, fontWeight: FontWeight.w900, height: 1.1)),
@@ -1183,7 +1223,7 @@ class _YrShareCard extends StatelessWidget {
           _list(tx('yr_top_tracks'), data.tracks, 'tracks'),
           const SizedBox(height: 12),
           _list(tx('yr_top_albums'), data.albums, 'albums'),
-          const Spacer(),
+          const SizedBox(height: 18),
           Center(child: Text('LastStats', style: TextStyle(color: scheme.onSurfaceVariant.withValues(alpha: 0.7), fontSize: 11, fontWeight: FontWeight.w700))),
         ]),
       ),
