@@ -1291,7 +1291,7 @@ class _YrShareCard extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            height: 230, // top quarter/third of the card
+            height: 170, // top quarter of the card
             child: ShaderMask(
               blendMode: BlendMode.dstIn,
               shaderCallback: (r) => const LinearGradient(
@@ -1299,7 +1299,17 @@ class _YrShareCard extends StatelessWidget {
                 end: Alignment.bottomCenter,
                 colors: [Color(0xE6000000), Color(0x00000000)],
               ).createShader(r),
-              child: ImageService.widgetImage(url: photo, width: 360, height: 230, fit: BoxFit.cover, errorWidget: const SizedBox()),
+              // Full square picture, cropped to the top band (never stretched)
+              child: ClipRect(
+                child: OverflowBox(
+                  minWidth: 360,
+                  maxWidth: 360,
+                  minHeight: 360,
+                  maxHeight: 360,
+                  alignment: Alignment.center,
+                  child: ImageService.widgetImage(url: photo, width: 360, height: 360, fit: BoxFit.cover, errorWidget: const SizedBox()),
+                ),
+              ),
             ),
           ),
         Container(
@@ -1329,10 +1339,6 @@ class _YrShareCard extends StatelessWidget {
             const SizedBox(width: 8),
             _stat(tx('yr_card_streak'), '${data.longestStreak}'),
           ])),
-          if (rankLine != null) ...[
-            const SizedBox(height: 10),
-            Center(child: Text(rankLine!, style: TextStyle(color: scheme.primary, fontSize: 13, fontWeight: FontWeight.w800))),
-          ],
           const SizedBox(height: 10),
           _list(tx('yr_top_artists'), data.artists, 'artists'),
           const SizedBox(height: 10),
