@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-18T09:15:25Z",
+  "updated": "2026-10-18T09:25:38Z",
   "commits": [
+    {
+      "sha": "e10d749672aee11f7fa7fdcfbecb9517f69ef06d",
+      "message": "Update localization strings for year recap feature across multiple languages\n\n- Enhanced English, Spanish, French, Italian, Japanese, Portuguese, Russian, and Chinese strings for better clarity and consistency.\n- Improved phrasing for music listening statistics, including hours, best month, and best day.\n- Added full month names and weekdays for better formatting in year recap.\n- Adjusted UI components in year recap page for improved user experience, including share button functionality and layout adjustments.",
+      "date": "2026-10-18T09:22:43Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/e10d749672aee11f7fa7fdcfbecb9517f69ef06d",
+      "tags": []
+    },
     {
       "sha": "d84204c990e4cbbafc88eaa43ce7ddf426584d83",
       "message": "feat: add Year in Review feature with detailed recap and sharing options\n\n- Introduced a new \"Year in Review\" section in the profile menu, providing a comprehensive recap of the user's listening habits over the year.\n- Added various metrics including total scrobbles, estimated listening hours, top artists, tracks, albums, monthly charts, and more.\n- Implemented a shareable summary card with visual elements and friend comparisons.\n- Updated localization files for multiple languages to support new strings related to the Year in Review feature.\n- Refactored related classes and methods to accommodate the new feature, ensuring a cohesive integration within the existing app structure.",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/4ee430b861c625ac9e591787eeb0e9ef858f3649",
-      "tags": []
-    },
-    {
-      "sha": "55edc494a3e5e2f4f4ba5353d654f690b34f58f1",
-      "message": "feat: update changelog for v3.0.0 and adjust color scheme handling",
-      "date": "2026-08-14T05:42:53Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/55edc494a3e5e2f4f4ba5353d654f690b34f58f1",
       "tags": []
     }
   ]
