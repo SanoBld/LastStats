@@ -68,6 +68,13 @@ class SpotifyCanvasService {
   static Future<void> saveLogin(
       String spDc, String bearer, String clientToken) async {
     final p = await SharedPreferences.getInstance();
+    // Fresh login = clean start: forget anything learned before.
+    for (final k in [_kTpl, _kHash, _kHashAt]) {
+      await p.remove(k);
+    }
+    _failedAt = null;
+    _lastRefresh = null;
+    lastError = null;
     await p.setString(kSpDc, spDc);
     await _saveToken(p, bearer, clientToken);
   }
@@ -83,9 +90,14 @@ class SpotifyCanvasService {
 
   static Future<void> disconnect() async {
     final p = await SharedPreferences.getInstance();
-    for (final k in [kSpDc, _kTok, _kCt, _kExp, _kTpl]) {
+    // Everything Spotify related is removed: login cookie, tokens, copied
+    // search request, and the repaired query hash (with its 6 h timer).
+    for (final k in [kSpDc, _kTok, _kCt, _kExp, _kTpl, _kHash, _kHashAt]) {
       await p.remove(k);
     }
+    _failedAt = null;
+    _lastRefresh = null;
+    lastError = null;
     await SpotifyWebSession.clear();
   }
 
@@ -120,6 +132,8 @@ class SpotifyCanvasService {
           _err('no token (login expired?)');
           return null;
         }
+        // Disconnected while the web player was loading: save nothing.
+        if ((p.getString(kSpDc) ?? '').isEmpty) return null;
         _failedAt = null;
         await _saveToken(p, r.token, r.clientToken);
         if (r.search != null) await p.setString(_kTpl, r.search!);

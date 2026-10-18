@@ -1315,6 +1315,7 @@ const Map<String, String> kTxEs = {
   'sp_login_t': 'Inicio de sesión en Spotify',
   'sp_login_hint': 'Inicie sesión con su correo y su contraseña de Spotify. La ventana se cierra sola al terminar.',
   'sp_risk_note': 'Atención: esta función se basa en llamadas no oficiales de Spotify, no en una API oficial. Spotify puede cambiarla o bloquearla en cualquier momento, puede dejar de funcionar, y su uso puede ir en contra de las condiciones de uso de Spotify, lo que podría provocar restricciones en tu cuenta de Spotify. Úsala bajo tu propia responsabilidad.',
+  'sp_perf_note': 'Rendimiento: la búsqueda de Canvas ejecuta un reproductor web oculto en segundo plano y hace solicitudes de red adicionales. Puede consumir más batería, datos y memoria y ralentizar un poco la app. Quita Spotify de esta lista si lo notas.',
   'sp_t': 'Spotify (Canvas)',
   'sp_on': 'Conectado',
   'sp_off': 'No conectado',

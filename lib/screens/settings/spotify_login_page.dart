@@ -55,17 +55,6 @@ class _SpotifyLoginPageState extends State<SpotifyLoginPage> {
           child: Text(tx('sp_login_hint'),
               style: Theme.of(context).textTheme.bodySmall),
         ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Icon(Icons.warning_amber_rounded, size: 18,
-                color: Theme.of(context).colorScheme.error),
-            const SizedBox(width: 8),
-            Expanded(child: Text(tx('sp_risk_note'),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.error))),
-          ]),
-        ),
         Expanded(
           child: InAppWebView(
             initialUrlRequest: URLRequest(

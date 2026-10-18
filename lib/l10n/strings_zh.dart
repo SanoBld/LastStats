@@ -1312,6 +1312,7 @@ const Map<String, String> kTxZh = {
   'sp_login_t': '登录 Spotify',
   'sp_login_hint': '请使用您的 Spotify 邮箱和密码登录。登录成功后此窗口会自动关闭。',
   'sp_risk_note': '注意：此功能依赖 Spotify 的非官方调用，而非官方 API。Spotify 可能随时更改或封锁它，它可能停止工作，使用它也可能违反 Spotify 的使用条款，从而可能导致你的 Spotify 账号受到限制。使用风险自负。',
+  'sp_perf_note': '性能:查找 Canvas 时会在后台运行一个隐藏的网页播放器,并产生额外的网络请求。这可能会增加电量、流量和内存消耗,并让应用稍微变慢。如果你有所察觉,请把 Spotify 从此列表中移除。',
   'sp_t': 'Spotify (Canvas)',
   'sp_on': '已连接',
   'sp_off': '未连接',

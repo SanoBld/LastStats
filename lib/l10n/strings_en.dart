@@ -1315,6 +1315,7 @@ const Map<String, String> kTxEn = {
   'sp_login_t': 'Spotify login',
   'sp_login_hint': 'Sign in with your Spotify email and password. This window closes by itself once you are signed in.',
   'sp_risk_note': 'Heads up: this feature relies on unofficial Spotify calls, not an official API. Spotify can change or block it at any time, it may stop working, and using it may go against Spotify\'s terms of use, which could lead to restrictions on your Spotify account. Use it at your own risk.',
+  'sp_perf_note': 'Performance: Canvas lookups run a hidden web player in the background and make extra network requests. This can use more battery, data and memory and slow the app down a little. Remove Spotify from this list if you notice it.',
   'sp_t': 'Spotify (Canvas)',
   'sp_on': 'Connected',
   'sp_off': 'Not connected',

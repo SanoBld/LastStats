@@ -75,3 +75,6 @@
 - Fixed: when Spotify failed for a real reason (login token not ready, network error, Spotify refusing a request), the app remembered "no video" for the whole session, so no Canvas was ever shown again until restart. A failed lookup is now tried again later; a track that simply has no Canvas is still remembered as before
 - After a failed Spotify token refresh, the app waits 2 minutes before opening the hidden web player again, so covers do not each open one
 - Removed the leftover code of the old "Test Spotify" button and its texts in the 10 languages
+- Disconnecting from Spotify now removes everything it kept: login cookie, tokens, the copied search request, the repaired query hash and its timer, and the video links already looked up in memory (a wrong repaired hash could survive a logout and break Canvas). A fresh login also starts clean
+- Nothing Spotify related runs in the background when you are disconnected (lookups, token refresh and hash repair were already stopped; a refresh that finishes after a disconnect now saves nothing)
+- Spotify warnings: the risk warning is removed from the Spotify web login screen and stays only on the Connection page, where a new note also says the feature can affect performance (hidden web player, more network use, battery and memory), in all 10 languages

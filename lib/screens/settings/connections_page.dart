@@ -8,6 +8,7 @@ import '../../l10n/extra_strings.dart';
 import '../../l10n/l10n.dart';
 import '../../services/account_manager.dart';
 import '../../services/internal_keys.dart';
+import '../../services/motion_artwork_service.dart';
 import '../../services/spotify_canvas_service.dart';
 import '../../widgets/brand_icon.dart';
 import '../../widgets/m3_components.dart';
@@ -48,12 +49,15 @@ class _ConnectionsPageState extends State<ConnectionsPage> {
   Future<void> _spTap() async {
     if (_sp) {
       await SpotifyCanvasService.disconnect();
+      // Forget the video links looked up so far (they may hold old failures).
+      MotionArtworkService.clearMemory();
       if (!mounted) return;
       setState(() => _sp = false);
       _snack(tx('sp_off_s'));
       return;
     }
     final ok = await SpotifyLoginPage.open(context);
+    if (ok) MotionArtworkService.clearMemory();
     if (mounted) setState(() => _sp = ok);
   }
 
@@ -126,6 +130,9 @@ class _ConnectionsPageState extends State<ConnectionsPage> {
             Text(tx('conn_sp_desc'), style: body),
             const SizedBox(height: 6),
             Text(tx('sp_risk_note'),
+                style: text.bodySmall?.copyWith(color: scheme.error)),
+            const SizedBox(height: 6),
+            Text(tx('sp_perf_note'),
                 style: text.bodySmall?.copyWith(color: scheme.error)),
             const SizedBox(height: 6),
             Text(tx('conn_q_note'),

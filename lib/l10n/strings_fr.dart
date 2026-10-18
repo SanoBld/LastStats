@@ -1315,6 +1315,7 @@ const Map<String, String> kTxFr = {
   'sp_login_t': 'Connexion à Spotify',
   'sp_login_hint': 'Connectez-vous avec votre e-mail et votre mot de passe Spotify. La fenêtre se ferme toute seule une fois la connexion réussie.',
   'sp_risk_note': 'Attention : cette fonction repose sur des appels non officiels de Spotify, pas sur une API officielle. Spotify peut la modifier ou la bloquer à tout moment, elle peut cesser de fonctionner, et son usage peut aller à l\'encontre des conditions d\'utilisation de Spotify, ce qui pourrait entraîner des restrictions sur votre compte Spotify. Utilisation à vos risques.',
+  'sp_perf_note': 'Performance : la recherche des Canvas lance un lecteur web caché en arrière-plan et fait des requêtes réseau en plus. Cela peut consommer plus de batterie, de données et de mémoire, et ralentir un peu l\'app. Retirez Spotify de cette liste si vous le remarquez.',
   'sp_t': 'Spotify (Canvas)',
   'sp_on': 'Connecté',
   'sp_off': 'Non connecté',
