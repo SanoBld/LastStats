@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-18T10:32:27Z",
+  "updated": "2026-10-18T12:30:02Z",
   "commits": [
+    {
+      "sha": "2156431e28e617546c784a7dd7010714c968aa20",
+      "message": "feat: ajouter la fonctionnalité de partage de diapositive avec un cadre 9:16",
+      "date": "2026-10-18T12:29:43Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/2156431e28e617546c784a7dd7010714c968aa20",
+      "tags": []
+    },
     {
       "sha": "d2a3c05bb565efb41a87405c3edbbbf126564c0d",
       "message": "feat: ajuster la taille de la carte de partage et modifier l'affichage de l'image",
@@ -2700,15 +2709,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/4d3244957a17cc81c36b98b21873df48780793f6",
-      "tags": []
-    },
-    {
-      "sha": "d5ca97e27d06ed86e762a8d88d75ec7aa184ad34",
-      "message": "feat: add home screen widgets for scrobble count, now playing, loved tracks, weekly scrobbles, and recap",
-      "date": "2026-08-20T18:04:46Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/d5ca97e27d06ed86e762a8d88d75ec7aa184ad34",
       "tags": []
     }
   ]
