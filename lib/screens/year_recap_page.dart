@@ -7,6 +7,9 @@ const double _kYrAvgTrackMinutes = 3.5;
 // Accent-tinted soft text colour (instead of a neutral grey), works in light and dark
 Color _yrSoft(ColorScheme s) => Color.lerp(s.onSurface, s.primary, 0.55)!;
 
+// True while a slide is rendered for sharing: animations jump to their final state
+bool _yrInstant = false;
+
 class _YrRanked {
   final String name;
   final String artist; // empty for artists
@@ -73,6 +76,9 @@ class _YearRecapPageState extends State<YearRecapPage> {
   int _slide = 0;
   final PageController _pages = PageController();
   final GlobalKey _shareKey = GlobalKey();
+  // Hidden 9:16 frame used for single-slide sharing
+  final GlobalKey _frameKey = GlobalKey();
+  final ValueNotifier<int?> _frameIdx = ValueNotifier(null);
   bool _sharing = false;
   // Profile picture url used as the share card background ('' = none)
   final ValueNotifier<String> _photo = ValueNotifier('');
@@ -130,6 +136,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
   void dispose() {
     _sharingN.dispose();
     _photo.dispose();
+    _frameIdx.dispose();
     _profileOn.dispose();
     _pages.dispose();
     super.dispose();
@@ -405,6 +412,37 @@ class _YearRecapPageState extends State<YearRecapPage> {
     }
   }
 
+  // Share the slide currently shown, inside the same themed 9:16 card as the final recap.
+  // The slide is rebuilt off-screen at a fixed phone size with all animations finished.
+  Future<void> _shareSlide() async {
+    if (_sharing || _data == null) return;
+    _sharing = true;
+    _sharingN.value = true;
+    try {
+      _yrInstant = true;
+      _frameIdx.value = _slide;
+      // Let the frame (and the pictures) build and load before the capture
+      await Future.delayed(const Duration(milliseconds: 1800));
+      await WidgetsBinding.instance.endOfFrame;
+      final fb = _frameKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      if (fb == null) throw StateError('no frame');
+      final img = await fb.toImage(pixelRatio: 3.0);
+      final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
+      img.dispose();
+      if (bytes == null) throw StateError('no bytes');
+      await AppShare.shareBytes('laststats_year_${widget.username}_${_year}_${_slide + 1}.png', bytes.buffer.asUint8List());
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tx('yr_share_err'))));
+      }
+    } finally {
+      _frameIdx.value = null;
+      _yrInstant = false;
+      _sharing = false;
+      if (mounted) _sharingN.value = false;
+    }
+  }
+
   void _next() {
     if (_data == null) return;
     if (_slide < _slideCount - 1) {
@@ -443,7 +481,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
 
     return Scaffold(
       backgroundColor: scheme.surface,
-      body: DecoratedBox(
+      body: Stack(clipBehavior: Clip.none, children: [Positioned.fill(child: DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [scheme.primaryContainer.withValues(alpha: 0.6), scheme.surface],
@@ -510,16 +548,66 @@ class _YearRecapPageState extends State<YearRecapPage> {
                 child: Row(children: [
                   _navBtn(scheme, Icons.chevron_left_rounded, _slide > 0, _prev),
                   Expanded(
-                    child: Text('${_slide + 1} / ${slides.length}',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: _yrSoft(scheme), fontSize: 13, fontWeight: FontWeight.w800)),
+                    child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Text('${_slide + 1} / ${slides.length}',
+                          style: TextStyle(color: _yrSoft(scheme), fontSize: 13, fontWeight: FontWeight.w800)),
+                      // Share this slide alone (the last slide has its own share button)
+                      if (_slide < slides.length - 1) ...[
+                        const SizedBox(width: 10),
+                        ValueListenableBuilder<bool>(
+                          valueListenable: _sharingN,
+                          builder: (_, busy, __) => IconButton.filledTonal(
+                            visualDensity: VisualDensity.compact,
+                            tooltip: L.commonShare,
+                            onPressed: busy ? null : _shareSlide,
+                            icon: busy ? SizedBox(width: 18, height: 18, child: M3Spinner(color: scheme.primary)) : const Icon(Icons.ios_share_rounded, size: 20),
+                          ),
+                        ),
+                      ],
+                    ]),
                   ),
                   _navBtn(scheme, Icons.chevron_right_rounded, _slide < slides.length - 1, _next),
                 ]),
               ),
           ]),
         ),
-      ),
+      )),
+        // Hidden (off-screen) 9:16 frame, only built while a single slide is being shared
+        Positioned(
+          left: -5000,
+          top: 0,
+          width: 360,
+          height: 640,
+          child: ValueListenableBuilder<int?>(
+            valueListenable: _frameIdx,
+            builder: (_, idx, __) => (idx == null || d == null)
+                ? const SizedBox.shrink()
+                : ValueListenableBuilder<String>(
+                    valueListenable: _photo,
+                    builder: (_, photo, __) => ValueListenableBuilder<bool>(
+                      valueListenable: _profileOn,
+                      builder: (_, on, __) => RepaintBoundary(
+                        key: _frameKey,
+                        child: _YrShareCard(
+                          scheme: scheme,
+                          year: _year,
+                          username: widget.username,
+                          data: d,
+                          hours: (d.total * _kYrAvgTrackMinutes / 60).round(),
+                          fmt: _fmt,
+                          photo: on ? photo : '',
+                          photoDark: _photoDark,
+                          slide: () {
+                            final all = _buildSlides(scheme, frame: true);
+                            return idx < all.length ? all[idx] : const SizedBox();
+                          }(),
+                        ),
+                      ),
+                    ),
+                  ),
+          ),
+        ),
+      ]),
     );
   }
 
@@ -578,13 +666,13 @@ class _YearRecapPageState extends State<YearRecapPage> {
   }
 
   // ── Slides ───────────────────────────────────────────────────────────────
-  List<Widget> _buildSlides(ColorScheme s) {
+  List<Widget> _buildSlides(ColorScheme s, {bool frame = false}) {
     final d = _data;
     if (d == null || d.total == 0) return const [];
     final hours = (d.total * _kYrAvgTrackMinutes / 60).round();
     final out = <Widget>[];
     final mq = MediaQuery.of(context);
-    final cardW = math.min(mq.size.width - 56, 320.0).clamp(180.0, 320.0).toDouble();
+    final cardW = math.min((frame ? 360.0 : mq.size.width) - 56, 320.0).clamp(180.0, 320.0).toDouble();
 
     // 1. Intro
     out.add(_YrSlide(
@@ -632,7 +720,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                         alignment: Alignment.bottomCenter,
                         child: TweenAnimationBuilder<double>(
                           tween: Tween(begin: 0, end: f),
-                          duration: Duration(milliseconds: 500 + i * 80),
+                          duration: _yrInstant ? Duration.zero : Duration(milliseconds: 500 + i * 80),
                           curve: Curves.easeOutCubic,
                           builder: (_, v, __) => FractionallySizedBox(
                             heightFactor: v.clamp(0.02, 1.0),
@@ -975,7 +1063,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
           padding: const EdgeInsets.only(left: 68),
           child: TweenAnimationBuilder<double>(
             tween: Tween(begin: 0, end: f),
-            duration: Duration(milliseconds: 900 + (delayMs ~/ 4)),
+            duration: _yrInstant ? Duration.zero : Duration(milliseconds: 900 + (delayMs ~/ 4)),
             curve: Curves.easeOutCubic,
             builder: (_, v, __) => ClipRRect(
               borderRadius: BorderRadius.circular(6),
@@ -1076,6 +1164,10 @@ class _YrRevealState extends State<_YrReveal> with SingleTickerProviderStateMixi
   @override
   void initState() {
     super.initState();
+    if (_yrInstant) {
+      _c.value = 1;
+      return;
+    }
     _t = Timer(Duration(milliseconds: widget.delayMs), () {
       if (mounted) _c.forward();
     });
@@ -1123,6 +1215,10 @@ class _YrCountUpState extends State<_YrCountUp> with SingleTickerProviderStateMi
   @override
   void initState() {
     super.initState();
+    if (_yrInstant) {
+      _c.value = 1;
+      return;
+    }
     _t = Timer(Duration(milliseconds: widget.delayMs), () {
       if (mounted) _c.forward();
     });
@@ -1157,7 +1253,7 @@ class _YrSlide extends StatelessWidget {
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 450),
+      duration: _yrInstant ? Duration.zero : const Duration(milliseconds: 450),
       curve: Curves.easeOutCubic,
       builder: (_, v, child) => Opacity(
         opacity: v,
@@ -1234,8 +1330,9 @@ class _YrShareCard extends StatelessWidget {
   final String Function(int) fmt;
   final String? rankLine; // friends ranking, when known
   final bool photoDark; // dark picture -> white header text
+  final Widget? slide; // single-slide share: this slide is shown instead of the lists
   final String photo; // profile picture url shown as background ('' = theme gradient)
-  const _YrShareCard({required this.scheme, required this.year, required this.username, required this.data, required this.hours, required this.fmt, this.rankLine, this.photo = '', this.photoDark = false});
+  const _YrShareCard({required this.scheme, required this.year, required this.username, required this.data, required this.hours, required this.fmt, this.rankLine, this.photo = '', this.photoDark = false, this.slide});
 
   Widget _stat(String label, String value) => Expanded(
         child: Container(
@@ -1332,6 +1429,16 @@ class _YrShareCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(tx('yr_intro_h', {'year': '$year'}), style: TextStyle(color: photo.isEmpty ? scheme.onSurface : (photoDark ? Colors.white : const Color(0xFF111111)), fontSize: 22, fontWeight: FontWeight.w900, height: 1.1)),
           const SizedBox(height: 10),
+          if (slide != null)
+            SizedBox(
+              height: 480,
+              width: 332,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: SizedBox(width: 332, height: 520, child: slide),
+              ),
+            )
+          else ...[
           IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             _stat(tx('yr_scrobbles'), fmt(data.total)),
             const SizedBox(width: 8),
@@ -1345,6 +1452,7 @@ class _YrShareCard extends StatelessWidget {
           _list(tx('yr_top_tracks'), data.tracks, 'tracks'),
           const SizedBox(height: 10),
           _list(tx('yr_top_albums'), data.albums, 'albums'),
+          ],
           const SizedBox(height: 14),
           Center(child: Text('LastStats', style: TextStyle(color: _yrSoft(scheme).withValues(alpha: 0.7), fontSize: 11, fontWeight: FontWeight.w700))),
         ]))),
