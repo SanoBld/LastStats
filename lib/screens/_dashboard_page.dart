@@ -877,6 +877,14 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
             Text(L.dashRecap),
           ]),
         ),
+        PopupMenuItem(
+          value: 'year_recap',
+          child: Row(children: [
+            const Icon(Icons.celebration_rounded, size: 20),
+            const SizedBox(width: 10),
+            Text(tx('yr_title')),
+          ]),
+        ),
         if (achievementsEnabledNotifier.value)
           PopupMenuItem(
             value: 'achievements',
@@ -907,6 +915,13 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
             username: widget.username,
             initialPeriod: 1,
             onOpenDetail: showDetailSheet,
+          ),
+        ));
+      case 'year_recap':
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => YearRecapPage(
+            service: widget.service,
+            username: widget.username,
           ),
         ));
       case 'achievements':
