@@ -27,9 +27,9 @@ class _FriendData {
 }
 
 
-// Year-recap shortcut (👀) in the dashboard header. TEST MODE: always visible.
+// Year-recap shortcut (👀) in the dashboard header. Visible Jan 1-15 only (set the flag below to true to test).
 // Set to false to only show it from January 1st to January 15th.
-const _kYearRecapAlwaysVisible = true;
+const _kYearRecapAlwaysVisible = false;
 bool _yearRecapSeason() {
   if (_kYearRecapAlwaysVisible) return true;
   final n = DateTime.now();

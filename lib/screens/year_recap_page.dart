@@ -8,6 +8,8 @@ const double _kYrAvgTrackMinutes = 3.5;
 Color _yrSoft(ColorScheme s) => Color.lerp(s.onPrimaryContainer, s.primary, 0.55)!;
 
 // True while a slide is rendered for sharing: animations jump to their final state
+// TEST ONLY: set to true to also open the current (unfinished) year.
+const bool _kYearRecapAllowCurrent = false;
 bool _yrInstant = false;
 
 class _YrRanked {
@@ -68,10 +70,8 @@ class YearRecapPage extends StatefulWidget {
 }
 
 class _YearRecapPageState extends State<YearRecapPage> {
-  // In the first half of January, open on the year that just ended.
-  late int _year = (DateTime.now().month == 1 && DateTime.now().day <= 15)
-      ? DateTime.now().year - 1
-      : DateTime.now().year;
+  // Only finished years are available (the current year is not over yet).
+  late int _year = _kYearRecapAllowCurrent ? DateTime.now().year : DateTime.now().year - 1;
   _YrData? _data;
   bool _loading = true;
   bool _error = false;
@@ -149,8 +149,9 @@ class _YearRecapPageState extends State<YearRecapPage> {
 
   List<int> get _years {
     final now = DateTime.now().year;
+    final last = _kYearRecapAllowCurrent ? now : now - 1;
     final first = AllScrobblesService.getRegistrationYear().clamp(2002, now).toInt();
-    return [for (var y = now; y >= first; y--) y];
+    return [for (var y = last; y >= first; y--) y];
   }
 
   Future<void> _load() async {
