@@ -1,7 +1,161 @@
 {
-  "updated": "2026-10-18T20:37:22Z",
+  "updated": "2026-10-18T21:00:57Z",
   "stars": 2,
   "releases": [
+    {
+      "tag_name": "v4.2.0",
+      "name": "LastStats v4.2.0",
+      "published_at": "2026-10-18T20:59:49Z",
+      "prerelease": false,
+      "draft": false,
+      "body": "## LastStats v4.2.0\n\n**News translation and website fixes**\n- News: items are now translated automatically into the app language, with a compact translate button in the top bar to switch back to the original text\n- News: long-press the translate button to pick another target language (same list as the biography translation)\n- Spotify Canvas: the app now repairs itself when Spotify changes its private query (it reads the new hash from the web player's scripts, at most once every 6 hours, and retries); the \"Test Spotify\" button also tries this repair\n- Spotify: when you are not logged in, nothing runs in the background for it (no lookups, no token refresh, no repair)\n- Video covers: new switch \"Also on the dashboard\" (off by default) to allow YouTube for the animated cover behind your profile on the dashboard; it works even when YouTube is not one of your sources, translated in all 10 languages\n- New: **Year in review** (profile menu > \"Year in review\"): a story-style recap of your year with total scrobbles and estimated hours, top artist, top tracks and albums, month by month chart, when you listen (night owl, early bird...), longest streak, discoveries, and a final summary card you can share as an image. Pick any year since you joined. Numbers count up and tops are revealed one by one, with two friends slides with profile pictures (yearly scrobbles ranking among your friends, and your \"music twin\" based on shared top artists), and a top artists donut reused from the Charts tab. Navigation arrows at the bottom, cookie shapes for artists and profile pictures, full sentences and full month/day names in every language, and a shared image that now includes every cover and the whole summary. Built from your local scrobble history, available in all 10 languages\n- Year in review: only finished years can be opened (the current year unlocks on January 1st); every past year since you joined stays available\n- Year in review: shared images redesigned so every slide looks alike: same title position and font sizes, accent theme colours instead of black text, content centered under the header photo, top artist/track/album with the title on the left and the cover on the right, a darker header photo so the white title stays readable, and a richer first slide with the estimation note made discreet\n- Year in review: the loading screen now uses the app's wavy progress bar\n- New: **year-in-review notification** on January 1st (once a year, in your local time, if at least one notification type is enabled), translated in all 10 languages\n- New: a 👀 button next to the bell on the dashboard that opens the year in review, shown only from January 1st to January 15th\n- Notifications: enabling the milestone interval no longer sends a notification right away (the first check only records your current scrobble count)\n- Calendar pickers (history day and news date range) are now translated into the app language\n- Year in review: the year picker is now a bottom sheet of pill chips, like the period chips\n- 🏎️ 🐉 🤖\n- Website: the table of contents dots of the help and legal pages are now all aligned on the same line\n- Website: reworded the awkward \"fiche artiste / fiche titre\" wording to \"page artiste / page titre\" in French, and the matching Spanish, Italian and Portuguese texts\n- Website: fixed the mixed \"tu/vous\" in two French titles on the home page\n\n**Legal notice, links and README**\n- About: new \"Legal\" section with a link to the legal notice and privacy page, publisher and contact, a short data and privacy summary, and the non-affiliation notice for all third-party services\n- About: Flutter and open-source package licenses are now available in the app\n- About: \"Powered by\" now lists every service the app uses (ListenBrainz, LRCLIB, lyrics.ovh, Google Translate, Spotify, Apple Music, GitHub)\n- New legal texts translated in all 10 languages\n- Fixed the license link in About (it pointed to a missing page)\n- All links now point to the main repository, SanoBld/LastStats, in the website and the deploy workflow\n- Website: the \"last updated\" date on the legal page now updates by itself from the repository history\n- Website and README: the web version is now described as a preview (it has bugs, missing images and broken features), no more \"beta\" label\n- Website: the legal notice is now complete and translated in all 10 languages (lyrics, Apple Music and YouTube Music posters, Google Translate for biographies, optional Spotify Canvas login, no ads or trackers in the app, AI use)\n- Legal notice reviewed and rewritten in a friendlier, more natural tone with full sentences (no more outdated law article, clearer data and rights sections), translated in all 10 languages\n- README badges no longer depend on the GitHub API (they now read data generated by the site deploy)\n- README rewritten with a more human tone, a clearer structure and a Legal section\n\n**Build and release (CI)**\n- The build workflows keep the same inputs, file names and artifact names (the in-app updater and the release page are not affected), but each platform now builds with the language that fits it best: Android with Gradle (Kotlin DSL), iOS and macOS with Fastlane (Ruby), Windows with PowerShell, Linux with Bash, and the web app with Dart\n- The workflow files are now short: all the build logic lives in scripts next to each platform (`android/ci.gradle.kts`, `ios/fastlane`, `macos/fastlane`, `windows/ci/build.ps1`, `linux/packaging/ci-build.sh`, `tool/ci/build_web.dart`)\n- iOS and macOS builds now install CocoaPods in the same Ruby as Fastlane, so Flutter can find it on the runner\n\n**Spotify Canvas**\n- Fixed: when Spotify failed for a real reason (login token not ready, network error, Spotify refusing a request), the app remembered \"no video\" for the whole session, so no Canvas was ever shown again until restart. A failed lookup is now tried again later; a track that simply has no Canvas is still remembered as before\n- After a failed Spotify token refresh, the app waits 2 minutes before opening the hidden web player again, so covers do not each open one\n- Removed the leftover code of the old \"Test Spotify\" button and its texts in the 10 languages\n- Disconnecting from Spotify now removes everything it kept: login cookie, tokens, the copied search request, the repaired query hash and its timer, and the video links already looked up in memory (a wrong repaired hash could survive a logout and break Canvas). A fresh login also starts clean\n- Nothing Spotify related runs in the background when you are disconnected (lookups, token refresh and hash repair were already stopped; a refresh that finishes after a disconnect now saves nothing)\n- Spotify warnings: the risk warning is removed from the Spotify web login screen and stays only on the Connection page, where a new note also says the feature can affect performance (hidden web player, more network use, battery and memory), in all 10 languages\n\n**macOS**\n- The macOS app now declares the network entitlement (outgoing connections) in its release build, so the sandboxed universal build can reach Last.fm and the other services\n\n### Android\n| File | Use case |\n|------|----------|\n| `app-universal-release.apk` | Works on any phone (biggest file) |\n| `app-arm64-v8a-release.apk` | Most modern phones (2018+) |\n| `app-armeabi-v7a-release.apk` | Older 32-bit phones |\n| `app-x86_64-release.apk` | Emulators / x86 tablets |\n\n### iOS\n| File | Use case |\n|------|----------|\n| `LastStats-ios.ipa` | Unsigned: install with AltStore / Sideloadly / TrollStore (or re-sign it yourself) |\n\n### Desktop\n| File | Platform |\n|------|----------|\n| `LastStats-Setup-x64.exe` | **Windows (x64) — recommended installer** |\n| `LastStats-Setup-arm64.exe` | **Windows on ARM (Snapdragon) — recommended installer** |\n| `laststats-windows.zip` | Windows (x64), portable / no install |\n| `laststats-windows-arm64.zip` | Windows on ARM, portable / no install |\n| `LastStats-linux-x64.deb` | **Linux x64 (Debian/Ubuntu/Mint) — recommended installer** |\n| `LastStats-linux-arm64.deb` | **Linux ARM64 (Debian/Ubuntu, Raspberry Pi...) — recommended installer** |\n| `LastStats-linux-x64.rpm` | **Linux x64 (Fedora/openSUSE/RHEL) — recommended installer** |\n| `LastStats-linux-arm64.rpm` | **Linux ARM64 (Fedora/openSUSE) — recommended installer** |\n| `install-linux.sh` | Linux, any CPU: picks the right package for your distro |\n| `LastStats-linux-x64.AppImage` | Linux x64, any distro (portable) |\n| `LastStats-linux-arm64.AppImage` | Linux ARM64, any distro (portable) |\n| `laststats-linux.zip`   | Linux x64, manual install |\n| `laststats-linux-arm64.zip` | Linux ARM64, manual install |\n| `LastStats-macos-arm64.dmg` | **macOS Apple Silicon (M1 and later) — recommended installer** (drag to Applications) |\n| `LastStats-macos-x64.dmg` | **macOS Intel — recommended installer** (drag to Applications) |\n| `LastStats-macos.dmg`   | macOS universal (Intel + Apple Silicon) installer |\n| `laststats-macos-arm64.zip` | macOS Apple Silicon, manual install |\n| `laststats-macos-x64.zip` | macOS Intel, manual install |\n| `laststats-macos.zip`   | macOS universal, manual install |\n**Full Changelog**: https://github.com/SanoBld/LastStats/compare/v4.1.0...v4.2.0",
+      "assets": [
+        {
+          "name": "app-arm64-v8a-release.apk",
+          "size": 48051914,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/app-arm64-v8a-release.apk"
+        },
+        {
+          "name": "app-armeabi-v7a-release.apk",
+          "size": 44767874,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/app-armeabi-v7a-release.apk"
+        },
+        {
+          "name": "app-universal-release.apk",
+          "size": 105922012,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/app-universal-release.apk"
+        },
+        {
+          "name": "app-x86_64-release.apk",
+          "size": 50838048,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/app-x86_64-release.apk"
+        },
+        {
+          "name": "install-linux.sh",
+          "size": 1940,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/install-linux.sh"
+        },
+        {
+          "name": "LastStats-ios.ipa",
+          "size": 25469868,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-ios.ipa"
+        },
+        {
+          "name": "LastStats-linux-arm64.AppImage",
+          "size": 17799688,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-linux-arm64.AppImage"
+        },
+        {
+          "name": "LastStats-linux-arm64.deb",
+          "size": 14323558,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-linux-arm64.deb"
+        },
+        {
+          "name": "LastStats-linux-arm64.rpm",
+          "size": 18539820,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-linux-arm64.rpm"
+        },
+        {
+          "name": "laststats-linux-arm64.zip",
+          "size": 18804595,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/laststats-linux-arm64.zip"
+        },
+        {
+          "name": "LastStats-linux-x64.AppImage",
+          "size": 18250232,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-linux-x64.AppImage"
+        },
+        {
+          "name": "LastStats-linux-x64.deb",
+          "size": 14693268,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-linux-x64.deb"
+        },
+        {
+          "name": "LastStats-linux-x64.rpm",
+          "size": 18948913,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-linux-x64.rpm"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 19267366,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/laststats-linux.zip"
+        },
+        {
+          "name": "LastStats-macos-arm64.dmg",
+          "size": 22632970,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-macos-arm64.dmg"
+        },
+        {
+          "name": "laststats-macos-arm64.zip",
+          "size": 228783252,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/laststats-macos-arm64.zip"
+        },
+        {
+          "name": "LastStats-macos-x64.dmg",
+          "size": 23985207,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-macos-x64.dmg"
+        },
+        {
+          "name": "laststats-macos-x64.zip",
+          "size": 229910225,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/laststats-macos-x64.zip"
+        },
+        {
+          "name": "LastStats-macos.dmg",
+          "size": 38885703,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-macos.dmg"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 242280635,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/laststats-macos.zip"
+        },
+        {
+          "name": "LastStats-Setup-arm64.exe",
+          "size": 16173139,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-Setup-arm64.exe"
+        },
+        {
+          "name": "LastStats-Setup-x64.exe",
+          "size": 16976519,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-Setup-x64.exe"
+        },
+        {
+          "name": "laststats-windows-arm64.zip",
+          "size": 21471957,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/laststats-windows-arm64.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 22412340,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/laststats-windows.zip"
+        }
+      ]
+    },
     {
       "tag_name": "v4.1.0",
       "name": "LastStats v4.1.0",

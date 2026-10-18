@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-18T20:37:24Z",
+  "updated": "2026-10-18T21:00:59Z",
   "commits": [
+    {
+      "sha": "a6fe64f2f7ed0c56a4639be4ee5629af74cc193c",
+      "message": "chore: bump version to 4.2.0 [skip ci]",
+      "date": "2026-10-18T20:49:14Z",
+      "author": "github-actions[bot]",
+      "avatar": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/a6fe64f2f7ed0c56a4639be4ee5629af74cc193c",
+      "tags": []
+    },
     {
       "sha": "365430259c7a2e1c1d01590c7119930e846a991d",
       "message": "feat: mettre à jour le changelog et déclarer l'entitlement réseau pour l'application macOS",
@@ -8,7 +17,9 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/365430259c7a2e1c1d01590c7119930e846a991d",
-      "tags": []
+      "tags": [
+        "v4.2.0"
+      ]
     },
     {
       "sha": "617841dbd97b77afa4b4d2acbf425496b254fcf2",
@@ -2700,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/ea160cb312e387a1b1764ebc278e34c808d6d2b5",
-      "tags": []
-    },
-    {
-      "sha": "2ed1875a7d3e87fbb06f970b147b6396cd3476f7",
-      "message": "Refactor widget backgrounds and themes to use color filters and new drawable shapes\n\n- Updated RecapWidgetProvider, ScrobbleCountWidgetProvider, and WeeklyScrobblesWidgetProvider to set color filters for backgrounds instead of using drawable resources.\n- Removed unused drawable resources for default and nothing styles.\n- Introduced new drawable shapes for card backgrounds and chip icons to enhance visual consistency.\n- Modified layout files for widgets to utilize the new drawable shapes and adjusted structure for better alignment and padding.\n- Enhanced WidgetTheme to blend colors based on user accent choices, improving the overall aesthetic of the widgets.",
-      "date": "2026-08-21T10:41:30Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/2ed1875a7d3e87fbb06f970b147b6396cd3476f7",
       "tags": []
     }
   ]
