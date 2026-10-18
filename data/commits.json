@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-18T13:18:05Z",
+  "updated": "2026-10-18T13:44:52Z",
   "commits": [
+    {
+      "sha": "30ab9b86aaab5caa4390a8f4c0a4402b2a579352",
+      "message": "feat: ajouter la fonctionnalité de récapitulatif annuel avec notifications et affichage",
+      "date": "2026-10-18T13:42:38Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/30ab9b86aaab5caa4390a8f4c0a4402b2a579352",
+      "tags": []
+    },
     {
       "sha": "e721ec5303abb796799e601e70cf3ada57d5d819",
       "message": "feat: améliorer l'affichage du récapitulatif annuel avec des ajustements de taille et de mise en page",
@@ -2700,15 +2709,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/744a6d081bd190f107120b72216485154863c19e",
-      "tags": []
-    },
-    {
-      "sha": "7050f6a7c2d943e25dd37031a4c50cd5df4b351a",
-      "message": "refactor: remove unnecessary intent creation in widget tap action",
-      "date": "2026-08-20T18:26:35Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/7050f6a7c2d943e25dd37031a4c50cd5df4b351a",
       "tags": []
     }
   ]
