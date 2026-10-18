@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-18T12:45:58Z",
+  "updated": "2026-10-18T13:07:27Z",
   "commits": [
+    {
+      "sha": "e721ec5303abb796799e601e70cf3ada57d5d819",
+      "message": "feat: améliorer l'affichage du récapitulatif annuel avec des ajustements de taille et de mise en page",
+      "date": "2026-10-18T13:07:08Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/e721ec5303abb796799e601e70cf3ada57d5d819",
+      "tags": []
+    },
     {
       "sha": "35cbcdacfa52ffbded196013e3fcbfabe591ac52",
       "message": "feat: modifier le type de la photo de profil pour le partage et ajuster l'affichage",
@@ -2700,15 +2709,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/7050f6a7c2d943e25dd37031a4c50cd5df4b351a",
-      "tags": []
-    },
-    {
-      "sha": "26e56d00ab498a5fd4a6fca2bed33002d2759ac3",
-      "message": "refactor: simplify intent creation for widget tap action",
-      "date": "2026-08-20T18:16:04Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/26e56d00ab498a5fd4a6fca2bed33002d2759ac3",
       "tags": []
     }
   ]
