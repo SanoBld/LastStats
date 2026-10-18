@@ -78,3 +78,7 @@
 - Disconnecting from Spotify now removes everything it kept: login cookie, tokens, the copied search request, the repaired query hash and its timer, and the video links already looked up in memory (a wrong repaired hash could survive a logout and break Canvas). A fresh login also starts clean
 - Nothing Spotify related runs in the background when you are disconnected (lookups, token refresh and hash repair were already stopped; a refresh that finishes after a disconnect now saves nothing)
 - Spotify warnings: the risk warning is removed from the Spotify web login screen and stays only on the Connection page, where a new note also says the feature can affect performance (hidden web player, more network use, battery and memory), in all 10 languages
+
+**macOS**
+- The macOS app now declares the network entitlement (outgoing connections) in its release build, so the sandboxed universal build can reach Last.fm and the other services
+
