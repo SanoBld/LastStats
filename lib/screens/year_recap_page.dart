@@ -1,43 +1,17 @@
-// lib/screens/year_recap_page.dart
-//
-// "Year in review" story: one slide per highlight (total, top artist, top
-// tracks / albums, month by month, listening hours, streak, discoveries) and a
-// final slide with a shareable summary card.
-//
-// Everything is built from data the app already has: the per-year scrobble
-// cache (AllScrobblesService), the "link versions / split collabs" rules
-// (LibraryMerge), the artwork resolver (ImageService), the PNG share helper
-// (AppShare) and the current Material You colour scheme.
-
-import 'dart:async';
-import 'dart:ui' as ui;
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import '../widgets/skeleton.dart';
-import '../theme/m3_motion.dart';
-import '../theme/story_style.dart';
-import '../services/app_share.dart';
-import '../services/lastfm_service.dart';
-import '../services/library_merge.dart';
-import '../services/friends_library_service.dart';
-import '../services/image_service.dart';
-import '../services/all_scrobbles_service.dart';
-import '../services/scrobbles_file_cache.dart';
-import '../l10n/l10n.dart';
-import '../l10n/extra_strings.dart';
+part of 'home_screen.dart';
 
 // Average track length used for the "hours of music" estimate (Last.fm does
 // not give durations in scrobble history), clearly labelled as an estimate.
-const double _kAvgTrackMinutes = 3.5;
+const double _kYrAvgTrackMinutes = 3.5;
 
-class _Ranked {
+class _YrRanked {
   final String name;
   final String artist; // empty for artists
   final int count;
-  const _Ranked(this.name, this.artist, this.count);
+  const _YrRanked(this.name, this.artist, this.count);
 }
 
-class _YearData {
+class _YrData {
   int total = 0;
   int activeDays = 0;
   int daysInRange = 0;
@@ -47,27 +21,35 @@ class _YearData {
   List<int> monthly = List.filled(12, 0);
   List<int> hourly = List.filled(24, 0);
   List<int> weekday = List.filled(7, 0); // Mon..Sun
-  List<_Ranked> artists = [];
-  List<_Ranked> tracks = [];
-  List<_Ranked> albums = [];
+  List<_YrRanked> artists = [];
+  List<_YrRanked> tracks = [];
+  List<_YrRanked> albums = [];
   int uniqueArtists = 0;
   int uniqueTracks = 0;
   int? newArtists; // null = unknown (older years not cached)
   List<String> topArtistNames = []; // top 50, lower-case, for taste matching
+  List<_YrRanked> artistsWide = []; // top 20, for the share donut
+  Map<String, int> calendar = {}; // YYYY-MM-DD -> scrobbles
+  Map<String, int> cumulative = {}; // YYYY-MM -> running total
+  Map<int, int> hourlyMap = {};
+  Map<int, int> weekdayMap = {}; // 1 (Mon) .. 7 (Sun)
 }
 
-class _FriendRow {
+class _YrFriend {
   final String name;
   final int total;
-  const _FriendRow(this.name, this.total);
+  final String image;
+  const _YrFriend(this.name, this.total, [this.image = '']);
 }
 
-class _FriendsData {
-  final List<_FriendRow> board; // friends with scrobbles this year
+class _YrFriends {
+  final List<_YrFriend> board; // friends with scrobbles this year
   final String? twin;           // friend with the most artists in common
   final List<String> shared;    // shared artists (display names, my rank order)
   final int sharedCount;
-  const _FriendsData(this.board, this.twin, this.shared, this.sharedCount);
+  final Map<String, String> images; // friend name -> avatar url
+  final String myImage;
+  const _YrFriends(this.board, this.twin, this.shared, this.sharedCount, this.images, this.myImage);
 }
 
 class YearRecapPage extends StatefulWidget {
@@ -81,7 +63,7 @@ class YearRecapPage extends StatefulWidget {
 
 class _YearRecapPageState extends State<YearRecapPage> {
   late int _year = DateTime.now().year;
-  _YearData? _data;
+  _YrData? _data;
   bool _loading = true;
   bool _error = false;
   double _progress = 0;
@@ -89,7 +71,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
   final PageController _pages = PageController();
   final GlobalKey _shareKey = GlobalKey();
   bool _sharing = false;
-  _FriendsData? _friendsData;
+  _YrFriends? _friendsData;
   int _token = 0;
 
   @override
@@ -146,8 +128,8 @@ class _YearRecapPageState extends State<YearRecapPage> {
   }
 
   // ── Aggregation ──────────────────────────────────────────────────────────
-  _YearData _compute(List<ScrobbleRecord> records, int year) {
-    final d = _YearData();
+  _YrData _compute(List<ScrobbleRecord> records, int year) {
+    final d = _YrData();
     d.total = records.length;
     if (records.isEmpty) return d;
 
@@ -191,9 +173,15 @@ class _YearRecapPageState extends State<YearRecapPage> {
       return e.take(5).map((x) => build(x.key, x.value)).toList();
     }
 
-    d.artists = top(artistCount, (k, c) => _Ranked(k, '', c));
-    d.tracks = top(trackCount, (k, c) => _Ranked(trackRep[k]!.track, trackRep[k]!.artist, c));
-    d.albums = top(albumCount, (k, c) => _Ranked(albumRep[k]!.album, albumRep[k]!.artist, c));
+    d.artists = top(artistCount, (k, c) => _YrRanked(k, '', c));
+    d.artistsWide = (artistCount.entries.toList()..sort((a, b) => b.value.compareTo(a.value)))
+        .take(20).map((e) => _YrRanked(e.key, '', e.value)).toList();
+    d.calendar = dayCount;
+    d.cumulative = AllScrobblesService.computeYearCumulative(records, year);
+    d.hourlyMap = {for (var h = 0; h < 24; h++) h: d.hourly[h]};
+    d.weekdayMap = {for (var w = 0; w < 7; w++) w + 1: d.weekday[w]};
+    d.tracks = top(trackCount, (k, c) => _YrRanked(trackRep[k]!.track, trackRep[k]!.artist, c));
+    d.albums = top(albumCount, (k, c) => _YrRanked(albumRep[k]!.album, albumRep[k]!.artist, c));
     final ranked = artistCount.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
     d.topArtistNames = ranked.take(50).map((e) => e.key).toList();
     d.uniqueArtists = artistCount.length;
@@ -246,29 +234,46 @@ class _YearRecapPageState extends State<YearRecapPage> {
   // Yearly totals: one cheap call per friend (limit 1 -> only the total).
   // Taste twin: overlap between your top artists of the year and the friend
   // libraries already synced by FriendsLibraryService (no extra requests).
-  Future<void> _loadFriends(int year, _YearData d, int token) async {
+  Future<void> _loadFriends(int year, _YrData d, int token) async {
     try {
       final raw = await widget.service.getFriends(limit: 30, withRecentTrack: false);
-      final names = <String>[
-        for (final f in raw)
-          if (f is Map && (f['name'] ?? '').toString().isNotEmpty) f['name'].toString()
-      ].take(20).toList();
+      String bestImg(dynamic imgs) {
+        if (imgs is! List || imgs.isEmpty) return '';
+        final e = imgs.lastWhere((i) => i is Map && i['size'] == 'extralarge', orElse: () => imgs.last);
+        return (e is Map ? e['#text'] ?? '' : '').toString();
+      }
+
+      final images = <String, String>{};
+      final names = <String>[];
+      for (final f in raw) {
+        if (f is Map && (f['name'] ?? '').toString().isNotEmpty) {
+          final n = f['name'].toString();
+          names.add(n);
+          images[n] = bestImg(f['image']);
+        }
+      }
+      if (names.length > 20) names.removeRange(20, names.length);
+      var myImage = '';
+      try {
+        final me = await widget.service.getUserInfo();
+        myImage = bestImg(me?['image']);
+      } catch (_) {}
       if (names.isEmpty) return;
       final now = DateTime.now();
       final from = DateTime(year, 1, 1).millisecondsSinceEpoch ~/ 1000;
       final to = (year == now.year ? now.add(const Duration(minutes: 1)) : DateTime(year + 1, 1, 1))
               .millisecondsSinceEpoch ~/ 1000;
 
-      final board = <_FriendRow>[];
+      final board = <_YrFriend>[];
       for (var i = 0; i < names.length; i += 5) {
         final batch = names.skip(i).take(5);
         final res = await Future.wait(batch.map((n) async {
           try {
             final r = await widget.service.getRecentTracks(user: n, from: from, to: to, limit: 1);
             final t = int.tryParse((r['@attr']?['total'] ?? '0').toString()) ?? 0;
-            return _FriendRow(n, t);
+            return _YrFriend(n, t, images[n] ?? '');
           } catch (_) {
-            return _FriendRow(n, 0); // private profile / error: skipped below
+            return _YrFriend(n, 0); // private profile / error: skipped below
           }
         }));
         board.addAll(res.where((r) => r.total > 0));
@@ -291,7 +296,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
         }
       }
       if (!mounted || token != _token) return;
-      setState(() => _friendsData = _FriendsData(board, twin, shared.take(6).toList(), best));
+      setState(() => _friendsData = _YrFriends(board, twin, shared.take(6).toList(), best, images, myImage));
     } catch (_) {
       // Friends are a bonus: no friends / network error -> no friend slides.
     }
@@ -321,15 +326,18 @@ class _YearRecapPageState extends State<YearRecapPage> {
     if (_sharing) return;
     setState(() => _sharing = true);
     try {
+      await WidgetsBinding.instance.endOfFrame;
       final rb = _shareKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
-      if (rb == null) return;
+      if (rb == null) throw StateError('no boundary');
       final img = await rb.toImage(pixelRatio: 3.0);
       final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
       img.dispose();
-      if (bytes == null) return;
+      if (bytes == null) throw StateError('no bytes');
       await AppShare.shareBytes('laststats_year_${widget.username}_$_year.png', bytes.buffer.asUint8List());
     } catch (_) {
-      // Render/share failure: nothing to share, fail silently.
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tx('yr_share_err'))));
+      }
     } finally {
       if (mounted) setState(() => _sharing = false);
     }
@@ -464,6 +472,8 @@ class _YearRecapPageState extends State<YearRecapPage> {
         children: slides,
       ),
       // Tap zones (left third = back, right two thirds = next), like a story.
+      // Not on the last slide: they would swallow taps on the share button.
+      if (_slide < _slideCount - 1)
       Positioned.fill(
         child: Row(children: [
           Expanded(
@@ -483,23 +493,25 @@ class _YearRecapPageState extends State<YearRecapPage> {
   List<Widget> _buildSlides(ColorScheme s) {
     final d = _data;
     if (d == null || d.total == 0) return const [];
-    final hours = (d.total * _kAvgTrackMinutes / 60).round();
+    final hours = (d.total * _kYrAvgTrackMinutes / 60).round();
     final out = <Widget>[];
+    final mq = MediaQuery.of(context);
+    final cardW = math.min(math.min(mq.size.width - 56, 320.0), (mq.size.height - 280) * 340 / 600).clamp(180.0, 320.0).toDouble();
 
     // 1. Intro
-    out.add(_Slide(
+    out.add(_YrSlide(
       scheme: s,
       children: [
         Text(tx('yr_intro_h', {'year': '$_year'}),
             textAlign: TextAlign.center,
             style: TextStyle(color: s.onSurface, fontSize: 30, fontWeight: FontWeight.w900, height: 1.1)),
         const SizedBox(height: 28),
-        _CountUp(value: d.total, fmt: _fmt, delayMs: 350, durationMs: 1600,
+        _YrCountUp(value: d.total, fmt: _fmt, delayMs: 350, durationMs: 1600,
             style: TextStyle(color: s.primary, fontSize: 72, fontWeight: FontWeight.w900, height: 1)),
         const SizedBox(height: 6),
-        _Reveal(delayMs: 500, child: Text(tx('yr_scrobbles'), style: TextStyle(color: s.onSurfaceVariant, fontSize: 18, fontWeight: FontWeight.w700))),
+        _YrReveal(delayMs: 500, child: Text(tx('yr_scrobbles'), style: TextStyle(color: s.onSurfaceVariant, fontSize: 18, fontWeight: FontWeight.w700))),
         const SizedBox(height: 20),
-        _Reveal(delayMs: 1900, child: Text(tx('yr_hours', {'h': _fmt(hours)}),
+        _YrReveal(delayMs: 1900, child: Text(tx('yr_hours', {'h': _fmt(hours)}),
             textAlign: TextAlign.center, style: TextStyle(color: s.onSurfaceVariant, fontSize: 14))),
       ],
     ));
@@ -512,7 +524,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     // 5. Month by month
     final maxM = d.monthly.fold<int>(0, (m, v) => v > m ? v : m);
     final bestMonth = d.monthly.indexOf(maxM);
-    out.add(_Slide(
+    out.add(_YrSlide(
       scheme: s,
       children: [
         _label(s, tx('yr_months_h')),
@@ -579,7 +591,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     final maxW = d.weekday.fold<int>(0, (m, v) => v > m ? v : m);
     final favDay = d.weekday.indexOf(maxW);
     final wd = L.weekdaysShort;
-    out.add(_Slide(
+    out.add(_YrSlide(
       scheme: s,
       children: [
         _label(s, tx('yr_when_h')),
@@ -626,12 +638,12 @@ class _YearRecapPageState extends State<YearRecapPage> {
     ));
 
     // 7. Consistency
-    out.add(_Slide(
+    out.add(_YrSlide(
       scheme: s,
       children: [
         _label(s, tx('yr_streak_h')),
         const SizedBox(height: 22),
-        _CountUp(value: d.longestStreak, fmt: _fmt, delayMs: 300, durationMs: 1400,
+        _YrCountUp(value: d.longestStreak, fmt: _fmt, delayMs: 300, durationMs: 1400,
             style: TextStyle(color: s.primary, fontSize: 84, fontWeight: FontWeight.w900, height: 1)),
         const SizedBox(height: 6),
         Text(tx('yr_streak', {'n': '${d.longestStreak}'}),
@@ -642,14 +654,30 @@ class _YearRecapPageState extends State<YearRecapPage> {
       ],
     ));
 
+    // 7b. Where the plays go (Charts tab donut)
+    if (d.artistsWide.length > 1) {
+      out.add(_YrSlide(
+        scheme: s,
+        children: [
+          _label(s, tx('yr_share_h')),
+          const SizedBox(height: 16),
+          _ShareDonut(
+            items: d.artistsWide,
+            getLabel: (e) => (e as _YrRanked).name,
+            getPlays: (e) => (e as _YrRanked).count,
+          ),
+        ],
+      ));
+    }
+
     // 8. Discoveries
-    out.add(_Slide(
+    out.add(_YrSlide(
       scheme: s,
       children: [
         _label(s, tx('yr_disc_h')),
         const SizedBox(height: 22),
         if (d.newArtists != null) ...[
-          _CountUp(value: d.newArtists!, fmt: _fmt, delayMs: 300, durationMs: 1400,
+          _YrCountUp(value: d.newArtists!, fmt: _fmt, delayMs: 300, durationMs: 1400,
               style: TextStyle(color: s.primary, fontSize: 72, fontWeight: FontWeight.w900, height: 1)),
           const SizedBox(height: 6),
           Text(tx('yr_new'), textAlign: TextAlign.center, style: TextStyle(color: s.onSurface, fontSize: 18, fontWeight: FontWeight.w800)),
@@ -668,23 +696,23 @@ class _YearRecapPageState extends State<YearRecapPage> {
     final fr = _friendsData;
     String? rankLine;
     if (fr != null && fr.board.isNotEmpty) {
-      final rows = [...fr.board, _FriendRow('', d.total)]..sort((a, b) => b.total.compareTo(a.total));
+      final rows = [...fr.board, _YrFriend('', d.total, fr.myImage)]..sort((a, b) => b.total.compareTo(a.total));
       final myRank = rows.indexWhere((r) => r.name.isEmpty) + 1;
       rankLine = tx('yr_rank', {'r': '$myRank', 'n': '${rows.length}'});
       final shown = rows.take(6).toList();
       if (!shown.any((r) => r.name.isEmpty)) shown[shown.length - 1] = rows[myRank - 1];
       final maxT = rows.first.total;
-      out.add(_Slide(
+      out.add(_YrSlide(
         scheme: s,
         children: [
           _label(s, tx('yr_friends_h')),
           const SizedBox(height: 10),
-          _Reveal(delayMs: 250, pop: true, child: Text(rankLine,
+          _YrReveal(delayMs: 250, pop: true, child: Text(rankLine,
               textAlign: TextAlign.center,
               style: TextStyle(color: s.primary, fontSize: 26, fontWeight: FontWeight.w900))),
           const SizedBox(height: 20),
           for (var i = 0; i < shown.length; i++)
-            _Reveal(
+            _YrReveal(
               delayMs: 700 + i * 180,
               child: _friendBar(s, shown[i], maxT, 900 + i * 180, rows.indexOf(shown[i]) + 1),
             ),
@@ -694,27 +722,22 @@ class _YearRecapPageState extends State<YearRecapPage> {
 
     // 10. Friends: music twin
     if (fr != null && fr.twin != null) {
-      out.add(_Slide(
+      out.add(_YrSlide(
         scheme: s,
         children: [
           _label(s, tx('yr_twin_h')),
           const SizedBox(height: 20),
-          _Reveal(
+          _YrReveal(
             delayMs: 300,
             pop: true,
-            child: CircleAvatar(
-              radius: 52,
-              backgroundColor: s.primaryContainer,
-              child: Text(fr.twin!.characters.first.toUpperCase(),
-                  style: TextStyle(color: s.onPrimaryContainer, fontSize: 44, fontWeight: FontWeight.w900)),
-            ),
+            child: _YrAvatar(url: fr.images[fr.twin!] ?? '', label: fr.twin!, size: 104),
           ),
           const SizedBox(height: 14),
-          _Reveal(delayMs: 800, child: Text(fr.twin!,
+          _YrReveal(delayMs: 800, child: Text(fr.twin!,
               textAlign: TextAlign.center,
               style: TextStyle(color: s.onSurface, fontSize: 28, fontWeight: FontWeight.w900))),
           const SizedBox(height: 6),
-          _Reveal(delayMs: 1100, child: Text(tx('yr_twin_s', {'n': '${fr.sharedCount}'}),
+          _YrReveal(delayMs: 1100, child: Text(tx('yr_twin_s', {'n': '${fr.sharedCount}'}),
               textAlign: TextAlign.center, style: TextStyle(color: s.onSurfaceVariant, fontSize: 15))),
           const SizedBox(height: 18),
           Wrap(
@@ -723,7 +746,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
             runSpacing: 8,
             children: [
               for (var i = 0; i < fr.shared.length; i++)
-                _Reveal(
+                _YrReveal(
                   delayMs: 1400 + i * 160,
                   child: Chip(
                     label: Text(fr.shared[i], style: const TextStyle(fontWeight: FontWeight.w700)),
@@ -738,13 +761,15 @@ class _YearRecapPageState extends State<YearRecapPage> {
     }
 
     // 11. Summary + share
-    out.add(_Slide(
+    out.add(_YrSlide(
       scheme: s,
       children: [
-        Flexible(
+        SizedBox(
+          width: cardW,
+          height: cardW * 600 / 340,
           child: FittedBox(
             fit: BoxFit.contain,
-            child: RepaintBoundary(key: _shareKey, child: _ShareCard(scheme: s, year: _year, username: widget.username, data: d, hours: hours, fmt: _fmt, rankLine: rankLine)),
+            child: RepaintBoundary(key: _shareKey, child: _YrShareCard(scheme: s, year: _year, username: widget.username, data: d, hours: hours, fmt: _fmt, rankLine: rankLine)),
           ),
         ),
         const SizedBox(height: 14),
@@ -761,20 +786,20 @@ class _YearRecapPageState extends State<YearRecapPage> {
   }
 
   // Big #1 (artwork, name, plays counting up) followed by ranks 2..5.
-  Widget _topSlide(ColorScheme s, List<_Ranked> items, String type, String label) {
+  Widget _topSlide(ColorScheme s, List<_YrRanked> items, String type, String label) {
     final first = items.first;
-    return _Slide(
+    return _YrSlide(
       scheme: s,
       children: [
         _label(s, label),
         const SizedBox(height: 18),
-        _Reveal(
+        _YrReveal(
           delayMs: 300,
           pop: true,
-          child: _YImg(name: first.name, artist: first.artist, type: type, size: 190, round: type == 'artists'),
+          child: _YrImg(name: first.name, artist: first.artist, type: type, size: 190, round: type == 'artists'),
         ),
         const SizedBox(height: 18),
-        _Reveal(
+        _YrReveal(
           delayMs: 900,
           child: Text(first.name,
               textAlign: TextAlign.center,
@@ -783,7 +808,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
               style: TextStyle(color: s.onSurface, fontSize: 28, fontWeight: FontWeight.w900)),
         ),
         if (first.artist.isNotEmpty)
-          _Reveal(
+          _YrReveal(
             delayMs: 1000,
             child: Text(first.artist,
                 textAlign: TextAlign.center,
@@ -792,7 +817,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                 style: TextStyle(color: s.onSurfaceVariant, fontSize: 15, fontWeight: FontWeight.w700)),
           ),
         const SizedBox(height: 4),
-        _CountUp(
+        _YrCountUp(
             value: first.count,
             fmt: (n) => tx('yr_plays', {'n': _fmt(n)}),
             delayMs: 1200,
@@ -808,7 +833,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
       textAlign: TextAlign.center,
       style: TextStyle(color: s.onSurfaceVariant, fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: 1.4));
 
-  Widget _friendBar(ColorScheme s, _FriendRow r, int maxT, int delayMs, int rank) {
+  Widget _friendBar(ColorScheme s, _YrFriend r, int maxT, int delayMs, int rank) {
     final me = r.name.isEmpty;
     final f = maxT == 0 ? 0.0 : r.total / maxT;
     return Padding(
@@ -816,18 +841,20 @@ class _YearRecapPageState extends State<YearRecapPage> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           SizedBox(width: 26, child: Text('$rank', style: TextStyle(color: me ? s.primary : s.onSurfaceVariant, fontSize: 15, fontWeight: FontWeight.w900))),
+          _YrAvatar(url: r.image, label: me ? tx('yr_you') : r.name, size: 32),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(me ? tx('yr_you') : r.name,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(color: s.onSurface, fontSize: 14, fontWeight: me ? FontWeight.w900 : FontWeight.w700)),
           ),
-          _CountUp(value: r.total, fmt: _fmt, delayMs: delayMs, durationMs: 1100,
+          _YrCountUp(value: r.total, fmt: _fmt, delayMs: delayMs, durationMs: 1100,
               style: TextStyle(color: me ? s.primary : s.onSurfaceVariant, fontSize: 14, fontWeight: FontWeight.w800)),
         ]),
         const SizedBox(height: 4),
         Padding(
-          padding: const EdgeInsets.only(left: 26),
+          padding: const EdgeInsets.only(left: 68),
           child: TweenAnimationBuilder<double>(
             tween: Tween(begin: 0, end: f),
             duration: Duration(milliseconds: 900 + (delayMs ~/ 4)),
@@ -848,11 +875,11 @@ class _YearRecapPageState extends State<YearRecapPage> {
   }
 
   // Rows are revealed from the last to the first, so #1 lands last.
-  Widget _rankList(ColorScheme s, List<_Ranked> items, String type, {int startAt = 1, int baseDelay = 300}) {
+  Widget _rankList(ColorScheme s, List<_YrRanked> items, String type, {int startAt = 1, int baseDelay = 300}) {
     return Column(
       children: [
         for (var i = 0; i < items.length; i++)
-          _Reveal(
+          _YrReveal(
             delayMs: baseDelay + (items.length - 1 - i) * 240,
             pop: i == 0 && startAt == 1,
             child: Padding(
@@ -863,7 +890,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                 child: Text('${startAt + i}',
                     style: TextStyle(color: i == 0 && startAt == 1 ? s.primary : s.onSurfaceVariant, fontSize: 18, fontWeight: FontWeight.w900)),
               ),
-              _YImg(name: items[i].name, artist: items[i].artist, type: type, size: 46, round: type == 'artists'),
+              _YrImg(name: items[i].name, artist: items[i].artist, type: type, size: 46, round: type == 'artists'),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -882,19 +909,45 @@ class _YearRecapPageState extends State<YearRecapPage> {
   }
 }
 
+// Round profile picture (same ImageService loader as the rest of the app),
+// with a coloured initial while loading / when the user has no picture.
+class _YrAvatar extends StatelessWidget {
+  final String url, label;
+  final double size;
+  const _YrAvatar({required this.url, required this.label, required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Theme.of(context).colorScheme;
+    final fallback = Container(
+      width: size,
+      height: size,
+      alignment: Alignment.center,
+      color: s.primaryContainer,
+      child: Text(label.isEmpty ? '?' : label.characters.first.toUpperCase(),
+          style: TextStyle(color: s.onPrimaryContainer, fontSize: size * 0.42, fontWeight: FontWeight.w900)),
+    );
+    return ClipOval(
+      child: url.isEmpty
+          ? fallback
+          : ImageService.widgetImage(url: url, width: size, height: size, fit: BoxFit.cover, errorWidget: fallback),
+    );
+  }
+}
+
 // Fade + slide + scale-in after a delay. [pop] adds an overshoot (the reveal
 // of a #1). Replays each time its slide is built, i.e. each time it is shown.
-class _Reveal extends StatefulWidget {
+class _YrReveal extends StatefulWidget {
   final Widget child;
   final int delayMs;
   final bool pop;
-  const _Reveal({required this.child, this.delayMs = 0, this.pop = false});
+  const _YrReveal({required this.child, this.delayMs = 0, this.pop = false});
 
   @override
-  State<_Reveal> createState() => _RevealState();
+  State<_YrReveal> createState() => _YrRevealState();
 }
 
-class _RevealState extends State<_Reveal> with SingleTickerProviderStateMixin {
+class _YrRevealState extends State<_YrReveal> with SingleTickerProviderStateMixin {
   late final AnimationController _c =
       AnimationController(vsync: this, duration: Duration(milliseconds: widget.pop ? 750 : 520));
   Timer? _t;
@@ -929,19 +982,19 @@ class _RevealState extends State<_Reveal> with SingleTickerProviderStateMixin {
 }
 
 // Number that counts up from 0 after a delay.
-class _CountUp extends StatefulWidget {
+class _YrCountUp extends StatefulWidget {
   final int value;
   final String Function(int) fmt;
   final TextStyle style;
   final int delayMs;
   final int durationMs;
-  const _CountUp({required this.value, required this.fmt, required this.style, this.delayMs = 0, this.durationMs = 1200});
+  const _YrCountUp({required this.value, required this.fmt, required this.style, this.delayMs = 0, this.durationMs = 1200});
 
   @override
-  State<_CountUp> createState() => _CountUpState();
+  State<_YrCountUp> createState() => _YrCountUpState();
 }
 
-class _CountUpState extends State<_CountUp> with SingleTickerProviderStateMixin {
+class _YrCountUpState extends State<_YrCountUp> with SingleTickerProviderStateMixin {
   late final AnimationController _c =
       AnimationController(vsync: this, duration: Duration(milliseconds: widget.durationMs));
   Timer? _t;
@@ -974,10 +1027,10 @@ class _CountUpState extends State<_CountUp> with SingleTickerProviderStateMixin 
 }
 
 // One story slide: centred column that fades/slides in when first shown.
-class _Slide extends StatelessWidget {
+class _YrSlide extends StatelessWidget {
   final ColorScheme scheme;
   final List<Widget> children;
-  const _Slide({required this.scheme, required this.children});
+  const _YrSlide({required this.scheme, required this.children});
 
   @override
   Widget build(BuildContext context) {
@@ -1004,17 +1057,17 @@ class _Slide extends StatelessWidget {
 }
 
 // Artwork resolved through the same ImageService chain as the rest of the app.
-class _YImg extends StatefulWidget {
+class _YrImg extends StatefulWidget {
   final String name, artist, type; // type: artists | tracks | albums
   final double size;
   final bool round;
-  const _YImg({required this.name, required this.artist, required this.type, required this.size, this.round = false});
+  const _YrImg({required this.name, required this.artist, required this.type, required this.size, this.round = false});
 
   @override
-  State<_YImg> createState() => _YImgState();
+  State<_YrImg> createState() => _YrImgState();
 }
 
-class _YImgState extends State<_YImg> {
+class _YrImgState extends State<_YrImg> {
   late final Future<String> _future = switch (widget.type) {
     'artists' => ImageService.resolveArtist(widget.name),
     'albums' => ImageService.resolveAlbum(widget.name, widget.artist),
@@ -1049,15 +1102,15 @@ class _YImgState extends State<_YImg> {
 }
 
 // Fixed-size portrait card, exported as a PNG by the share button.
-class _ShareCard extends StatelessWidget {
+class _YrShareCard extends StatelessWidget {
   final ColorScheme scheme;
   final int year;
   final String username;
-  final _YearData data;
+  final _YrData data;
   final int hours;
   final String Function(int) fmt;
   final String? rankLine; // friends ranking, when known
-  const _ShareCard({required this.scheme, required this.year, required this.username, required this.data, required this.hours, required this.fmt, this.rankLine});
+  const _YrShareCard({required this.scheme, required this.year, required this.username, required this.data, required this.hours, required this.fmt, this.rankLine});
 
   Widget _stat(String label, String value) => Expanded(
         child: Container(
@@ -1071,7 +1124,7 @@ class _ShareCard extends StatelessWidget {
         ),
       );
 
-  Widget _list(String title, List<_Ranked> items, String type) {
+  Widget _list(String title, List<_YrRanked> items, String type) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(title.toUpperCase(), style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2)),
       const SizedBox(height: 6),
@@ -1080,7 +1133,7 @@ class _ShareCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 3),
           child: Row(children: [
             SizedBox(width: 20, child: Text('${i + 1}', style: TextStyle(color: scheme.primary, fontSize: 14, fontWeight: FontWeight.w900))),
-            _YImg(name: items[i].name, artist: items[i].artist, type: type, size: 34, round: type == 'artists'),
+            _YrImg(name: items[i].name, artist: items[i].artist, type: type, size: 34, round: type == 'artists'),
             const SizedBox(width: 10),
             Expanded(
               child: Text(items[i].name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: scheme.onSurface, fontSize: 13, fontWeight: FontWeight.w800)),
