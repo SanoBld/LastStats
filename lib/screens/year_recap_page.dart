@@ -504,53 +504,10 @@ class _YearRecapPageState extends State<YearRecapPage> {
       ],
     ));
 
-    // 2. Top artist + runners-up
-    if (d.artists.isNotEmpty) {
-      final a = d.artists.first;
-      out.add(_Slide(
-        scheme: s,
-        children: [
-          _label(s, tx('yr_top_artist')),
-          const SizedBox(height: 18),
-          _Reveal(delayMs: 300, pop: true, child: _YImg(name: a.name, artist: '', type: 'artists', size: 190, round: true)),
-          const SizedBox(height: 18),
-          _Reveal(delayMs: 900, child: Text(a.name,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: s.onSurface, fontSize: 30, fontWeight: FontWeight.w900))),
-          const SizedBox(height: 4),
-          _CountUp(value: a.count, fmt: (n) => tx('yr_plays', {'n': _fmt(n)}), delayMs: 1200, durationMs: 1000,
-              style: TextStyle(color: s.primary, fontSize: 18, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 22),
-          _rankList(s, d.artists.skip(1).toList(), 'artists', startAt: 2, baseDelay: 1800),
-        ],
-      ));
-    }
-
-    // 3. Top tracks
-    if (d.tracks.isNotEmpty) {
-      out.add(_Slide(
-        scheme: s,
-        children: [
-          _label(s, tx('yr_top_tracks')),
-          const SizedBox(height: 16),
-          _rankList(s, d.tracks, 'tracks'),
-        ],
-      ));
-    }
-
-    // 4. Top albums
-    if (d.albums.isNotEmpty) {
-      out.add(_Slide(
-        scheme: s,
-        children: [
-          _label(s, tx('yr_top_albums')),
-          const SizedBox(height: 16),
-          _rankList(s, d.albums, 'albums'),
-        ],
-      ));
-    }
+    // 2-4. Top artist / track / album: #1 big in the middle, then the rest
+    if (d.artists.isNotEmpty) out.add(_topSlide(s, d.artists, 'artists', tx('yr_top_artist')));
+    if (d.tracks.isNotEmpty) out.add(_topSlide(s, d.tracks, 'tracks', tx('yr_top_track')));
+    if (d.albums.isNotEmpty) out.add(_topSlide(s, d.albums, 'albums', tx('yr_top_album')));
 
     // 5. Month by month
     final maxM = d.monthly.fold<int>(0, (m, v) => v > m ? v : m);
@@ -801,6 +758,50 @@ class _YearRecapPageState extends State<YearRecapPage> {
       ],
     ));
     return out;
+  }
+
+  // Big #1 (artwork, name, plays counting up) followed by ranks 2..5.
+  Widget _topSlide(ColorScheme s, List<_Ranked> items, String type, String label) {
+    final first = items.first;
+    return _Slide(
+      scheme: s,
+      children: [
+        _label(s, label),
+        const SizedBox(height: 18),
+        _Reveal(
+          delayMs: 300,
+          pop: true,
+          child: _YImg(name: first.name, artist: first.artist, type: type, size: 190, round: type == 'artists'),
+        ),
+        const SizedBox(height: 18),
+        _Reveal(
+          delayMs: 900,
+          child: Text(first.name,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: s.onSurface, fontSize: 28, fontWeight: FontWeight.w900)),
+        ),
+        if (first.artist.isNotEmpty)
+          _Reveal(
+            delayMs: 1000,
+            child: Text(first.artist,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: s.onSurfaceVariant, fontSize: 15, fontWeight: FontWeight.w700)),
+          ),
+        const SizedBox(height: 4),
+        _CountUp(
+            value: first.count,
+            fmt: (n) => tx('yr_plays', {'n': _fmt(n)}),
+            delayMs: 1200,
+            durationMs: 1000,
+            style: TextStyle(color: s.primary, fontSize: 18, fontWeight: FontWeight.w800)),
+        const SizedBox(height: 22),
+        _rankList(s, items.skip(1).toList(), type, startAt: 2, baseDelay: 1800),
+      ],
+    );
   }
 
   Widget _label(ColorScheme s, String t) => Text(t.toUpperCase(),
