@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-18T09:45:26Z",
+  "updated": "2026-10-18T09:47:38Z",
   "commits": [
+    {
+      "sha": "d2a3c05bb565efb41a87405c3edbbbf126564c0d",
+      "message": "feat: ajuster la taille de la carte de partage et modifier l'affichage de l'image",
+      "date": "2026-10-18T09:45:28Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/d2a3c05bb565efb41a87405c3edbbbf126564c0d",
+      "tags": []
+    },
     {
       "sha": "2d53599a6ab5905afbdfbabb9207d9e3c98cf751",
       "message": "feat: mettre à jour les chaînes de localisation pour utiliser la photo de profil comme fond dans le récapitulatif de l'année",
@@ -2700,15 +2709,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/d5ca97e27d06ed86e762a8d88d75ec7aa184ad34",
-      "tags": []
-    },
-    {
-      "sha": "2525a484282878f12a0313662ab890549dbf54e5",
-      "message": "chore: bump version to 3.1.0 [skip ci]",
-      "date": "2026-08-14T11:48:59Z",
-      "author": "github-actions[bot]",
-      "avatar": "https://avatars.githubusercontent.com/in/15368?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/2525a484282878f12a0313662ab890549dbf54e5",
       "tags": []
     }
   ]
