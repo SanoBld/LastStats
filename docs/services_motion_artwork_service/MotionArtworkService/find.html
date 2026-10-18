@@ -115,8 +115,9 @@
     }
 
     &#47;&#47; YouTube only has videos of songs (never albums or artists).
-    &#47;&#47; On the dashboard, YouTube is used only if the user allowed it.
-    final ytOk = cfg.useYoutube &amp;&amp; track.isNotEmpty &amp;&amp; (!dashboard || cfg.ytDash);
+    &#47;&#47; Elsewhere YouTube follows the sources. On the dashboard it follows
+    &#47;&#47; the dedicated switch instead, even if YouTube is not a source.
+    final ytOk = track.isNotEmpty &amp;&amp; (dashboard ? cfg.ytDash : cfg.useYoutube);
     String? video;
     &#47;&#47; Try the sources in the order chosen by the user.
     for (final src in cfg.order) {
@@ -127,6 +128,10 @@
         case &#39;youtube&#39;:
           if (ytOk) video = await _youtube(artist, track, cfg.height);
       }
+    }
+    &#47;&#47; Dashboard switch on but YouTube not in the sources: last resort.
+    if (video == null &amp;&amp; ytOk &amp;&amp; !cfg.useYoutube) {
+      video = await _youtube(artist, track, cfg.height);
     }
     _remember(key, video);
     return video;
