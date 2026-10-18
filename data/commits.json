@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-18T19:30:36Z",
+  "updated": "2026-10-18T19:44:59Z",
   "commits": [
+    {
+      "sha": "1b5c43d7583b9d25e24955a91f8d0c078a1fa6b2",
+      "message": "feat: mettre à jour le changelog et améliorer la gestion des erreurs pour Spotify Canvas",
+      "date": "2026-10-18T19:44:32Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/1b5c43d7583b9d25e24955a91f8d0c078a1fa6b2",
+      "tags": []
+    },
     {
       "sha": "69beb7d21e7e078d10d86554a688db5cfa938fa8",
       "message": "feat: ajouter cocoapods au Gemfile pour iOS et macOS",
@@ -2700,15 +2709,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/b95b064cff216d9c9d5c04b4f08f74f4fcc79d9a",
-      "tags": []
-    },
-    {
-      "sha": "14c9f6937ee06ce5add3cc4674af92a004438c9c",
-      "message": "refactor: mise à jour des mises en page des widgets et suppression des polices inutilisées",
-      "date": "2026-08-21T09:44:00Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/14c9f6937ee06ce5add3cc4674af92a004438c9c",
       "tags": []
     }
   ]
