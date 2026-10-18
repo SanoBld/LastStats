@@ -89,7 +89,7 @@
   await Workmanager().cancelByUniqueName(_kTaskRecap);
   final dailyOn  = prefs.getBool(_kDailyEnabled)  ?? false;
   final weeklyOn = prefs.getBool(_kWeeklyEnabled) ?? false;
-  if (dailyOn || weeklyOn) {
+  if (dailyOn || weeklyOn || _yearRecapEnabled(prefs)) {
     await Workmanager().registerPeriodicTask(
       _kTaskRecap,
       _kTaskRecap,
