@@ -680,17 +680,37 @@ class _YearRecapPageState extends State<YearRecapPage> {
     out.add(_YrSlide(
       scheme: s,
       children: [
-        Text(tx('yr_intro_h', {'year': '$_year'}),
-            textAlign: TextAlign.center,
-            style: TextStyle(color: s.onSurface, fontSize: 30, fontWeight: FontWeight.w900, height: 1.1)),
-        const SizedBox(height: 28),
+        if (_yrInstant)
+          const SizedBox(height: 40)
+        else ...[
+          Text(tx('yr_intro_h', {'year': '$_year'}),
+              textAlign: TextAlign.center,
+              style: TextStyle(color: s.onSurface, fontSize: 28, fontWeight: FontWeight.w900, height: 1.1)),
+          const SizedBox(height: 28),
+        ],
         _YrCountUp(value: d.total, fmt: _fmt, delayMs: 350, durationMs: 1600,
             style: TextStyle(color: s.primary, fontSize: 72, fontWeight: FontWeight.w900, height: 1)),
         const SizedBox(height: 6),
-        _YrReveal(delayMs: 500, child: Text(tx('yr_scrobbles'), style: TextStyle(color: _yrSoft(s), fontSize: 18, fontWeight: FontWeight.w700))),
+        _YrReveal(delayMs: 500, child: Text(tx('yr_scrobbles'), style: TextStyle(color: _yrSoft(s), fontSize: 16, fontWeight: FontWeight.w700))),
         const SizedBox(height: 20),
-        _YrReveal(delayMs: 1900, child: Text(tx('yr_hours', {'h': _fmt(hours)}),
-            textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 14))),
+        Builder(builder: (_) {
+          final raw = tx('yr_hours', {'h': _fmt(hours)});
+          final m = RegExp(r'\s*[\(（]([^\)）]*)[\)）]').firstMatch(raw);
+          final main = m == null ? raw : raw.replaceFirst(m.group(0)!, '');
+          return _YrReveal(delayMs: 1900, child: Column(children: [
+            Text(main, textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 14)),
+            if (m != null)
+              Text(m.group(1)!, textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s).withValues(alpha: 0.6), fontSize: 10, fontStyle: FontStyle.italic)),
+          ]));
+        }),
+        if (_yrInstant) ...[
+          const SizedBox(height: 28),
+          Text(tx('yr_unique', {'a': _fmt(d.uniqueArtists), 't': _fmt(d.uniqueTracks)}),
+              textAlign: TextAlign.center, style: TextStyle(color: s.onSurface, fontSize: 14, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 8),
+          Text(tx('yr_active', {'n': '${d.activeDays}', 't': '${d.daysInRange}'}),
+              textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 14)),
+        ],
       ],
     ));
 
@@ -776,7 +796,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
         const SizedBox(height: 14),
         Text(tx('yr_p_$persona'),
             textAlign: TextAlign.center,
-            style: TextStyle(color: s.primary, fontSize: 32, fontWeight: FontWeight.w900)),
+            style: TextStyle(color: s.primary, fontSize: 28, fontWeight: FontWeight.w900)),
         const SizedBox(height: 22),
         SizedBox(
           height: 110,
@@ -811,7 +831,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
         ),
         const SizedBox(height: 22),
         Text(tx('yr_peak', {'h': '$peakHour', 'd': favDay < wd.length ? wd[favDay] : ''}),
-            textAlign: TextAlign.center, style: TextStyle(color: s.onSurface, fontSize: 15, fontWeight: FontWeight.w700)),
+            textAlign: TextAlign.center, style: TextStyle(color: s.onSurface, fontSize: 16, fontWeight: FontWeight.w800)),
       ],
     ));
 
@@ -822,10 +842,10 @@ class _YearRecapPageState extends State<YearRecapPage> {
         _label(s, tx('yr_streak_h')),
         const SizedBox(height: 22),
         _YrCountUp(value: d.longestStreak, fmt: _fmt, delayMs: 300, durationMs: 1400,
-            style: TextStyle(color: s.primary, fontSize: 84, fontWeight: FontWeight.w900, height: 1)),
+            style: TextStyle(color: s.primary, fontSize: 72, fontWeight: FontWeight.w900, height: 1)),
         const SizedBox(height: 6),
         Text(tx('yr_streak', {'n': '${d.longestStreak}'}),
-            textAlign: TextAlign.center, style: TextStyle(color: s.onSurface, fontSize: 18, fontWeight: FontWeight.w800)),
+            textAlign: TextAlign.center, style: TextStyle(color: s.onSurface, fontSize: 16, fontWeight: FontWeight.w800)),
         const SizedBox(height: 18),
         Text(tx('yr_active', {'n': '${d.activeDays}', 't': '${d.daysInRange}'}),
             textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 14)),
@@ -858,7 +878,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
           _YrCountUp(value: d.newArtists!, fmt: _fmt, delayMs: 300, durationMs: 1400,
               style: TextStyle(color: s.primary, fontSize: 72, fontWeight: FontWeight.w900, height: 1)),
           const SizedBox(height: 6),
-          Text(tx('yr_new'), textAlign: TextAlign.center, style: TextStyle(color: s.onSurface, fontSize: 18, fontWeight: FontWeight.w800)),
+          Text(tx('yr_new'), textAlign: TextAlign.center, style: TextStyle(color: s.onSurface, fontSize: 16, fontWeight: FontWeight.w800)),
           const SizedBox(height: 18),
         ],
         Text(tx('yr_unique', {'a': _fmt(d.uniqueArtists), 't': _fmt(d.uniqueTracks)}),
@@ -887,7 +907,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
           const SizedBox(height: 10),
           _YrReveal(delayMs: 250, pop: true, child: Text(rankLine,
               textAlign: TextAlign.center,
-              style: TextStyle(color: s.primary, fontSize: 26, fontWeight: FontWeight.w900))),
+              style: TextStyle(color: s.primary, fontSize: 28, fontWeight: FontWeight.w900))),
           const SizedBox(height: 20),
           for (var i = 0; i < shown.length; i++)
             _YrReveal(
@@ -913,10 +933,10 @@ class _YearRecapPageState extends State<YearRecapPage> {
           const SizedBox(height: 14),
           _YrReveal(delayMs: 800, child: Text(fr.twin!,
               textAlign: TextAlign.center,
-              style: TextStyle(color: s.onSurface, fontSize: 28, fontWeight: FontWeight.w900))),
+              style: TextStyle(color: s.onSurface, fontSize: 22, fontWeight: FontWeight.w900))),
           const SizedBox(height: 6),
           _YrReveal(delayMs: 1100, child: Text(tx('yr_twin_s', {'n': '${fr.sharedCount}'}),
-              textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 15))),
+              textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 14))),
           const SizedBox(height: 18),
           Wrap(
             alignment: WrapAlignment.center,
@@ -998,22 +1018,23 @@ class _YearRecapPageState extends State<YearRecapPage> {
     final first = items.first;
     return _YrSlide(
       scheme: s,
+      compact: true,
       children: [
         _label(s, label),
-        const SizedBox(height: 18),
+        SizedBox(height: _yrInstant ? 12 : 18),
         _YrReveal(
           delayMs: 300,
           pop: true,
-          child: _YrImg(name: first.name, artist: first.artist, type: type, size: 190, round: type == 'artists'),
+          child: _YrImg(name: first.name, artist: first.artist, type: type, size: _yrInstant ? 110 : 190, round: type == 'artists'),
         ),
-        const SizedBox(height: 18),
+        SizedBox(height: _yrInstant ? 12 : 18),
         _YrReveal(
           delayMs: 900,
           child: Text(first.name,
               textAlign: TextAlign.center,
-              maxLines: 2,
+              maxLines: _yrInstant ? 1 : 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: s.onSurface, fontSize: 28, fontWeight: FontWeight.w900)),
+              style: TextStyle(color: s.onSurface, fontSize: 22, fontWeight: FontWeight.w900)),
         ),
         if (first.artist.isNotEmpty)
           _YrReveal(
@@ -1022,7 +1043,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: _yrSoft(s), fontSize: 15, fontWeight: FontWeight.w700)),
+                style: TextStyle(color: _yrSoft(s), fontSize: 14, fontWeight: FontWeight.w700)),
           ),
         const SizedBox(height: 4),
         _YrCountUp(
@@ -1030,8 +1051,8 @@ class _YearRecapPageState extends State<YearRecapPage> {
             fmt: (n) => tx('yr_plays', {'n': _fmt(n)}),
             delayMs: 1200,
             durationMs: 1000,
-            style: TextStyle(color: s.primary, fontSize: 18, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 22),
+            style: TextStyle(color: s.primary, fontSize: 16, fontWeight: FontWeight.w800)),
+        SizedBox(height: _yrInstant ? 14 : 22),
         _rankList(s, items.skip(1).toList(), type, startAt: 2, baseDelay: 1800),
       ],
     );
@@ -1091,7 +1112,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
             delayMs: baseDelay + (items.length - 1 - i) * 240,
             pop: i == 0 && startAt == 1,
             child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5),
+            padding: EdgeInsets.symmetric(vertical: _yrInstant ? 3 : 5),
             child: Row(children: [
               SizedBox(
                 width: 28,
@@ -1249,14 +1270,15 @@ class _YrCountUpState extends State<_YrCountUp> with SingleTickerProviderStateMi
 class _YrSlide extends StatelessWidget {
   final ColorScheme scheme;
   final List<Widget> children;
-  const _YrSlide({required this.scheme, required this.children});
+  final bool compact;
+  const _YrSlide({required this.scheme, required this.children, this.compact = false});
 
   @override
   Widget build(BuildContext context) {
     // Share frame: natural height (the card scales it), small side margins
     if (_yrInstant) {
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        padding: EdgeInsets.fromLTRB(8, compact ? 0 : 56, 8, 0),
         child: Column(mainAxisSize: MainAxisSize.min, children: children),
       );
     }
@@ -1444,6 +1466,7 @@ class _YrShareCard extends StatelessWidget {
               width: 332,
               child: FittedBox(
                 fit: BoxFit.scaleDown,
+                alignment: Alignment.topCenter,
                 child: SizedBox(width: 332, child: slide),
               ),
             )
