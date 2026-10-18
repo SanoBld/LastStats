@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-18T19:55:59Z",
+  "updated": "2026-10-18T20:08:48Z",
   "commits": [
+    {
+      "sha": "617841dbd97b77afa4b4d2acbf425496b254fcf2",
+      "message": "feat: améliorer la gestion de la connexion Spotify et ajouter des notes de performance",
+      "date": "2026-10-18T20:05:46Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/617841dbd97b77afa4b4d2acbf425496b254fcf2",
+      "tags": []
+    },
     {
       "sha": "1b5c43d7583b9d25e24955a91f8d0c078a1fa6b2",
       "message": "feat: mettre à jour le changelog et améliorer la gestion des erreurs pour Spotify Canvas",
@@ -2700,15 +2709,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/a72a71d8b262a7179157ece8aa92a4a66a9d1bf8",
-      "tags": []
-    },
-    {
-      "sha": "b95b064cff216d9c9d5c04b4f08f74f4fcc79d9a",
-      "message": "chore: suppression des fichiers de mise en page de widgets obsolètes",
-      "date": "2026-08-21T09:52:35Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/b95b064cff216d9c9d5c04b4f08f74f4fcc79d9a",
       "tags": []
     }
   ]
