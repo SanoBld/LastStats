@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-18T18:57:55Z",
+  "updated": "2026-10-18T19:05:32Z",
   "commits": [
+    {
+      "sha": "5244c2563eac5aad3206343c5693ec857406e12d",
+      "message": "feat: refactor CI workflows for Android, iOS, Linux, macOS, and Windows; add Fastlane support and streamline build processes",
+      "date": "2026-10-18T19:05:14Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/5244c2563eac5aad3206343c5693ec857406e12d",
+      "tags": []
+    },
     {
       "sha": "90c274d44acf1c0182b084434e91c2568ac90013",
       "message": "feat: ajouter des sélecteurs de date localisés et améliorer l'interface utilisateur des dialogues de calendrier",
@@ -2700,15 +2709,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/17866939ab56460bc5682450bf6caca40c14e580",
-      "tags": []
-    },
-    {
-      "sha": "1f204e2e345fe4c5d1d2544d7e52751dc9b45dcd",
-      "message": "feat: ajouter une barre d'accent aux widgets et mettre à jour le service de notification pour le rafraîchissement des widgets",
-      "date": "2026-08-21T05:06:55Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/1f204e2e345fe4c5d1d2544d7e52751dc9b45dcd",
       "tags": []
     }
   ]
