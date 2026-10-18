@@ -1,5 +1,6 @@
 name: Deploy Flutter Web to gh-pages
 
+# Language: Dart -> tool/ci/build_web.dart
 on:
   push:
     branches: [main, master]
@@ -12,20 +13,16 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      # Get the repo code
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      # Install Flutter SDK
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
 
-      # Get dependencies
-      - run: flutter pub get
-
-      # Build web app, base-href must match the repo name + /app/ subfolder
+      # base-href must match the repo name + /app/ subfolder
       # (site URL: https://sanobld.github.io/LastStats/app/)
-      - run: flutter build web --release --base-href /LastStats/app/
+      - name: Build web app (Dart)
+        run: dart run tool/ci/build_web.dart /LastStats/app/
 
       # Publish only to /app subfolder. keep_files protects the existing /docs folder
       - uses: peaceiris/actions-gh-pages@v4

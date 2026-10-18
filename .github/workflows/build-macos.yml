@@ -1,11 +1,12 @@
 name: Build macOS
 
-# Reusable: called by build-all.yml / release.yml — also runnable manually.
-# Flutter always builds a universal app (Intel + Apple Silicon). For each
-# target we publish a .zip (used by the in-app updater) and a .dmg installer:
-#   - universal : both chips in one app (names kept: old app versions use them)
-#   - x64       : Intel Macs only, smaller (universal build, arm64 stripped)
-#   - arm64     : Apple Silicon only, smaller (universal build, x86_64 stripped)
+# Reusable: called by build-all.yml / release.yml, also runnable manually.
+# Language: Fastlane (Ruby) -> macos/fastlane/Fastfile, lane "package".
+# Flutter always builds a universal app (Intel + Apple Silicon). Per target:
+# a .zip (used by the in-app updater) and a .dmg installer.
+#   - universal : both chips (names kept: old app versions use them)
+#   - x64       : Intel only (arm64 stripped)
+#   - arm64     : Apple Silicon only (x86_64 stripped)
 on:
   workflow_call:
     inputs:
@@ -38,8 +39,6 @@ jobs:
             zip: laststats-macos-arm64.zip
             dmg: LastStats-macos-arm64.dmg
     runs-on: macos-latest
-    env:
-      VERSION: ''
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -50,48 +49,29 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Set up Ruby + Fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: macos
+
       - name: Get dependencies
         run: flutter pub get
       - name: Generate launcher icons
         run: dart run flutter_launcher_icons
 
-      # Ad-hoc/dev build (no version given): never claim to be a real release.
-      - name: Resolve version
-        shell: bash
-        run: |
-          if [ -n "${{ inputs.version }}" ]; then
-            VERSION="${{ inputs.version }}"
-          else
-            VERSION="0.0.0-dev.${{ github.run_number }}"
-          fi
-          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+      - name: Build, thin, zip and DMG (Fastlane)
+        working-directory: macos
+        env:
+          APP_VERSION: ${{ inputs.version }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: bundle exec fastlane package arch:${{ matrix.arch }} zip:${{ matrix.zip }} dmg:${{ matrix.dmg }}
 
-      - name: Build macOS (universal)
-        run: flutter build macos --release --build-name="$VERSION" --build-number=${{ github.run_number }}
-
-      # Strips the other CPU architecture from the app (x64 / arm64 only).
-      - name: Thin app to ${{ matrix.arch }}
-        if: matrix.arch != 'universal'
-        run: |
-          sed -i '' 's/\r$//' macos/packaging/thin-arch.sh
-          bash macos/packaging/thin-arch.sh build/macos/Build/Products/Release ${{ matrix.arch }}
-
-      # cd into the actual app folder first, so the zip does not contain the
-      # long "build/macos/Build/Products/Release/" path inside it.
-      - name: Zip macOS build
-        run: |
-          cd build/macos/Build/Products/Release
-          zip -r -y "$GITHUB_WORKSPACE/${{ matrix.zip }}" .
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.zip }}
           path: ${{ matrix.zip }}
-
-      # Installer: a .dmg that opens with the app + an "Applications" shortcut.
-      - name: Build DMG installer
-        run: |
-          sed -i '' 's/\r$//' macos/packaging/build-dmg.sh
-          bash macos/packaging/build-dmg.sh ${{ matrix.dmg }}
       - uses: actions/upload-artifact@v4
         with:
           name: laststats-macos-${{ matrix.arch }}-dmg

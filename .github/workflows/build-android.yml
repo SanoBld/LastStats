@@ -1,8 +1,8 @@
 name: Build Android
 
-# Reusable: called by build-all.yml / release.yml — also runnable manually.
-# One job per target: a universal APK (works on every phone, biggest file) and
-# one smaller APK per CPU architecture (arm64-v8a, armeabi-v7a, x86_64).
+# Reusable: called by build-all.yml / release.yml, also runnable manually.
+# Language: Gradle (Kotlin DSL) -> android/ci.gradle.kts renames the APKs.
+# One job per target: a universal APK + one smaller APK per CPU architecture.
 # File names are what the in-app updater looks for, so don't rename them.
 on:
   workflow_call:
@@ -43,8 +43,6 @@ jobs:
             src: app-x86_64-release.apk
             apk: app-x86_64-release.apk
     runs-on: ubuntu-latest
-    env:
-      VERSION: ''
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -66,23 +64,24 @@ jobs:
       - name: Generate launcher icons
         run: dart run flutter_launcher_icons
 
-      # Ad-hoc/dev build (no version given): never claim to be a real release.
-      - name: Resolve version
-        shell: bash
-        run: |
-          if [ -n "${{ inputs.version }}" ]; then
-            VERSION="${{ inputs.version }}"
-          else
-            VERSION="0.0.0-dev.${{ github.run_number }}"
-          fi
-          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-
+      # No version given = dev build: never claim to be a real release.
       - name: Build Android (${{ matrix.abi }})
         shell: bash
+        env:
+          IN_VERSION: ${{ inputs.version }}
         run: |
+          VERSION="${IN_VERSION:-0.0.0-dev.${{ github.run_number }}}"
           flutter build apk --release ${{ matrix.flags }} --build-name="$VERSION" --build-number=${{ github.run_number }}
-          cp build/app/outputs/flutter-apk/${{ matrix.src }} ${{ matrix.apk }}
+
+      # Gradle (Kotlin DSL) task: copy + rename the APK into dist/
+      - name: Collect APK with Gradle
+        shell: bash
+        run: |
+          cd android
+          chmod +x gradlew 2>/dev/null || true
+          ./gradlew collectApk -PapkSrc=${{ matrix.src }} -PapkName=${{ matrix.apk }} --no-daemon -q
+
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.apk }}
-          path: ${{ matrix.apk }}
+          path: dist/${{ matrix.apk }}

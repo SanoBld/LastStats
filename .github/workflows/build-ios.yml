@@ -1,10 +1,9 @@
 name: Build iOS
 
-# Reusable: called by build-all.yml / release.yml — also runnable manually.
-# Builds the iOS app WITHOUT code signing (no Apple certificate is needed on
-# CI) and packs it into an unsigned .ipa. An unsigned .ipa can't be installed
-# directly: sideload it with AltStore / Sideloadly / TrollStore, or re-sign it
-# with your own Apple ID or developer certificate.
+# Reusable: called by build-all.yml / release.yml, also runnable manually.
+# Language: Fastlane (Ruby) -> ios/fastlane/Fastfile, lane "unsigned_ipa".
+# No code signing (no Apple certificate needed on CI): the .ipa is unsigned,
+# sideload it with AltStore / Sideloadly / TrollStore, or re-sign it yourself.
 on:
   workflow_call:
     inputs:
@@ -24,8 +23,6 @@ on:
 jobs:
   build:
     runs-on: macos-latest
-    env:
-      VERSION: ''
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -36,31 +33,25 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Set up Ruby + Fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: ios
+
       - name: Get dependencies
         run: flutter pub get
       - name: Generate launcher icons
         run: dart run flutter_launcher_icons
 
-      # Ad-hoc/dev build (no version given): never claim to be a real release.
-      - name: Resolve version
-        shell: bash
-        run: |
-          if [ -n "${{ inputs.version }}" ]; then
-            VERSION="${{ inputs.version }}"
-          else
-            VERSION="0.0.0-dev.${{ github.run_number }}"
-          fi
-          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+      - name: Build unsigned .ipa (Fastlane)
+        working-directory: ios
+        env:
+          APP_VERSION: ${{ inputs.version }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: bundle exec fastlane unsigned_ipa
 
-      - name: Build iOS (no codesign)
-        run: flutter build ios --release --no-codesign --build-name="$VERSION" --build-number=${{ github.run_number }}
-
-      # An .ipa is just a zip with the .app inside a "Payload" folder.
-      - name: Package unsigned .ipa
-        run: |
-          mkdir -p Payload
-          cp -R build/ios/iphoneos/Runner.app Payload/
-          zip -r -y LastStats-ios.ipa Payload
       - uses: actions/upload-artifact@v4
         with:
           name: laststats-ios-ipa

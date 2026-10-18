@@ -1,9 +1,8 @@
 name: Build Windows
 
-# Reusable: called by build-all.yml / release.yml — also runnable manually.
-# Builds x64 and ARM64 natively (Flutter can't cross-compile Windows), and for
-# each one: a .zip (used by the in-app updater) and a setup .exe installer
-# (Program Files, Start Menu + optional Desktop shortcut, uninstaller).
+# Reusable: called by build-all.yml / release.yml, also runnable manually.
+# Language: PowerShell -> windows/ci/build.ps1 (zip + Inno Setup installer).
+# Builds x64 and ARM64 natively (Flutter can't cross-compile Windows).
 #
 # NOTE: the ARM64 job uses GitHub's hosted "windows-11-arm" runner. If it fails
 # with "no runner matching 'windows-11-arm'", that label isn't enabled for this
@@ -37,8 +36,6 @@ jobs:
             runner: windows-11-arm              # GitHub-hosted native ARM64 runner
             zip: laststats-windows-arm64.zip
     runs-on: ${{ matrix.runner }}
-    env:
-      VERSION: ''
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -63,39 +60,18 @@ jobs:
         run: flutter pub get
       - name: Generate launcher icons
         run: dart run flutter_launcher_icons
-      # Ad-hoc/dev build (no version given): never claim to be a real release.
-      - name: Resolve version
-        shell: bash
-        run: |
-          if [ -n "${{ inputs.version }}" ]; then
-            VERSION="${{ inputs.version }}"
-          else
-            VERSION="0.0.0-dev.${{ github.run_number }}"
-          fi
-          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
-      - name: Build Windows (${{ matrix.arch }})
-        shell: bash
-        run: flutter build windows --release --build-name="$VERSION" --build-number=${{ github.run_number }}
-
-      # The /* makes sure the zip contains the files directly, not a wrapping
-      # "Release" folder.
-      - name: Zip Windows build
+      - name: Build + package (PowerShell)
         shell: pwsh
-        run: Compress-Archive -Path build/windows/${{ matrix.arch }}/runner/Release/* -DestinationPath ${{ matrix.zip }}
+        env:
+          APP_VERSION: ${{ inputs.version }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: ./windows/ci/build.ps1 -Arch ${{ matrix.arch }} -Zip ${{ matrix.zip }}
+
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.zip }}
           path: ${{ matrix.zip }}
-
-      # Installer built with Inno Setup.
-      - name: Install Inno Setup
-        run: choco install innosetup -y --no-progress
-      - name: Build installer
-        shell: pwsh
-        env:
-          APP_VERSION: ${{ env.VERSION }}
-        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" windows\installer.iss /DMyArch=${{ matrix.arch }}'
       - uses: actions/upload-artifact@v4
         with:
           name: laststats-windows-${{ matrix.arch }}-installer

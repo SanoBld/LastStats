@@ -22,3 +22,6 @@ subprojects {
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
+
+// CI: APK collect/rename task
+apply(from = "ci.gradle.kts")

@@ -1,0 +1,18 @@
+# Fastlane runs from ios/fastlane, so the repo root is two folders up.
+ROOT = ENV["GITHUB_WORKSPACE"] || File.expand_path("../..")
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Build an unsigned .ipa (no Apple certificate needed)"
+  lane :unsigned_ipa do
+    # No version given = dev build: never claim to be a real release
+    run = ENV["RUN_NUMBER"] || "0"
+    version = ENV["APP_VERSION"].to_s.empty? ? "0.0.0-dev.#{run}" : ENV["APP_VERSION"]
+
+    sh("cd '#{ROOT}' && flutter build ios --release --no-codesign --build-name='#{version}' --build-number=#{run}")
+
+    # An .ipa is just a zip with the .app inside a "Payload" folder
+    sh("cd '#{ROOT}' && rm -rf Payload LastStats-ios.ipa && mkdir -p Payload && cp -R build/ios/iphoneos/Runner.app Payload/ && zip -r -y LastStats-ios.ipa Payload")
+  end
+end

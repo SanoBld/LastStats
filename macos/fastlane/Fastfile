@@ -1,0 +1,38 @@
+# Fastlane runs from macos/fastlane, so the repo root is two folders up.
+ROOT = ENV["GITHUB_WORKSPACE"] || File.expand_path("../..")
+
+default_platform(:mac)
+
+# Remove Windows line endings so the .sh scripts run on macOS
+def fix_crlf(path)
+  File.write(path, File.read(path).gsub("\r\n", "\n"))
+end
+
+platform :mac do
+  desc "Build macOS app, then zip + dmg. Params: arch (universal|x64|arm64), zip, dmg"
+  lane :package do |options|
+    arch = options[:arch] || "universal"
+    zip  = options[:zip]  || "laststats-macos.zip"
+    dmg  = options[:dmg]  || "LastStats-macos.dmg"
+
+    # No version given = dev build: never claim to be a real release
+    run = ENV["RUN_NUMBER"] || "0"
+    version = ENV["APP_VERSION"].to_s.empty? ? "0.0.0-dev.#{run}" : ENV["APP_VERSION"]
+    release_dir = "#{ROOT}/build/macos/Build/Products/Release"
+
+    sh("cd '#{ROOT}' && flutter build macos --release --build-name='#{version}' --build-number=#{run}")
+
+    # Strip the other CPU architecture (x64 / arm64 only)
+    if arch != "universal"
+      fix_crlf("#{ROOT}/macos/packaging/thin-arch.sh")
+      sh("bash '#{ROOT}/macos/packaging/thin-arch.sh' '#{release_dir}' #{arch}")
+    end
+
+    # cd into the app folder first, so the zip has no long build path inside
+    sh("cd '#{release_dir}' && rm -f '#{ROOT}/#{zip}' && zip -r -y '#{ROOT}/#{zip}' .")
+
+    # Installer: .dmg with the app + an "Applications" shortcut
+    fix_crlf("#{ROOT}/macos/packaging/build-dmg.sh")
+    sh("cd '#{ROOT}' && bash macos/packaging/build-dmg.sh '#{dmg}'")
+  end
+end
