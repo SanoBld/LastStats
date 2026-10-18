@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-18T20:17:14Z",
+  "updated": "2026-10-18T20:26:52Z",
   "commits": [
+    {
+      "sha": "365430259c7a2e1c1d01590c7119930e846a991d",
+      "message": "feat: mettre à jour le changelog et déclarer l'entitlement réseau pour l'application macOS",
+      "date": "2026-10-18T20:26:29Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/365430259c7a2e1c1d01590c7119930e846a991d",
+      "tags": []
+    },
     {
       "sha": "617841dbd97b77afa4b4d2acbf425496b254fcf2",
       "message": "feat: améliorer la gestion de la connexion Spotify et ajouter des notes de performance",
@@ -2700,15 +2709,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/2ed1875a7d3e87fbb06f970b147b6396cd3476f7",
-      "tags": []
-    },
-    {
-      "sha": "a72a71d8b262a7179157ece8aa92a4a66a9d1bf8",
-      "message": "refactor: remplacer les éléments View par ImageView pour la barre d'accent dans les mises en page des widgets",
-      "date": "2026-08-21T10:03:50Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/a72a71d8b262a7179157ece8aa92a4a66a9d1bf8",
       "tags": []
     }
   ]
