@@ -1,6 +1,24 @@
 {
-  "updated": "2026-10-18T13:44:52Z",
+  "updated": "2026-10-18T13:50:53Z",
   "commits": [
+    {
+      "sha": "4b64f7faf8a44ffd8b9170e0a2cc937101116876",
+      "message": "feat: améliorer la fonctionnalité de récapitulatif annuel avec des restrictions d'accès et un nouveau design d'image partagée",
+      "date": "2026-10-18T13:49:47Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/4b64f7faf8a44ffd8b9170e0a2cc937101116876",
+      "tags": []
+    },
+    {
+      "sha": "ae1958a1c7efe906943d67549919e0d31a67ea59",
+      "message": "feat: ajuster la visibilité du récapitulatif annuel et permettre l'ouverture de l'année en cours",
+      "date": "2026-10-18T13:48:43Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/ae1958a1c7efe906943d67549919e0d31a67ea59",
+      "tags": []
+    },
     {
       "sha": "30ab9b86aaab5caa4390a8f4c0a4402b2a579352",
       "message": "feat: ajouter la fonctionnalité de récapitulatif annuel avec notifications et affichage",
@@ -2691,24 +2709,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/2336acc68299528251304035e30caffa0618178e",
-      "tags": []
-    },
-    {
-      "sha": "9309a31f4e01887293af2c98ff3d0fee6648477c",
-      "message": "Enhance widget theming and layouts\n\n- Introduced a new WidgetTheme class to manage widget theming based on app settings (light/dark mode and accent colors).\n- Updated LovedCountWidgetProvider, NowPlayingWidgetProvider, RecapWidgetProvider, ScrobbleCountWidgetProvider, and WeeklyScrobblesWidgetProvider to utilize the new theming system.\n- Added new layout files for \"nothing\" states for each widget, providing a consistent look when no data is available.\n- Modified widget_info XML files to reference the new \"nothing\" layouts as initial and preview layouts.\n- Created drawable resources for default and \"nothing\" backgrounds in both light and dark themes.",
-      "date": "2026-08-20T18:51:33Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/9309a31f4e01887293af2c98ff3d0fee6648477c",
-      "tags": []
-    },
-    {
-      "sha": "744a6d081bd190f107120b72216485154863c19e",
-      "message": "Add widget string resources for LastStats app",
-      "date": "2026-08-20T18:48:24Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/744a6d081bd190f107120b72216485154863c19e",
       "tags": []
     }
   ]
