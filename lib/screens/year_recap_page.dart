@@ -81,7 +81,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
   final ValueNotifier<int?> _frameIdx = ValueNotifier(null);
   bool _sharing = false;
   // Profile picture url used as the share card background ('' = none)
-  final ValueNotifier<String> _photo = ValueNotifier('');
+  final ValueNotifier<Uint8List?> _photo = ValueNotifier(null);
   bool _photoDark = false; // true = dark picture, so the header text is white
   final ValueNotifier<bool> _profileOn = ValueNotifier(true);
   final ValueNotifier<bool> _sharingN = ValueNotifier(false);
@@ -109,9 +109,11 @@ class _YearRecapPageState extends State<YearRecapPage> {
       // Empty or default Last.fm picture: keep the theme gradient
       if (url.isEmpty || url.contains('2a96cbd8b46e442fc41c2b86b821562f')) return;
       // Average brightness of the picture decides white or black header text
+      Uint8List? bytes;
       try {
         final r = await OfflineImageCache.responseFor(url).timeout(const Duration(seconds: 8));
         if (r.statusCode == 200 && r.bodyBytes.isNotEmpty) {
+          bytes = r.bodyBytes;
           final codec = await ui.instantiateImageCodec(r.bodyBytes, targetWidth: 32, targetHeight: 32);
           final frame = await codec.getNextFrame();
           final raw = await frame.image.toByteData(format: ui.ImageByteFormat.rawRgba);
@@ -128,7 +130,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
           }
         }
       } catch (_) {}
-      if (mounted) _photo.value = url;
+      if (mounted && bytes != null) _photo.value = bytes;
     } catch (_) {}
   }
 
@@ -582,7 +584,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
             valueListenable: _frameIdx,
             builder: (_, idx, __) => (idx == null || d == null)
                 ? const SizedBox.shrink()
-                : ValueListenableBuilder<String>(
+                : ValueListenableBuilder<Uint8List?>(
                     valueListenable: _photo,
                     builder: (_, photo, __) => ValueListenableBuilder<bool>(
                       valueListenable: _profileOn,
@@ -595,7 +597,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                           data: d,
                           hours: (d.total * _kYrAvgTrackMinutes / 60).round(),
                           fmt: _fmt,
-                          photo: on ? photo : '',
+                          photo: on ? photo : null,
                           photoDark: _photoDark,
                           slide: () {
                             final all = _buildSlides(scheme, frame: true);
@@ -672,7 +674,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     final hours = (d.total * _kYrAvgTrackMinutes / 60).round();
     final out = <Widget>[];
     final mq = MediaQuery.of(context);
-    final cardW = math.min((frame ? 360.0 : mq.size.width) - 56, 320.0).clamp(180.0, 320.0).toDouble();
+    final cardW = (frame ? 316.0 : math.min(mq.size.width - 56, 320.0)).clamp(180.0, 320.0).toDouble();
 
     // 1. Intro
     out.add(_YrSlide(
@@ -944,22 +946,22 @@ class _YearRecapPageState extends State<YearRecapPage> {
           width: cardW,
           child: FittedBox(
             fit: BoxFit.fitWidth,
-            child: ValueListenableBuilder<String>(
+            child: ValueListenableBuilder<Uint8List?>(
               valueListenable: _photo,
               builder: (_, photo, __) => ValueListenableBuilder<bool>(
                 valueListenable: _profileOn,
                 builder: (_, on, __) => RepaintBoundary(
                   key: _shareKey,
-                  child: _YrShareCard(scheme: s, year: _year, username: widget.username, data: d, hours: hours, fmt: _fmt, rankLine: rankLine, photo: on ? photo : '', photoDark: _photoDark),
+                  child: _YrShareCard(scheme: s, year: _year, username: widget.username, data: d, hours: hours, fmt: _fmt, rankLine: rankLine, photo: on ? photo : null, photoDark: _photoDark),
                 ),
               ),
             ),
           ),
         ),
         // Option: use the profile picture colours for the share image
-        ValueListenableBuilder<String>(
+        ValueListenableBuilder<Uint8List?>(
           valueListenable: _photo,
-          builder: (_, photo, __) => photo.isEmpty
+          builder: (_, photo, __) => photo == null
               ? const SizedBox(height: 14)
               : ValueListenableBuilder<bool>(
                   valueListenable: _profileOn,
@@ -1251,6 +1253,13 @@ class _YrSlide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Share frame: natural height (the card scales it), small side margins
+    if (_yrInstant) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Column(mainAxisSize: MainAxisSize.min, children: children),
+      );
+    }
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 1),
       duration: _yrInstant ? Duration.zero : const Duration(milliseconds: 450),
@@ -1331,8 +1340,8 @@ class _YrShareCard extends StatelessWidget {
   final String? rankLine; // friends ranking, when known
   final bool photoDark; // dark picture -> white header text
   final Widget? slide; // single-slide share: this slide is shown instead of the lists
-  final String photo; // profile picture url shown as background ('' = theme gradient)
-  const _YrShareCard({required this.scheme, required this.year, required this.username, required this.data, required this.hours, required this.fmt, this.rankLine, this.photo = '', this.photoDark = false, this.slide});
+  final Uint8List? photo; // profile picture bytes shown as background (null = theme gradient)
+  const _YrShareCard({required this.scheme, required this.year, required this.username, required this.data, required this.hours, required this.fmt, this.rankLine, this.photo, this.photoDark = false, this.slide});
 
   Widget _stat(String label, String value) => Expanded(
         child: Container(
@@ -1383,7 +1392,7 @@ class _YrShareCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: Stack(children: [
         // Profile picture as background, fading into the card colour
-        if (photo.isNotEmpty)
+        if (photo != null)
           Positioned(
             top: 0,
             left: 0,
@@ -1404,7 +1413,7 @@ class _YrShareCard extends StatelessWidget {
                   minHeight: 360,
                   maxHeight: 360,
                   alignment: Alignment.center,
-                  child: ImageService.widgetImage(url: photo, width: 360, height: 360, fit: BoxFit.cover, errorWidget: const SizedBox()),
+                  child: Image.memory(photo!, width: 360, height: 360, fit: BoxFit.cover, gaplessPlayback: true, errorBuilder: (_, __, ___) => const SizedBox()),
                 ),
               ),
             ),
@@ -1413,7 +1422,7 @@ class _YrShareCard extends StatelessWidget {
         width: 360,
         height: 640, // 9:16 (story format), exported at 3x = 1080x1920
         padding: const EdgeInsets.fromLTRB(14, 22, 14, 14),
-        decoration: photo.isNotEmpty
+        decoration: photo != null
             ? null
             : BoxDecoration(
                 gradient: LinearGradient(
@@ -1425,9 +1434,9 @@ class _YrShareCard extends StatelessWidget {
               ),
         // FittedBox shrinks the content if it is ever taller than the card
         child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.topCenter, child: SizedBox(width: 332, child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-          Text(username, style: TextStyle(color: photo.isEmpty ? _yrSoft(scheme) : (photoDark ? Colors.white : const Color(0xFF111111)), fontSize: 12, fontWeight: FontWeight.w700)),
+          Text(username, style: TextStyle(color: photo == null ? _yrSoft(scheme) : (photoDark ? Colors.white : const Color(0xFF111111)), fontSize: 12, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
-          Text(tx('yr_intro_h', {'year': '$year'}), style: TextStyle(color: photo.isEmpty ? scheme.onSurface : (photoDark ? Colors.white : const Color(0xFF111111)), fontSize: 22, fontWeight: FontWeight.w900, height: 1.1)),
+          Text(tx('yr_intro_h', {'year': '$year'}), style: TextStyle(color: photo == null ? scheme.onSurface : (photoDark ? Colors.white : const Color(0xFF111111)), fontSize: 22, fontWeight: FontWeight.w900, height: 1.1)),
           const SizedBox(height: 10),
           if (slide != null)
             SizedBox(
@@ -1435,7 +1444,7 @@ class _YrShareCard extends StatelessWidget {
               width: 332,
               child: FittedBox(
                 fit: BoxFit.scaleDown,
-                child: SizedBox(width: 332, height: 520, child: slide),
+                child: SizedBox(width: 332, child: slide),
               ),
             )
           else ...[
