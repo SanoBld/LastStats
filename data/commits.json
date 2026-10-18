@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-18T09:39:43Z",
+  "updated": "2026-10-18T09:45:26Z",
   "commits": [
+    {
+      "sha": "2d53599a6ab5905afbdfbabb9207d9e3c98cf751",
+      "message": "feat: mettre à jour les chaînes de localisation pour utiliser la photo de profil comme fond dans le récapitulatif de l'année",
+      "date": "2026-10-18T09:42:47Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/2d53599a6ab5905afbdfbabb9207d9e3c98cf751",
+      "tags": []
+    },
     {
       "sha": "74b76cad8a9520e2f03836071f9b366ce4f0b917",
       "message": "feat: ajouter l'option d'utiliser les couleurs de la photo de profil pour le partage dans le récapitulatif de l'année",
@@ -2701,17 +2710,6 @@
       "avatar": "https://avatars.githubusercontent.com/in/15368?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/2525a484282878f12a0313662ab890549dbf54e5",
       "tags": []
-    },
-    {
-      "sha": "294ba0d628b914a56c1bcb7d9c5bbac8574932f8",
-      "message": "feat: update notifications and sync settings UI with new structure and improved layout",
-      "date": "2026-08-14T11:34:07Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/294ba0d628b914a56c1bcb7d9c5bbac8574932f8",
-      "tags": [
-        "v3.1.0"
-      ]
     }
   ]
 }
