@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-18T12:30:02Z",
+  "updated": "2026-10-18T12:34:43Z",
   "commits": [
+    {
+      "sha": "35cbcdacfa52ffbded196013e3fcbfabe591ac52",
+      "message": "feat: modifier le type de la photo de profil pour le partage et ajuster l'affichage",
+      "date": "2026-10-18T12:34:24Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/35cbcdacfa52ffbded196013e3fcbfabe591ac52",
+      "tags": []
+    },
     {
       "sha": "2156431e28e617546c784a7dd7010714c968aa20",
       "message": "feat: ajouter la fonctionnalité de partage de diapositive avec un cadre 9:16",
@@ -2700,15 +2709,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/26e56d00ab498a5fd4a6fca2bed33002d2759ac3",
-      "tags": []
-    },
-    {
-      "sha": "4d3244957a17cc81c36b98b21873df48780793f6",
-      "message": "Merge branch 'master' of https://github.com/SanoBld/LastStats",
-      "date": "2026-08-20T18:04:56Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/4d3244957a17cc81c36b98b21873df48780793f6",
       "tags": []
     }
   ]
