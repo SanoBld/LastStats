@@ -4,6 +4,9 @@ part of 'home_screen.dart';
 // not give durations in scrobble history), clearly labelled as an estimate.
 const double _kYrAvgTrackMinutes = 3.5;
 
+// Accent-tinted soft text colour (instead of a neutral grey), works in light and dark
+Color _yrSoft(ColorScheme s) => Color.lerp(s.onSurface, s.primary, 0.55)!;
+
 class _YrRanked {
   final String name;
   final String artist; // empty for artists
@@ -71,8 +74,9 @@ class _YearRecapPageState extends State<YearRecapPage> {
   final PageController _pages = PageController();
   final GlobalKey _shareKey = GlobalKey();
   bool _sharing = false;
-  // Share card colour from the profile picture (null = no picture / not loaded)
-  final ValueNotifier<Color?> _tint = ValueNotifier(null);
+  // Profile picture url used as the share card background ('' = none)
+  final ValueNotifier<String> _photo = ValueNotifier('');
+  bool _photoDark = false; // true = dark picture, so the header text is white
   final ValueNotifier<bool> _profileOn = ValueNotifier(true);
   final ValueNotifier<bool> _sharingN = ValueNotifier(false);
   _YrFriends? _friendsData;
@@ -98,17 +102,34 @@ class _YearRecapPageState extends State<YearRecapPage> {
       }
       // Empty or default Last.fm picture: keep the theme gradient
       if (url.isEmpty || url.contains('2a96cbd8b46e442fc41c2b86b821562f')) return;
-      final r = await OfflineImageCache.responseFor(url).timeout(const Duration(seconds: 8));
-      if (r.statusCode != 200 || r.bodyBytes.isEmpty) return;
-      final argb = await _extractDominantColorArgb(r.bodyBytes);
-      if (argb != null && mounted) _tint.value = Color(argb);
+      // Average brightness of the picture decides white or black header text
+      try {
+        final r = await OfflineImageCache.responseFor(url).timeout(const Duration(seconds: 8));
+        if (r.statusCode == 200 && r.bodyBytes.isNotEmpty) {
+          final codec = await ui.instantiateImageCodec(r.bodyBytes, targetWidth: 32, targetHeight: 32);
+          final frame = await codec.getNextFrame();
+          final raw = await frame.image.toByteData(format: ui.ImageByteFormat.rawRgba);
+          frame.image.dispose();
+          if (raw != null) {
+            final px = raw.buffer.asUint8List();
+            var sum = 0.0, n = 0;
+            for (var i = 0; i + 3 < px.length; i += 4) {
+              if (px[i + 3] < 200) continue;
+              sum += 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
+              n++;
+            }
+            if (n > 0) _photoDark = sum / n < 140;
+          }
+        }
+      } catch (_) {}
+      if (mounted) _photo.value = url;
     } catch (_) {}
   }
 
   @override
   void dispose() {
     _sharingN.dispose();
-    _tint.dispose();
+    _photo.dispose();
     _profileOn.dispose();
     _pages.dispose();
     super.dispose();
@@ -405,10 +426,10 @@ class _YearRecapPageState extends State<YearRecapPage> {
       width: 72,
       height: 52,
       padding: EdgeInsets.zero,
-      color: scheme.secondaryContainer,
+      color: scheme.primaryContainer,
       radius: BorderRadius.circular(26),
       onTap: enabled ? onTap : null,
-      child: Icon(icon, color: scheme.onSecondaryContainer, size: 28),
+      child: Icon(icon, color: scheme.onPrimaryContainer, size: 28),
     );
   }
 
@@ -491,7 +512,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                   Expanded(
                     child: Text('${_slide + 1} / ${slides.length}',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13, fontWeight: FontWeight.w800)),
+                        style: TextStyle(color: _yrSoft(scheme), fontSize: 13, fontWeight: FontWeight.w800)),
                   ),
                   _navBtn(scheme, Icons.chevron_right_rounded, _slide < slides.length - 1, _next),
                 ]),
@@ -508,7 +529,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           SizedBox(width: 120, child: LinearProgressIndicator(value: _progress > 0 ? _progress : null, borderRadius: BorderRadius.circular(8))),
           const SizedBox(height: 16),
-          Text(tx('yr_loading'), style: TextStyle(color: scheme.onSurfaceVariant)),
+          Text(tx('yr_loading'), style: TextStyle(color: _yrSoft(scheme))),
         ]),
       );
     }
@@ -517,12 +538,12 @@ class _YearRecapPageState extends State<YearRecapPage> {
         child: Padding(
           padding: const EdgeInsets.all(32),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Icon(_error ? Icons.cloud_off_rounded : Icons.music_off_rounded, size: 48, color: scheme.onSurfaceVariant),
+            Icon(_error ? Icons.cloud_off_rounded : Icons.music_off_rounded, size: 48, color: _yrSoft(scheme)),
             const SizedBox(height: 12),
             Text(
               _error ? tx('yr_error') : tx('yr_empty', {'year': '$_year'}),
               textAlign: TextAlign.center,
-              style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 15),
+              style: TextStyle(color: _yrSoft(scheme), fontSize: 15),
             ),
             if (_error) ...[
               const SizedBox(height: 16),
@@ -576,10 +597,10 @@ class _YearRecapPageState extends State<YearRecapPage> {
         _YrCountUp(value: d.total, fmt: _fmt, delayMs: 350, durationMs: 1600,
             style: TextStyle(color: s.primary, fontSize: 72, fontWeight: FontWeight.w900, height: 1)),
         const SizedBox(height: 6),
-        _YrReveal(delayMs: 500, child: Text(tx('yr_scrobbles'), style: TextStyle(color: s.onSurfaceVariant, fontSize: 18, fontWeight: FontWeight.w700))),
+        _YrReveal(delayMs: 500, child: Text(tx('yr_scrobbles'), style: TextStyle(color: _yrSoft(s), fontSize: 18, fontWeight: FontWeight.w700))),
         const SizedBox(height: 20),
         _YrReveal(delayMs: 1900, child: Text(tx('yr_hours', {'h': _fmt(hours)}),
-            textAlign: TextAlign.center, style: TextStyle(color: s.onSurfaceVariant, fontSize: 14))),
+            textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 14))),
       ],
     ));
 
@@ -627,7 +648,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(i < _months.length ? _months[i].characters.first : '',
-                        style: TextStyle(color: s.onSurfaceVariant, fontSize: 10, fontWeight: FontWeight.w700)),
+                        style: TextStyle(color: _yrSoft(s), fontSize: 10, fontWeight: FontWeight.w700)),
                   ]),
                 ),
               );
@@ -640,7 +661,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
         if (d.busiestDay != null) ...[
           const SizedBox(height: 8),
           Text(tx('yr_best_day', {'d': _dayLabel(d.busiestDay!), 'n': _fmt(d.busiestDayCount)}),
-              textAlign: TextAlign.center, style: TextStyle(color: s.onSurfaceVariant, fontSize: 14)),
+              textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 14)),
         ],
       ],
     ));
@@ -695,7 +716,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
           padding: const EdgeInsets.only(top: 4),
           child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             for (final t in const ['0h', '6h', '12h', '18h', '23h'])
-              Text(t, style: TextStyle(color: s.onSurfaceVariant, fontSize: 10)),
+              Text(t, style: TextStyle(color: _yrSoft(s), fontSize: 10)),
           ]),
         ),
         const SizedBox(height: 22),
@@ -717,7 +738,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
             textAlign: TextAlign.center, style: TextStyle(color: s.onSurface, fontSize: 18, fontWeight: FontWeight.w800)),
         const SizedBox(height: 18),
         Text(tx('yr_active', {'n': '${d.activeDays}', 't': '${d.daysInRange}'}),
-            textAlign: TextAlign.center, style: TextStyle(color: s.onSurfaceVariant, fontSize: 14)),
+            textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 14)),
       ],
     ));
 
@@ -753,7 +774,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
         Text(tx('yr_unique', {'a': _fmt(d.uniqueArtists), 't': _fmt(d.uniqueTracks)}),
             textAlign: TextAlign.center,
             style: TextStyle(
-                color: d.newArtists != null ? s.onSurfaceVariant : s.onSurface,
+                color: d.newArtists != null ? _yrSoft(s) : s.onSurface,
                 fontSize: d.newArtists != null ? 14 : 20,
                 fontWeight: d.newArtists != null ? FontWeight.w600 : FontWeight.w800)),
       ],
@@ -805,7 +826,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
               style: TextStyle(color: s.onSurface, fontSize: 28, fontWeight: FontWeight.w900))),
           const SizedBox(height: 6),
           _YrReveal(delayMs: 1100, child: Text(tx('yr_twin_s', {'n': '${fr.sharedCount}'}),
-              textAlign: TextAlign.center, style: TextStyle(color: s.onSurfaceVariant, fontSize: 15))),
+              textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 15))),
           const SizedBox(height: 18),
           Wrap(
             alignment: WrapAlignment.center,
@@ -817,7 +838,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                   delayMs: 1400 + i * 160,
                   child: Chip(
                     label: Text(fr.shared[i], style: const TextStyle(fontWeight: FontWeight.w700)),
-                    backgroundColor: s.secondaryContainer,
+                    backgroundColor: s.primaryContainer,
                     side: BorderSide.none,
                   ),
                 ),
@@ -835,22 +856,22 @@ class _YearRecapPageState extends State<YearRecapPage> {
           width: cardW,
           child: FittedBox(
             fit: BoxFit.fitWidth,
-            child: ValueListenableBuilder<Color?>(
-              valueListenable: _tint,
-              builder: (_, tint, __) => ValueListenableBuilder<bool>(
+            child: ValueListenableBuilder<String>(
+              valueListenable: _photo,
+              builder: (_, photo, __) => ValueListenableBuilder<bool>(
                 valueListenable: _profileOn,
                 builder: (_, on, __) => RepaintBoundary(
                   key: _shareKey,
-                  child: _YrShareCard(scheme: s, year: _year, username: widget.username, data: d, hours: hours, fmt: _fmt, rankLine: rankLine, tint: on ? tint : null),
+                  child: _YrShareCard(scheme: s, year: _year, username: widget.username, data: d, hours: hours, fmt: _fmt, rankLine: rankLine, photo: on ? photo : '', photoDark: _photoDark),
                 ),
               ),
             ),
           ),
         ),
         // Option: use the profile picture colours for the share image
-        ValueListenableBuilder<Color?>(
-          valueListenable: _tint,
-          builder: (_, tint, __) => tint == null
+        ValueListenableBuilder<String>(
+          valueListenable: _photo,
+          builder: (_, photo, __) => photo.isEmpty
               ? const SizedBox(height: 14)
               : ValueListenableBuilder<bool>(
                   valueListenable: _profileOn,
@@ -911,7 +932,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: s.onSurfaceVariant, fontSize: 15, fontWeight: FontWeight.w700)),
+                style: TextStyle(color: _yrSoft(s), fontSize: 15, fontWeight: FontWeight.w700)),
           ),
         const SizedBox(height: 4),
         _YrCountUp(
@@ -928,7 +949,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
 
   Widget _label(ColorScheme s, String t) => Text(t.toUpperCase(),
       textAlign: TextAlign.center,
-      style: TextStyle(color: s.onSurfaceVariant, fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: 1.4));
+      style: TextStyle(color: _yrSoft(s), fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: 1.4));
 
   Widget _friendBar(ColorScheme s, _YrFriend r, int maxT, int delayMs, int rank) {
     final me = r.name.isEmpty;
@@ -937,7 +958,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          SizedBox(width: 26, child: Text('$rank', style: TextStyle(color: me ? s.primary : s.onSurfaceVariant, fontSize: 15, fontWeight: FontWeight.w900))),
+          SizedBox(width: 26, child: Text('$rank', style: TextStyle(color: me ? s.primary : _yrSoft(s), fontSize: 15, fontWeight: FontWeight.w900))),
           _YrAvatar(url: r.image, label: me ? tx('yr_you') : r.name, size: 32),
           const SizedBox(width: 10),
           Expanded(
@@ -947,7 +968,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                 style: TextStyle(color: s.onSurface, fontSize: 14, fontWeight: me ? FontWeight.w900 : FontWeight.w700)),
           ),
           _YrCountUp(value: r.total, fmt: _fmt, delayMs: delayMs, durationMs: 1100,
-              style: TextStyle(color: me ? s.primary : s.onSurfaceVariant, fontSize: 14, fontWeight: FontWeight.w800)),
+              style: TextStyle(color: me ? s.primary : _yrSoft(s), fontSize: 14, fontWeight: FontWeight.w800)),
         ]),
         const SizedBox(height: 4),
         Padding(
@@ -985,7 +1006,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
               SizedBox(
                 width: 28,
                 child: Text('${startAt + i}',
-                    style: TextStyle(color: i == 0 && startAt == 1 ? s.primary : s.onSurfaceVariant, fontSize: 18, fontWeight: FontWeight.w900)),
+                    style: TextStyle(color: i == 0 && startAt == 1 ? s.primary : _yrSoft(s), fontSize: 18, fontWeight: FontWeight.w900)),
               ),
               _YrImg(name: items[i].name, artist: items[i].artist, type: type, size: 46, round: type == 'artists'),
               const SizedBox(width: 12),
@@ -993,7 +1014,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(items[i].name, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppText.itemTitle.copyWith(color: s.onSurface)),
                   if (items[i].artist.isNotEmpty)
-                    Text(items[i].artist, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppText.label.copyWith(color: s.onSurfaceVariant)),
+                    Text(items[i].artist, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppText.label.copyWith(color: _yrSoft(s))),
                 ]),
               ),
               const SizedBox(width: 8),
@@ -1180,10 +1201,10 @@ class _YrImgState extends State<_YrImg> {
     final fallback = Container(
       width: widget.size,
       height: widget.size,
-      color: s.surfaceContainerHighest,
+      color: s.primaryContainer,
       child: Icon(
         widget.type == 'artists' ? Icons.person_rounded : (widget.type == 'albums' ? Icons.album_rounded : Icons.music_note_rounded),
-        color: s.onSurfaceVariant,
+        color: _yrSoft(s),
         size: widget.size * 0.5,
       ),
     );
@@ -1212,25 +1233,26 @@ class _YrShareCard extends StatelessWidget {
   final int hours;
   final String Function(int) fmt;
   final String? rankLine; // friends ranking, when known
-  final Color? tint; // profile picture colour for the gradient (null = theme)
-  const _YrShareCard({required this.scheme, required this.year, required this.username, required this.data, required this.hours, required this.fmt, this.rankLine, this.tint});
+  final bool photoDark; // dark picture -> white header text
+  final String photo; // profile picture url shown as background ('' = theme gradient)
+  const _YrShareCard({required this.scheme, required this.year, required this.username, required this.data, required this.hours, required this.fmt, this.rankLine, this.photo = '', this.photoDark = false});
 
   Widget _stat(String label, String value) => Expanded(
         child: Container(
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
-          decoration: BoxDecoration(color: scheme.surfaceContainerHigh, borderRadius: BorderRadius.circular(14)),
+          decoration: BoxDecoration(color: scheme.primaryContainer.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(14)),
           child: Column(children: [
             Text(value, style: TextStyle(color: scheme.primary, fontSize: 20, fontWeight: FontWeight.w900)),
             const SizedBox(height: 2),
-            Text(label, textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 10, fontWeight: FontWeight.w600)),
+            Text(label, textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: scheme.onPrimaryContainer, fontSize: 10, fontWeight: FontWeight.w600)),
           ]),
         ),
       );
 
   Widget _list(String title, List<_YrRanked> items, String type) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(title.toUpperCase(), style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2)),
+      Text(title.toUpperCase(), style: TextStyle(color: _yrSoft(scheme), fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2)),
       const SizedBox(height: 6),
       for (var i = 0; i < items.length && i < 3; i++)
         Padding(
@@ -1247,7 +1269,7 @@ class _YrShareCard extends StatelessWidget {
                   [if (items[i].artist.isNotEmpty) items[i].artist, tx('yr_plays', {'n': fmt(items[i].count)})].join(' · '),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 10.5, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: _yrSoft(scheme), fontSize: 10.5, fontWeight: FontWeight.w600),
                 ),
               ]),
             ),
@@ -1262,26 +1284,43 @@ class _YrShareCard extends StatelessWidget {
       color: scheme.surface,
       borderRadius: BorderRadius.circular(28),
       clipBehavior: Clip.antiAlias,
-      child: Container(
+      child: Stack(children: [
+        // Profile picture as background, fading into the card colour
+        if (photo.isNotEmpty)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 230, // top quarter/third of the card
+            child: ShaderMask(
+              blendMode: BlendMode.dstIn,
+              shaderCallback: (r) => const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xE6000000), Color(0x00000000)],
+              ).createShader(r),
+              child: ImageService.widgetImage(url: photo, width: 360, height: 230, fit: BoxFit.cover, errorWidget: const SizedBox()),
+            ),
+          ),
+        Container(
         width: 360,
         height: 640, // 9:16 (story format), exported at 3x = 1080x1920
         padding: const EdgeInsets.fromLTRB(14, 22, 14, 14),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              tint == null ? scheme.primaryContainer : ColorScheme.fromSeed(seedColor: tint!, brightness: scheme.brightness).primaryContainer,
-              scheme.surface,
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            stops: const [0, 0.45],
-          ),
-        ),
+        decoration: photo.isNotEmpty
+            ? null
+            : BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [scheme.primaryContainer, scheme.surface],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: const [0, 0.45],
+                ),
+              ),
         // FittedBox shrinks the content if it is ever taller than the card
         child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.topCenter, child: SizedBox(width: 332, child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-          Text(username, style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12, fontWeight: FontWeight.w700)),
+          Text(username, style: TextStyle(color: photo.isEmpty ? _yrSoft(scheme) : (photoDark ? Colors.white : const Color(0xFF111111)), fontSize: 12, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
-          Text(tx('yr_intro_h', {'year': '$year'}), style: TextStyle(color: scheme.onSurface, fontSize: 22, fontWeight: FontWeight.w900, height: 1.1)),
+          Text(tx('yr_intro_h', {'year': '$year'}), style: TextStyle(color: photo.isEmpty ? scheme.onSurface : (photoDark ? Colors.white : const Color(0xFF111111)), fontSize: 22, fontWeight: FontWeight.w900, height: 1.1)),
           const SizedBox(height: 10),
           IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             _stat(tx('yr_scrobbles'), fmt(data.total)),
@@ -1301,9 +1340,10 @@ class _YrShareCard extends StatelessWidget {
           const SizedBox(height: 10),
           _list(tx('yr_top_albums'), data.albums, 'albums'),
           const SizedBox(height: 14),
-          Center(child: Text('LastStats', style: TextStyle(color: scheme.onSurfaceVariant.withValues(alpha: 0.7), fontSize: 11, fontWeight: FontWeight.w700))),
+          Center(child: Text('LastStats', style: TextStyle(color: _yrSoft(scheme).withValues(alpha: 0.7), fontSize: 11, fontWeight: FontWeight.w700))),
         ]))),
       ),
+      ]),
     );
   }
 }

@@ -1358,7 +1358,7 @@ const Map<String, String> kTxZh = {
   'yr_cal_h': '日历中的一年',
   'yr_share_h': '播放都去哪了',
   'yr_share_err': '无法生成图片，请重试。',
-  'yr_share_profile': '使用头像颜色',
+  'yr_share_profile': '使用头像作为背景',
   'yr_months_full': '1月,2月,3月,4月,5月,6月,7月,8月,9月,10月,11月,12月',
   'yr_months_gen': '1月,2月,3月,4月,5月,6月,7月,8月,9月,10月,11月,12月',
   'yr_day_fmt': '{m}{d}日',

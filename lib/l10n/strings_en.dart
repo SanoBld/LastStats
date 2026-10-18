@@ -1361,7 +1361,7 @@ const Map<String, String> kTxEn = {
   'yr_cal_h': 'Your year in a calendar',
   'yr_share_h': 'Where your plays go',
   'yr_share_err': 'Couldn\'t create the image. Try again.',
-  'yr_share_profile': 'Use my profile picture colors',
+  'yr_share_profile': 'Use my profile picture as background',
   'yr_months_full': 'January,February,March,April,May,June,July,August,September,October,November,December',
   'yr_months_gen': 'January,February,March,April,May,June,July,August,September,October,November,December',
   'yr_day_fmt': '{m} {d}',

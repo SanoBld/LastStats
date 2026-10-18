@@ -1361,7 +1361,7 @@ const Map<String, String> kTxFr = {
   'yr_cal_h': 'Votre année en calendrier',
   'yr_share_h': 'Où vont vos écoutes',
   'yr_share_err': 'Impossible de créer l\'image. Réessayez.',
-  'yr_share_profile': 'Utiliser les couleurs de ma photo de profil',
+  'yr_share_profile': 'Utiliser ma photo de profil en fond',
   'yr_months_full': 'janvier,février,mars,avril,mai,juin,juillet,août,septembre,octobre,novembre,décembre',
   'yr_months_gen': 'janvier,février,mars,avril,mai,juin,juillet,août,septembre,octobre,novembre,décembre',
   'yr_day_fmt': '{d} {m}',

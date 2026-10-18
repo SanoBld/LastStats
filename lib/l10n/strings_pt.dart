@@ -1361,7 +1361,7 @@ const Map<String, String> kTxPt = {
   'yr_cal_h': 'Seu ano em um calendário',
   'yr_share_h': 'Para onde vão suas reproduções',
   'yr_share_err': 'Não foi possível criar a imagem. Tente de novo.',
-  'yr_share_profile': 'Usar as cores da minha foto de perfil',
+  'yr_share_profile': 'Usar minha foto de perfil como fundo',
   'yr_months_full': 'janeiro,fevereiro,março,abril,maio,junho,julho,agosto,setembro,outubro,novembro,dezembro',
   'yr_months_gen': 'janeiro,fevereiro,março,abril,maio,junho,julho,agosto,setembro,outubro,novembro,dezembro',
   'yr_day_fmt': '{d} de {m}',
