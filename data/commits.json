@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-18T08:42:22Z",
+  "updated": "2026-10-18T08:51:47Z",
   "commits": [
+    {
+      "sha": "95948eee36b819fb6ec3c2d2457fb611fa490afd",
+      "message": "feat: ajouter la fonctionnalité \"Récapitulatif de l'année\" avec classement des amis et jumeau musical",
+      "date": "2026-10-18T08:51:25Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/95948eee36b819fb6ec3c2d2457fb611fa490afd",
+      "tags": []
+    },
     {
       "sha": "a914b37f9fcb4d2e5716a3c3c8e6e5b401300911",
       "message": "Add Year Recap feature with localization support\n\n- Implemented Year Recap page to display user's music statistics for the year.\n- Added localization strings for Portuguese, Russian, and Chinese languages.\n- Updated dashboard to include Year Recap option in the popup menu.\n- Created a new YearRecapPage that aggregates and displays yearly listening data.\n- Enhanced user experience with visual statistics including top artists, tracks, albums, and listening habits.",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/08b5fa1854c1f5078c9581483267e6dd279d1ead",
-      "tags": []
-    },
-    {
-      "sha": "35821a64b5685970913f8229dd0455397f7f466b",
-      "message": "chore: bump version to 3.1.0-beta [skip ci]",
-      "date": "2026-08-13T15:47:48Z",
-      "author": "github-actions[bot]",
-      "avatar": "https://avatars.githubusercontent.com/in/15368?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/35821a64b5685970913f8229dd0455397f7f466b",
       "tags": []
     }
   ]
