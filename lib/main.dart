@@ -139,11 +139,17 @@ Future<void> _mainImpl() async {
   // existed, make sure it's added to the user's saved stat card selection.
   // Guarded by its own flag so it never re-adds a card the user removed.
   final favMigrated = prefs.getBool('ls_fav_stat_migrated') ?? false;
-  if (!favMigrated && sessionKeyNotifier.value.isNotEmpty) {
-    final cards = prefs.getStringList('ls_stat_cards');
-    if (cards != null && !cards.contains('favorites_count')) {
-      await prefs.setStringList('ls_stat_cards', [...cards, 'favorites_count']);
+  if (!favMigrated) {
+    // Never re-add the card if the user turned favorites off.
+    final favHidden = prefs.getBool('ls_show_favorites') == false;
+    if (sessionKeyNotifier.value.isNotEmpty && !favHidden) {
+      final cards = prefs.getStringList('ls_stat_cards');
+      if (cards != null && !cards.contains('favorites_count')) {
+        await prefs.setStringList('ls_stat_cards', [...cards, 'favorites_count']);
+      }
     }
+    // Always mark as done, even without a session key, so it can never
+    // re-add a card the user removed on a later launch.
     await prefs.setBool('ls_fav_stat_migrated', true);
   }
   showLovedBadgeNotifier.value         = prefs.getBool('ls_show_loved_badge')        ?? true;

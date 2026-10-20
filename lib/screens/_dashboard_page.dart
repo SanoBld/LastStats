@@ -506,7 +506,9 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                 ),
               ),
               const SizedBox(height: 10),
-              _StatGrid(children: _statCards.map((cid) {
+              ValueListenableBuilder<bool>(
+                valueListenable: showFavoritesStatNotifier,
+                builder: (_, _, _) => _StatGrid(children: _statCards.map((cid) {
                 return _buildStatCard(
                   cid,
                   total: total, avg: avg, weekly: weekly,
@@ -518,6 +520,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                   topTrackWeek:  _topTracksWeek.isNotEmpty  ? _topTracksWeek[0]  as Map : null,
                 );
               }).whereType<Widget>().toList()),
+              ),
             ]),
           ),
           const SizedBox(height: 20),
@@ -1561,7 +1564,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
           rollPrefix: '~',
         );
       case 'favorites_count':
-        if (!favoritesEnabled) return null;
+        if (!favoritesEnabled || !showFavoritesStatNotifier.value) return null;
         return _DashStatCard(
           icon: Icons.favorite_rounded,
           value:  _fmtFull(_lovedCount),
