@@ -68,9 +68,14 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; disconnect() async {
   final p = await SharedPreferences.getInstance();
-  for (final k in [kSpDc, _kTok, _kCt, _kExp, _kTpl]) {
+  &#47;&#47; Everything Spotify related is removed: login cookie, tokens, copied
+  &#47;&#47; search request, and the repaired query hash (with its 6 h timer).
+  for (final k in [kSpDc, _kTok, _kCt, _kExp, _kTpl, _kHash, _kHashAt]) {
     await p.remove(k);
   }
+  _failedAt = null;
+  _lastRefresh = null;
+  lastError = null;
   await SpotifyWebSession.clear();
 }</code></pre>
 </section>
@@ -100,7 +105,7 @@
 <footer>
   <span class="no-break">
     laststats_mobile
-      4.1.0+27
+      4.2.0+28
   </span>
   
 </footer>
