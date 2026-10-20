@@ -1,6 +1,24 @@
 {
-  "updated": "2026-10-20T16:29:11Z",
+  "updated": "2026-10-20T20:23:56Z",
   "commits": [
+    {
+      "sha": "f4407186f8ecb12d1412863ee88ce5954ee89ad0",
+      "message": "Merge branch 'master' of https://github.com/SanoBld/LastStats",
+      "date": "2026-10-20T20:20:40Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/f4407186f8ecb12d1412863ee88ce5954ee89ad0",
+      "tags": []
+    },
+    {
+      "sha": "0d60a4b9d271604f51b2aea1c6eb36df8720025a",
+      "message": "Respect hidden favorites during stat migration\n\nAvoid restoring the favorites stat when the user has hidden it, and rebuild the dashboard stat grid when its visibility changes.",
+      "date": "2026-10-20T20:20:36Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/0d60a4b9d271604f51b2aea1c6eb36df8720025a",
+      "tags": []
+    },
     {
       "sha": "a6fe64f2f7ed0c56a4639be4ee5629af74cc193c",
       "message": "chore: bump version to 4.2.0 [skip ci]",
@@ -2693,24 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/0388a1527eb89855e536905b63a63579ecea74c4",
-      "tags": []
-    },
-    {
-      "sha": "c7b258d5833f7aaf10d1ab44008109e1ba563c4f",
-      "message": "refactor: ajuster les marges et les dimensions des widgets pour une meilleure présentation",
-      "date": "2026-08-21T11:18:20Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/c7b258d5833f7aaf10d1ab44008109e1ba563c4f",
-      "tags": []
-    },
-    {
-      "sha": "ea160cb312e387a1b1764ebc278e34c808d6d2b5",
-      "message": "refactor: améliorer la gestion des couleurs d'accent et mettre à jour les widgets à chaque retour en avant-plan",
-      "date": "2026-08-21T11:00:21Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/ea160cb312e387a1b1764ebc278e34c808d6d2b5",
       "tags": []
     }
   ]
