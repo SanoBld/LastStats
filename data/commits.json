@@ -1,6 +1,26 @@
 {
-  "updated": "2026-10-20T20:36:17Z",
+  "updated": "2026-10-20T20:43:56Z",
   "commits": [
+    {
+      "sha": "129ac0fa4d197e95d028c489d8965c6afb0a9d8b",
+      "message": "chore: bump version to 4.2.1 [skip ci]",
+      "date": "2026-10-20T20:41:03Z",
+      "author": "github-actions[bot]",
+      "avatar": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/129ac0fa4d197e95d028c489d8965c6afb0a9d8b",
+      "tags": []
+    },
+    {
+      "sha": "c7e8187702911116f5f4af254b68d2cf3a8499dd",
+      "message": "fix: corrige les paramètres de constructeur pour les widgets dans year_recap_page.dart",
+      "date": "2026-10-20T20:39:53Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/c7e8187702911116f5f4af254b68d2cf3a8499dd",
+      "tags": [
+        "v4.2.1"
+      ]
+    },
     {
       "sha": "f4407186f8ecb12d1412863ee88ce5954ee89ad0",
       "message": "Merge branch 'master' of https://github.com/SanoBld/LastStats",
@@ -2693,24 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/320a9bea3d284348dce4e0520dbeb7add3de5107",
-      "tags": []
-    },
-    {
-      "sha": "600c2755eaaf0b6ba0a8a8ad5e91e202da863027",
-      "message": "refactor: ajouter de nouveaux widgets d'écran d'accueil et options de teinte pour une personnalisation améliorée",
-      "date": "2026-08-21T20:38:19Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/600c2755eaaf0b6ba0a8a8ad5e91e202da863027",
-      "tags": []
-    },
-    {
-      "sha": "0388a1527eb89855e536905b63a63579ecea74c4",
-      "message": "refactor: ajouter la gestion du widget \"maintenant en cours\" pour une mise à jour en temps réel sans appel réseau supplémentaire",
-      "date": "2026-08-21T11:20:40Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/0388a1527eb89855e536905b63a63579ecea74c4",
       "tags": []
     }
   ]
