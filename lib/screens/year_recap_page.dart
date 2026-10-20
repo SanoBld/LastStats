@@ -623,7 +623,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                         const SizedBox(width: 10),
                         ValueListenableBuilder<bool>(
                           valueListenable: _sharingN,
-                          builder: (_, busy, __) => IconButton.filledTonal(
+                          builder: (_, busy, _) => IconButton.filledTonal(
                             visualDensity: VisualDensity.compact,
                             tooltip: L.commonShare,
                             onPressed: busy ? null : _shareSlide,
@@ -647,13 +647,13 @@ class _YearRecapPageState extends State<YearRecapPage> {
           height: 640,
           child: ValueListenableBuilder<int?>(
             valueListenable: _frameIdx,
-            builder: (_, idx, __) => (idx == null || d == null)
+            builder: (_, idx, _) => (idx == null || d == null)
                 ? const SizedBox.shrink()
                 : ValueListenableBuilder<Uint8List?>(
                     valueListenable: _photo,
-                    builder: (_, photo, __) => ValueListenableBuilder<bool>(
+                    builder: (_, photo, _) => ValueListenableBuilder<bool>(
                       valueListenable: _profileOn,
-                      builder: (_, on, __) => RepaintBoundary(
+                      builder: (_, on, _) => RepaintBoundary(
                         key: _frameKey,
                         child: _YrShareCard(
                           scheme: scheme,
@@ -809,7 +809,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                           tween: Tween(begin: 0, end: f),
                           duration: _yrInstant ? Duration.zero : Duration(milliseconds: 500 + i * 80),
                           curve: Curves.easeOutCubic,
-                          builder: (_, v, __) => FractionallySizedBox(
+                          builder: (_, v, _) => FractionallySizedBox(
                             heightFactor: v.clamp(0.02, 1.0),
                             child: Container(
                               decoration: BoxDecoration(
@@ -1034,9 +1034,9 @@ class _YearRecapPageState extends State<YearRecapPage> {
             fit: BoxFit.fitWidth,
             child: ValueListenableBuilder<Uint8List?>(
               valueListenable: _photo,
-              builder: (_, photo, __) => ValueListenableBuilder<bool>(
+              builder: (_, photo, _) => ValueListenableBuilder<bool>(
                 valueListenable: _profileOn,
-                builder: (_, on, __) => RepaintBoundary(
+                builder: (_, on, _) => RepaintBoundary(
                   key: _shareKey,
                   child: _YrShareCard(scheme: s, year: _year, username: widget.username, data: d, hours: hours, fmt: _fmt, rankLine: rankLine, photo: on ? photo : null, photoDark: _photoDark),
                 ),
@@ -1047,11 +1047,11 @@ class _YearRecapPageState extends State<YearRecapPage> {
         // Option: use the profile picture colours for the share image
         ValueListenableBuilder<Uint8List?>(
           valueListenable: _photo,
-          builder: (_, photo, __) => photo == null
+          builder: (_, photo, _) => photo == null
               ? const SizedBox(height: 14)
               : ValueListenableBuilder<bool>(
                   valueListenable: _profileOn,
-                  builder: (_, on, __) => SwitchListTile(
+                  builder: (_, on, _) => SwitchListTile(
                     dense: true,
                     contentPadding: const EdgeInsets.symmetric(horizontal: 24),
                     title: Text(tx('yr_share_profile'), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
@@ -1066,7 +1066,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
         ),
         ValueListenableBuilder<bool>(
           valueListenable: _sharingN,
-          builder: (_, busy, __) => FilledButton.icon(
+          builder: (_, busy, _) => FilledButton.icon(
             onPressed: busy ? null : _share,
             icon: busy
                 ? SizedBox(width: 18, height: 18, child: M3Spinner(color: s.onPrimary))
@@ -1166,7 +1166,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
             tween: Tween(begin: 0, end: f),
             duration: _yrInstant ? Duration.zero : Duration(milliseconds: 900 + (delayMs ~/ 4)),
             curve: Curves.easeOutCubic,
-            builder: (_, v, __) => ClipRRect(
+            builder: (_, v, _) => ClipRRect(
               borderRadius: BorderRadius.circular(6),
               child: LinearProgressIndicator(
                 value: v.clamp(0.02, 1.0),
@@ -1336,7 +1336,7 @@ class _YrCountUpState extends State<_YrCountUp> with SingleTickerProviderStateMi
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _c,
-      builder: (_, __) {
+      builder: (_, _) {
         final v = Curves.easeOutCubic.transform(_c.value);
         return Text(widget.fmt((widget.value * v).round()), textAlign: TextAlign.center, style: widget.style);
       },
@@ -1513,7 +1513,7 @@ class _YrShareCard extends StatelessWidget {
                   minHeight: 360,
                   maxHeight: 360,
                   alignment: Alignment.center,
-                  child: Image.memory(photo!, width: 360, height: 360, fit: BoxFit.cover, gaplessPlayback: true, errorBuilder: (_, __, ___) => const SizedBox()),
+                  child: Image.memory(photo!, width: 360, height: 360, fit: BoxFit.cover, gaplessPlayback: true, errorBuilder: (_, _, _) => const SizedBox()),
                 ),
               ),
             ),
