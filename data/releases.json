@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-21T21:21:24Z",
+  "updated": "2026-10-22T03:40:29Z",
   "stars": 2,
   "releases": [
     {
@@ -43,7 +43,7 @@
         {
           "name": "LastStats-ios.ipa",
           "size": 25473603,
-          "download_count": 9,
+          "download_count": 11,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/LastStats-ios.ipa"
         },
         {
