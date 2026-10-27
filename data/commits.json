@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-27T21:53:43Z",
+  "updated": "2026-10-27T22:41:52Z",
   "commits": [
+    {
+      "sha": "c21ddd3016dbfc9ed30f8510852c1ee368b55f6d",
+      "message": "feat: ajout de nouvelles chaînes pour les statistiques de musique, y compris les titres en feu et les records journaliers",
+      "date": "2026-10-27T22:39:07Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/c21ddd3016dbfc9ed30f8510852c1ee368b55f6d",
+      "tags": []
+    },
     {
       "sha": "69f7f099ae0ac2aa00531c0a90b3565efdb5ad03",
       "message": "feat: ajout de la prise en charge des aperçus audio Deezer avec gestion des pistes et des états de lecture",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/ba68ab86785f94f189df07967d67cd02e085e2e1",
-      "tags": []
-    },
-    {
-      "sha": "6f277273eb37f6109f9e6082252a141d5dd25dd1",
-      "message": "refactor: améliorer la présentation des widgets avec des ajustements de mise en page et des styles de texte, et ajouter un index de mots-clés pour la recherche dans les paramètres",
-      "date": "2026-08-22T14:50:14Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/6f277273eb37f6109f9e6082252a141d5dd25dd1",
       "tags": []
     }
   ]
