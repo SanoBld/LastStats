@@ -41,6 +41,20 @@ class _YrData {
   Map<String, int> cumulative = {}; // YYYY-MM -> running total
   Map<int, int> hourlyMap = {};
   Map<int, int> weekdayMap = {}; // 1 (Mon) .. 7 (Sun)
+  List<_YrRanked> tracksAll = [];
+  _YrRanked? busiestTrack, peakTrack, streakTrack, randomTrack;
+}
+
+// What to play on a slide (type: tracks / artists / albums).
+class _PvReq {
+  final String type, name, artist;
+  const _PvReq(this.type, this.name, this.artist);
+  _PvReq.of(String type, _YrRanked r) : this(type, r.name, r.artist);
+}
+
+class _PvRes {
+  final String url, title;
+  const _PvRes(this.url, this.title);
 }
 
 class _YrFriend {
@@ -93,72 +107,109 @@ class _YearRecapPageState extends State<YearRecapPage> {
 
   // ── Deezer preview (auto-play on top slides, with fade-in) ──
   final AudioPlayer _audio = AudioPlayer();
-  final Map<String, String?> _previewCache = {};
+  final Map<String, _PvRes?> _previewCache = {};
   Timer? _fadeTimer;
   int _playToken = 0;
 
-  // Slide index -> (type, item) for the top artist / track / album slides.
-  Map<int, (String, _YrRanked)> get _previewSlides {
-    final d = _data;
-    final m = <int, (String, _YrRanked)>{};
-    if (d == null) return m;
-    var i = 1;
-    if (d.artists.isNotEmpty) m[i++] = ('artists', d.artists.first);
-    if (d.tracks.isNotEmpty) m[i++] = ('tracks', d.tracks.first);
-    if (d.albums.isNotEmpty) m[i++] = ('albums', d.albums.first);
-    return m;
+  List<_PvReq?> _pvList = const [];
+  _YrRanked? _twinTrack;
+  final ValueNotifier<bool> _playing = ValueNotifier(false);
+  final ValueNotifier<String> _nowTitle = ValueNotifier('');
+  bool _userPaused = false;
+  StreamSubscription? _stateSub;
+
+  Future<void> _loadTwinTrack(String user) async {
+    try {
+      final l = await widget.service.getTopTracks(user: user, period: '12month', limit: 1);
+      if (l.isEmpty || !mounted) return;
+      final t = l.first as Map;
+      final a = t['artist'];
+      final an = a is Map ? (a['name'] ?? a['#text'] ?? '') : '$a';
+      setState(() => _twinTrack = _YrRanked('${t['name']}', '$an', 1));
+    } catch (_) {}
   }
 
-  Future<String?> _deezerPreview(String type, _YrRanked it) async {
-    final key = '$type|${it.artist}|${it.name}';
+  bool _same(String a, String b) => a.toLowerCase().trim() == b.toLowerCase().trim();
+
+  Future<_PvRes?> _deezerPreview(_PvReq q) async {
+    final key = '${q.type}|${q.artist}|${q.name}';
     if (_previewCache.containsKey(key)) return _previewCache[key];
-    String? url;
+    _PvRes? res;
     try {
       Future<Map<String, dynamic>?> get(Uri u) async {
         final r = await ApiHttp.get(u).timeout(const Duration(seconds: 6));
         return r.statusCode == 200 ? jsonDecode(r.body) as Map<String, dynamic> : null;
       }
-      String? firstPreview(Map<String, dynamic>? j) {
-        for (final t in (j?['data'] as List?)?.cast<Map<String, dynamic>>() ?? const []) {
-          final u = (t['preview'] as String?) ?? '';
-          if (u.isNotEmpty) return u;
+      List<Map<String, dynamic>> list(Map<String, dynamic>? j) =>
+          (j?['data'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+      _PvRes? pick(List<Map<String, dynamic>> l, {String? artist}) {
+        Map<String, dynamic>? best;
+        for (final t in l) {
+          if (((t['preview'] as String?) ?? '').isEmpty) continue;
+          final an = '${(t['artist'] as Map?)?['name'] ?? ''}';
+          if (artist == null || artist.isEmpty || _same(an, artist) || an.toLowerCase().contains(artist.toLowerCase())) { best = t; break; }
         }
-        return null;
+        if (best == null) return null;
+        return _PvRes(best['preview'] as String, '${best['title']} — ${(best['artist'] as Map?)?['name'] ?? ''}');
       }
-      if (type == 'tracks') {
-        url = firstPreview(await get(Uri.https('api.deezer.com', '/search', {'q': '${it.artist} ${it.name}', 'limit': '5'})));
-      } else if (type == 'artists') {
-        url = firstPreview(await get(Uri.https('api.deezer.com', '/search', {'q': 'artist:"${it.name}"', 'limit': '5'})));
+      if (q.type == 'tracks') {
+        res = pick(list(await get(Uri.https('api.deezer.com', '/search', {'q': 'artist:"${q.artist}" track:"${q.name}"', 'limit': '5'}))), artist: q.artist)
+           ?? pick(list(await get(Uri.https('api.deezer.com', '/search', {'q': '${q.artist} ${q.name}', 'limit': '8'}))), artist: q.artist);
+      } else if (q.type == 'artists') {
+        final arts = list(await get(Uri.https('api.deezer.com', '/search/artist', {'q': q.name, 'limit': '5'})));
+        Map<String, dynamic>? a;
+        for (final x in arts) { if (_same('${x['name']}', q.name)) { a = x; break; } }
+        a ??= arts.firstOrNull;
+        if (a != null) res = pick(list(await get(Uri.https('api.deezer.com', '/artist/${a['id']}/top', {'limit': '10'}))));
       } else {
-        final j = await get(Uri.https('api.deezer.com', '/search/album', {'q': '${it.artist} ${it.name}', 'limit': '1'}));
-        final id = ((j?['data'] as List?)?.firstOrNull as Map?)?['id'];
-        if (id != null) url = firstPreview(await get(Uri.https('api.deezer.com', '/album/$id/tracks', {'limit': '5'})));
+        final als = list(await get(Uri.https('api.deezer.com', '/search/album', {'q': '${q.artist} ${q.name}', 'limit': '3'})));
+        Map<String, dynamic>? a;
+        for (final x in als) { if (_same('${(x['artist'] as Map?)?['name']}', q.artist)) { a = x; break; } }
+        a ??= als.firstOrNull;
+        if (a != null) {
+          final tr = list(await get(Uri.https('api.deezer.com', '/album/${a['id']}/tracks', {'limit': '10'})));
+          // album track endpoint has no artist field: fall back to the album artist
+          for (final t in tr) {
+            final u = (t['preview'] as String?) ?? '';
+            if (u.isNotEmpty) { res = _PvRes(u, '${t['title']} — ${q.artist}'); break; }
+          }
+        }
       }
     } catch (_) {}
-    _previewCache[key] = url;
-    return url;
+    _previewCache[key] = res;
+    return res;
   }
 
   Future<void> _stopPreview() async {
     _playToken++;
     _fadeTimer?.cancel();
+    _nowTitle.value = '';
     try { await _audio.stop(); } catch (_) {}
   }
 
   Future<void> _playForSlide(int i) async {
     await _stopPreview();
-    final entry = _previewSlides[i];
-    if (entry == null) return;
+    final q = i >= 0 && i < _pvList.length ? _pvList[i] : null;
+    if (q == null) return;
     final tok = _playToken;
-    final url = await _deezerPreview(entry.$1, entry.$2);
-    if (url == null || !mounted || tok != _playToken) return;
+    final r = await _deezerPreview(q);
+    if (r == null || !mounted || tok != _playToken) return;
+    _nowTitle.value = r.title;
+    if (_userPaused) { _pendingUrl = r.url; return; }
+    await _startUrl(r.url, tok);
+  }
+
+  String? _pendingUrl;
+
+  Future<void> _startUrl(String url, int tok) async {
     try {
       await _audio.setReleaseMode(ReleaseMode.stop);
       await _audio.setVolume(0);
       await _audio.play(UrlSource(url));
     } catch (_) { return; }
-    // Fade-in over ~1.5 s
+    if (tok != _playToken) return;
     var step = 0;
+    _fadeTimer?.cancel();
     _fadeTimer = Timer.periodic(const Duration(milliseconds: 100), (t) {
       step++;
       final v = (step / 15).clamp(0.0, 1.0);
@@ -167,9 +218,27 @@ class _YearRecapPageState extends State<YearRecapPage> {
     });
   }
 
+  Future<void> _togglePlay() async {
+    if (_playing.value) {
+      _userPaused = true;
+      _fadeTimer?.cancel();
+      await _audio.pause();
+    } else {
+      _userPaused = false;
+      if (_pendingUrl != null) {
+        final u = _pendingUrl!; _pendingUrl = null;
+        await _startUrl(u, _playToken);
+      } else {
+        await _audio.resume();
+        _audio.setVolume(1);
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    _stateSub = _audio.onPlayerStateChanged.listen((st) { if (mounted) _playing.value = st == PlayerState.playing; });
     _load();
     _loadProfile();
   }
@@ -219,6 +288,9 @@ class _YearRecapPageState extends State<YearRecapPage> {
     _photo.dispose();
     _frameIdx.dispose();
     _profileOn.dispose();
+    _stateSub?.cancel();
+    _playing.dispose();
+    _nowTitle.dispose();
     _fadeTimer?.cancel();
     _audio.stop();
     _audio.dispose();
@@ -306,6 +378,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     final token = ++_token;
     setState(() {
       _friendsData = null;
+      _twinTrack = null;
       _loading = true;
       _error = false;
       _progress = 0;
@@ -391,6 +464,8 @@ class _YearRecapPageState extends State<YearRecapPage> {
     d.hourlyMap = {for (var h = 0; h < 24; h++) h: d.hourly[h]};
     d.weekdayMap = {for (var w = 0; w < 7; w++) w + 1: d.weekday[w]};
     d.tracks = top(trackCount, (k, c) => _YrRanked(trackRep[k]!.track, trackRep[k]!.artist, c));
+    d.tracksAll = (trackCount.entries.toList()..sort((a, b) => b.value.compareTo(a.value)))
+        .take(300).map((e) => _YrRanked(trackRep[e.key]!.track, trackRep[e.key]!.artist, e.value)).toList();
     d.albums = top(albumCount, (k, c) => _YrRanked(albumRep[k]!.album, albumRep[k]!.artist, c));
     final ranked = artistCount.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
     d.topArtistNames = ranked.take(50).map((e) => e.key).toList();
@@ -418,6 +493,46 @@ class _YearRecapPageState extends State<YearRecapPage> {
     final now = DateTime.now();
     final end = year == now.year ? now : DateTime(year, 12, 31);
     d.daysInRange = end.difference(DateTime(year, 1, 1)).inDays + 1;
+
+    // Tracks tied to specific slides (busiest day, main listening period, longest streak, random)
+    String bucketOf(int h) => (h < 5 || h >= 22) ? 'night' : h < 12 ? 'morning' : h < 18 ? 'day' : 'evening';
+    final bk = <String, int>{};
+    for (var h = 0; h < 24; h++) { bk[bucketOf(h)] = (bk[bucketOf(h)] ?? 0) + d.hourly[h]; }
+    final persona = bk.entries.reduce((a, b) => b.value > a.value ? b : a).key;
+    final streakDays = <String>{};
+    {
+      var st = 0; DateTime? pv;
+      for (var i = 0; i < days.length; i++) {
+        final q = days[i].split('-');
+        final dd = DateTime(int.parse(q[0]), int.parse(q[1]), int.parse(q[2]));
+        st = (pv != null && dd.difference(pv).inHours <= 36) ? st + 1 : 1;
+        pv = dd;
+        if (st == best && streakDays.isEmpty) streakDays.addAll(days.sublist(i - best + 1, i + 1));
+      }
+    }
+    String dk(DateTime t) => '${t.year}-${t.month.toString().padLeft(2, '0')}-${t.day.toString().padLeft(2, '0')}';
+    _YrRanked? topOf(bool Function(DateTime) test) {
+      final c = <String, int>{};
+      final rp = <String, ScrobbleRecord>{};
+      for (final r in records) {
+        if (r.artist.isEmpty || r.track.isEmpty) continue;
+        if (!test(DateTime.fromMillisecondsSinceEpoch(r.ts * 1000))) continue;
+        final k = '${r.artist} — ${r.track}';
+        c[k] = (c[k] ?? 0) + 1;
+        rp.putIfAbsent(k, () => r);
+      }
+      if (c.isEmpty) return null;
+      final b = c.entries.reduce((a, x) => x.value > a.value ? x : a);
+      return _YrRanked(rp[b.key]!.track, rp[b.key]!.artist, b.value);
+    }
+    d.busiestTrack = topOf((t) => dk(t) == d.busiestDay);
+    d.peakTrack = topOf((t) => bucketOf(t.hour) == persona);
+    d.streakTrack = topOf((t) => streakDays.contains(dk(t)));
+    final withTrack = records.where((r) => r.artist.isNotEmpty && r.track.isNotEmpty).toList();
+    if (withTrack.isNotEmpty) {
+      final r = withTrack[math.Random(year).nextInt(withTrack.length)];
+      d.randomTrack = _YrRanked(r.track, r.artist, 1);
+    }
 
     // Discoveries: artists never scrobbled in any earlier year. Only computed
     // when every earlier year since registration is in the local cache.
@@ -507,6 +622,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
       }
       if (!mounted || token != _token) return;
       setState(() => _friendsData = _YrFriends(board, twin, shared.take(6).toList(), best, images, myImage));
+      if (twin != null) _loadTwinTrack(twin);
     } catch (_) {
       // Friends are a bonus: no friends / network error -> no friend slides.
     }
@@ -808,6 +924,33 @@ class _YearRecapPageState extends State<YearRecapPage> {
           ),
         ]),
       ),
+      if (_slide < _slideCount - 1 && !_sharing)
+        Positioned(
+          left: 16, right: 16, bottom: 14,
+          child: ValueListenableBuilder<String>(
+            valueListenable: _nowTitle,
+            builder: (_, title, _) => title.isEmpty
+                ? const SizedBox.shrink()
+                : ValueListenableBuilder<bool>(
+                    valueListenable: _playing,
+                    builder: (_, on, _) => Material(
+                      color: scheme.primaryContainer.withValues(alpha: 0.92),
+                      borderRadius: BorderRadius.circular(28),
+                      child: Row(children: [
+                        IconButton(
+                          onPressed: _togglePlay,
+                          icon: Icon(on ? Icons.pause_rounded : Icons.play_arrow_rounded, color: scheme.primary),
+                        ),
+                        Expanded(
+                          child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: scheme.onPrimaryContainer, fontSize: 13, fontWeight: FontWeight.w700)),
+                        ),
+                        const SizedBox(width: 16),
+                      ]),
+                    ),
+                  ),
+          ),
+        ),
     ]);
   }
 
@@ -817,11 +960,14 @@ class _YearRecapPageState extends State<YearRecapPage> {
     if (d == null || d.total == 0) return const [];
     final hours = (d.total * _kYrAvgTrackMinutes / 60).round();
     final out = <Widget>[];
+    final pv = <_PvReq?>[];
+    _PvReq? cur;
+    void add(Widget w) { out.add(w); pv.add(cur); cur = null; }
     final mq = MediaQuery.of(context);
     final cardW = (frame ? 316.0 : math.min(mq.size.width - 56, 320.0)).clamp(180.0, 320.0).toDouble();
 
     // 1. Intro
-    out.add(_YrSlide(
+    add(_YrSlide(
       scheme: s,
       children: [
         if (_yrInstant)
@@ -859,14 +1005,15 @@ class _YearRecapPageState extends State<YearRecapPage> {
     ));
 
     // 2-4. Top artist / track / album: #1 big in the middle, then the rest
-    if (d.artists.isNotEmpty) out.add(_topSlide(s, d.artists, 'artists', tx('yr_top_artist')));
-    if (d.tracks.isNotEmpty) out.add(_topSlide(s, d.tracks, 'tracks', tx('yr_top_track')));
-    if (d.albums.isNotEmpty) out.add(_topSlide(s, d.albums, 'albums', tx('yr_top_album')));
+    if (d.artists.isNotEmpty) { cur = _PvReq.of('artists', d.artists.first); add(_topSlide(s, d.artists, 'artists', tx('yr_top_artist'))); }
+    if (d.tracks.isNotEmpty) { cur = _PvReq.of('tracks', d.tracks.first); add(_topSlide(s, d.tracks, 'tracks', tx('yr_top_track'))); }
+    if (d.albums.isNotEmpty) { cur = _PvReq.of('albums', d.albums.first); add(_topSlide(s, d.albums, 'albums', tx('yr_top_album'))); }
 
     // 5. Month by month
+    if (d.busiestTrack != null) cur = _PvReq.of('tracks', d.busiestTrack!);
     final maxM = d.monthly.fold<int>(0, (m, v) => v > m ? v : m);
     final bestMonth = d.monthly.indexOf(maxM);
-    out.add(_YrSlide(
+    add(_YrSlide(
       scheme: s,
       children: [
         _label(s, tx('yr_months_h')),
@@ -921,6 +1068,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     ));
 
     // 6. When you listen
+    if (d.peakTrack != null) cur = _PvReq.of('tracks', d.peakTrack!);
     final buckets = <String, int>{
       'night': [for (var h = 0; h < 24; h++) if (h < 5 || h >= 22) d.hourly[h]].fold(0, (a, b) => a + b),
       'morning': [for (var h = 5; h < 12; h++) d.hourly[h]].fold(0, (a, b) => a + b),
@@ -933,7 +1081,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     final maxW = d.weekday.fold<int>(0, (m, v) => v > m ? v : m);
     final favDay = d.weekday.indexOf(maxW);
     final wd = _weekdaysFull;
-    out.add(_YrSlide(
+    add(_YrSlide(
       scheme: s,
       children: [
         _label(s, tx('yr_when_h')),
@@ -980,7 +1128,8 @@ class _YearRecapPageState extends State<YearRecapPage> {
     ));
 
     // 7. Consistency
-    out.add(_YrSlide(
+    if (d.streakTrack != null) cur = _PvReq.of('tracks', d.streakTrack!);
+    add(_YrSlide(
       scheme: s,
       children: [
         _label(s, tx('yr_streak_h')),
@@ -998,7 +1147,8 @@ class _YearRecapPageState extends State<YearRecapPage> {
 
     // 7b. Where the plays go (Charts tab donut)
     if (d.artistsWide.length > 1) {
-      out.add(_YrSlide(
+      cur = _PvReq.of('artists', d.artistsWide.first);
+      add(_YrSlide(
         scheme: s,
         children: [
           _label(s, tx('yr_share_h')),
@@ -1014,7 +1164,8 @@ class _YearRecapPageState extends State<YearRecapPage> {
     }
 
     // 8. Discoveries
-    out.add(_YrSlide(
+    if (d.randomTrack != null) cur = _PvReq.of('tracks', d.randomTrack!);
+    add(_YrSlide(
       scheme: s,
       children: [
         _label(s, tx('yr_disc_h')),
@@ -1045,7 +1196,8 @@ class _YearRecapPageState extends State<YearRecapPage> {
       final shown = rows.take(6).toList();
       if (!shown.any((r) => r.name.isEmpty)) shown[shown.length - 1] = rows[myRank - 1];
       final maxT = rows.first.total;
-      out.add(_YrSlide(
+      if (d.tracksAll.isNotEmpty) cur = _PvReq.of('tracks', d.tracksAll[(myRank - 1).clamp(0, d.tracksAll.length - 1)]);
+      add(_YrSlide(
         scheme: s,
         children: [
           _label(s, tx('yr_friends_h')),
@@ -1065,7 +1217,8 @@ class _YearRecapPageState extends State<YearRecapPage> {
 
     // 10. Friends: music twin
     if (fr != null && fr.twin != null) {
-      out.add(_YrSlide(
+      if (_twinTrack != null) cur = _PvReq.of('tracks', _twinTrack!);
+      add(_YrSlide(
         scheme: s,
         children: [
           _label(s, tx('yr_twin_h')),
@@ -1104,7 +1257,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     }
 
     // 11. Summary + share
-    out.add(_YrSlide(
+    add(_YrSlide(
       scheme: s,
       children: [
         SizedBox(
@@ -1155,10 +1308,14 @@ class _YearRecapPageState extends State<YearRecapPage> {
         ),
       ],
     ));
+    if (!frame) _pvList = pv;
     return out;
   }
 
   // Big #1 (artwork, name, plays counting up) followed by ranks 2..5.
+  // #1 never uses the circle: clover / burst / cookie
+  int _heroShape(String type) => type == 'artists' ? 2 : (type == 'tracks' ? 4 : 0);
+
   Widget _topSlide(ColorScheme s, List<_YrRanked> items, String type, String label) {
     final first = items.first;
     return _YrSlide(
@@ -1173,7 +1330,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                   style: TextStyle(color: s.primary, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 1.0, height: 1.25)),
             ),
             const SizedBox(width: 12),
-            _YrImg(name: first.name, artist: first.artist, type: type, size: 120, round: type == 'artists'),
+            _YrImg(name: first.name, artist: first.artist, type: type, size: 120, shapeIndex: _heroShape(type)),
           ])
         else ...[
           _label(s, label),
@@ -1181,7 +1338,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
           _YrReveal(
             delayMs: 300,
             pop: true,
-            child: _YrImg(name: first.name, artist: first.artist, type: type, size: 190, round: type == 'artists'),
+            child: _YrImg(name: first.name, artist: first.artist, type: type, size: 190, shapeIndex: _heroShape(type), spin: _playing),
           ),
         ],
         SizedBox(height: _yrInstant ? 14 : 18),
@@ -1276,7 +1433,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                 child: Text('${startAt + i}',
                     style: TextStyle(color: i == 0 && startAt == 1 ? s.primary : _yrSoft(s), fontSize: 18, fontWeight: FontWeight.w900)),
               ),
-              _YrImg(name: items[i].name, artist: items[i].artist, type: type, size: 46, round: type == 'artists'),
+              _YrImg(name: items[i].name, artist: items[i].artist, type: type, size: 46, shapeIndex: (i * 3 + (type == 'artists' ? 0 : type == 'tracks' ? 1 : 2) + 3) % 8),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1466,7 +1623,9 @@ class _YrImg extends StatefulWidget {
   final String name, artist, type; // type: artists | tracks | albums
   final double size;
   final bool round;
-  const _YrImg({required this.name, required this.artist, required this.type, required this.size, this.round = false});
+  final int? shapeIndex;
+  final ValueNotifier<bool>? spin;
+  const _YrImg({required this.name, required this.artist, required this.type, required this.size, this.round = false, this.shapeIndex, this.spin});
 
   @override
   State<_YrImg> createState() => _YrImgState();
@@ -1492,6 +1651,27 @@ class _YrImgState extends State<_YrImg> {
         size: widget.size * 0.5,
       ),
     );
+    if (widget.shapeIndex != null) {
+      // Static image, only the shape turns (image oversized so no corner shows)
+      final big = widget.size * 1.45;
+      return _YrSpinClip(
+        size: widget.size,
+        shapeIndex: widget.shapeIndex!,
+        spin: widget.spin,
+        child: FutureBuilder<String>(
+          future: _future,
+          builder: (_, snap) {
+            final url = snap.data ?? '';
+            if (url.isEmpty) {
+              return SizedBox(width: big, height: big, child: ColoredBox(color: s.primaryContainer, child: Icon(
+                widget.type == 'artists' ? Icons.person_rounded : (widget.type == 'albums' ? Icons.album_rounded : Icons.music_note_rounded),
+                color: _yrSoft(s), size: widget.size * 0.5)));
+            }
+            return ImageService.widgetImage(url: url, width: big, height: big, fit: BoxFit.cover, errorWidget: fallback);
+          },
+        ),
+      );
+    }
     // Shape follows the app setting, same seed rule as the recap tabs
     return M3ShapedBox(
       size: widget.size,
@@ -1665,4 +1845,75 @@ class _YrShareCard extends StatelessWidget {
       ]),
     );
   }
+}
+
+
+// Clips a static child with a shape that rotates while [spin] is true.
+class _YrSpinClip extends StatefulWidget {
+  final double size;
+  final int shapeIndex;
+  final ValueNotifier<bool>? spin;
+  final Widget child;
+  const _YrSpinClip({required this.size, required this.shapeIndex, required this.child, this.spin});
+
+  @override
+  State<_YrSpinClip> createState() => _YrSpinClipState();
+}
+
+class _YrSpinClipState extends State<_YrSpinClip> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(seconds: 10));
+
+  void _sync() {
+    if (widget.spin?.value == true) {
+      if (!_c.isAnimating) _c.repeat();
+    } else {
+      _c.stop();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.spin?.addListener(_sync);
+    _sync();
+  }
+
+  @override
+  void dispose() {
+    widget.spin?.removeListener(_sync);
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final sz = widget.size;
+    return ClipPath(
+      clipper: _YrRotClipper(m3ImageShape(widget.shapeIndex, sz), _c),
+      child: SizedBox(
+        width: sz, height: sz,
+        child: OverflowBox(minWidth: 0, minHeight: 0, maxWidth: sz * 1.45, maxHeight: sz * 1.45, child: widget.child),
+      ),
+    );
+  }
+}
+
+class _YrRotClipper extends CustomClipper<Path> {
+  final ShapeBorder shape;
+  final Animation<double> anim;
+  _YrRotClipper(this.shape, this.anim) : super(reclip: anim);
+
+  @override
+  Path getClip(Size size) {
+    final path = shape.getOuterPath(Offset.zero & size);
+    final c = size.center(Offset.zero);
+    final m = Matrix4.identity()
+      ..translateByDouble(c.dx, c.dy, 0, 1)
+      ..rotateZ(anim.value * 2 * math.pi)
+      ..translateByDouble(-c.dx, -c.dy, 0, 1);
+    return path.transform(m.storage);
+  }
+
+  @override
+  bool shouldReclip(covariant _YrRotClipper old) => old.shape != shape;
 }
