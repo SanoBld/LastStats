@@ -91,6 +91,82 @@ class _YearRecapPageState extends State<YearRecapPage> {
   _YrFriends? _friendsData;
   int _token = 0;
 
+  // ── Deezer preview (auto-play on top slides, with fade-in) ──
+  final AudioPlayer _audio = AudioPlayer();
+  final Map<String, String?> _previewCache = {};
+  Timer? _fadeTimer;
+  int _playToken = 0;
+
+  // Slide index -> (type, item) for the top artist / track / album slides.
+  Map<int, (String, _YrRanked)> get _previewSlides {
+    final d = _data;
+    final m = <int, (String, _YrRanked)>{};
+    if (d == null) return m;
+    var i = 1;
+    if (d.artists.isNotEmpty) m[i++] = ('artists', d.artists.first);
+    if (d.tracks.isNotEmpty) m[i++] = ('tracks', d.tracks.first);
+    if (d.albums.isNotEmpty) m[i++] = ('albums', d.albums.first);
+    return m;
+  }
+
+  Future<String?> _deezerPreview(String type, _YrRanked it) async {
+    final key = '$type|${it.artist}|${it.name}';
+    if (_previewCache.containsKey(key)) return _previewCache[key];
+    String? url;
+    try {
+      Future<Map<String, dynamic>?> get(Uri u) async {
+        final r = await ApiHttp.get(u).timeout(const Duration(seconds: 6));
+        return r.statusCode == 200 ? jsonDecode(r.body) as Map<String, dynamic> : null;
+      }
+      String? firstPreview(Map<String, dynamic>? j) {
+        for (final t in (j?['data'] as List?)?.cast<Map<String, dynamic>>() ?? const []) {
+          final u = (t['preview'] as String?) ?? '';
+          if (u.isNotEmpty) return u;
+        }
+        return null;
+      }
+      if (type == 'tracks') {
+        url = firstPreview(await get(Uri.https('api.deezer.com', '/search', {'q': '${it.artist} ${it.name}', 'limit': '5'})));
+      } else if (type == 'artists') {
+        url = firstPreview(await get(Uri.https('api.deezer.com', '/search', {'q': 'artist:"${it.name}"', 'limit': '5'})));
+      } else {
+        final j = await get(Uri.https('api.deezer.com', '/search/album', {'q': '${it.artist} ${it.name}', 'limit': '1'}));
+        final id = ((j?['data'] as List?)?.firstOrNull as Map?)?['id'];
+        if (id != null) url = firstPreview(await get(Uri.https('api.deezer.com', '/album/$id/tracks', {'limit': '5'})));
+      }
+    } catch (_) {}
+    _previewCache[key] = url;
+    return url;
+  }
+
+  Future<void> _stopPreview() async {
+    _playToken++;
+    _fadeTimer?.cancel();
+    try { await _audio.stop(); } catch (_) {}
+  }
+
+  Future<void> _playForSlide(int i) async {
+    await _stopPreview();
+    final entry = _previewSlides[i];
+    if (entry == null) return;
+    final tok = _playToken;
+    final url = await _deezerPreview(entry.$1, entry.$2);
+    if (url == null || !mounted || tok != _playToken) return;
+    try {
+      await _audio.setReleaseMode(ReleaseMode.stop);
+      await _audio.setVolume(0);
+      await _audio.play(UrlSource(url));
+    } catch (_) { return; }
+    // Fade-in over ~1.5 s
+    var step = 0;
+    _fadeTimer = Timer.periodic(const Duration(milliseconds: 100), (t) {
+      step++;
+      final v = (step / 15).clamp(0.0, 1.0);
+      _audio.setVolume(v);
+      if (v >= 1.0) t.cancel();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -143,6 +219,9 @@ class _YearRecapPageState extends State<YearRecapPage> {
     _photo.dispose();
     _frameIdx.dispose();
     _profileOn.dispose();
+    _fadeTimer?.cancel();
+    _audio.stop();
+    _audio.dispose();
     _pages.dispose();
     super.dispose();
   }
@@ -711,7 +790,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     return Stack(children: [
       PageView(
         controller: _pages,
-        onPageChanged: (i) => setState(() => _slide = i),
+        onPageChanged: (i) { setState(() => _slide = i); _playForSlide(i); },
         children: slides,
       ),
       // Tap zones (left third = back, right two thirds = next), like a story.
