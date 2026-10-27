@@ -42,7 +42,8 @@ class _YrData {
   Map<int, int> hourlyMap = {};
   Map<int, int> weekdayMap = {}; // 1 (Mon) .. 7 (Sun)
   List<_YrRanked> tracksAll = [];
-  _YrRanked? busiestTrack, peakTrack, streakTrack, randomTrack;
+  _YrRanked? busiestTrack, peakTrack, streakTrack, randomTrack, dayRecord;
+  String dayRecordDate = '';
 }
 
 // What to play on a slide (type: tracks / artists / albums).
@@ -116,7 +117,9 @@ class _YearRecapPageState extends State<YearRecapPage> {
   final ValueNotifier<bool> _playing = ValueNotifier(false);
   final ValueNotifier<String> _nowTitle = ValueNotifier('');
   bool _userPaused = false;
-  StreamSubscription? _stateSub;
+  StreamSubscription? _stateSub, _posSub, _durSub;
+  Duration _dur = Duration.zero;
+  final ValueNotifier<double> _prog = ValueNotifier(0);
 
   Future<void> _loadTwinTrack(String user) async {
     try {
@@ -147,14 +150,17 @@ class _YearRecapPageState extends State<YearRecapPage> {
         for (final t in l) {
           if (((t['preview'] as String?) ?? '').isEmpty) continue;
           final an = '${(t['artist'] as Map?)?['name'] ?? ''}';
-          if (artist == null || artist.isEmpty || _same(an, artist) || an.toLowerCase().contains(artist.toLowerCase())) { best = t; break; }
+          if (artist == null || artist.isEmpty || _same(an, artist) || an.toLowerCase().contains(artist.toLowerCase()) || (an.isNotEmpty && artist.toLowerCase().contains(an.toLowerCase()))) { best = t; break; }
         }
         if (best == null) return null;
         return _PvRes(best['preview'] as String, '${best['title']} — ${(best['artist'] as Map?)?['name'] ?? ''}');
       }
       if (q.type == 'tracks') {
-        res = pick(list(await get(Uri.https('api.deezer.com', '/search', {'q': 'artist:"${q.artist}" track:"${q.name}"', 'limit': '5'}))), artist: q.artist)
-           ?? pick(list(await get(Uri.https('api.deezer.com', '/search', {'q': '${q.artist} ${q.name}', 'limit': '8'}))), artist: q.artist);
+        res = pick(list(await get(Uri.https('api.deezer.com', '/search', {'q': 'artist:"${q.artist}" track:"${q.name}"', 'limit': '5'}))), artist: q.artist);
+        if (res == null) {
+          final l2 = list(await get(Uri.https('api.deezer.com', '/search', {'q': '${q.artist} ${q.name}', 'limit': '8'})));
+          res = pick(l2, artist: q.artist) ?? pick(l2);
+        }
       } else if (q.type == 'artists') {
         final arts = list(await get(Uri.https('api.deezer.com', '/search/artist', {'q': q.name, 'limit': '5'})));
         Map<String, dynamic>? a;
@@ -184,6 +190,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     _playToken++;
     _fadeTimer?.cancel();
     _nowTitle.value = '';
+    _prog.value = 0;
     try { await _audio.stop(); } catch (_) {}
   }
 
@@ -238,6 +245,14 @@ class _YearRecapPageState extends State<YearRecapPage> {
   @override
   void initState() {
     super.initState();
+    _durSub = _audio.onDurationChanged.listen((x) => _dur = x);
+    _posSub = _audio.onPositionChanged.listen((pos) {
+      final t = _dur.inMilliseconds;
+      if (t <= 0) return;
+      _prog.value = (pos.inMilliseconds / t).clamp(0.0, 1.0);
+      final rem = t - pos.inMilliseconds;
+      if (rem <= 2500) _audio.setVolume((rem / 2500).clamp(0.0, 1.0)); // fade-out
+    });
     _stateSub = _audio.onPlayerStateChanged.listen((st) { if (mounted) _playing.value = st == PlayerState.playing; });
     _load();
     _loadProfile();
@@ -289,6 +304,9 @@ class _YearRecapPageState extends State<YearRecapPage> {
     _frameIdx.dispose();
     _profileOn.dispose();
     _stateSub?.cancel();
+    _posSub?.cancel();
+    _durSub?.cancel();
+    _prog.dispose();
     _playing.dispose();
     _nowTitle.dispose();
     _fadeTimer?.cancel();
@@ -528,6 +546,22 @@ class _YearRecapPageState extends State<YearRecapPage> {
     d.busiestTrack = topOf((t) => dk(t) == d.busiestDay);
     d.peakTrack = topOf((t) => bucketOf(t.hour) == persona);
     d.streakTrack = topOf((t) => streakDays.contains(dk(t)));
+    {
+      final c = <String, int>{};
+      final rp = <String, ScrobbleRecord>{};
+      for (final r in records) {
+        if (r.artist.isEmpty || r.track.isEmpty) continue;
+        final k = '${dk(DateTime.fromMillisecondsSinceEpoch(r.ts * 1000))}|${r.artist} — ${r.track}';
+        c[k] = (c[k] ?? 0) + 1;
+        rp.putIfAbsent(k, () => r);
+      }
+      if (c.isNotEmpty) {
+        final b = c.entries.reduce((a, x) => x.value > a.value ? x : a);
+        d.dayRecord = _YrRanked(rp[b.key]!.track, rp[b.key]!.artist, b.value);
+        final q = b.key.split('|').first.split('-');
+        d.dayRecordDate = '${q[2]}/${q[1]}/${q[0]}';
+      }
+    }
     final withTrack = records.where((r) => r.artist.isNotEmpty && r.track.isNotEmpty).toList();
     if (withTrack.isNotEmpty) {
       final r = withTrack[math.Random(year).nextInt(withTrack.length)];
@@ -924,7 +958,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
           ),
         ]),
       ),
-      if (_slide < _slideCount - 1 && !_sharing)
+      if (!_sharing)
         Positioned(
           left: 16, right: 16, bottom: 14,
           child: ValueListenableBuilder<String>(
@@ -933,7 +967,19 @@ class _YearRecapPageState extends State<YearRecapPage> {
                 ? const SizedBox.shrink()
                 : ValueListenableBuilder<bool>(
                     valueListenable: _playing,
-                    builder: (_, on, _) => Material(
+                    builder: (_, on, _) => _slide >= _slideCount - 1
+                        ? Align(
+                            alignment: Alignment.centerRight,
+                            child: Material(
+                              color: scheme.primaryContainer.withValues(alpha: 0.92),
+                              shape: const CircleBorder(),
+                              child: IconButton(
+                                onPressed: _togglePlay,
+                                icon: Icon(on ? Icons.pause_rounded : Icons.play_arrow_rounded, color: scheme.primary),
+                              ),
+                            ),
+                          )
+                        : Material(
                       color: scheme.primaryContainer.withValues(alpha: 0.92),
                       borderRadius: BorderRadius.circular(28),
                       child: Row(children: [
@@ -942,8 +988,24 @@ class _YearRecapPageState extends State<YearRecapPage> {
                           icon: Icon(on ? Icons.pause_rounded : Icons.play_arrow_rounded, color: scheme.primary),
                         ),
                         Expanded(
-                          child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: scheme.onPrimaryContainer, fontSize: 13, fontWeight: FontWeight.w700)),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text(title, maxLines: 1, overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(color: scheme.onPrimaryContainer, fontSize: 13, fontWeight: FontWeight.w700)),
+                              const SizedBox(height: 5),
+                              ValueListenableBuilder<double>(
+                                valueListenable: _prog,
+                                builder: (_, v, _) => ClipRRect(
+                                  borderRadius: BorderRadius.circular(3),
+                                  child: LinearProgressIndicator(
+                                    value: v, minHeight: 4, color: scheme.primary,
+                                    backgroundColor: scheme.primary.withValues(alpha: 0.15),
+                                  ),
+                                ),
+                              ),
+                            ]),
+                          ),
                         ),
                         const SizedBox(width: 16),
                       ]),
@@ -963,10 +1025,25 @@ class _YearRecapPageState extends State<YearRecapPage> {
     final pv = <_PvReq?>[];
     _PvReq? cur;
     void add(Widget w) { out.add(w); pv.add(cur); cur = null; }
+    final used = <String>{};
+    String kk(_YrRanked r) => '${r.artist}|${r.name}'.toLowerCase();
+    final reserved = <String>{
+      if (d.tracks.isNotEmpty) kk(d.tracks.first),
+      if (d.streakTrack != null) kk(d.streakTrack!),
+      if (d.dayRecord != null) kk(d.dayRecord!),
+    };
+    _PvReq? uniqT(_YrRanked? r) {
+      if (r != null && !used.contains(kk(r)) && !reserved.contains(kk(r))) { used.add(kk(r)); return _PvReq.of('tracks', r); }
+      for (final c in d.tracksAll) {
+        if (!used.contains(kk(c)) && !reserved.contains(kk(c))) { used.add(kk(c)); return _PvReq.of('tracks', c); }
+      }
+      return r == null ? null : _PvReq.of('tracks', r);
+    }
     final mq = MediaQuery.of(context);
     final cardW = (frame ? 316.0 : math.min(mq.size.width - 56, 320.0)).clamp(180.0, 320.0).toDouble();
 
     // 1. Intro
+    if (d.tracksAll.length > 5) cur = uniqT(d.tracksAll[2 + math.Random(_year + 1).nextInt(math.min(20, d.tracksAll.length - 2))]);
     add(_YrSlide(
       scheme: s,
       children: [
@@ -1010,7 +1087,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     if (d.albums.isNotEmpty) { cur = _PvReq.of('albums', d.albums.first); add(_topSlide(s, d.albums, 'albums', tx('yr_top_album'))); }
 
     // 5. Month by month
-    if (d.busiestTrack != null) cur = _PvReq.of('tracks', d.busiestTrack!);
+    cur = uniqT(d.busiestTrack);
     final maxM = d.monthly.fold<int>(0, (m, v) => v > m ? v : m);
     final bestMonth = d.monthly.indexOf(maxM);
     add(_YrSlide(
@@ -1068,7 +1145,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     ));
 
     // 6. When you listen
-    if (d.peakTrack != null) cur = _PvReq.of('tracks', d.peakTrack!);
+    cur = uniqT(d.peakTrack);
     final buckets = <String, int>{
       'night': [for (var h = 0; h < 24; h++) if (h < 5 || h >= 22) d.hourly[h]].fold(0, (a, b) => a + b),
       'morning': [for (var h = 5; h < 12; h++) d.hourly[h]].fold(0, (a, b) => a + b),
@@ -1128,7 +1205,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     ));
 
     // 7. Consistency
-    if (d.streakTrack != null) cur = _PvReq.of('tracks', d.streakTrack!);
+    cur = uniqT(d.tracksAll.length > 8 ? d.tracksAll[4 + math.Random(_year + 7).nextInt(math.min(25, d.tracksAll.length - 4))] : null);
     add(_YrSlide(
       scheme: s,
       children: [
@@ -1145,9 +1222,19 @@ class _YearRecapPageState extends State<YearRecapPage> {
       ],
     ));
 
+    // 7a. Streak song + biggest single-day song
+    if (d.streakTrack != null && d.longestStreak > 1) {
+      cur = _PvReq.of('tracks', d.streakTrack!);
+      add(_trackSlide(s, tx('yr_flame_h'), d.streakTrack!, 6, '${d.streakTrack!.count}×', tx('yr_flame_s', {'n': '${d.longestStreak}'})));
+    }
+    if (d.dayRecord != null && d.dayRecord!.count >= 2) {
+      cur = _PvReq.of('tracks', d.dayRecord!);
+      add(_trackSlide(s, tx('yr_day_h'), d.dayRecord!, 7, '${d.dayRecord!.count}×', tx('yr_day_s', {'d': d.dayRecordDate})));
+    }
+
     // 7b. Where the plays go (Charts tab donut)
     if (d.artistsWide.length > 1) {
-      cur = _PvReq.of('artists', d.artistsWide.first);
+      cur = _PvReq.of('artists', d.artistsWide.firstWhere((a) => d.artists.isEmpty || a.name != d.artists.first.name, orElse: () => d.artistsWide.first));
       add(_YrSlide(
         scheme: s,
         children: [
@@ -1164,7 +1251,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     }
 
     // 8. Discoveries
-    if (d.randomTrack != null) cur = _PvReq.of('tracks', d.randomTrack!);
+    cur = uniqT(d.randomTrack);
     add(_YrSlide(
       scheme: s,
       children: [
@@ -1196,7 +1283,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
       final shown = rows.take(6).toList();
       if (!shown.any((r) => r.name.isEmpty)) shown[shown.length - 1] = rows[myRank - 1];
       final maxT = rows.first.total;
-      if (d.tracksAll.isNotEmpty) cur = _PvReq.of('tracks', d.tracksAll[(myRank - 1).clamp(0, d.tracksAll.length - 1)]);
+      if (d.tracksAll.isNotEmpty) cur = uniqT(d.tracksAll[(myRank - 1).clamp(0, d.tracksAll.length - 1)]);
       add(_YrSlide(
         scheme: s,
         children: [
@@ -1217,7 +1304,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
 
     // 10. Friends: music twin
     if (fr != null && fr.twin != null) {
-      if (_twinTrack != null) cur = _PvReq.of('tracks', _twinTrack!);
+      cur = uniqT(_twinTrack);
       add(_YrSlide(
         scheme: s,
         children: [
@@ -1257,6 +1344,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     }
 
     // 11. Summary + share
+    if (d.tracks.isNotEmpty) cur = _PvReq.of('tracks', d.tracks.first);
     add(_YrSlide(
       scheme: s,
       children: [
@@ -1313,6 +1401,33 @@ class _YearRecapPageState extends State<YearRecapPage> {
   }
 
   // Big #1 (artwork, name, plays counting up) followed by ranks 2..5.
+  // Shapes for ranks 2+: never the hero's shape (nor its look-alike)
+  int _listShape(String type, int i) {
+    final hero = _heroShape(type);
+    final pool = [for (var k = 0; k < 8; k++) if (k != hero && !((hero == 0 || hero == 4) && (k == 0 || k == 4))) k];
+    return pool[(i - 1 + (type == 'artists' ? 0 : type == 'tracks' ? 2 : 4)) % pool.length];
+  }
+
+  Widget _trackSlide(ColorScheme s, String label, _YrRanked r, int shape, String big, String sub) => _YrSlide(
+        scheme: s,
+        compact: true,
+        children: [
+          _label(s, label),
+          const SizedBox(height: 18),
+          _YrImg(name: r.name, artist: r.artist, type: 'tracks', size: 170, shapeIndex: shape, spin: _playing),
+          const SizedBox(height: 16),
+          Text(r.name, textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: s.onPrimaryContainer, fontSize: 22, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 2),
+          Text(r.artist, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: _yrSoft(s), fontSize: 15)),
+          const SizedBox(height: 14),
+          Text(big, style: TextStyle(color: s.primary, fontSize: 44, fontWeight: FontWeight.w900, height: 1)),
+          const SizedBox(height: 6),
+          Text(sub, textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 14)),
+        ],
+      );
+
   // #1 never uses the circle: clover / burst / cookie
   int _heroShape(String type) => type == 'artists' ? 2 : (type == 'tracks' ? 4 : 0);
 
@@ -1433,7 +1548,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                 child: Text('${startAt + i}',
                     style: TextStyle(color: i == 0 && startAt == 1 ? s.primary : _yrSoft(s), fontSize: 18, fontWeight: FontWeight.w900)),
               ),
-              _YrImg(name: items[i].name, artist: items[i].artist, type: type, size: 46, shapeIndex: (i * 3 + (type == 'artists' ? 0 : type == 'tracks' ? 1 : 2) + 3) % 8),
+              _YrImg(name: items[i].name, artist: items[i].artist, type: type, size: 46, shapeIndex: _listShape(type, i)),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
