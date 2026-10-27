@@ -513,6 +513,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
         _loading = false;
       });
       if (data.total > 0) _loadFriends(_year, data, token);
+      WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted && token == _token) _playForSlide(_slide); });
     } catch (_) {
       if (!mounted) return;
       setState(() {
@@ -1161,24 +1162,18 @@ class _YearRecapPageState extends State<YearRecapPage> {
             style: TextStyle(color: s.primary, fontSize: 72, fontWeight: FontWeight.w900, height: 1)),
         const SizedBox(height: 6),
         _YrReveal(delayMs: 500, child: Text(tx('yr_scrobbles'), style: TextStyle(color: _yrSoft(s), fontSize: 16, fontWeight: FontWeight.w700))),
-        const SizedBox(height: 20),
-        Builder(builder: (_) {
-          final raw = tx('yr_hours', {'h': _fmt(hours)});
-          final m = RegExp(r'\s*[\(（]([^\)）]*)[\)）]').firstMatch(raw);
-          final main = m == null ? raw : raw.replaceFirst(m.group(0)!, '');
-          return _YrReveal(delayMs: 1900, child: Column(children: [
-            Text(main, textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 14)),
-            if (m != null)
-              Text(m.group(1)!, textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s).withValues(alpha: 0.6), fontSize: 10, fontStyle: FontStyle.italic)),
-          ]));
-        }),
-        if (_yrInstant) ...[
-          const SizedBox(height: 28),
-          Text(tx('yr_unique', {'a': _fmt(d.uniqueArtists), 't': _fmt(d.uniqueTracks)}),
-              textAlign: TextAlign.center, style: TextStyle(color: s.onPrimaryContainer, fontSize: 14, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 8),
-          Text(tx('yr_active', {'n': '${d.activeDays}', 't': '${d.daysInRange}'}),
-              textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 14)),
+        if (!_yrInstant) ...[
+          const SizedBox(height: 20),
+          Builder(builder: (_) {
+            final raw = tx('yr_hours', {'h': _fmt(hours)});
+            final m = RegExp(r'\s*[\(（]([^\)）]*)[\)）]').firstMatch(raw);
+            final main = m == null ? raw : raw.replaceFirst(m.group(0)!, '');
+            return _YrReveal(delayMs: 1900, child: Column(children: [
+              Text(main, textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 14)),
+              if (m != null)
+                Text(m.group(1)!, textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s).withValues(alpha: 0.6), fontSize: 10, fontStyle: FontStyle.italic)),
+            ]));
+          }),
         ],
       ],
     ));
@@ -1327,11 +1322,11 @@ class _YearRecapPageState extends State<YearRecapPage> {
     // 7a. Streak song + biggest single-day song
     if (d.streakTrack != null && d.longestStreak > 1) {
       cur = _PvReq.of('tracks', d.streakTrack!);
-      add(_trackSlide(s, tx('yr_flame_h'), d.streakTrack!, 6, '${d.streakTrack!.count}×', tx('yr_flame_s', {'n': '${d.longestStreak}'})));
+      add(_trackSlide(s, tx('yr_flame_h'), d.streakTrack!, 6, d.streakTrack!.count, tx('yr_flame_s', {'n': '${d.longestStreak}'})));
     }
     if (d.dayRecord != null && d.dayRecord!.count >= 2) {
       cur = _PvReq.of('tracks', d.dayRecord!);
-      add(_trackSlide(s, tx('yr_day_h'), d.dayRecord!, 7, '${d.dayRecord!.count}×', tx('yr_day_s', {'d': d.dayRecordDate})));
+      add(_trackSlide(s, tx('yr_day_h'), d.dayRecord!, 7, d.dayRecord!.count, tx('yr_day_s', {'d': d.dayRecordDate})));
     }
 
     // 7b. Where the plays go (Charts tab donut)
@@ -1514,7 +1509,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     return pool[(i - 1 + (type == 'artists' ? 0 : type == 'tracks' ? 2 : 4)) % pool.length];
   }
 
-  Widget _trackSlide(ColorScheme s, String label, _YrRanked r, int shape, String big, String sub) => _YrSlide(
+  Widget _trackSlide(ColorScheme s, String label, _YrRanked r, int shape, int bigN, String sub) => _YrSlide(
         scheme: s,
         compact: true,
         children: [
@@ -1528,9 +1523,13 @@ class _YearRecapPageState extends State<YearRecapPage> {
           Text(r.artist, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis,
               style: TextStyle(color: _yrSoft(s), fontSize: 15)),
           const SizedBox(height: 14),
-          Text(big, style: TextStyle(color: s.primary, fontSize: 44, fontWeight: FontWeight.w900, height: 1)),
+          Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
+            _YrCountUp(value: bigN, fmt: _fmt, delayMs: 300, durationMs: 1400,
+                style: TextStyle(color: s.primary, fontSize: 44, fontWeight: FontWeight.w900, height: 1)),
+            Text('×', style: TextStyle(color: s.primary, fontSize: 44, fontWeight: FontWeight.w900, height: 1)),
+          ]),
           const SizedBox(height: 6),
-          Text(sub, textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 14)),
+          _YrReveal(delayMs: 900, child: Text(sub, textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 14))),
         ],
       );
 
