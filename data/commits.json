@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-27T22:50:11Z",
+  "updated": "2026-10-27T23:00:58Z",
   "commits": [
+    {
+      "sha": "0bfb81611efd0f57cba1383fa73e2c62844fdc30",
+      "message": "feat: ajout de la personnalisation des styles dans la page de récapitulatif annuel et mise à jour des chaînes de localisation",
+      "date": "2026-10-27T23:00:37Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/0bfb81611efd0f57cba1383fa73e2c62844fdc30",
+      "tags": []
+    },
     {
       "sha": "c21ddd3016dbfc9ed30f8510852c1ee368b55f6d",
       "message": "feat: ajout de nouvelles chaînes pour les statistiques de musique, y compris les titres en feu et les records journaliers",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/f539cd71a31c9946712f664e75ff7165d623d7fa",
-      "tags": []
-    },
-    {
-      "sha": "ba68ab86785f94f189df07967d67cd02e085e2e1",
-      "message": "refactor: améliorer la réactivité des widgets avec des mises à jour de mise en page pour les styles \"tiny\", \"pill\" et \"full\", et ajouter des fichiers de mise en page pour les widgets \"loved count\" et \"scrobble count\"",
-      "date": "2026-08-22T22:14:50Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/ba68ab86785f94f189df07967d67cd02e085e2e1",
       "tags": []
     }
   ]
