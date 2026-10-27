@@ -117,6 +117,99 @@ class _YearRecapPageState extends State<YearRecapPage> {
   final ValueNotifier<bool> _playing = ValueNotifier(false);
   final ValueNotifier<String> _nowTitle = ValueNotifier('');
   bool _userPaused = false;
+
+  // Temporary look for the share image: restored when the recap is closed
+  Map<String, Object?>? _styleBackup;
+  void _backupStyle() {
+    _styleBackup ??= {
+      'accent': accentNotifier.value, 'dyn': useDynamicColorNotifier.value, 'np': useNowPlayingColorNotifier.value,
+      'art': artworkColorThemeNotifier.value, 'dn': useDayNightAccentNotifier.value,
+      'mode': themeModeNotifier.value, 'font': appFontNotifier.value,
+    };
+  }
+
+  void _restoreStyle() {
+    final b = _styleBackup;
+    if (b == null) return;
+    _styleBackup = null;
+    accentNotifier.value = b['accent'] as Color;
+    useDynamicColorNotifier.value = b['dyn'] as bool;
+    useNowPlayingColorNotifier.value = b['np'] as bool;
+    artworkColorThemeNotifier.value = b['art'] as bool;
+    useDayNightAccentNotifier.value = b['dn'] as bool;
+    themeModeNotifier.value = b['mode'] as ThemeMode;
+    appFontNotifier.value = b['font'] as String;
+  }
+
+  void _openStyle() {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      barrierColor: Colors.black26,
+      builder: (ctx) {
+        final sc = Theme.of(ctx).colorScheme;
+        const colors = [0xFF7C3AED, 0xFFE11D48, 0xFFF97316, 0xFFEAB308, 0xFF16A34A, 0xFF0EA5E9, 0xFF14B8A6, 0xFFEC4899];
+        const fonts = [('GoogleSansFlex', 'Google Sans'), ('Inter', 'Inter'), ('SpaceGrotesk', 'Space Grotesk'), ('RobotoSlab', 'Roboto Slab'), ('DancingScript', 'Dancing Script'), ('Ndot57', 'Ndot 57')];
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(tx('yr_style'), style: TextStyle(color: sc.onSurface, fontSize: 16, fontWeight: FontWeight.w900)),
+              const SizedBox(height: 12),
+              ValueListenableBuilder<Color>(
+                valueListenable: accentNotifier,
+                builder: (_, cur, _) => Wrap(spacing: 10, runSpacing: 10, children: [
+                  for (final c in colors)
+                    GestureDetector(
+                      onTap: () {
+                        _backupStyle();
+                        useDynamicColorNotifier.value = false;
+                        useNowPlayingColorNotifier.value = false;
+                        artworkColorThemeNotifier.value = false;
+                        useDayNightAccentNotifier.value = false;
+                        accentNotifier.value = Color(c);
+                      },
+                      child: Container(
+                        width: 38, height: 38,
+                        decoration: BoxDecoration(
+                          color: Color(c), shape: BoxShape.circle,
+                          border: Border.all(color: cur.toARGB32() == c ? sc.onSurface : Colors.transparent, width: 3),
+                        ),
+                      ),
+                    ),
+                ]),
+              ),
+              const SizedBox(height: 14),
+              ValueListenableBuilder<ThemeMode>(
+                valueListenable: themeModeNotifier,
+                builder: (_, m, _) => SegmentedButton<ThemeMode>(
+                  showSelectedIcon: false,
+                  segments: const [
+                    ButtonSegment(value: ThemeMode.light, icon: Icon(Icons.light_mode_rounded)),
+                    ButtonSegment(value: ThemeMode.dark, icon: Icon(Icons.dark_mode_rounded)),
+                  ],
+                  selected: {m == ThemeMode.light ? ThemeMode.light : ThemeMode.dark},
+                  onSelectionChanged: (v) { _backupStyle(); themeModeNotifier.value = v.first; },
+                ),
+              ),
+              const SizedBox(height: 14),
+              ValueListenableBuilder<String>(
+                valueListenable: appFontNotifier,
+                builder: (_, f, _) => Wrap(spacing: 8, runSpacing: 4, children: [
+                  for (final ft in fonts)
+                    ChoiceChip(
+                      label: Text(ft.$2, style: TextStyle(fontFamily: ft.$1)),
+                      selected: f == ft.$1,
+                      onSelected: (_) { _backupStyle(); appFontNotifier.value = ft.$1; },
+                    ),
+                ]),
+              ),
+            ]),
+          ),
+        );
+      },
+    );
+  }
   StreamSubscription? _stateSub, _posSub, _durSub;
   Duration _dur = Duration.zero;
   final ValueNotifier<double> _prog = ValueNotifier(0);
@@ -303,6 +396,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     _photo.dispose();
     _frameIdx.dispose();
     _profileOn.dispose();
+    scheduleMicrotask(_restoreStyle);
     _stateSub?.cancel();
     _posSub?.cancel();
     _durSub?.cancel();
@@ -963,54 +1057,62 @@ class _YearRecapPageState extends State<YearRecapPage> {
           left: 16, right: 16, bottom: 14,
           child: ValueListenableBuilder<String>(
             valueListenable: _nowTitle,
-            builder: (_, title, _) => title.isEmpty
-                ? const SizedBox.shrink()
-                : ValueListenableBuilder<bool>(
-                    valueListenable: _playing,
-                    builder: (_, on, _) => _slide >= _slideCount - 1
-                        ? Align(
-                            alignment: Alignment.centerRight,
-                            child: Material(
-                              color: scheme.primaryContainer.withValues(alpha: 0.92),
-                              shape: const CircleBorder(),
-                              child: IconButton(
-                                onPressed: _togglePlay,
-                                icon: Icon(on ? Icons.pause_rounded : Icons.play_arrow_rounded, color: scheme.primary),
-                              ),
-                            ),
-                          )
-                        : Material(
-                      color: scheme.primaryContainer.withValues(alpha: 0.92),
-                      borderRadius: BorderRadius.circular(28),
-                      child: Row(children: [
-                        IconButton(
-                          onPressed: _togglePlay,
-                          icon: Icon(on ? Icons.pause_rounded : Icons.play_arrow_rounded, color: scheme.primary),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 6),
-                            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                              Text(title, maxLines: 1, overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(color: scheme.onPrimaryContainer, fontSize: 13, fontWeight: FontWeight.w700)),
-                              const SizedBox(height: 5),
-                              ValueListenableBuilder<double>(
-                                valueListenable: _prog,
-                                builder: (_, v, _) => ClipRRect(
-                                  borderRadius: BorderRadius.circular(3),
-                                  child: LinearProgressIndicator(
-                                    value: v, minHeight: 4, color: scheme.primary,
-                                    backgroundColor: scheme.primary.withValues(alpha: 0.15),
-                                  ),
+            builder: (_, title, _) => AnimatedSwitcher(
+              duration: const Duration(milliseconds: 320),
+              switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
+              transitionBuilder: (c, a) => FadeTransition(
+                opacity: a,
+                child: SlideTransition(position: Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(a), child: c),
+              ),
+              child: title.isEmpty
+                  ? const SizedBox.shrink(key: ValueKey('off'))
+                  : ValueListenableBuilder<bool>(
+                      key: ValueKey(_slide >= _slideCount - 1),
+                      valueListenable: _playing,
+                      builder: (_, on, _) => _slide >= _slideCount - 1
+                          ? Align(
+                              alignment: Alignment.centerRight,
+                              child: Material(
+                                color: scheme.primaryContainer.withValues(alpha: 0.92),
+                                shape: const CircleBorder(),
+                                child: IconButton(
+                                  onPressed: _togglePlay,
+                                  icon: Icon(on ? Icons.pause_rounded : Icons.play_arrow_rounded, color: scheme.primary),
                                 ),
                               ),
-                            ]),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                      ]),
+                            )
+                          : Material(
+                              color: scheme.primaryContainer.withValues(alpha: 0.92),
+                              borderRadius: BorderRadius.circular(28),
+                              child: Row(children: [
+                                IconButton(
+                                  onPressed: _togglePlay,
+                                  icon: Icon(on ? Icons.pause_rounded : Icons.play_arrow_rounded, color: scheme.primary),
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 6),
+                                    child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                      Text(title, maxLines: 1, overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(color: scheme.onPrimaryContainer, fontSize: 13, fontWeight: FontWeight.w700)),
+                                      const SizedBox(height: 4),
+                                      ValueListenableBuilder<double>(
+                                        valueListenable: _prog,
+                                        builder: (_, v, _) => M3WavyProgress(
+                                          value: v, height: 10, stroke: 3,
+                                          color: scheme.primary,
+                                          trackColor: scheme.primary.withValues(alpha: 0.18),
+                                        ),
+                                      ),
+                                    ]),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                              ]),
+                            ),
                     ),
-                  ),
+            ),
           ),
         ),
     ]);
@@ -1384,16 +1486,20 @@ class _YearRecapPageState extends State<YearRecapPage> {
                   ),
                 ),
         ),
-        ValueListenableBuilder<bool>(
-          valueListenable: _sharingN,
-          builder: (_, busy, _) => FilledButton.icon(
-            onPressed: busy ? null : _share,
-            icon: busy
-                ? SizedBox(width: 18, height: 18, child: M3Spinner(color: s.onPrimary))
-                : const Icon(Icons.ios_share_rounded),
-            label: Text(L.commonShare),
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          ValueListenableBuilder<bool>(
+            valueListenable: _sharingN,
+            builder: (_, busy, _) => FilledButton.icon(
+              onPressed: busy ? null : _share,
+              icon: busy
+                  ? SizedBox(width: 18, height: 18, child: M3Spinner(color: s.onPrimary))
+                  : const Icon(Icons.ios_share_rounded),
+              label: Text(L.commonShare),
+            ),
           ),
-        ),
+          const SizedBox(width: 10),
+          IconButton.filledTonal(onPressed: _openStyle, tooltip: tx('yr_style'), icon: const Icon(Icons.palette_rounded)),
+        ]),
       ],
     ));
     if (!frame) _pvList = pv;
@@ -1924,13 +2030,14 @@ class _YrShareCard extends StatelessWidget {
               ),
         // FittedBox shrinks the content if it is ever taller than the card
         child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.topCenter, child: SizedBox(width: 332, child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+          if (slide != null) const SizedBox(height: 28),
           Text(username, style: TextStyle(color: photo == null ? _yrSoft(scheme) : (photoDark ? Colors.white : const Color(0xFF111111)), fontSize: 12, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
           Text(tx('yr_intro_h', {'year': '$year'}), style: TextStyle(color: photo == null ? scheme.onSurface : (photoDark ? Colors.white : const Color(0xFF111111)), fontSize: 22, fontWeight: FontWeight.w900, height: 1.1)),
           const SizedBox(height: 10),
           if (slide != null)
             SizedBox(
-              height: 480,
+              height: 452,
               width: 332,
               child: FittedBox(
                 fit: BoxFit.scaleDown,
@@ -2003,11 +2110,18 @@ class _YrSpinClipState extends State<_YrSpinClip> with SingleTickerProviderState
   @override
   Widget build(BuildContext context) {
     final sz = widget.size;
-    return ClipPath(
-      clipper: _YrRotClipper(m3ImageShape(widget.shapeIndex, sz), _c),
-      child: SizedBox(
-        width: sz, height: sz,
-        child: OverflowBox(minWidth: 0, minHeight: 0, maxWidth: sz * 1.45, maxHeight: sz * 1.45, child: widget.child),
+    // When it turns, the shape is drawn smaller so it never leaves its box (no overlap with the text)
+    final inner = widget.spin != null ? sz * 0.74 : sz;
+    return SizedBox(
+      width: sz, height: sz,
+      child: Center(
+        child: ClipPath(
+          clipper: _YrRotClipper(m3ImageShape(widget.shapeIndex, inner), _c),
+          child: SizedBox(
+            width: inner, height: inner,
+            child: OverflowBox(minWidth: 0, minHeight: 0, maxWidth: sz * 1.45, maxHeight: sz * 1.45, child: widget.child),
+          ),
+        ),
       ),
     );
   }

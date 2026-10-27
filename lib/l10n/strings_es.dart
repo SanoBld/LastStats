@@ -1347,6 +1347,7 @@ const Map<String, String> kTxEs = {
   'yr_peak': 'Tu momento de mayor escucha es hacia las {h}:00, y tu día favorito es el {d}.',
   'yr_streak_h': 'Tu constancia',
   'yr_streak': 'días',
+  'yr_style': 'Personalizar',
   'yr_flame_h': 'Tu canción en racha',
   'yr_flame_s': 'reproducciones durante tu racha de {n} días',
   'yr_day_h': 'Tu récord con una canción',

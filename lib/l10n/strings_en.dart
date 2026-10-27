@@ -1347,6 +1347,7 @@ const Map<String, String> kTxEn = {
   'yr_peak': 'Your listening peaks around {h}:00, and your favourite day is {d}.',
   'yr_streak_h': 'Your consistency',
   'yr_streak': 'days',
+  'yr_style': 'Customize',
   'yr_flame_h': 'Your streak song',
   'yr_flame_s': 'plays during your {n}-day streak',
   'yr_day_h': 'Your single-day record',

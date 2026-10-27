@@ -1318,6 +1318,7 @@ const Map<String, String> kTxDe = {
   'yr_peak': 'Am meisten hörst du gegen {h} Uhr, und dein Lieblingstag ist der {d}.',
   'yr_streak_h': 'Deine Beständigkeit',
   'yr_streak': 'Tage',
+  'yr_style': 'Anpassen',
   'yr_flame_h': 'Dein Song der Serie',
   'yr_flame_s': 'Wiedergaben während deiner {n}-Tage-Serie',
   'yr_day_h': 'Dein Rekord mit einem Song',

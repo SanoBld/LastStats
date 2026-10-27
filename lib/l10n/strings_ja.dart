@@ -1317,6 +1317,7 @@ const Map<String, String> kTxJa = {
   'yr_peak': '聴く時間のピークは{h}時ごろで、好きな曜日は{d}です。',
   'yr_streak_h': '継続力',
   'yr_streak': '日',
+  'yr_style': 'カスタマイズ',
   'yr_flame_h': '連続再生の1曲',
   'yr_flame_s': '{n}日連続の間の再生回数',
   'yr_day_h': '1曲の1日最多再生',

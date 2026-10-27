@@ -1347,6 +1347,7 @@ const Map<String, String> kTxFr = {
   'yr_peak': 'Votre pic d\'écoute se situe vers {h} h, et votre jour préféré est le {d}.',
   'yr_streak_h': 'Votre régularité',
   'yr_streak': 'jours',
+  'yr_style': 'Personnaliser',
   'yr_flame_h': 'Votre titre en feu',
   'yr_flame_s': 'écoutes pendant votre série de {n} jours',
   'yr_day_h': 'Votre record sur un titre',

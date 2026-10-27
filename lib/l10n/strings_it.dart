@@ -1318,6 +1318,7 @@ const Map<String, String> kTxIt = {
   'yr_peak': 'Il tuo picco di ascolto è verso le {h}:00 e il tuo giorno preferito è {d}.',
   'yr_streak_h': 'La tua costanza',
   'yr_streak': 'giorni',
+  'yr_style': 'Personalizza',
   'yr_flame_h': 'La tua canzone della serie',
   'yr_flame_s': 'riproduzioni durante la tua serie di {n} giorni',
   'yr_day_h': 'Il tuo record con una canzone',
