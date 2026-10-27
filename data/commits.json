@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-27T12:51:30Z",
+  "updated": "2026-10-27T13:03:45Z",
   "commits": [
+    {
+      "sha": "69f7f099ae0ac2aa00531c0a90b3565efdb5ad03",
+      "message": "feat: ajout de la prise en charge des aperçus audio Deezer avec gestion des pistes et des états de lecture",
+      "date": "2026-10-27T13:03:23Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/69f7f099ae0ac2aa00531c0a90b3565efdb5ad03",
+      "tags": []
+    },
     {
       "sha": "adff1c2082ae40c1a558c1850a156e1f682e0dd8",
       "message": "feat: ajout de l'aperçu audio Deezer avec lecture automatique pour les diapositives",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/6f277273eb37f6109f9e6082252a141d5dd25dd1",
-      "tags": []
-    },
-    {
-      "sha": "75a14d4756ddd23c373c2059c026606e89f6eb06",
-      "message": "update traduction widget, app\nNew search bar in settings option",
-      "date": "2026-08-22T13:55:04Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/75a14d4756ddd23c373c2059c026606e89f6eb06",
       "tags": []
     }
   ]
