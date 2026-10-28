@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-28T14:11:03Z",
+  "updated": "2026-10-28T14:15:40Z",
   "commits": [
+    {
+      "sha": "fdea1a9e6c6d9e1b5884b7ae1775403b8f79a332",
+      "message": "feat: mise à jour des styles d'interaction pour une cohérence dans l'application et ajustement du comportement des boutons",
+      "date": "2026-10-28T14:12:08Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/fdea1a9e6c6d9e1b5884b7ae1775403b8f79a332",
+      "tags": []
+    },
     {
       "sha": "fbd8146270111a0e370835a8dd336d39ff919652",
       "message": "feat: mise à jour de l'interface avec M3InkWell pour une interaction cohérente dans toute l'application",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/e11d5bb796d7562764e3cf2169dd6b377013007c",
-      "tags": []
-    },
-    {
-      "sha": "d91dba82e8e4b165c561cf1626d345c6dc8e09a2",
-      "message": "refactor: améliorer la lisibilité du code en ajoutant des accolades pour les instructions conditionnelles",
-      "date": "2026-08-24T10:39:30Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/d91dba82e8e4b165c561cf1626d345c6dc8e09a2",
       "tags": []
     }
   ]
