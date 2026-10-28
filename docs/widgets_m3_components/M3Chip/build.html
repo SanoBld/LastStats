@@ -127,14 +127,8 @@ Widget build(BuildContext context) {
           : scheme.primaryContainer.withValues(alpha: 0.55),
       child: Material(
         type: MaterialType.transparency,
-        child: InkWell(
+        child: M3InkWell(
           borderRadius: r,
-          &#47;&#47; Fixes a visual glitch: the default highlight color would
-          &#47;&#47; sometimes stay painted as a full white square until the
-          &#47;&#47; next drag&#47;scroll event forced a repaint. Splash only, no
-          &#47;&#47; persisting highlight overlay.
-          highlightColor: Colors.transparent,
-          splashColor: fg.withValues(alpha: 0.10),
           onHighlightChanged: setDown,
           onTap: onSelected == null
               ? null

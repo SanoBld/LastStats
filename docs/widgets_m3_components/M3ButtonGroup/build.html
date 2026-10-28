@@ -131,7 +131,7 @@ Widget build(BuildContext context) {
           color: sel ? scheme.primary : scheme.primaryContainer.withValues(alpha: 0.55),
           child: Material(
             type: MaterialType.transparency,
-            child: InkWell(
+            child: M3InkWell(
               borderRadius: r,
               onHighlightChanged: setDown,
               onTap: () { if (!sel) m3Haptic(); onSelected(items[i].$1); },
