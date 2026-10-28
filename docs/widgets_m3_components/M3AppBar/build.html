@@ -120,10 +120,7 @@ Widget build(BuildContext context) {
     elevation: 0,
     scrolledUnderElevation: 0,
     surfaceTintColor: Colors.transparent,
-    backgroundColor: WidgetStateColor.resolveWith((states) =&gt;
-        states.contains(WidgetState.scrolledUnder)
-            ? scheme.surfaceContainer
-            : scheme.surface),
+    backgroundColor: m3TopBarColor(scheme),
     leading: Padding(
       padding: const EdgeInsets.only(left: 12),
       child: Center(
