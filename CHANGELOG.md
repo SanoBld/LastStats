@@ -39,5 +39,12 @@
 - Year recap: the #1 artist, track and album shapes now turn while the music plays (the picture stays still), and ranks 2-5 use a variety of shapes
 - Year recap: customize the share image (color, light/dark theme, font) from the last slide, your own style is restored when you leave
 - Year recap: shared single slides show the title a bit lower, and the first slide only keeps the scrobble count
+- Dashboard: tapping your profile now opens a centered bubble with your profile info and every shortcut (settings, notifications, recaps, achievements, profile scanner, refresh, reset cache)
+- Dashboard: the settings button and its long-press menu are gone, the notification bell only shows in the header when you have unread news
+- Year recap: the shared image uses your display name when you set one
 - Fixed the preview picking a song from the wrong artist
 - New texts translated in all languages
+
+## v4.2.1
+
+- Corrects the favorites button on the dashboard

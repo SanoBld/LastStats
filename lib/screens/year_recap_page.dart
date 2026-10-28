@@ -2030,7 +2030,7 @@ class _YrShareCard extends StatelessWidget {
         // FittedBox shrinks the content if it is ever taller than the card
         child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.topCenter, child: SizedBox(width: 332, child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
           if (slide != null) const SizedBox(height: 28),
-          Text(username, style: TextStyle(color: photo == null ? _yrSoft(scheme) : (photoDark ? Colors.white : const Color(0xFF111111)), fontSize: 12, fontWeight: FontWeight.w700)),
+          Text(displayNameNotifier.value.trim().isNotEmpty ? displayNameNotifier.value.trim() : username, style: TextStyle(color: photo == null ? _yrSoft(scheme) : (photoDark ? Colors.white : const Color(0xFF111111)), fontSize: 12, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
           Text(tx('yr_intro_h', {'year': '$year'}), style: TextStyle(color: photo == null ? scheme.onSurface : (photoDark ? Colors.white : const Color(0xFF111111)), fontSize: 22, fontWeight: FontWeight.w900, height: 1.1)),
           const SizedBox(height: 10),

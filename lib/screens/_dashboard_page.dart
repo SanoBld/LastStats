@@ -863,62 +863,161 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   final _settingsBtnKey = GlobalKey();
   final _newsBtnKey     = GlobalKey();
 
-  // Show popup bubble near the profile row
+  // Centered bubble: profile card (tap → account settings) + all shortcuts
   Future<void> _showProfileMenu() async {
-    final box = _profileKey.currentContext?.findRenderObject() as RenderBox?;
-    if (box == null || !mounted) return;
-    final pos    = box.localToGlobal(Offset.zero);
-    final size   = box.size;
-    final screen = MediaQuery.of(context).size;
+    final info = _userInfo;
+    if (info == null || !mounted) return;
+    _haptic(_HapticImpact.light);
+    final name      = (info['name']     ?? widget.username).toString();
+    final realName  = (info['realname'] ?? '').toString();
+    final country   = (info['country']  ?? '').toString();
+    final avatarUrl = _extractImage(info['image']);
+    final regStr    = _regDate();
+    final total     = _total();
+    final level     = accountLevel(total);
+    final from      = levelThreshold(level);
+    final to        = levelThreshold(level + 1);
+    final ratio     = to > from ? ((total - from) / (to - from)).clamp(0.0, 1.0) : 0.0;
+    final nick      = displayNameNotifier.value.trim();
+    final bigName   = nick.isNotEmpty ? nick : name;
+    String fmt(int n) => n.toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (_) => ' ');
 
-    final result = await showMenu<String>(
+    final result = await showDialog<String>(
       context: context,
-      position: RelativeRect.fromLTRB(
-        pos.dx,
-        pos.dy + size.height + 4,
-        screen.width - pos.dx - size.width,
-        0,
-      ),
-      shape: RoundedRectangleBorder(borderRadius: AppRadius.lgR),
-      items: [
-        PopupMenuItem(
-          value: 'recap',
-          child: Row(children: [
-            const Icon(Icons.auto_stories_rounded, size: 20),
-            const SizedBox(width: 10),
-            Text(L.dashRecap),
-          ]),
-        ),
-        PopupMenuItem(
-          value: 'year_recap',
-          child: Row(children: [
-            const Icon(Icons.celebration_rounded, size: 20),
-            const SizedBox(width: 10),
-            Text(tx('yr_title')),
-          ]),
-        ),
-        if (achievementsEnabledNotifier.value)
-          PopupMenuItem(
-            value: 'achievements',
-            child: Row(children: [
-              const Icon(Icons.emoji_events_outlined, size: 20),
-              const SizedBox(width: 10),
-              Text(L.achvTitle),
-            ]),
+      animationStyle: kM3DialogAnimation,
+      builder: (ctx) {
+        final sc = Theme.of(ctx).colorScheme;
+        Widget tile(String id, IconData icon, String label, {Color? color, int badge = 0}) {
+          final fg = color ?? sc.onSecondaryContainer;
+          return InkWell(
+            borderRadius: BorderRadius.circular(18),
+            onTap: () => Navigator.pop(ctx, id),
+            child: Container(
+              decoration: BoxDecoration(color: sc.secondaryContainer.withValues(alpha: 0.55), borderRadius: BorderRadius.circular(18)),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Stack(clipBehavior: Clip.none, children: [
+                  Icon(icon, size: 24, color: fg),
+                  if (badge > 0)
+                    Positioned(
+                      right: -8, top: -6,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                        decoration: BoxDecoration(color: sc.primary, borderRadius: BorderRadius.circular(8)),
+                        child: Text(badge > 9 ? '9+' : '$badge', style: TextStyle(color: sc.onPrimary, fontSize: 9, fontWeight: FontWeight.w800, height: 1.1)),
+                      ),
+                    ),
+                ]),
+                const SizedBox(height: 6),
+                Text(label, maxLines: 2, textAlign: TextAlign.center, overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: fg, fontSize: 11.5, fontWeight: FontWeight.w700, height: 1.15)),
+              ]),
+            ),
+          );
+        }
+
+        final tiles = <Widget>[
+          tile('settings', Icons.settings_rounded, L.navSettings),
+          tile('news', Icons.notifications_rounded, L.newsWhatsNew, badge: showNewsBadgeNotifier.value ? _unreadCount : 0),
+          tile('recap', Icons.auto_stories_rounded, L.dashRecap),
+          tile('year_recap', Icons.celebration_rounded, tx('yr_title')),
+          if (achievementsEnabledNotifier.value) tile('achievements', Icons.emoji_events_outlined, L.achvTitle),
+          tile('qrscan', Icons.qr_code_scanner_rounded, tx('ui_scan_a_profile')),
+          tile('refresh', Icons.refresh_rounded, L.dashRefresh),
+          tile('reset', Icons.delete_sweep_outlined, L.dashResetCache, color: sc.error),
+        ];
+
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 380),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(18),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                InkWell(
+                  borderRadius: BorderRadius.circular(24),
+                  onTap: () => Navigator.pop(ctx, 'profile'),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                    child: Row(children: [
+                      CircleAvatar(
+                        radius: 34,
+                        backgroundColor: sc.primaryContainer,
+                        backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                        child: avatarUrl.isEmpty ? Icon(Icons.person_rounded, size: 34, color: sc.onPrimaryContainer) : null,
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text(bigName, maxLines: 1, overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: sc.onSurface, fontSize: 20, fontWeight: FontWeight.w900)),
+                          if (nick.isNotEmpty && nick != name)
+                            Text('@$name', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sc.onSurfaceVariant, fontSize: 13))
+                          else if (realName.isNotEmpty)
+                            Text(realName, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sc.onSurfaceVariant, fontSize: 13)),
+                          const SizedBox(height: 4),
+                          Wrap(spacing: 10, runSpacing: 2, children: [
+                            Row(mainAxisSize: MainAxisSize.min, children: [
+                              Icon(Icons.music_note_rounded, size: 13, color: sc.onSurfaceVariant),
+                              const SizedBox(width: 2),
+                              Text(fmt(total), style: TextStyle(color: sc.onSurfaceVariant, fontSize: 12.5, fontWeight: FontWeight.w700)),
+                            ]),
+                            if (country.isNotEmpty && country != 'None')
+                              Row(mainAxisSize: MainAxisSize.min, children: [
+                                Icon(Icons.location_on_outlined, size: 13, color: sc.onSurfaceVariant),
+                                const SizedBox(width: 2),
+                                Text(country, style: TextStyle(color: sc.onSurfaceVariant, fontSize: 12.5)),
+                              ]),
+                            if (regStr.isNotEmpty)
+                              Row(mainAxisSize: MainAxisSize.min, children: [
+                                Icon(Icons.calendar_today_outlined, size: 12, color: sc.onSurfaceVariant),
+                                const SizedBox(width: 2),
+                                Text(L.memberSince(regStr), style: TextStyle(color: sc.onSurfaceVariant, fontSize: 12.5)),
+                              ]),
+                          ]),
+                          if (achievementsEnabledNotifier.value) ...[
+                            const SizedBox(height: 8),
+                            Row(children: [
+                              Text(tx('ui_lvl', {'level': '$level'}), style: TextStyle(color: sc.primary, fontSize: 12, fontWeight: FontWeight.w800)),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(3),
+                                  child: LinearProgressIndicator(value: ratio, minHeight: 5, backgroundColor: sc.primary.withValues(alpha: 0.15)),
+                                ),
+                              ),
+                            ]),
+                          ],
+                        ]),
+                      ),
+                      Icon(Icons.chevron_right_rounded, color: sc.onSurfaceVariant),
+                    ]),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                LayoutBuilder(builder: (_, c) {
+                  final w = (c.maxWidth - 20) / 3;
+                  return Wrap(spacing: 10, runSpacing: 10, children: [for (final t in tiles) SizedBox(width: w, child: t)]);
+                }),
+              ]),
+            ),
           ),
-        PopupMenuItem(
-          value: 'qrscan',
-          child: Row(children: [
-            const Icon(Icons.qr_code_scanner_rounded, size: 20),
-            const SizedBox(width: 10),
-            Text(tx('ui_scan_a_profile')),
-          ]),
-        ),
-      ],
+        );
+      },
     );
 
     if (!mounted) return;
     switch (result) {
+      case 'profile':
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => Scaffold(
+          appBar: M3AppBar(title: L.navSettings),
+          body: AccountPage(username: widget.username),
+        )));
+      case 'settings':
+        await _openSettings();
+      case 'news':
+        _openNewsSheet();
       case 'recap':
         _markStorySeen();
         Navigator.of(context).push(MaterialPageRoute(
@@ -931,15 +1030,16 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         ));
       case 'year_recap':
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => YearRecapPage(
-            service: widget.service,
-            username: widget.username,
-          ),
+          builder: (_) => YearRecapPage(service: widget.service, username: widget.username),
         ));
       case 'achievements':
         showAchievementsSheet(context, _userInfo, isSelf: true);
       case 'qrscan':
         showQrScannerPage(context, widget.service);
+      case 'refresh':
+        _load();
+      case 'reset':
+        _confirmResetCache();
     }
   }
 
@@ -1145,64 +1245,6 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   }
 
   // Show popup bubble near the settings button (long press = more options)
-  Future<void> _showSettingsMenu() async {
-    final box = _settingsBtnKey.currentContext?.findRenderObject() as RenderBox?;
-    if (box == null || !mounted) return;
-    final pos    = box.localToGlobal(Offset.zero);
-    final size   = box.size;
-    final screen = MediaQuery.of(context).size;
-
-    final result = await showMenu<String>(
-      context: context,
-      position: RelativeRect.fromLTRB(
-        screen.width - pos.dx - size.width,
-        pos.dy + size.height + 4,
-        pos.dx,
-        0,
-      ),
-      shape: RoundedRectangleBorder(borderRadius: AppRadius.lgR),
-      items: [
-        PopupMenuItem(
-          value: 'refresh',
-          child: Row(children: [
-            const Icon(Icons.refresh_rounded, size: 20),
-            const SizedBox(width: 10),
-            Text(L.dashRefresh),
-          ]),
-        ),
-        PopupMenuItem(
-          value: 'settings',
-          child: Row(children: [
-            const Icon(Icons.settings_outlined, size: 20),
-            const SizedBox(width: 10),
-            Text(L.navSettings),
-          ]),
-        ),
-        PopupMenuItem(
-          value: 'reset',
-          child: Builder(builder: (ctx) {
-            final color = Theme.of(ctx).colorScheme.error;
-            return Row(children: [
-              Icon(Icons.delete_sweep_outlined, size: 20, color: color),
-              const SizedBox(width: 10),
-              Text(L.dashResetCache, style: TextStyle(color: color)),
-            ]);
-          }),
-        ),
-      ],
-    );
-
-    if (!mounted) return;
-    switch (result) {
-      case 'refresh':
-        _load();
-      case 'settings':
-        await _openSettings();
-      case 'reset':
-        _confirmResetCache();
-    }
-  }
-
   // Open the news bell bottom sheet, anchored from the bell button
 
   void _openNewsSheet() {
@@ -1690,7 +1732,6 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                     child: GestureDetector(
                       key: _settingsBtnKey,
                       onTap: () { _haptic(_HapticImpact.light); _openSettings(); },
-                      onLongPress: () { _haptic(_HapticImpact.medium); _showSettingsMenu(); },
                       child: Icon(Icons.settings_rounded, color: scheme.onSurfaceVariant, size: 24),
                     ),
                   ),
@@ -1971,6 +2012,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                         const SizedBox(width: 8),
                       ],
                       // News bell with unread badge
+                      if (_unreadCount > 0 && showNewsBadgeNotifier.value)
                       GestureDetector(
                         key: _newsBtnKey,
                         onTap: _openNewsSheet,
@@ -2019,29 +2061,6 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                               },
                             ),
                           ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      // Settings: tap → open settings, long press → bubble menu
-                      GestureDetector(
-                        key: _settingsBtnKey,
-                        onTap: () {
-                          _haptic(_HapticImpact.light);
-                          _openSettings();
-                        },
-                        onLongPress: () {
-                          _haptic(_HapticImpact.medium);
-                          _showSettingsMenu();
-                        },
-                        child: Container(
-                          width: 34, height: 34,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: scheme.primaryContainer.withValues(alpha: 0.78),
-                          ),
-                          child: Icon(Icons.settings_rounded,
-                              size: 17,
-                              color: scheme.onPrimaryContainer),
                         ),
                       ),
                     ],
