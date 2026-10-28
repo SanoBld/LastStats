@@ -889,7 +889,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         final sc = Theme.of(ctx).colorScheme;
         Widget tile(String id, IconData icon, String label, {Color? color, int badge = 0}) {
           final fg = color ?? sc.onSecondaryContainer;
-          return InkWell(
+          return M3InkWell(
             borderRadius: BorderRadius.circular(18),
             onTap: () => Navigator.pop(ctx, id),
             child: Container(
@@ -938,7 +938,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(18),
               child: Column(mainAxisSize: MainAxisSize.min, children: [
-                InkWell(
+                M3InkWell(
                   borderRadius: BorderRadius.circular(24),
                   onTap: () => Navigator.pop(ctx, 'profile'),
                   child: Padding(
@@ -3048,7 +3048,7 @@ class _DashStatCard extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(28),
         ),
-        child: InkWell(
+        child: M3InkWell(
           borderRadius: BorderRadius.circular(28),
           onTap: onTap,
           child: Padding(
@@ -3112,7 +3112,7 @@ class _NowPlayingCard extends StatelessWidget {
     final album  = (track['album']?['#text']  ?? '').toString();
     final rawUrl = _extractImage(track['image']);
 
-    return InkWell(
+    return M3InkWell(
       borderRadius: AppRadius.xlR,
       onTap: () {
         _haptic(_HapticImpact.light);
@@ -4376,7 +4376,7 @@ class _NewsDetailSheetState extends State<_NewsDetailSheet> {
             ),
             if (isLong) ...[
               const SizedBox(height: 4),
-              InkWell(
+              M3InkWell(
                 onTap: () => setState(() => _expanded = !_expanded),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   Text(_expanded ? L.commonSeeLess : L.commonSeeMore,

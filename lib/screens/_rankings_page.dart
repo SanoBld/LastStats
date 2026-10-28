@@ -401,7 +401,7 @@ class _TopListBodyState extends State<_TopListBody>
               case 'albums':  imgF = ImageService.resolveAlbum(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null); break;
               default:        imgF = ImageService.resolveTrack(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null);
             }
-            return InkWell(
+            return M3InkWell(
               key: ValueKey('rank_row_${widget.type}_${idx}_$name'),
               onTap: () { _haptic(_HapticImpact.light); _showDetail(ctx, item); },
               borderRadius: AppRadius.smR,

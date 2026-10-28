@@ -1,6 +1,7 @@
 // README viewer + live project activity (latest release, downloads, commits,
 // workflow runs). Opened from Settings > About. The README is fetched from
 // GitHub (always current) and falls back to the copy bundled in the app.
+import '../../theme/m3_interaction.dart';
 import '../../l10n/extra_strings.dart';
 import 'dart:convert';
 import 'package:flutter/gestures.dart';
@@ -334,7 +335,7 @@ class _Row extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
     final color  = bad ? scheme.error : (good ? scheme.primary : scheme.onSurfaceVariant);
-    return InkWell(
+    return M3InkWell(
       onTap: url.isEmpty ? null : () => _open(url),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

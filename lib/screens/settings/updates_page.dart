@@ -1,5 +1,6 @@
 // lib/screens/settings/updates_page.dart
 
+import '../../theme/m3_interaction.dart';
 import 'package:flutter/material.dart';
 import '../../l10n/extra_strings.dart';
 import '../../widgets/skeleton.dart';
@@ -144,7 +145,7 @@ class _UpdatesPageState extends State<UpdatesPage> {
                 ),
                 if (_updateInfo!.notes.length > 200) ...[
                   const SizedBox(height: 6),
-                  InkWell(
+                  M3InkWell(
                     onTap: () => setState(() => _notesExpanded = !_notesExpanded),
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
                       Text(_notesExpanded ? L.commonSeeLess : L.commonSeeMore,

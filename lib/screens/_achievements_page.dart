@@ -201,7 +201,7 @@ class _AchvCategoryCard extends StatelessWidget {
 
     // Row inside an M3SegmentTile: tier badge, title + description,
     // progress pill and chevron.
-    return InkWell(
+    return M3InkWell(
       onTap: () => Navigator.of(context).push(M3SharedAxisRoute(
         builder: (_) => _AchvCategoryDetailPage(
           category: category, items: items, title: title, description: desc, icon: icon,
@@ -310,7 +310,7 @@ class _AchvMilestoneTile extends StatelessWidget {
     final fgSoft = a.unlocked
         ? scheme.onPrimaryContainer.withValues(alpha: 0.75)
         : scheme.onSurfaceVariant;
-    return InkWell(
+    return M3InkWell(
       onTap: () => _openAchvCard(context, a, icon),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

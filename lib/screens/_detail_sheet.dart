@@ -1570,7 +1570,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           color: scheme.surface.withValues(alpha: 0.55),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           clipBehavior: Clip.antiAlias,
-          child: InkWell(
+          child: M3InkWell(
             onTap: onTap,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(10, 8, 12, 8),
@@ -1889,7 +1889,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     if (album.isEmpty && durStr.isEmpty) return const SizedBox.shrink();
 
     Widget cell(String label, String value, {VoidCallback? onTap}) => Expanded(
-      child: InkWell(
+      child: M3InkWell(
         onTap: onTap,
         borderRadius: AppRadius.xlR,
         child: Padding(
@@ -4024,7 +4024,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     final plays  = int.tryParse((a['playcount'] ?? '0').toString()) ?? 0;
     final imgUrl = _extractImage(a['image']);
 
-    return InkWell(
+    return M3InkWell(
       onTap: () {
         showDetailSheet(ctx, a, 'artists', widget.service);
       },
@@ -4314,7 +4314,7 @@ class _PlatformLinkButtonState extends State<_PlatformLinkButton> {
           color: scheme.secondaryContainer,
           shape: widget.shape,
           clipBehavior: Clip.antiAlias,
-          child: InkWell(
+          child: M3InkWell(
             customBorder: widget.shape,
             onTap: _open,
             onHighlightChanged: (v) => setState(() => _down = v),

@@ -534,7 +534,7 @@ class _WeekChartState extends State<_WeekChart> {
               final isSel = _sel == d;
               final pct = total > 0 ? v * 100 / total : 0.0;
               final fg = isPeak ? s.tertiary : s.primary;
-              return InkWell(
+              return M3InkWell(
                 borderRadius: BorderRadius.circular(14),
                 onTap: () { _haptic(_HapticImpact.selection); setState(() => _sel = isSel ? null : d); },
                 child: Container(
@@ -625,7 +625,7 @@ class _ShareDonut extends StatelessWidget {
         const SizedBox(width: 16),
         Expanded(child: Column(children: [
           for (var i = 0; i < top.length; i++)
-            InkWell(
+            M3InkWell(
               borderRadius: BorderRadius.circular(10),
               onTap: onTap == null ? null : () => onTap!(top[i]),
               child: Padding(

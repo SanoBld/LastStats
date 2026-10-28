@@ -684,7 +684,7 @@ class _ChartsPageState extends State<_ChartsPage>
                 spacing: 10, runSpacing: 10,
                 children: _kCharts.map((c) {
                   final label = tx(c.$2);
-                  return InkWell(
+                  return M3InkWell(
                     borderRadius: BorderRadius.circular(16),
                     onTap: () { _haptic(_HapticImpact.selection); Navigator.pop(sh, c.$1); },
                     child: Container(

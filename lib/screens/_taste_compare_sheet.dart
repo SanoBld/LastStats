@@ -806,7 +806,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
             child: Material(
               color: Colors.transparent,
               borderRadius: BorderRadius.circular(18),
-              child: InkWell(
+              child: M3InkWell(
                 borderRadius: BorderRadius.circular(18),
                 onTap: () { _haptic(_HapticImpact.light); _openItemDetail(context, _topMatch!); },
                 child: _TopMatchCard(match: _topMatch!),
@@ -931,7 +931,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
       ),
       child: Column(
         children: [
-          InkWell(
+          M3InkWell(
             borderRadius: BorderRadius.circular(16),
             onTap: empty ? null : () { _haptic(_HapticImpact.selection); setState(() => _expanded = !_expanded); },
             child: Padding(
@@ -1036,7 +1036,7 @@ class _RankedListTile extends StatelessWidget {
       _       => Icons.mic_rounded,
     };
 
-    return InkWell(
+    return M3InkWell(
       borderRadius: AppRadius.mdR,
       onTap: onTap,
       child: Padding(
@@ -1179,7 +1179,7 @@ class _ItemCompareSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Tap the header again to open the full item page (bio, top tracks, etc).
-            InkWell(
+            M3InkWell(
               borderRadius: AppRadius.xlR,
               onTap: () { _haptic(_HapticImpact.light); showDetailSheet(context, _asLastFmItem, _detailType, service); },
               child: Padding(

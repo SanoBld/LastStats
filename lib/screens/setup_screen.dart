@@ -1,3 +1,4 @@
+import '../theme/m3_interaction.dart';
 import 'package:flutter/material.dart';
 import '../widgets/skeleton.dart';
 import '../theme/m3_motion.dart';
@@ -794,7 +795,7 @@ class _LangSelectorButton extends StatelessWidget {
     return Material(
       color: scheme.surfaceContainerHighest,
       borderRadius: BorderRadius.circular(20),
-      child: InkWell(
+      child: M3InkWell(
         onTap:        onTap,
         borderRadius: BorderRadius.circular(20),
         child: Container(

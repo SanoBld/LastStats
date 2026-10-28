@@ -29,6 +29,16 @@ ThemeData applyM3Interaction(ThemeData t) {
       scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
     ),
+    // Filter pills / chips: same pressed fill as every other button, inside
+    // their own pill shape.
+    chipTheme: t.chipTheme.copyWith(
+      overlayColor: WidgetStateProperty.resolveWith<Color?>((st) =>
+          st.contains(WidgetState.pressed)
+              ? s.onSurface.withValues(alpha: kM3PressAlpha)
+              : st.contains(WidgetState.hovered)
+                  ? s.onSurface.withValues(alpha: kM3PressAlpha / 2)
+                  : null),
+    ),
     filledButtonTheme:   FilledButtonThemeData(style: _noRipple(t.filledButtonTheme.style)),
     elevatedButtonTheme: ElevatedButtonThemeData(style: _noRipple(t.elevatedButtonTheme.style)),
     outlinedButtonTheme: OutlinedButtonThemeData(style: _noRipple(t.outlinedButtonTheme.style)),
@@ -37,4 +47,53 @@ ThemeData applyM3Interaction(ThemeData t) {
     segmentedButtonTheme: SegmentedButtonThemeData(
         style: _noRipple(t.segmentedButtonTheme.style)),
   );
+}
+
+
+/// Default corner radius of the pressed fill when a tappable has no shape.
+const double kM3PressRadius = 16;
+
+/// THE tappable of the app. Use it instead of InkWell everywhere.
+/// - no round Android ripple, the pressed state fills the exact shape
+/// - if no shape is given, a rounded one is used (never a sharp square)
+/// - same pressed color on every page (see [kM3PressAlpha])
+class M3InkWell extends StatelessWidget {
+  const M3InkWell({
+    super.key,
+    this.child,
+    this.onTap,
+    this.onLongPress,
+    this.onHighlightChanged,
+    this.borderRadius,
+    this.customBorder,
+    this.enableFeedback,
+  });
+
+  final Widget? child;
+  final GestureTapCallback? onTap;
+  final GestureLongPressCallback? onLongPress;
+  final ValueChanged<bool>? onHighlightChanged;
+  final BorderRadius? borderRadius;
+  final ShapeBorder? customBorder;
+  final bool? enableFeedback;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Theme.of(context).colorScheme;
+    return InkWell(
+      onTap: onTap,
+      onLongPress: onLongPress,
+      onHighlightChanged: onHighlightChanged,
+      customBorder: customBorder,
+      borderRadius: customBorder != null
+          ? null
+          : (borderRadius ?? BorderRadius.circular(kM3PressRadius)),
+      enableFeedback: enableFeedback,
+      splashFactory: kM3SplashFactory,
+      splashColor: Colors.transparent,
+      highlightColor: s.onSurface.withValues(alpha: kM3PressAlpha),
+      hoverColor: s.onSurface.withValues(alpha: kM3PressAlpha / 2),
+      child: child,
+    );
+  }
 }

@@ -1,5 +1,6 @@
 // lib/screens/settings/language_page.dart
 
+import '../../theme/m3_interaction.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/m3_components.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -50,7 +51,7 @@ class _LanguagePageState extends State<LanguagePage> {
           ...kSupportedLocales.map((lang) {
             final sel = _locale == lang.code;
             return Column(children: [
-              InkWell(
+              M3InkWell(
                 borderRadius: BorderRadius.circular(24),
                 onTap: () => _setLocale(lang.code),
                 child: Padding(

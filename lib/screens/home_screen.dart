@@ -493,7 +493,7 @@ class _SideRail extends StatelessWidget {
                     ),
                     child: Material(
                       type: MaterialType.transparency,
-                      child: InkWell(
+                      child: M3InkWell(
                         customBorder: shape,
                         onTap: () => onSelected(i),
                         child: Row(

@@ -11,6 +11,7 @@
 //   SettingTextRow    → text / URL      SettingTimeRow   → a time
 //   PickSortSheet     → choose items + sort them (+ optional "own row")
 
+import '../../theme/m3_interaction.dart';
 import 'package:flutter/material.dart';
 import '../../l10n/l10n.dart';
 import '../../theme/m3_shapes.dart';
@@ -112,7 +113,7 @@ class _SettingTileState extends State<SettingTile> {
         scale: _down && !reduce ? 0.985 : 1.0,
         duration: M3Motion.spatialFastDuration,
         curve: M3Motion.spatialFast,
-        child: InkWell(
+        child: M3InkWell(
           onTap: widget.enabled && widget.onTap != null
               ? () { m3Haptic(); widget.onTap!(); }
               : null,
@@ -480,7 +481,7 @@ class _OptionCard extends StatelessWidget {
         color: selected ? scheme.primaryContainer : scheme.surfaceContainerHigh,
         child: Material(
           type: MaterialType.transparency,
-          child: InkWell(
+          child: M3InkWell(
             onTap: onTap,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -809,7 +810,7 @@ class _GroupButtonState extends State<_GroupButton> {
         color: bg,
         child: Material(
           type: MaterialType.transparency,
-          child: InkWell(
+          child: M3InkWell(
             onTap: it.onPressed == null
                 ? null
                 : () { m3Haptic(); it.onPressed!(); },

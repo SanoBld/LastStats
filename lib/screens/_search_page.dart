@@ -387,14 +387,14 @@ class _SearchPageState extends State<_SearchPage> {
   }
 
   Widget _card(ColorScheme scheme, Widget child, VoidCallback onTap, {bool plain = false}) => plain
-      ? InkWell(onTap: onTap, borderRadius: BorderRadius.circular(16), child: child)
+      ? M3InkWell(onTap: onTap, borderRadius: BorderRadius.circular(16), child: child)
       : Padding(
         padding: const EdgeInsets.symmetric(vertical: 3),
         child: Material(
           color: Color.lerp(scheme.primaryContainer, scheme.surface, 0.55),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
           clipBehavior: Clip.antiAlias,
-          child: InkWell(
+          child: M3InkWell(
             onTap: onTap,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -567,7 +567,7 @@ class _SearchPageState extends State<_SearchPage> {
     return out.take(5).toList();
   }
 
-  Widget _suggestRow(ColorScheme scheme, TextTheme text, String t, {bool history = false}) => InkWell(
+  Widget _suggestRow(ColorScheme scheme, TextTheme text, String t, {bool history = false}) => M3InkWell(
         onTap: () => _submit(t),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),

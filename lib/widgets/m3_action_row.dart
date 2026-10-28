@@ -7,6 +7,7 @@
 //  (cookie / square, vivid accent color) and morph between them.
 // ══════════════════════════════════════════════════════════════════════════
 
+import '../theme/m3_interaction.dart';
 import 'package:flutter/material.dart';
 import 'skeleton.dart';
 import '../theme/m3_motion.dart';
@@ -65,7 +66,7 @@ class _M3PressableState extends State<_M3Pressable> {
         ),
         child: Material(
           type: MaterialType.transparency,
-          child: InkWell(
+          child: M3InkWell(
             customBorder: shape,
             onTap: widget.onTap == null
                 ? null

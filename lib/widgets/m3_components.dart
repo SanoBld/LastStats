@@ -119,7 +119,7 @@ class M3ButtonGroup<T> extends StatelessWidget {
             color: sel ? scheme.primary : scheme.primaryContainer.withValues(alpha: 0.55),
             child: Material(
               type: MaterialType.transparency,
-              child: InkWell(
+              child: M3InkWell(
                 borderRadius: r,
                 onHighlightChanged: setDown,
                 onTap: () { if (!sel) m3Haptic(); onSelected(items[i].$1); },
@@ -227,7 +227,7 @@ class _M3PressCardState extends State<M3PressCard> {
         color: widget.color,
         child: Material(
           type: MaterialType.transparency,
-          child: InkWell(
+          child: M3InkWell(
             borderRadius: r,
             onTap: widget.onTap == null
                 ? null
@@ -512,14 +512,8 @@ class M3Chip extends StatelessWidget {
             : scheme.primaryContainer.withValues(alpha: 0.55),
         child: Material(
           type: MaterialType.transparency,
-          child: InkWell(
+          child: M3InkWell(
             borderRadius: r,
-            // Fixes a visual glitch: the default highlight color would
-            // sometimes stay painted as a full white square until the
-            // next drag/scroll event forced a repaint. Splash only, no
-            // persisting highlight overlay.
-            highlightColor: Colors.transparent,
-            splashColor: fg.withValues(alpha: 0.10),
             onHighlightChanged: setDown,
             onTap: onSelected == null
                 ? null
@@ -601,7 +595,7 @@ class M3SegmentedButton<T> extends StatelessWidget {
       color: sel ? scheme.primary : scheme.surfaceContainerHigh,
       child: Material(
         type: MaterialType.transparency,
-        child: InkWell(
+        child: M3InkWell(
           borderRadius: r,
           onHighlightChanged: setDown,
           onTap: onSelectionChanged == null
@@ -744,7 +738,7 @@ class _M3TonalButtonState extends State<M3TonalButton> {
           color: widget.onTap == null ? base.withValues(alpha: 0.5) : base,
           child: Material(
             type: MaterialType.transparency,
-            child: InkWell(
+            child: M3InkWell(
               borderRadius: r,
               onTap: widget.onTap == null
                   ? null

@@ -118,11 +118,10 @@ final WidgetStateProperty<OutlinedBorder?> _pillShape =
             ? RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))
             : const StadiumBorder());
 
+// Round buttons (back arrow, icon buttons) stay round when pressed: the
+// pressed fill is a circle, never a square.
 final WidgetStateProperty<OutlinedBorder?> _roundShape =
-    WidgetStateProperty.resolveWith<OutlinedBorder?>((states) =>
-        states.contains(WidgetState.pressed)
-            ? RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))
-            : const CircleBorder());
+    const WidgetStatePropertyAll<OutlinedBorder?>(CircleBorder());
 
 ThemeData applyM3Shapes(ThemeData t) {
   ButtonStyle pill(ButtonStyle? base) =>

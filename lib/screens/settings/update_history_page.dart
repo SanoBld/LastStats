@@ -2,6 +2,7 @@
 //
 // Lists every past release: version, date, full changelog, and a direct
 // download button per version — not just the newest one.
+import '../../theme/m3_interaction.dart';
 import 'package:flutter/material.dart';
 import '../../l10n/extra_strings.dart';
 import 'settings_rows.dart';
@@ -200,7 +201,7 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
                         ),
                       ),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        InkWell(
+                        M3InkWell(
                           borderRadius: BorderRadius.circular(24),
                           onTap: () => setState(() {
                             if (isExpanded) { _expanded.remove(r.version); }

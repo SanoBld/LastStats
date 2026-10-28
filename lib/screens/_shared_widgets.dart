@@ -317,7 +317,7 @@ class _ItemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return InkWell(
+    return M3InkWell(
       borderRadius: AppRadius.mdR,
       child: Padding(padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
         child: Row(children: [

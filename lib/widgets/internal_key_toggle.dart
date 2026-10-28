@@ -1,5 +1,6 @@
 // lib/widgets/internal_key_toggle.dart
 // Checkbox "Use the app's built-in key" with a "?" button explaining the risks.
+import '../theme/m3_interaction.dart';
 import 'package:flutter/material.dart';
 import '../l10n/extra_strings.dart';
 
@@ -27,7 +28,7 @@ class InternalKeyToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    return InkWell(
+    return M3InkWell(
       borderRadius: BorderRadius.circular(12),
       onTap: () => onChanged(!value),
       child: Row(children: [

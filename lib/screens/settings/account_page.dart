@@ -3,6 +3,7 @@
 //  AccountPage — Last.fm account management (multi-account, max 3)
 // ══════════════════════════════════════════════════════════════════════════
 
+import '../../theme/m3_interaction.dart';
 import 'dart:convert';
 import '../../widgets/m3_components.dart';
 import '../../theme/m3_shapes.dart';
@@ -804,7 +805,7 @@ class _AddAccountDialogState extends State<_AddAccountDialog> {
 
           if (widget.existingApiKey != null) ...[
             const SizedBox(height: 10),
-            InkWell(
+            M3InkWell(
               borderRadius: BorderRadius.circular(12),
               onTap: () => setState(() {
                 _sameApiKey = !_sameApiKey;

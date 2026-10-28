@@ -395,7 +395,7 @@ class _HistTrackRow extends StatelessWidget {
       color: Color.lerp(scheme.primaryContainer, scheme.surface, 0.55),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       clipBehavior: Clip.antiAlias,
-      child: InkWell(
+      child: M3InkWell(
       onTap: () {
         _haptic(_HapticImpact.light);
         showDetailSheet(
