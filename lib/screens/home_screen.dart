@@ -68,6 +68,7 @@ import '../services/favorites_folders_service.dart';
 import 'track_row_tile.dart';
 import '../theme/m3_motion.dart';
 import '../theme/m3_shapes.dart';
+import '../theme/m3_interaction.dart';
 import '../widgets/skeleton.dart';
 import '../widgets/m3_action_row.dart';
 import '../widgets/m3_components.dart';
@@ -239,7 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // fades in (Material 3 "fade through"). Pages stay alive for state.
     // Solid status bar slides in once a tab's content is scrolled.
     return ScrollStatusBarHost(
-      color: Theme.of(context).colorScheme.surfaceContainer,
+      color: m3TopBarColor(Theme.of(context).colorScheme),
       resetToken: _idx,
       enabled: _idx != 3, // Charts tab: no solid status bar
       // Dashboard: wait until its 170dp header image has fully collapsed.

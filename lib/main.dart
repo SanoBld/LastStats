@@ -38,6 +38,7 @@ import 'widgets/custom_title_bar.dart';
 import 'services/internal_keys.dart';
 import 'theme/m3_motion.dart';
 import 'theme/m3_shapes.dart';
+import 'theme/m3_interaction.dart';
 import 'package:app_links/app_links.dart';
 
 // navigatorKey now lives in notification_service.dart so the notification
@@ -484,20 +485,20 @@ class LastStatsApp extends StatelessWidget {
                                         : NavigationDestinationLabelBehavior.alwaysHide;
                                     // Inject labelBehavior into both themes so it
                                     // takes effect regardless of widget-level override.
-                                    final lTheme = applyM3Shapes(ThemeData(
+                                    final lTheme = applyM3Interaction(applyM3Shapes(ThemeData(
                                       colorScheme: lightScheme,
                                       useMaterial3: true,
                                       pageTransitionsTheme: kM3PageTransitions,
                                       navigationBarTheme: NavigationBarThemeData(
                                           labelBehavior: navBehavior),
-                                    ));
-                                    final dTheme = applyM3Shapes(ThemeData(
+                                    )));
+                                    final dTheme = applyM3Interaction(applyM3Shapes(ThemeData(
                                       colorScheme: darkScheme,
                                       useMaterial3: true,
                                       pageTransitionsTheme: kM3PageTransitions,
                                       navigationBarTheme: NavigationBarThemeData(
                                           labelBehavior: navBehavior),
-                                    ));
+                                    )));
                                     return MaterialApp(
                                       navigatorKey:               navigatorKey,
                                       title:                      'LastStats',

@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 import '../theme/m3_motion.dart';
 import '../app_state.dart';
 import '../theme/m3_shapes.dart';
+import '../theme/m3_interaction.dart';
 import 'skeleton.dart';
 
 BorderRadius _clampRadius(BorderRadius b) {
@@ -280,10 +281,7 @@ class M3AppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
-      backgroundColor: WidgetStateColor.resolveWith((states) =>
-          states.contains(WidgetState.scrolledUnder)
-              ? scheme.surfaceContainer
-              : scheme.surface),
+      backgroundColor: m3TopBarColor(scheme),
       leading: Padding(
         padding: const EdgeInsets.only(left: 12),
         child: Center(
