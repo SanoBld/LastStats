@@ -478,7 +478,7 @@ class AppStringsJa implements AppStrings {
   @override String get dashChartMonthlyLabel => '月別バー';
   @override String get settingsDisplayNameSection => '表示名';
   @override String get settingsDisplayNameLabel => '何と呼べばいい？';
-  @override String get settingsDisplayNameHint => '例: Sano Bld — 空欄の場合はアカウント名を使用します';
+  @override String get settingsDisplayNameHint => '例: Noham — 空欄の場合はアカウント名を使用します';
   @override String get newsSearchHint => 'お知らせを検索…';
   @override String get aboutOpenSourceLibs => 'オープンソースライブラリ';
   @override String get aboutOpenSourceLibsSub => 'このアプリの構築に使用したすべての Flutter パッケージ。';

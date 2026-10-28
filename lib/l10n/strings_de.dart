@@ -478,7 +478,7 @@ class AppStringsDe implements AppStrings {
   @override String get dashChartMonthlyLabel => 'Monatsbalken';
   @override String get settingsDisplayNameSection => 'Eigener Name';
   @override String get settingsDisplayNameLabel => 'Wie sollen wir Sie nennen?';
-  @override String get settingsDisplayNameHint => 'Z. B. Sano Bld — leer lassen, um den Kontonamen zu verwenden';
+  @override String get settingsDisplayNameHint => 'Z. B. Noham — leer lassen, um den Kontonamen zu verwenden';
   @override String get newsSearchHint => 'News durchsuchen…';
   @override String get aboutOpenSourceLibs => 'Open-Source-Bibliotheken';
   @override String get aboutOpenSourceLibsSub => 'Alle Flutter-Pakete, die für diese App verwendet wurden.';

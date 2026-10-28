@@ -478,7 +478,7 @@ class AppStringsRu implements AppStrings {
   @override String get dashChartMonthlyLabel => 'Столбцы по месяцам';
   @override String get settingsDisplayNameSection => 'Своё имя';
   @override String get settingsDisplayNameLabel => 'Как вас называть?';
-  @override String get settingsDisplayNameHint => 'Например, Sano Bld — оставьте пустым, чтобы использовать имя аккаунта';
+  @override String get settingsDisplayNameHint => 'Например, Noham — оставьте пустым, чтобы использовать имя аккаунта';
   @override String get newsSearchHint => 'Поиск по новостям…';
   @override String get aboutOpenSourceLibs => 'Библиотеки с открытым кодом';
   @override String get aboutOpenSourceLibsSub => 'Все пакеты Flutter, использованные для создания приложения.';

@@ -527,7 +527,7 @@ class AppStringsZh implements AppStrings {
   @override String get dashChartMonthlyLabel => '月度柱状图';
   @override String get settingsDisplayNameSection => '自定义名称';
   @override String get settingsDisplayNameLabel => '我们该怎么称呼您？';
-  @override String get settingsDisplayNameHint => '例如 Sano Bld — 留空则使用账号名称';
+  @override String get settingsDisplayNameHint => '例如 Noham — 留空则使用账号名称';
   @override String get newsSearchHint => '搜索动态…';
   @override String get aboutOpenSourceLibs => '开源库';
   @override String get aboutOpenSourceLibsSub => '构建此应用所使用的所有 Flutter 包。';

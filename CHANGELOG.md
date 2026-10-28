@@ -42,5 +42,6 @@
 - Dashboard: tapping your profile now opens a centered bubble with your profile info and every shortcut (settings, notifications, recaps, achievements, profile scanner, refresh, reset cache)
 - Dashboard: the settings button and its long-press menu are gone, the notification bell only shows in the header when you have unread news
 - Year recap: the shared image uses your display name when you set one
+- Dashboard: the profile bubble tiles are all the same size, tapping the profile card goes straight to the account page, and a new Connections shortcut was added
 - Fixed the preview picking a song from the wrong artist
 - New texts translated in all languages

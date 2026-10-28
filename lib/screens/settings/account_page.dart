@@ -795,7 +795,7 @@ class _AddAccountDialogState extends State<_AddAccountDialog> {
             autofocus: true,
             textInputAction: TextInputAction.next,
             decoration: InputDecoration(
-              labelText: L.acctUsernameLabel,
+              labelText: L.acctUsernameLabel, hintText: 'SanoBld',
               prefixIcon: const Icon(Icons.person_outline_rounded),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),

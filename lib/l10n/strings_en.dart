@@ -530,7 +530,7 @@ class AppStringsEn implements AppStrings {
   @override String get dashChartMonthlyLabel => 'Monthly bars';
   @override String get settingsDisplayNameSection => 'Custom name';
   @override String get settingsDisplayNameLabel => 'What should we call you?';
-  @override String get settingsDisplayNameHint => 'E.g. Sano Bld — leave empty to use your account name';
+  @override String get settingsDisplayNameHint => 'E.g. Noham — leave empty to use your account name';
   @override String get newsSearchHint => 'Search the news…';
   @override String get aboutOpenSourceLibs => 'Open-source libraries';
   @override String get aboutOpenSourceLibsSub => 'Every Flutter package used to build this app.';

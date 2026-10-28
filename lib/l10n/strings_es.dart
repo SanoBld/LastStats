@@ -530,7 +530,7 @@ class AppStringsEs implements AppStrings {
   @override String get dashChartMonthlyLabel => 'Barras mensuales';
   @override String get settingsDisplayNameSection => 'Nombre personalizado';
   @override String get settingsDisplayNameLabel => '¿Cómo quiere que le llamemos?';
-  @override String get settingsDisplayNameHint => 'Ej. Sano Bld — déjelo vacío para usar el nombre de su cuenta';
+  @override String get settingsDisplayNameHint => 'Ej. Noham — déjelo vacío para usar el nombre de su cuenta';
   @override String get newsSearchHint => 'Buscar en las noticias…';
   @override String get aboutOpenSourceLibs => 'Bibliotecas de código abierto';
   @override String get aboutOpenSourceLibsSub => 'Todos los paquetes de Flutter usados para crear la app.';

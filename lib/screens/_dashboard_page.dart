@@ -894,8 +894,10 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
             onTap: () => Navigator.pop(ctx, id),
             child: Container(
               decoration: BoxDecoration(color: sc.secondaryContainer.withValues(alpha: 0.55), borderRadius: BorderRadius.circular(18)),
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
+              height: 88,
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, children: [
                 Stack(clipBehavior: Clip.none, children: [
                   Icon(icon, size: 24, color: fg),
                   if (badge > 0)
@@ -917,14 +919,15 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         }
 
         final tiles = <Widget>[
-          tile('settings', Icons.settings_rounded, L.navSettings),
           tile('news', Icons.notifications_rounded, L.newsWhatsNew, badge: showNewsBadgeNotifier.value ? _unreadCount : 0),
           tile('recap', Icons.auto_stories_rounded, L.dashRecap),
           tile('year_recap', Icons.celebration_rounded, tx('yr_title')),
           if (achievementsEnabledNotifier.value) tile('achievements', Icons.emoji_events_outlined, L.achvTitle),
           tile('qrscan', Icons.qr_code_scanner_rounded, tx('ui_scan_a_profile')),
+          tile('connections', Icons.link_rounded, tx('conn_btn_t')),
           tile('refresh', Icons.refresh_rounded, L.dashRefresh),
           tile('reset', Icons.delete_sweep_outlined, L.dashResetCache, color: sc.error),
+          tile('settings', Icons.settings_rounded, L.navSettings),
         ];
 
         return Dialog(
@@ -1010,10 +1013,13 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     if (!mounted) return;
     switch (result) {
       case 'profile':
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => Scaffold(
-          appBar: M3AppBar(title: L.navSettings),
-          body: AccountPage(username: widget.username),
-        )));
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => AccountPage(username: widget.username),
+        ));
+      case 'connections':
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => ConnectionsPage(username: widget.username),
+        ));
       case 'settings':
         await _openSettings();
       case 'news':
