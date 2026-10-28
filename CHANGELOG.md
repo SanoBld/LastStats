@@ -44,7 +44,3 @@
 - Year recap: the shared image uses your display name when you set one
 - Fixed the preview picking a song from the wrong artist
 - New texts translated in all languages
-
-## v4.2.1
-
-- Corrects the favorites button on the dashboard
