@@ -29,16 +29,6 @@ ThemeData applyM3Interaction(ThemeData t) {
       scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
     ),
-    // Filter pills / chips: same pressed fill as every other button, inside
-    // their own pill shape.
-    chipTheme: t.chipTheme.copyWith(
-      overlayColor: WidgetStateProperty.resolveWith<Color?>((st) =>
-          st.contains(WidgetState.pressed)
-              ? s.onSurface.withValues(alpha: kM3PressAlpha)
-              : st.contains(WidgetState.hovered)
-                  ? s.onSurface.withValues(alpha: kM3PressAlpha / 2)
-                  : null),
-    ),
     filledButtonTheme:   FilledButtonThemeData(style: _noRipple(t.filledButtonTheme.style)),
     elevatedButtonTheme: ElevatedButtonThemeData(style: _noRipple(t.elevatedButtonTheme.style)),
     outlinedButtonTheme: OutlinedButtonThemeData(style: _noRipple(t.outlinedButtonTheme.style)),
@@ -88,7 +78,7 @@ class M3InkWell extends StatelessWidget {
       borderRadius: customBorder != null
           ? null
           : (borderRadius ?? BorderRadius.circular(kM3PressRadius)),
-      enableFeedback: enableFeedback,
+      enableFeedback: enableFeedback ?? true,
       splashFactory: kM3SplashFactory,
       splashColor: Colors.transparent,
       highlightColor: s.onSurface.withValues(alpha: kM3PressAlpha),

@@ -45,7 +45,7 @@
 - Top bar no longer turns grey when scrolling, and pressed buttons fill their own shape instead of showing a round Android ripple
 - New central file lib/theme/m3_interaction.dart for press and top-bar style
 - Interface: every tappable area in the app (lists, cards, settings rows, chips, sheets) now uses the same pressed fill, which follows its own rounded shape
-- Interface: round buttons such as the back arrow stay round when pressed, and filter pills get the same pressed fill
+- Interface: round buttons such as the back arrow stay round when pressed
 - Dashboard: the profile bubble tiles are all the same size, tapping the profile card goes straight to the account page, and a new Connections shortcut was added
 - Fixed the preview picking a song from the wrong artist
 - New texts translated in all languages
