@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-28T13:52:54Z",
+  "updated": "2026-10-28T14:07:54Z",
   "commits": [
+    {
+      "sha": "f94edbaf0607b69e64ea70654cedfb53fadff63f",
+      "message": "feat: ajout de la gestion des interactions et mise à jour des styles de la barre supérieure",
+      "date": "2026-10-28T14:05:21Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/f94edbaf0607b69e64ea70654cedfb53fadff63f",
+      "tags": []
+    },
     {
       "sha": "5b7992e5880256a73d68759f34268113aff4e7f3",
       "message": "feat: mise à jour des chaînes de localisation avec des exemples de noms d'utilisateur et ajout d'un raccourci vers les connexions dans le tableau de bord",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/8b6b900583b8741e46abd269dd2f256f454b17ef",
-      "tags": []
-    },
-    {
-      "sha": "797aa7ef77c2417c57eac5ea9379a616514a0a68",
-      "message": "refactor: mettre à jour les crédits et améliorer la recherche d'images sur YouTube Music",
-      "date": "2026-08-23T19:31:24Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/797aa7ef77c2417c57eac5ea9379a616514a0a68",
       "tags": []
     }
   ]
