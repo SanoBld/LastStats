@@ -339,7 +339,11 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Row(
             children: [
               // ── Side rail ────────────────────────────────────────────────
-              SizedBox(
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: M3Motion.emphasized,
+                clipBehavior: Clip.hardEdge,
+                decoration: const BoxDecoration(),
                 width: railWidth,
                 child: Column(
                   children: [
@@ -496,36 +500,43 @@ class _SideRail extends StatelessWidget {
                       child: M3InkWell(
                         customBorder: shape,
                         onTap: () => onSelected(i),
-                        child: Row(
-                          mainAxisAlignment: collapsed
-                              ? MainAxisAlignment.center
-                              : MainAxisAlignment.start,
-                          children: [
-                            if (!collapsed) const SizedBox(width: 18),
-                            Icon(
-                              i == selectedIndex ? items[i].selectedIcon : items[i].icon,
-                              size: 24,
-                              color: i == selectedIndex ? onPill : idle,
-                            ),
-                            if (!collapsed) ...[
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Text(
-                                  items[i].label,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: text.labelLarge?.copyWith(
-                                    fontSize: 14,
-                                    fontWeight: i == selectedIndex
-                                        ? FontWeight.w700
-                                        : FontWeight.w500,
-                                    color: i == selectedIndex ? onPill : idle,
+                        child: ClipRect(
+                          child: OverflowBox(
+                            alignment: Alignment.centerLeft,
+                            minWidth: 0,
+                            maxWidth: 216,
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 16),
+                                Icon(
+                                  i == selectedIndex ? items[i].selectedIcon : items[i].icon,
+                                  size: 24,
+                                  color: i == selectedIndex ? onPill : idle,
+                                ),
+                                const SizedBox(width: 14),
+                                SizedBox(
+                                  width: 150,
+                                  child: AnimatedOpacity(
+                                    duration: const Duration(milliseconds: 200),
+                                    opacity: collapsed ? 0 : 1,
+                                    child: Text(
+                                      items[i].label,
+                                      maxLines: 1,
+                                      softWrap: false,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: text.labelLarge?.copyWith(
+                                        fontSize: 14,
+                                        fontWeight: i == selectedIndex
+                                            ? FontWeight.w700
+                                            : FontWeight.w500,
+                                        color: i == selectedIndex ? onPill : idle,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(width: 12),
-                            ],
-                          ],
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ),

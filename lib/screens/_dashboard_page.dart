@@ -889,11 +889,14 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         final sc = Theme.of(ctx).colorScheme;
         Widget tile(String id, IconData icon, String label, {Color? color, int badge = 0}) {
           final fg = color ?? sc.onSecondaryContainer;
-          return M3InkWell(
+          return Material(
+            color: sc.secondaryContainer.withValues(alpha: 0.55),
             borderRadius: BorderRadius.circular(18),
-            onTap: () => Navigator.pop(ctx, id),
+            clipBehavior: Clip.antiAlias,
+            child: M3InkWell(
+            borderRadius: BorderRadius.circular(18),
+            onTap: () { m3Haptic(M3Haptic.light); Navigator.pop(ctx, id); },
             child: Container(
-              decoration: BoxDecoration(color: sc.secondaryContainer.withValues(alpha: 0.55), borderRadius: BorderRadius.circular(18)),
               height: 88,
               alignment: Alignment.center,
               padding: const EdgeInsets.symmetric(horizontal: 6),
@@ -914,6 +917,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                 Text(label, maxLines: 2, textAlign: TextAlign.center, overflow: TextOverflow.ellipsis,
                     style: TextStyle(color: fg, fontSize: 11.5, fontWeight: FontWeight.w700, height: 1.15)),
               ]),
+            ),
             ),
           );
         }

@@ -684,23 +684,26 @@ class _ChartsPageState extends State<_ChartsPage>
                 spacing: 10, runSpacing: 10,
                 children: _kCharts.map((c) {
                   final label = tx(c.$2);
-                  return M3InkWell(
+                  return Material(
+                    color: scheme.surfaceContainerHigh,
+                    clipBehavior: Clip.antiAlias,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.4)),
+                    ),
+                    child: M3InkWell(
                     borderRadius: BorderRadius.circular(16),
                     onTap: () { _haptic(_HapticImpact.selection); Navigator.pop(sh, c.$1); },
                     child: Container(
                       width: (MediaQuery.of(sh).size.width - 16 * 2 - 10) / 2,
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                      decoration: BoxDecoration(
-                        color: scheme.surfaceContainerHigh,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4)),
-                      ),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Icon(c.$3, color: scheme.primary, size: 22),
                         const SizedBox(height: 8),
                         Text(label, maxLines: 2, overflow: TextOverflow.ellipsis,
                             style: txt.labelLarge?.copyWith(fontWeight: FontWeight.w700)),
                       ]),
+                    ),
                     ),
                   );
                 }).toList(),

@@ -4,6 +4,7 @@
 //  (Shapes live in m3_shapes.dart, motion in m3_motion.dart.)
 // ─────────────────────────────────────────────────────────────────────────
 import 'package:flutter/material.dart';
+import 'm3_motion.dart';
 
 /// How strong the "pressed" fill is (drawn inside the widget's own shape).
 const double kM3PressAlpha = 0.12;
@@ -43,11 +44,17 @@ ThemeData applyM3Interaction(ThemeData t) {
 /// Default corner radius of the pressed fill when a tappable has no shape.
 const double kM3PressRadius = 16;
 
+/// Scale of a tappable while pressed (1 = no bounce).
+const double kM3BounceScale = 0.97;
+
 /// THE tappable of the app. Use it instead of InkWell everywhere.
 /// - no round Android ripple, the pressed state fills the exact shape
 /// - if no shape is given, a rounded one is used (never a sharp square)
 /// - same pressed color on every page (see [kM3PressAlpha])
-class M3InkWell extends StatelessWidget {
+/// - small "bounce" (scale down while the finger is down), like the buttons
+///   and cards of the app. Widgets that animate themselves (they pass
+///   [onHighlightChanged]) or that set [bounce] to false are left alone.
+class M3InkWell extends StatefulWidget {
   const M3InkWell({
     super.key,
     this.child,
@@ -57,6 +64,8 @@ class M3InkWell extends StatelessWidget {
     this.borderRadius,
     this.customBorder,
     this.enableFeedback,
+    this.bounce = true,
+    this.bounceScale = kM3BounceScale,
   });
 
   final Widget? child;
@@ -66,24 +75,47 @@ class M3InkWell extends StatelessWidget {
   final BorderRadius? borderRadius;
   final ShapeBorder? customBorder;
   final bool? enableFeedback;
+  final bool bounce;
+  final double bounceScale;
+
+  @override
+  State<M3InkWell> createState() => _M3InkWellState();
+}
+
+class _M3InkWellState extends State<M3InkWell> {
+  bool _down = false;
+
+  bool get _bounces =>
+      widget.bounce &&
+      widget.onHighlightChanged == null &&
+      (widget.onTap != null || widget.onLongPress != null);
 
   @override
   Widget build(BuildContext context) {
     final s = Theme.of(context).colorScheme;
-    return InkWell(
-      onTap: onTap,
-      onLongPress: onLongPress,
-      onHighlightChanged: onHighlightChanged,
-      customBorder: customBorder,
-      borderRadius: customBorder != null
+    final ink = InkWell(
+      onTap: widget.onTap,
+      onLongPress: widget.onLongPress,
+      onHighlightChanged: widget.onHighlightChanged ??
+          (_bounces ? (v) { if (mounted) setState(() => _down = v); } : null),
+      customBorder: widget.customBorder,
+      borderRadius: widget.customBorder != null
           ? null
-          : (borderRadius ?? BorderRadius.circular(kM3PressRadius)),
-      enableFeedback: enableFeedback ?? true,
+          : (widget.borderRadius ?? BorderRadius.circular(kM3PressRadius)),
+      enableFeedback: widget.enableFeedback ?? true,
       splashFactory: kM3SplashFactory,
       splashColor: Colors.transparent,
       highlightColor: s.onSurface.withValues(alpha: kM3PressAlpha),
       hoverColor: s.onSurface.withValues(alpha: kM3PressAlpha / 2),
-      child: child,
+      child: widget.child,
+    );
+    if (!_bounces) return ink;
+    final down = _down && !M3Motion.reduced(context);
+    return AnimatedScale(
+      scale: down ? widget.bounceScale : 1.0,
+      duration: M3Motion.spatialFastDuration,
+      curve: M3Motion.spatialFast,
+      child: ink,
     );
   }
 }
