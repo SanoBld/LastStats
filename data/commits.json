@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-28T13:30:38Z",
+  "updated": "2026-10-28T13:52:54Z",
   "commits": [
+    {
+      "sha": "5b7992e5880256a73d68759f34268113aff4e7f3",
+      "message": "feat: mise à jour des chaînes de localisation avec des exemples de noms d'utilisateur et ajout d'un raccourci vers les connexions dans le tableau de bord",
+      "date": "2026-10-28T13:50:22Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/5b7992e5880256a73d68759f34268113aff4e7f3",
+      "tags": []
+    },
     {
       "sha": "e40b9f7c331cd096500bafc4a2ba36d61c448664",
       "message": "fix",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/797aa7ef77c2417c57eac5ea9379a616514a0a68",
-      "tags": []
-    },
-    {
-      "sha": "92193537e16629187abfc5f7dc514155f21cb114",
-      "message": "refactor: mettre à jour le changelog avec de nouvelles fonctionnalités et améliorations dans les paramètres et la page À propos",
-      "date": "2026-08-23T19:11:40Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/92193537e16629187abfc5f7dc514155f21cb114",
       "tags": []
     }
   ]
