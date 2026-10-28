@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-28T14:07:54Z",
+  "updated": "2026-10-28T14:11:03Z",
   "commits": [
+    {
+      "sha": "fbd8146270111a0e370835a8dd336d39ff919652",
+      "message": "feat: mise à jour de l'interface avec M3InkWell pour une interaction cohérente dans toute l'application",
+      "date": "2026-10-28T14:10:42Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/fbd8146270111a0e370835a8dd336d39ff919652",
+      "tags": []
+    },
     {
       "sha": "f94edbaf0607b69e64ea70654cedfb53fadff63f",
       "message": "feat: ajout de la gestion des interactions et mise à jour des styles de la barre supérieure",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/d91dba82e8e4b165c561cf1626d345c6dc8e09a2",
-      "tags": []
-    },
-    {
-      "sha": "8b6b900583b8741e46abd269dd2f256f454b17ef",
-      "message": "refactor: ajouter une étiquette de source d'image pour les artistes, albums et pistes",
-      "date": "2026-08-24T10:36:47Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/8b6b900583b8741e46abd269dd2f256f454b17ef",
       "tags": []
     }
   ]
