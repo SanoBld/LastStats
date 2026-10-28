@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-28T14:15:40Z",
+  "updated": "2026-10-28T19:29:25Z",
   "commits": [
+    {
+      "sha": "d09393c0be9b8420b1ff37fd601078d9ad975d49",
+      "message": "feat: amélioration de l'interface avec des animations et des comportements de pression cohérents pour les éléments interactifs",
+      "date": "2026-10-28T19:26:15Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/d09393c0be9b8420b1ff37fd601078d9ad975d49",
+      "tags": []
+    },
     {
       "sha": "fdea1a9e6c6d9e1b5884b7ae1775403b8f79a332",
       "message": "feat: mise à jour des styles d'interaction pour une cohérence dans l'application et ajustement du comportement des boutons",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/9ffc423a693dc375f7bebb2068ec8bbf4c006f58",
-      "tags": []
-    },
-    {
-      "sha": "e11d5bb796d7562764e3cf2169dd6b377013007c",
-      "message": "refactor: réorganiser la logique de récupération des URL d'artistes, d'albums et de pistes pour privilégier les sources de meilleure qualité",
-      "date": "2026-08-24T11:05:30Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/e11d5bb796d7562764e3cf2169dd6b377013007c",
       "tags": []
     }
   ]
