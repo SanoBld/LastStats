@@ -81,16 +81,6 @@
       scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
     ),
-    &#47;&#47; Filter pills &#47; chips: same pressed fill as every other button, inside
-    &#47;&#47; their own pill shape.
-    chipTheme: t.chipTheme.copyWith(
-      overlayColor: WidgetStateProperty.resolveWith&lt;Color?&gt;((st) =&gt;
-          st.contains(WidgetState.pressed)
-              ? s.onSurface.withValues(alpha: kM3PressAlpha)
-              : st.contains(WidgetState.hovered)
-                  ? s.onSurface.withValues(alpha: kM3PressAlpha &#47; 2)
-                  : null),
-    ),
     filledButtonTheme:   FilledButtonThemeData(style: _noRipple(t.filledButtonTheme.style)),
     elevatedButtonTheme: ElevatedButtonThemeData(style: _noRipple(t.elevatedButtonTheme.style)),
     outlinedButtonTheme: OutlinedButtonThemeData(style: _noRipple(t.outlinedButtonTheme.style)),

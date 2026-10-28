@@ -118,7 +118,7 @@ Widget build(BuildContext context) {
     borderRadius: customBorder != null
         ? null
         : (borderRadius ?? BorderRadius.circular(kM3PressRadius)),
-    enableFeedback: enableFeedback,
+    enableFeedback: enableFeedback ?? true,
     splashFactory: kM3SplashFactory,
     splashColor: Colors.transparent,
     highlightColor: s.onSurface.withValues(alpha: kM3PressAlpha),
