@@ -59,6 +59,9 @@
 <li>no round Android ripple, the pressed state fills the exact shape</li>
 <li>if no shape is given, a rounded one is used (never a sharp square)</li>
 <li>same pressed color on every page (see <a href="../theme_m3_interaction/kM3PressAlpha-constant.html">kM3PressAlpha</a>)</li>
+<li>small "bounce" (scale down while the finger is down), like the buttons
+and cards of the app. Widgets that animate themselves (they pass
+<a href="../theme_m3_interaction/M3InkWell/onHighlightChanged.html">onHighlightChanged</a>) or that set <a href="../theme_m3_interaction/M3InkWell/bounce.html">bounce</a> to false are left alone.</li>
 </ul>
 </section>
 
@@ -72,7 +75,7 @@
       <li><a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></li>
         <li><a href="https://api.flutter.dev/flutter/foundation/DiagnosticableTree-class.html">DiagnosticableTree</a></li>
         <li><a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></li>
-        <li><a href="https://api.flutter.dev/flutter/widgets/StatelessWidget-class.html">StatelessWidget</a></li>
+        <li><a href="https://api.flutter.dev/flutter/widgets/StatefulWidget-class.html">StatefulWidget</a></li>
       <li>M3InkWell</li>
     </ul>
   </dd>
@@ -93,7 +96,7 @@
     <h2>Constructors</h2>
     <dl class="constructor-summary-list">
         <dt id="M3InkWell.new" class="callable">
-          <span class="name"><a href="../theme_m3_interaction/M3InkWell/M3InkWell.html">M3InkWell</a></span><span class="signature">({<span class="parameter" id="param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span> <span class="parameter-name">key</span>, </span><span class="parameter" id="param-child"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a>?</span> <span class="parameter-name">child</span>, </span><span class="parameter" id="param-onTap"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/gestures/GestureTapCallback.html">GestureTapCallback</a>?</span> <span class="parameter-name">onTap</span>, </span><span class="parameter" id="param-onLongPress"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/gestures/GestureLongPressCallback.html">GestureLongPressCallback</a>?</span> <span class="parameter-name">onLongPress</span>, </span><span class="parameter" id="param-onHighlightChanged"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/ValueChanged.html">ValueChanged</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>&gt;</span>?</span> <span class="parameter-name">onHighlightChanged</span>, </span><span class="parameter" id="param-borderRadius"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/painting/BorderRadius-class.html">BorderRadius</a>?</span> <span class="parameter-name">borderRadius</span>, </span><span class="parameter" id="param-customBorder"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/painting/ShapeBorder-class.html">ShapeBorder</a>?</span> <span class="parameter-name">customBorder</span>, </span><span class="parameter" id="param-enableFeedback"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">enableFeedback</span></span>})</span>
+          <span class="name"><a href="../theme_m3_interaction/M3InkWell/M3InkWell.html">M3InkWell</a></span><span class="signature">({<span class="parameter" id="param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span> <span class="parameter-name">key</span>, </span><span class="parameter" id="param-child"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a>?</span> <span class="parameter-name">child</span>, </span><span class="parameter" id="param-onTap"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/gestures/GestureTapCallback.html">GestureTapCallback</a>?</span> <span class="parameter-name">onTap</span>, </span><span class="parameter" id="param-onLongPress"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/gestures/GestureLongPressCallback.html">GestureLongPressCallback</a>?</span> <span class="parameter-name">onLongPress</span>, </span><span class="parameter" id="param-onHighlightChanged"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/ValueChanged.html">ValueChanged</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>&gt;</span>?</span> <span class="parameter-name">onHighlightChanged</span>, </span><span class="parameter" id="param-borderRadius"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/painting/BorderRadius-class.html">BorderRadius</a>?</span> <span class="parameter-name">borderRadius</span>, </span><span class="parameter" id="param-customBorder"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/painting/ShapeBorder-class.html">ShapeBorder</a>?</span> <span class="parameter-name">customBorder</span>, </span><span class="parameter" id="param-enableFeedback"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">enableFeedback</span>, </span><span class="parameter" id="param-bounce"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">bounce</span> = <span class="default-value">true</span>, </span><span class="parameter" id="param-bounceScale"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">bounceScale</span> = <span class="default-value">kM3BounceScale</span></span>})</span>
         </dt>
         <dd>
           
@@ -110,6 +113,30 @@
         <dt id="borderRadius" class="property">
   <span class="name"><a href="../theme_m3_interaction/M3InkWell/borderRadius.html">borderRadius</a></span>
   <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/painting/BorderRadius-class.html">BorderRadius</a>?</span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="bounce" class="property">
+  <span class="name"><a href="../theme_m3_interaction/M3InkWell/bounce.html">bounce</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="bounceScale" class="property">
+  <span class="name"><a href="../theme_m3_interaction/M3InkWell/bounceScale.html">bounceScale</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span>
   
 
 </dt>
@@ -236,29 +263,29 @@
       id="instance-methods">
     <h2>Methods</h2>
     <dl class="callables">
-        <dt id="build" class="callable">
-  <span class="name"><a href="../theme_m3_interaction/M3InkWell/build.html">build</a></span><span class="signature">(<wbr><span class="parameter" id="build-param-context"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span></span>)
-    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
-  </span>
-  
-
-</dt>
-<dd>
-  Describes the part of the user interface represented by this widget.
-  <div class="features"><span class="feature">override</span></div>
-
-</dd>
-
         <dt id="createElement" class="callable inherited">
-  <span class="name"><a href="https://api.flutter.dev/flutter/widgets/StatelessWidget/createElement.html">createElement</a></span><span class="signature">(<wbr>)
-    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/StatelessElement-class.html">StatelessElement</a></span>
+  <span class="name"><a href="https://api.flutter.dev/flutter/widgets/StatefulWidget/createElement.html">createElement</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/StatefulElement-class.html">StatefulElement</a></span>
   </span>
   
 
 </dt>
 <dd class="inherited">
-  Creates a <a href="https://api.flutter.dev/flutter/widgets/StatelessElement-class.html">StatelessElement</a> to manage this widget's location in the tree.
+  Creates a <a href="https://api.flutter.dev/flutter/widgets/StatefulElement-class.html">StatefulElement</a> to manage this widget's location in the tree.
   <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="createState" class="callable">
+  <span class="name"><a href="../theme_m3_interaction/M3InkWell/createState.html">createState</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/State-class.html">State</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../theme_m3_interaction/M3InkWell-class.html">M3InkWell</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Creates the mutable state for this widget at a given location in the tree.
+  <div class="features"><span class="feature">override</span></div>
 
 </dd>
 
