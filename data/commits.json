@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-29T19:37:40Z",
+  "updated": "2026-10-29T20:50:26Z",
   "commits": [
+    {
+      "sha": "098af753d208bf6f1ec318000abb624794ff09ef",
+      "message": "feat: mise à jour du changelog et amélioration de la gestion des couleurs dans l'application",
+      "date": "2026-10-29T20:47:29Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/098af753d208bf6f1ec318000abb624794ff09ef",
+      "tags": []
+    },
     {
       "sha": "4b0e3a69d0a5f79f65b2532293c75820d018b76a",
       "message": "feat: enhance appearance settings with new color harmony options and API data cache limits\n\n- Added new color harmony options: tinted, classic, vivid, and soft to the appearance settings.\n- Implemented user-defined API data cache limits with corresponding UI elements for setting and confirming cache clear actions.\n- Updated localization files for English, Spanish, French, Italian, Japanese, Portuguese, Russian, and Chinese to reflect new strings related to color harmony and cache management.\n- Refactored dashboard and year recap pages to incorporate new spinning shape component for visual enhancements.\n- Improved cache management logic to enforce size limits on API data and added relevant UI components for user interaction.",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/bec70fdc87f7d5da329a7078af74c87448745cbe",
-      "tags": []
-    },
-    {
-      "sha": "7a2e110dfe31054399b45bd7fe72272504072716",
-      "message": "refactor: améliorer la gestion du cache d'URL en ajoutant le suivi des sources",
-      "date": "2026-08-25T20:03:23Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/7a2e110dfe31054399b45bd7fe72272504072716",
       "tags": []
     }
   ]
