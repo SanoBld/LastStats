@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-29T20:58:15Z",
+  "updated": "2026-10-29T21:09:48Z",
   "commits": [
+    {
+      "sha": "1a0b7cac341485c323a72078c6ed2e6a2a3dcf90",
+      "message": "feat: ajout de la gestion de la concurrence pour les déploiements sur gh-pages et amélioration de l'interface utilisateur avec des animations et des comportements de pression cohérents",
+      "date": "2026-10-29T21:09:26Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/1a0b7cac341485c323a72078c6ed2e6a2a3dcf90",
+      "tags": []
+    },
     {
       "sha": "098af753d208bf6f1ec318000abb624794ff09ef",
       "message": "feat: mise à jour du changelog et amélioration de la gestion des couleurs dans l'application",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/847a1c7ebf4dc0cb0be538c6313c08da59c5bd8c",
-      "tags": []
-    },
-    {
-      "sha": "bec70fdc87f7d5da329a7078af74c87448745cbe",
-      "message": "refactor: ajouter la prise en charge multilingue pour le texte de lien et améliorer la logique de mise à l'échelle des vignettes YouTube",
-      "date": "2026-08-26T04:22:04Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/bec70fdc87f7d5da329a7078af74c87448745cbe",
       "tags": []
     }
   ]
