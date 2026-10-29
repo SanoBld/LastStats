@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-29T12:26:56Z",
+  "updated": "2026-10-29T13:01:11Z",
   "commits": [
+    {
+      "sha": "f0e4f7544584c5e54e7eaf72f5a12bb5fe117124",
+      "message": "feat: ajout de la gestion du taux de rafraîchissement pour le mode éco et amélioration de la synchronisation des amis",
+      "date": "2026-10-29T13:00:47Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/f0e4f7544584c5e54e7eaf72f5a12bb5fe117124",
+      "tags": []
+    },
     {
       "sha": "d09393c0be9b8420b1ff37fd601078d9ad975d49",
       "message": "feat: amélioration de l'interface avec des animations et des comportements de pression cohérents pour les éléments interactifs",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/2833d2d7b57f2ff8c5de79ea3377ecb203ef4797",
-      "tags": []
-    },
-    {
-      "sha": "9ffc423a693dc375f7bebb2068ec8bbf4c006f58",
-      "message": "refactor: ajouter la prise en charge multilingue pour les étiquettes de source et améliorer la logique de récupération des sources d'images",
-      "date": "2026-08-24T15:23:56Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/9ffc423a693dc375f7bebb2068ec8bbf4c006f58",
       "tags": []
     }
   ]
