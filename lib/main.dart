@@ -476,6 +476,8 @@ class LastStatsApp extends StatelessWidget {
                                         surfaceContainerHighest: const Color(0xFF1C1C1C),
                                       )
                                     : darkSchemeBase;
+                                final ColorScheme darkSchemeFinal =
+                                    (oled && harmony == 'tinted') ? tintNeutrals(darkScheme) : darkScheme;
 
                                 return ValueListenableBuilder<bool>(
                                   valueListenable: navLabelNotifier,
@@ -493,7 +495,7 @@ class LastStatsApp extends StatelessWidget {
                                           labelBehavior: navBehavior),
                                     )));
                                     final dTheme = applyM3Interaction(applyM3Shapes(ThemeData(
-                                      colorScheme: darkScheme,
+                                      colorScheme: darkSchemeFinal,
                                       useMaterial3: true,
                                       pageTransitionsTheme: kM3PageTransitions,
                                       navigationBarTheme: NavigationBarThemeData(

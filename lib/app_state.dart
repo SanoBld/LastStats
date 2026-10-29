@@ -341,15 +341,16 @@ ColorScheme tintNeutrals(ColorScheme s) {
   if (isNeutralColor(s.primary)) return s;
   final h = HSLColor.fromColor(s.primary).hue;
   final dark = s.brightness == Brightness.dark;
-  Color t(Color c, {double sat = 0.16}) {
+  // Fixed saturation (not "at least"): the tonal palette is almost gray at
+  // these lightness values, so a floor would change nothing visible.
+  Color t(Color c, {double sat = 0.30}) {
     final l = HSLColor.fromColor(c);
-    // Near-white / near-black keep a smaller tint so they stay readable.
-    final k = (l.lightness > 0.93 || l.lightness < 0.07) ? 0.6 : 1.0;
-    final target = (dark ? sat * 0.8 : sat) * k;
-    return HSLColor.fromAHSL(1, h, l.saturation > target ? l.saturation : target, l.lightness).toColor();
+    if (l.lightness < 0.02) return c; // keep pure black (OLED)
+    final target = dark ? sat * 0.75 : sat;
+    return HSLColor.fromAHSL(1, h, target.clamp(0.0, 1.0), l.lightness).toColor();
   }
   return s.copyWith(
-    outline: t(s.outline, sat: 0.12),
+    outline: t(s.outline, sat: 0.22),
     outlineVariant: t(s.outlineVariant),
     surface: t(s.surface), surfaceDim: t(s.surfaceDim), surfaceBright: t(s.surfaceBright),
     surfaceContainerLowest: t(s.surfaceContainerLowest),
@@ -357,8 +358,12 @@ ColorScheme tintNeutrals(ColorScheme s) {
     surfaceContainer: t(s.surfaceContainer),
     surfaceContainerHigh: t(s.surfaceContainerHigh),
     surfaceContainerHighest: t(s.surfaceContainerHighest),
-    onSurface: t(s.onSurface, sat: 0.1),
-    onSurfaceVariant: t(s.onSurfaceVariant, sat: 0.12),
+    onSurface: t(s.onSurface, sat: 0.22),
+    onSurfaceVariant: t(s.onSurfaceVariant, sat: 0.2),
+    inverseSurface: t(s.inverseSurface, sat: 0.2),
+    onInverseSurface: t(s.onInverseSurface, sat: 0.2),
+    surfaceVariant: t(s.surfaceVariant),
+    shadow: t(s.shadow, sat: 0.2),
   );
 }
 

@@ -32,6 +32,12 @@
 
 ## v4.3.0
 
+- Dashboard: the now-playing cover now sits in a spinning shape (star by default) that follows your image-shape setting, like the year recap
+- Dashboard: the "this week" badge uses the softer accent, like the other badges
+- Year recap: the customize options now open in a scrollable panel with colors, color style, light/dark, image shapes and every font
+- Cache: new size limit for stored API data, the redundant "animated covers in memory" block is removed, and clearing any cache now asks for confirmation
+- Settings: new "Tinted" color style where even backgrounds, borders and text carry a faint tint of your accent (no neutral gray), and the descriptions of the other color styles are rewritten
+- All new texts are translated in every language
 - Year recap: a 30-second Deezer preview now plays automatically on every slide, with a fade-in and fade-out
 - Year recap: new player at the bottom with play/pause, the title being played and a wavy progress bar (pause applies to all slides)
 - Year recap: the music matches each slide (busiest day, listening period, consistency, discoveries, friends ranking, music twin, top 1 on the final slide)
