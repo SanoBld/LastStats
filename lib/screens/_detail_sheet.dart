@@ -3079,11 +3079,26 @@ class _M3Pill extends StatelessWidget {
       color: bg,
       padding: const EdgeInsets.symmetric(horizontal: 14),
       onTap: onTap,
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Icon(icon, size: 16, color: fg),
-        const SizedBox(width: 6),
-        Text(label, style: TextStyle(color: fg, fontWeight: FontWeight.w700, fontSize: 12.5)),
-      ]),
+      child: AnimatedSize(
+        duration: M3Motion.spatialFastDuration,
+        curve: M3Motion.spatialFast,
+        alignment: Alignment.center,
+        child: AnimatedSwitcher(
+          duration: M3Motion.spatialFastDuration,
+          switchInCurve: M3Motion.spatialFast,
+          transitionBuilder: (c, a) => FadeTransition(opacity: a, child: c),
+          layoutBuilder: (cur, prev) => Stack(alignment: Alignment.center, children: [...prev, if (cur != null) cur]),
+          child: Row(
+            key: ValueKey(label),
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 16, color: fg),
+              const SizedBox(width: 6),
+              Text(label, style: TextStyle(color: fg, fontWeight: FontWeight.w700, fontSize: 12.5)),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

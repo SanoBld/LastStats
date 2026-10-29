@@ -1453,10 +1453,17 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   // is still playing on the next timer tick.
   Future<void> _extractColor(Map<String, dynamic> track) async {
     if (!useNowPlayingColorNotifier.value) return;
-    final url = _extractImage(track['image']);
+    var url = _extractImage(track['image']);
+    // Last.fm often has no cover (blank placeholder) for tracks that do have
+    // artwork elsewhere (and a video): look the real cover up, like the card does.
     if (url.isEmpty || url.contains('2a96cbd8b46e442fc41c2b86b821562f')) {
-      if (mounted) accentNotifier.value = _lastFallback();
-      return;
+      final title  = (track['name'] ?? '').toString();
+      final artist = (track['artist']?['#text'] ?? '').toString();
+      String? alt;
+      try { alt = await ImageService.resolveTrack(title, artist).timeout(const Duration(seconds: 8)); } catch (_) {}
+      if (!mounted) return;
+      if (alt == null || alt.isEmpty) { accentNotifier.value = _lastFallback(); return; }
+      url = alt;
     }
     // Same URL already extracted — skip HTTP fetch
     if (url == _lastExtractedUrl) return;
@@ -1525,6 +1532,32 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         ]),
       ),
     );
+  }
+
+  // ── Greeting that follows the time, the listening and the account age ──
+  final int _greetSeed = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+  String _greeting(String name) {
+    final now = DateTime.now();
+    final h = now.hour;
+    final raw = _userInfo?['registered'];
+    var ts = 0;
+    if (raw is Map) { ts = int.tryParse((raw['#text'] ?? raw['unixtime'] ?? '0').toString()) ?? 0; }
+    else if (raw != null) { ts = int.tryParse(raw.toString()) ?? 0; }
+    if (ts > 0) {
+      final r = DateTime.fromMillisecondsSinceEpoch(ts * 1000);
+      final years = now.year - r.year;
+      if (years >= 1 && r.month == now.month && r.day == now.day) {
+        return tx('gr_birthday${_greetSeed % 2 + 1}', {'name': name, 'years': '$years'});
+      }
+    }
+    final pool = <String>[];
+    final part = h < 5 ? 'night' : h < 12 ? 'morning' : h < 18 ? 'afternoon' : 'evening';
+    pool.addAll([for (var i = 1; i <= 3; i++) 'gr_$part$i']);
+    if (now.weekday >= 6) pool.addAll(['gr_weekend1', 'gr_weekend2']);
+    if (_nowPlaying != null) pool.addAll(['gr_playing1', 'gr_playing2', 'gr_playing3']);
+    if (_avg() >= 40) pool.addAll(['gr_heavy1', 'gr_heavy2']);
+    return tx(pool[_greetSeed % pool.length], {'name': name});
   }
 
   int    _total()  => int.tryParse((_userInfo?['playcount'] ?? '0').toString()) ?? 0;
@@ -1600,6 +1633,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         );
       case 'total':
         return _DashStatCard(
+          icon: Icons.graphic_eq_rounded,
           value:      _fmtFull(total),
           label:      L.dashTotalScrobblesLabel,
           sub:        null,
@@ -1947,7 +1981,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                                   return Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(bigName,
+                                      Text(_greeting(bigName), maxLines: 2, overflow: TextOverflow.ellipsis,
                                         style: AppText.title.copyWith(color: Colors.white, shadows: [Shadow(color: Colors.black54, blurRadius: 4)])),
                                       // Nickname set → that's all we show now (no account
                                       // name underneath). No nickname → keep the old
@@ -2824,11 +2858,6 @@ class _HeroStatCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          M3CookieBadge(
-            color: scheme.primary, size: 36,
-            child: Icon(Icons.equalizer_rounded, size: 18, color: scheme.onPrimary),
-          ),
-          const SizedBox(width: 10),
           Text(L.dashScrobbles,
               style: text.titleMedium?.copyWith(
                   color: on.withValues(alpha: 0.8), fontWeight: FontWeight.w700)),
@@ -3100,6 +3129,7 @@ class _NowPlayingCard extends StatelessWidget {
     final album  = (track['album']?['#text']  ?? '').toString();
     final rawUrl = _extractImage(track['image']);
 
+    const h = 132.0;
     return M3InkWell(
       borderRadius: AppRadius.xlR,
       onTap: () {
@@ -3111,98 +3141,74 @@ class _NowPlayingCard extends StatelessWidget {
           'image':  track['image'],
         }, 'tracks', service);
       },
-      child: Container(
-      decoration: BoxDecoration(
-        color: scheme.secondaryContainer,
+      child: ClipRRect(
         borderRadius: AppRadius.xlR,
-        border: Border.all(
-          color: scheme.secondary.withValues(alpha: 0.25),
-          width: 1,
+        child: Container(
+          height: h,
+          color: scheme.secondaryContainer,
+          child: LayoutBuilder(builder: (_, c) {
+            final w = c.maxWidth;
+            final artW = w * 0.68;
+            return Stack(children: [
+              // Cover on the left, fading into the card color towards the right.
+              Positioned(
+                left: 0, top: 0, bottom: 0, width: artW,
+                child: ShaderMask(
+                  blendMode: BlendMode.dstIn,
+                  shaderCallback: (r) => const LinearGradient(
+                    begin: Alignment.centerLeft, end: Alignment.centerRight,
+                    colors: [Colors.black, Colors.black, Colors.transparent],
+                    stops: [0, 0.3, 1],
+                  ).createShader(r),
+                  child: ClipRect(
+                    child: OverflowBox(
+                      minWidth: 0, minHeight: 0, maxWidth: artW, maxHeight: artW,
+                      child: SizedBox(width: artW, height: artW, child: Stack(fit: StackFit.expand, children: [
+                        _SmartImage(
+                          size: artW,
+                          borderRadius: 0,
+                          shaped: false,
+                          initialUrl: rawUrl,
+                          resolver: () => ImageService.resolveTrack(title, artist,
+                              lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null),
+                        ),
+                        ValueListenableBuilder<bool>(
+                          valueListenable: dashMotionNotifier,
+                          builder: (_, on, _) => (on && motionArtworkNotifier.value && motionUrl != null)
+                              ? MotionArtworkVideo(key: ValueKey('np_${track['name']}_$motionUrl'), url: motionUrl!)
+                              : const SizedBox.shrink(),
+                        ),
+                      ])),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: w * 0.4, right: 16, top: 0, bottom: 0,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Row(mainAxisSize: MainAxisSize.min, children: [
+                      _PulsingDot(color: scheme.secondary, size: 7),
+                      const SizedBox(width: 6),
+                      Text(L.commonNowPlayingBadge,
+                          style: text.labelSmall?.copyWith(
+                              color: scheme.secondary, fontWeight: FontWeight.w700, letterSpacing: 1.1)),
+                    ]),
+                    const SizedBox(height: 6),
+                    Text(title, maxLines: 2, overflow: TextOverflow.ellipsis, textAlign: TextAlign.end,
+                        style: text.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800, color: scheme.onSecondaryContainer)),
+                    Text(artist, maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.end,
+                        style: text.bodyMedium?.copyWith(
+                            color: scheme.onSecondaryContainer.withValues(alpha: 0.75), fontWeight: FontWeight.w500)),
+                  ],
+                ),
+              ),
+            ]);
+          }),
         ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(children: [
-
-          // Star shape that spins (follows the shape setting, like the year recap).
-          M3SpinShape(
-            size: 128,
-            builder: (big) => Stack(fit: StackFit.expand, children: [
-              _SmartImage(
-                size: big,
-                borderRadius: 0,
-                shaped: false,
-                initialUrl: rawUrl,
-                resolver: () => ImageService.resolveTrack(title, artist,
-                    lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null),
-              ),
-              ValueListenableBuilder<bool>(
-                valueListenable: dashMotionNotifier,
-                builder: (_, on, _) => (on && motionArtworkNotifier.value && motionUrl != null)
-                    ? MotionArtworkVideo(key: ValueKey('np_${track['name']}_$motionUrl'), url: motionUrl!)
-                    : const SizedBox.shrink(),
-              ),
-            ]),
-          ),
-
-          const SizedBox(width: 14),
-
-          Expanded(child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-
-              Row(children: [
-                _PulsingDot(color: scheme.secondary, size: 7),
-                const SizedBox(width: 6),
-                Text(
-                  L.commonNowPlayingBadge,
-                  style: text.labelSmall?.copyWith(
-                    color:         scheme.secondary,
-                    fontWeight:    FontWeight.w700,
-                    letterSpacing: 1.1,
-                  ),
-                ),
-              ]),
-
-              const SizedBox(height: 5),
-
-              Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: text.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: scheme.onSecondaryContainer,
-                ),
-              ),
-
-              Text(
-                artist,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: text.bodyMedium?.copyWith(
-                  color: scheme.onSecondaryContainer.withValues(alpha: 0.75),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-
-              if (album.isNotEmpty && album != title) ...[
-                const SizedBox(height: 2),
-                Text(
-                  album,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: text.bodySmall?.copyWith(
-                    color: scheme.onSecondaryContainer.withValues(alpha: 0.5),
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-              ],
-
-            ],
-          )),
-        ]),
-      ),
       ),
     );
   }

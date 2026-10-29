@@ -32,6 +32,11 @@
 
 ## v4.3.0
 
+- Dashboard: the accent color now follows the cover of the playing track even when Last.fm has no picture for it (tracks with an animated cover)
+- Dashboard: the greeting next to your profile changes with the time of day, the weekend, what you are listening to, your listening habits and your account anniversary (translated in every language)
+- Dashboard: the now-playing card shows the cover on the left, fading into the card color, with the title on the right (no more spinning shape)
+- Dashboard: removed the duplicate icon on the scrobbles card
+- Details: the "read more" button now morphs smoothly between its two states
 - Year recap: tap a progress bar at the top to jump straight to that slide
 - Details: the "read more" button for bios and lyrics now expands smoothly
 - Dashboard: the now-playing shape is bigger, the country and member-since no longer show in the header (still in the profile bubble), and the duplicate scrobbles icon is gone
