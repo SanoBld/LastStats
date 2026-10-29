@@ -2815,7 +2815,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
 }
 
 // Clean, flat, non-tilted card used only for the share export image.
-class _ShareCardArt extends StatelessWidget {
+class _ShareCardArt extends StatefulWidget {
   final String url, title, subtitle, releaseDate, source;
   final List<(IconData, String)> extra;
   final String? qrData; // when set, the card is taller and shows a QR block
@@ -2825,18 +2825,56 @@ class _ShareCardArt extends StatelessWidget {
     this.qrData,
   });
 
-  Widget _tag(IconData icon, String text) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Icon(icon, color: Colors.white60, size: 13),
-      const SizedBox(width: 4),
-      Text(text, style: const TextStyle(color: Colors.white60, fontSize: 12)),
-    ],
-  );
+  @override
+  State<_ShareCardArt> createState() => _ShareCardArtState();
+}
+
+class _ShareCardArtState extends State<_ShareCardArt> {
+  Color _tint = const Color(0xFF222222); // cover's dominant color, once known
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTint();
+  }
+
+  @override
+  void didUpdateWidget(covariant _ShareCardArt old) {
+    super.didUpdateWidget(old);
+    if (old.url != widget.url) _loadTint();
+  }
+
+  Future<void> _loadTint() async {
+    if (widget.url.isEmpty) return;
+    try {
+      final res = await OfflineImageCache.responseFor(widget.url).timeout(const Duration(seconds: 8));
+      if (res.statusCode != 200 || res.bodyBytes.isEmpty) return;
+      final argb = await _extractDominantColorArgb(res.bodyBytes);
+      if (argb != null && mounted) setState(() => _tint = Color(argb));
+    } catch (_) {}
+  }
 
   @override
   Widget build(BuildContext context) {
-    final hasQr = qrData != null && qrData!.isNotEmpty;
+    final url = widget.url, title = widget.title, subtitle = widget.subtitle;
+    final releaseDate = widget.releaseDate, source = widget.source, extra = widget.extra;
+    final qrData = widget.qrData;
+    final hasQr = qrData != null && qrData.isNotEmpty;
+
+    // Text goes black or white depending on the gradient color behind it.
+    final light = _tint.computeLuminance() > 0.5;
+    final fg   = light ? Colors.black87 : Colors.white;
+    final fg2  = light ? Colors.black.withValues(alpha: 0.72) : Colors.white70;
+    final fg3  = light ? Colors.black.withValues(alpha: 0.55) : Colors.white60;
+
+    Widget tag(IconData icon, String text) => Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: fg3, size: 13),
+        const SizedBox(width: 4),
+        Text(text, style: TextStyle(color: fg3, fontSize: 12)),
+      ],
+    );
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(28),
@@ -2847,17 +2885,18 @@ class _ShareCardArt extends StatelessWidget {
           children: [
             Image.network(url, fit: BoxFit.cover,
                 errorBuilder: (_, _, _) => const ColoredBox(color: Color(0xFF222222))),
-            // Lighter than before — just enough for the title to stay
-            // readable, without hiding much of the photo itself.
+            // Cover fades into its own dominant color at the bottom, so the
+            // text there always reads well.
             DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                  stops: const [0.0, 0.62, 1.0],
+                  stops: const [0.0, 0.42, 0.78, 1.0],
                   colors: [
-                    Colors.transparent,
-                    Colors.transparent,
-                    Colors.black.withValues(alpha: 0.55),
+                    _tint.withValues(alpha: 0),
+                    _tint.withValues(alpha: 0),
+                    _tint.withValues(alpha: 0.88),
+                    _tint,
                   ],
                 ),
               ),
@@ -2874,40 +2913,38 @@ class _ShareCardArt extends StatelessWidget {
                       children: [
                         if (title.isNotEmpty)
                           Text(title, maxLines: 2, overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(color: Colors.white,
+                              style: TextStyle(color: fg,
                                   fontSize: 22, fontWeight: FontWeight.w800)),
                         if (subtitle.isNotEmpty) ...[
                           const SizedBox(height: 4),
                           Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(color: Colors.white70, fontSize: 15)),
+                              style: TextStyle(color: fg2, fontSize: 15)),
                         ],
                         if (releaseDate.isNotEmpty || extra.isNotEmpty) ...[
                           const SizedBox(height: 10),
                           Wrap(spacing: 14, runSpacing: 4, children: [
-                            if (releaseDate.isNotEmpty) _tag(Icons.calendar_today_rounded, releaseDate),
-                            for (final e in extra) _tag(e.$1, e.$2),
+                            if (releaseDate.isNotEmpty) tag(Icons.calendar_today_rounded, releaseDate),
+                            for (final e in extra) tag(e.$1, e.$2),
                           ]),
                         ],
                         const SizedBox(height: 14),
                         Row(children: [
-                          const AppLogo(size: 14, color: Colors.white38),
-                          const SizedBox(width: 6),
+                          AppLogo(size: 28, color: fg2),
+                          const SizedBox(width: 8),
                           Text('LastStats · $source',
-                              style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                              style: TextStyle(color: fg3, fontSize: 13, fontWeight: FontWeight.w600)),
                         ]),
                       ],
                     ),
                   ),
-                  // QR in the photo's bottom-right corner, no white frame,
-                  // white modules so it reads on the dark photo gradient.
                   if (hasQr) ...[
                     const SizedBox(width: 14),
                     QrImageView(
-                      data: qrData!, version: QrVersions.auto, size: 84, gapless: true,
-                      dataModuleStyle: const QrDataModuleStyle(
-                          color: Colors.white, dataModuleShape: QrDataModuleShape.square),
-                      eyeStyle: const QrEyeStyle(
-                          color: Colors.white, eyeShape: QrEyeShape.square),
+                      data: qrData, version: QrVersions.auto, size: 84, gapless: true,
+                      dataModuleStyle: QrDataModuleStyle(
+                          color: fg, dataModuleShape: QrDataModuleShape.square),
+                      eyeStyle: QrEyeStyle(
+                          color: fg, eyeShape: QrEyeShape.square),
                       backgroundColor: Colors.transparent,
                     ),
                   ],

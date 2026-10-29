@@ -32,6 +32,8 @@
 
 ## v4.3.0
 
+- Sharing a card (friend, track, artist, album): the bottom now fades into the cover's main color, the text switches between black and white to stay readable, and the logo is bigger
+- Dashboard greeting: seasons are reversed for devices set to a southern-hemisphere country
 - Details: the "read more" button keeps rounded corners while pressed
 - Artist page: the top tracks ranking has a sliding tab selector, bars that fill in, and a cleaner switch between "popular" and "recent"
 - Dashboard background: you can now pick an image from your device (kept inside the app, 4 MB max) in addition to a link

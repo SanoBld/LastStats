@@ -1587,9 +1587,14 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     if (dEaster >= 0 && dEaster <= 1) return tx('gr_easter${_greetSeed % 2 + 1}', args);
     final pool = <String>[];
     // Seasons (northern hemisphere), mixed in with the rest.
-    final season = (now.month >= 3 && now.month <= 5) ? 'spring'
-        : (now.month >= 6 && now.month <= 8) ? 'summer'
-        : (now.month >= 9 && now.month <= 11) ? 'autumn' : 'winter';
+    // Southern hemisphere countries get the opposite season (guessed from the
+    // device's region).
+    const south = {'AU', 'NZ', 'AR', 'CL', 'UY', 'PY', 'BO', 'PE', 'ZA', 'BR', 'MG', 'MZ', 'ZW', 'NA', 'BW', 'FJ'};
+    final cc = (PlatformDispatcher.instance.locale.countryCode ?? '').toUpperCase();
+    final m = south.contains(cc) ? (now.month + 5) % 12 + 1 : now.month;
+    final season = (m >= 3 && m <= 5) ? 'spring'
+        : (m >= 6 && m <= 8) ? 'summer'
+        : (m >= 9 && m <= 11) ? 'autumn' : 'winter';
     pool.addAll(['gr_${season}1', 'gr_${season}2']);
     final part = h < 5 ? 'night' : h < 12 ? 'morning' : h < 18 ? 'afternoon' : 'evening';
     pool.addAll([for (var i = 1; i <= 3; i++) 'gr_$part$i']);
