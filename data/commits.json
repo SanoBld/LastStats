@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-29T13:13:58Z",
+  "updated": "2026-10-29T19:28:41Z",
   "commits": [
+    {
+      "sha": "4b0e3a69d0a5f79f65b2532293c75820d018b76a",
+      "message": "feat: enhance appearance settings with new color harmony options and API data cache limits\n\n- Added new color harmony options: tinted, classic, vivid, and soft to the appearance settings.\n- Implemented user-defined API data cache limits with corresponding UI elements for setting and confirming cache clear actions.\n- Updated localization files for English, Spanish, French, Italian, Japanese, Portuguese, Russian, and Chinese to reflect new strings related to color harmony and cache management.\n- Refactored dashboard and year recap pages to incorporate new spinning shape component for visual enhancements.\n- Improved cache management logic to enforce size limits on API data and added relevant UI components for user interaction.",
+      "date": "2026-10-29T19:25:46Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/4b0e3a69d0a5f79f65b2532293c75820d018b76a",
+      "tags": []
+    },
     {
       "sha": "f0e4f7544584c5e54e7eaf72f5a12bb5fe117124",
       "message": "feat: ajout de la gestion du taux de rafraîchissement pour le mode éco et amélioration de la synchronisation des amis",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/7a2e110dfe31054399b45bd7fe72272504072716",
-      "tags": []
-    },
-    {
-      "sha": "2833d2d7b57f2ff8c5de79ea3377ecb203ef4797",
-      "message": "refactor: ajouter la gestion des sources d'images dans le cache URL",
-      "date": "2026-08-24T21:22:46Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/2833d2d7b57f2ff8c5de79ea3377ecb203ef4797",
       "tags": []
     }
   ]
