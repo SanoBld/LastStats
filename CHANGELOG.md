@@ -32,6 +32,7 @@
 
 ## v4.3.0
 
+- Sharing a card: uses your chosen font, bigger info lines (like your scrobbles), and every line starts at the same left edge
 - Sharing a card (friend, track, artist, album): the bottom now fades into the cover's main color, the text switches between black and white to stay readable, and the logo is bigger
 - Dashboard greeting: seasons are reversed for devices set to a southern-hemisphere country
 - Details: the "read more" button keeps rounded corners while pressed

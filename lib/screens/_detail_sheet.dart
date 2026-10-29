@@ -2867,16 +2867,16 @@ class _ShareCardArtState extends State<_ShareCardArt> {
     final fg2  = light ? Colors.black.withValues(alpha: 0.72) : Colors.white70;
     final fg3  = light ? Colors.black.withValues(alpha: 0.55) : Colors.white60;
 
-    Widget tag(IconData icon, String text) => Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: fg3, size: 13),
-        const SizedBox(width: 4),
-        Text(text, style: TextStyle(color: fg3, fontSize: 12)),
-      ],
-    );
+    // No leading icon: every line starts at the same left edge.
+    Widget tag(IconData icon, String text) =>
+        Text(text, style: TextStyle(color: fg2, fontSize: 15, fontWeight: FontWeight.w600));
 
-    return ClipRRect(
+    // The user's own font (and not the default one) on the exported image.
+    final font = appFontNotifier.value;
+
+    return DefaultTextStyle.merge(
+      style: TextStyle(fontFamily: font.isEmpty ? null : font),
+      child: ClipRRect(
       borderRadius: BorderRadius.circular(28),
       child: SizedBox(
         width: 360, height: 506,
@@ -2929,10 +2929,10 @@ class _ShareCardArtState extends State<_ShareCardArt> {
                         ],
                         const SizedBox(height: 14),
                         Row(children: [
-                          AppLogo(size: 28, color: fg2),
-                          const SizedBox(width: 8),
                           Text('LastStats · $source',
-                              style: TextStyle(color: fg3, fontSize: 13, fontWeight: FontWeight.w600)),
+                              style: TextStyle(color: fg3, fontSize: 11)),
+                          const SizedBox(width: 8),
+                          AppLogo(size: 28, color: fg2),
                         ]),
                       ],
                     ),
@@ -2954,7 +2954,7 @@ class _ShareCardArtState extends State<_ShareCardArt> {
           ],
         ),
       ),
-    );
+    ));
   }
 }
 
