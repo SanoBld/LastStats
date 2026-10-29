@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-29T22:36:07Z",
+  "updated": "2026-10-29T22:47:55Z",
   "commits": [
+    {
+      "sha": "21fb9e39dccab9efc599117921301f2b424e232c",
+      "message": "feat: amélioration de l'affichage des cartes de partage avec une police personnalisée et alignement des lignes",
+      "date": "2026-10-29T22:45:07Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/21fb9e39dccab9efc599117921301f2b424e232c",
+      "tags": []
+    },
     {
       "sha": "2e751b39c22ad674a34aadcbf3bd08a736b3b643",
       "message": "feat: amélioration de la gestion des saisons pour les utilisateurs de l'hémisphère sud et mise à jour de l'affichage des cartes de partage",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/bc727c581e3ee4e88bdbcdc60d81fc4343a6aef3",
-      "tags": []
-    },
-    {
-      "sha": "5f22898f5d7b75ebedfc599c532ec2b4e3f11eec",
-      "message": "refactor: ajuster le rembourrage de l'icône du logo SVG pour une meilleure présentation",
-      "date": "2026-08-27T16:27:09Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/5f22898f5d7b75ebedfc599c532ec2b4e3f11eec",
       "tags": []
     }
   ]
