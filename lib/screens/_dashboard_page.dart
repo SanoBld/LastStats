@@ -83,7 +83,8 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     final album  = (np['album']?['#text']  ?? '').toString();
     final title  = (np['name'] ?? '').toString();
     final key = '$artist|$album|$title';
-    if (artist.isEmpty || key == _npMotionKey) return;
+    if (artist.isEmpty) return;
+    if (key == _npMotionKey && _npMotionUrl != null) return;
     _npMotionKey = key;
     if (_npMotionUrl != null && mounted) setState(() => _npMotionUrl = null);
     final url = await MotionArtworkService.find(
@@ -1599,7 +1600,6 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         );
       case 'total':
         return _DashStatCard(
-          icon: Icons.graphic_eq_rounded,
           value:      _fmtFull(total),
           label:      L.dashTotalScrobblesLabel,
           sub:        null,
@@ -1860,7 +1860,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                   builder: (_, on, _) => (on && motionArtworkNotifier.value && _nowPlaying != null && _npMotionUrl != null)
                       ? Positioned.fill(
                           child: MotionArtworkVideo(
-                            key: ValueKey('hdr_$_npMotionUrl'),
+                            key: ValueKey('hdr_${_nowPlaying?['name']}_$_npMotionUrl'),
                             url: _npMotionUrl!,
                             onFailed: () { if (mounted) setState(() => _npMotionUrl = null); },
                           ),
@@ -1963,33 +1963,6 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                                   );
                                 },
                               ),
-                              Row(children: [
-                                if (country.isNotEmpty && country != 'None') ...[
-                                  Icon(Icons.location_on_outlined,
-                                      size: 12,
-                                      color: Colors.white.withValues(alpha: 0.75)),
-                                  const SizedBox(width: 2),
-                                  Text(country,
-                                    style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.75),
-                                      fontSize: 12,
-                                      shadows: const [Shadow(color: Colors.black45, blurRadius: 4)],
-                                    )),
-                                  const SizedBox(width: 8),
-                                ],
-                                if (regStr.isNotEmpty) ...[
-                                  Icon(Icons.calendar_today_outlined,
-                                      size: 11,
-                                      color: Colors.white.withValues(alpha: 0.75)),
-                                  const SizedBox(width: 2),
-                                  Text(L.memberSince(regStr),
-                                    style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.75),
-                                      fontSize: 12,
-                                      shadows: const [Shadow(color: Colors.black45, blurRadius: 4)],
-                                    )),
-                                ],
-                              ]),
                               if (achievementsEnabledNotifier.value)
                                 _buildLevelPill(),
                             ],
@@ -3020,7 +2993,7 @@ class _StatTone extends InheritedWidget {
 
 class _DashStatCard extends StatelessWidget {
   final String  value, label;
-  final IconData icon;
+  final IconData? icon;
   final String? sub;
   final int?    rawInt;
   final String  rollPrefix;
@@ -3028,7 +3001,7 @@ class _DashStatCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   const _DashStatCard({
-    required this.icon,
+    this.icon,
     required this.value,
     required this.label,
     this.sub,
@@ -3067,12 +3040,14 @@ class _DashStatCard extends StatelessWidget {
           child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            M3CookieBadge(
-              size: 40,
-              color: scheme.surface.withValues(alpha: 0.6),
-              child: Icon(icon, size: 22, color: fg),
-            ),
-            const SizedBox(height: 10),
+            if (icon != null) ...[
+              M3CookieBadge(
+                size: 40,
+                color: scheme.surface.withValues(alpha: 0.6),
+                child: Icon(icon, size: 22, color: fg),
+              ),
+              const SizedBox(height: 10),
+            ],
             if (rawInt != null)
               _RollingNumber(
                 key:      ValueKey('dash_${rawInt}_$rollPrefix$rollSuffix'),
@@ -3151,7 +3126,7 @@ class _NowPlayingCard extends StatelessWidget {
 
           // Star shape that spins (follows the shape setting, like the year recap).
           M3SpinShape(
-            size: 96,
+            size: 128,
             builder: (big) => Stack(fit: StackFit.expand, children: [
               _SmartImage(
                 size: big,
@@ -3164,7 +3139,7 @@ class _NowPlayingCard extends StatelessWidget {
               ValueListenableBuilder<bool>(
                 valueListenable: dashMotionNotifier,
                 builder: (_, on, _) => (on && motionArtworkNotifier.value && motionUrl != null)
-                    ? MotionArtworkVideo(key: ValueKey('np_$motionUrl'), url: motionUrl!)
+                    ? MotionArtworkVideo(key: ValueKey('np_${track['name']}_$motionUrl'), url: motionUrl!)
                     : const SizedBox.shrink(),
               ),
             ]),

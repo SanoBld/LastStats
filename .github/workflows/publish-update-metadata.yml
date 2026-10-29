@@ -10,6 +10,11 @@ on:
 permissions:
   contents: write
 
+# never push to gh-pages at the same time as another workflow
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: false
+
 jobs:
   publish-metadata:
     runs-on: ubuntu-latest

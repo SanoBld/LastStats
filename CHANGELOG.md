@@ -32,6 +32,11 @@
 
 ## v4.3.0
 
+- Year recap: tap a progress bar at the top to jump straight to that slide
+- Details: the "read more" button for bios and lyrics now expands smoothly
+- Dashboard: the now-playing shape is bigger, the country and member-since no longer show in the header (still in the profile bubble), and the duplicate scrobbles icon is gone
+- Dashboard: the animated cover now follows the track when it changes
+- Workflows: every job that pushes to gh-pages now shares one queue, which fixes the "fetch first" push error
 - Dashboard: the now-playing cover now sits in a spinning shape (star by default) that follows your image-shape setting, like the year recap
 - Dashboard: the "this week" badge uses the softer accent, like the other badges
 - Year recap: the customize options now open in a scrollable panel with colors, color style, light/dark, image shapes and every font

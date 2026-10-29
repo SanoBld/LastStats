@@ -1502,15 +1502,21 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           const SizedBox(height: 8),
 
           // Animated expand/collapse
-          AnimatedSize(
+          AnimatedCrossFade(
             duration: const Duration(milliseconds: 320),
-            curve: M3Motion.emphasized,
+            sizeCurve: Curves.easeInOutCubic,
             alignment: Alignment.topCenter,
-            child: _linkifiedText(
-              shown,
+            crossFadeState: _bioExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+            firstChild: SizedBox(width: double.infinity, child: _linkifiedText(
+              bio.length > maxChars ? '${bio.substring(0, maxChars)}…' : bio,
               text.bodyMedium?.copyWith(color: scheme.onPrimaryContainer, height: 1.55),
               scheme.primary,
-            ),
+            )),
+            secondChild: SizedBox(width: double.infinity, child: _linkifiedText(
+              bio,
+              text.bodyMedium?.copyWith(color: scheme.onPrimaryContainer, height: 1.55),
+              scheme.primary,
+            )),
           ),
           const SizedBox(height: 10),
           Wrap(
@@ -2037,13 +2043,16 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             Text(L.detailLyricsNotFound,
                 style: text.bodyMedium?.copyWith(color: scheme.onPrimaryContainer))
           else ...[
-            AnimatedSize(
+            AnimatedCrossFade(
               duration: const Duration(milliseconds: 320),
-              curve: M3Motion.emphasized,
+              sizeCurve: Curves.easeInOutCubic,
               alignment: Alignment.topCenter,
-              child: Text(shown,
-                  style: text.bodyMedium?.copyWith(
-                      color: scheme.onPrimaryContainer, height: 1.6)),
+              crossFadeState: _lyricsExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+              firstChild: SizedBox(width: double.infinity, child: Text(
+                  _lyrics.length > maxChars ? '${_lyrics.substring(0, maxChars)}…' : _lyrics,
+                  style: text.bodyMedium?.copyWith(color: scheme.onPrimaryContainer, height: 1.6))),
+              secondChild: SizedBox(width: double.infinity, child: Text(_lyrics,
+                  style: text.bodyMedium?.copyWith(color: scheme.onPrimaryContainer, height: 1.6))),
             ),
             if (_lyrics.length > maxChars) ...[
               const SizedBox(height: 10),

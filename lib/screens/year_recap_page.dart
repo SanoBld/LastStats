@@ -950,14 +950,18 @@ class _YearRecapPageState extends State<YearRecapPage> {
                 child: Row(
                   children: List.generate(slides.length, (i) {
                     return Expanded(
-                      child: AnimatedContainer(
-                        duration: M3Motion.spatialFastDuration,
-                        curve: M3Motion.spatialFast,
-                        margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: i <= _slide ? scheme.primary : scheme.primary.withValues(alpha: 0.22),
-                          borderRadius: BorderRadius.circular(4),
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () { if (_pages.hasClients && i != _slide) _pages.jumpToPage(i); },
+                        child: AnimatedContainer(
+                          duration: M3Motion.spatialFastDuration,
+                          curve: M3Motion.spatialFast,
+                          margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: i <= _slide ? scheme.primary : scheme.primary.withValues(alpha: 0.22),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
                         ),
                       ),
                     );
