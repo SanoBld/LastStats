@@ -47,6 +47,12 @@
 - Interface: every tappable area now has the same small press bounce as buttons and cards (login page, profile bubble, sheets, lists)
 - Interface: the pressed fill is now visible on tiles that have their own background (profile bubble shortcuts, chart picker)
 - Interface: the side rail on large screens now slides smoothly when collapsed or expanded, instead of popping
+- Battery saver: the screen now really drops to ~60 Hz (native refresh-rate control, works on adaptive 120 Hz phones) and goes back to the highest rate when it is turned off
+- Battery saver: the animated background of the dashboard is paused, and the blurred image is cached instead of redrawn every frame
+- Sync: "Sync now" shows the wavy progress bar like the year recap player
+- Sync: friends sync now includes all your Last.fm friends, not only favourites and scanned profiles, with a wavy progress bar
+- Dashboard: tapping your own profile in the profile bubble opens your profile like a friend's one (the side arrow still opens the account settings)
+- Dashboard: tapping the level now opens the levels page instead of the history
 - Interface: every tappable area in the app (lists, cards, settings rows, chips, sheets) now uses the same pressed fill, which follows its own rounded shape
 - Interface: round buttons such as the back arrow stay round when pressed
 - Dashboard: the profile bubble tiles are all the same size, tapping the profile card goes straight to the account page, and a new Connections shortcut was added

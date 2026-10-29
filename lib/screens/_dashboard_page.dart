@@ -944,7 +944,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
               child: Column(mainAxisSize: MainAxisSize.min, children: [
                 M3InkWell(
                   borderRadius: BorderRadius.circular(24),
-                  onTap: () => Navigator.pop(ctx, 'profile'),
+                  onTap: () => Navigator.pop(ctx, 'my_profile'),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                     child: Row(children: [
@@ -998,7 +998,15 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                           ],
                         ]),
                       ),
-                      Icon(Icons.chevron_right_rounded, color: sc.onSurfaceVariant),
+                      // Side arrow = shortcut to the account page of the settings
+                      M3InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: () => Navigator.pop(ctx, 'profile'),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Icon(Icons.chevron_right_rounded, color: sc.onSurfaceVariant),
+                        ),
+                      ),
                     ]),
                   ),
                 ),
@@ -1016,6 +1024,8 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
 
     if (!mounted) return;
     switch (result) {
+      case 'my_profile':
+        showProfileSheet(context, widget.username, widget.service);
       case 'profile':
         Navigator.of(context).push(MaterialPageRoute(
           builder: (_) => AccountPage(username: widget.username),
@@ -1485,7 +1495,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   // ── Stat helpers ──────────────────────────────────────────────────────────
 
   // Small tappable "Level N" pill with a mini progress bar, shown right
-  // under the profile header. Opens the level history page on tap.
+  // under the profile header. Opens the levels / achievements page on tap.
   Widget _buildLevelPill() {
     final total  = _total();
     final level  = accountLevel(total);
@@ -1495,8 +1505,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     return Padding(
       padding: const EdgeInsets.only(top: 6),
       child: GestureDetector(
-        onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const _LevelHistoryPage())),
+        onTap: () => showAchievementsSheet(context, _userInfo, isSelf: true),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           Text(tx('ui_lvl', {'level': '$level'}),
               style: AppText.badge.copyWith(color: Colors.white.withValues(alpha: 0.9), shadows: const [Shadow(color: Colors.black45, blurRadius: 4)])),
@@ -3769,7 +3778,7 @@ class _AmbientHeaderState extends State<_AmbientHeader>
     _ctrl = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 8),
-    )..repeat(reverse: true);
+    );
 
     _scale = Tween<double>(begin: 1.0, end: 1.08)
         .animate(CurvedAnimation(parent: _ctrl, curve: M3Motion.emphasized));
@@ -3778,10 +3787,22 @@ class _AmbientHeaderState extends State<_AmbientHeader>
         .animate(CurvedAnimation(parent: _ctrl, curve: M3Motion.emphasized));
     _dy = Tween<double>(begin: -5.0, end: 5.0)
         .animate(CurvedAnimation(parent: _ctrl, curve: M3Motion.emphasized));
+    ecoModeActiveNotifier.addListener(_applyEco);
+    _applyEco();
+  }
+
+  void _applyEco() {
+    if (!mounted) return;
+    if (ecoModeActiveNotifier.value) {
+      _ctrl.stop(); // static background: no endless 60/120 fps redraw
+    } else if (!_ctrl.isAnimating) {
+      _ctrl.repeat(reverse: true);
+    }
   }
 
   @override
   void dispose() {
+    ecoModeActiveNotifier.removeListener(_applyEco);
     _ctrl.dispose();
     super.dispose();
   }
@@ -3803,7 +3824,7 @@ class _AmbientHeaderState extends State<_AmbientHeader>
           child: child,
         ),
         child: widget.url.isNotEmpty
-            ? ImageFiltered(
+            ? RepaintBoundary(child: ImageFiltered(
                 imageFilter: ImageFilter.blur(
                   sigmaX: ambientBlur,
                   sigmaY: ambientBlur,
@@ -3817,7 +3838,7 @@ class _AmbientHeaderState extends State<_AmbientHeader>
                   errorBuilder: (_, _, _) =>
                       _GradientHeader(scheme: widget.scheme),
                 ),
-              )
+              ))
             : _GradientHeader(scheme: widget.scheme),
       ),
     );

@@ -8,6 +8,7 @@
 import 'dart:async';
 import 'package:battery_plus/battery_plus.dart';
 import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
+import 'package:flutter/services.dart' show MethodChannel;
 import 'package:flutter/widgets.dart' show WidgetsBinding, WidgetsBindingObserver, AppLifecycleState;
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import '../app_state.dart';
@@ -85,15 +86,28 @@ class EcoModeController {
     ecoModeActiveNotifier.value = reason.isNotEmpty;
   }
 
-  // Android only: cap the screen to its lowest refresh rate (~60Hz) in eco
-  // mode, then restore the highest one when eco mode turns off.
+  // Android only: cap the screen to ~60 Hz in eco mode, then restore the
+  // highest rate when eco mode turns off. Uses our own native channel first
+  // (also works on adaptive 120 Hz screens); the plugin is only a fallback.
+  static const MethodChannel _refreshChannel = MethodChannel('laststats/refresh');
+
   static Future<void> _applyRefreshRate() async {
     if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
+    final eco = ecoModeActiveNotifier.value;
     try {
-      if (ecoModeActiveNotifier.value) {
-        final modes = await FlutterDisplayMode.supported;
+      final ok = await _refreshChannel.invokeMethod<bool>('set', {'mode': eco ? 'low' : 'high'});
+      if (ok == true) return;
+    } catch (_) {}
+    try {
+      if (eco) {
+        final active = await FlutterDisplayMode.active;
+        final modes = (await FlutterDisplayMode.supported)
+            .where((m) => m.width == active.width && m.height == active.height)
+            .toList();
         if (modes.isEmpty) return;
-        final lowest = modes.reduce((a, b) => a.refreshRate < b.refreshRate ? a : b);
+        final smooth = modes.where((m) => m.refreshRate >= 55).toList();
+        final pool = smooth.isNotEmpty ? smooth : modes;
+        final lowest = pool.reduce((a, b) => a.refreshRate < b.refreshRate ? a : b);
         await FlutterDisplayMode.setPreferredMode(lowest);
       } else {
         await FlutterDisplayMode.setHighRefreshRate();

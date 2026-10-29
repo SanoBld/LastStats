@@ -45,6 +45,8 @@ class _SyncPageState extends State<SyncPage> {
   int _friendsIntervalH = 24;
   List<String> _friendUsernames = [];
   bool _resyncingAll = false;
+  int  _resyncDone   = 0;
+  int  _resyncTotal  = 0;
 
   @override
   void initState() {
@@ -79,6 +81,31 @@ class _SyncPageState extends State<SyncPage> {
       _friendUsernames  = friends;
       _loaded  = true;
     });
+    _loadLastFmFriends(p);
+  }
+
+  // Our real Last.fm friends (not only the ones marked as favourites or
+  // scanned by QR), merged into the list that gets synchronized.
+  Future<void> _loadLastFmFriends(SharedPreferences p) async {
+    final service = _buildService(p);
+    if (service == null) return;
+    try {
+      final raw = await service.getFriends(limit: 200, withRecentTrack: false);
+      final names = raw
+          .map((u) => (u['name'] ?? '').toString())
+          .where((n) => n.isNotEmpty);
+      if (!mounted) return;
+      final merged = <String, String>{
+        for (final n in _friendUsernames) n.toLowerCase(): n,
+      };
+      for (final n in names) {
+        merged.putIfAbsent(n.toLowerCase(), () => n);
+      }
+      setState(() {
+        _friendUsernames = merged.values.toList()
+          ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+      });
+    } catch (_) {/* offline: keep the favourites list */}
   }
 
   Future<void> _setFriendsInterval(int h) async {
@@ -98,9 +125,12 @@ class _SyncPageState extends State<SyncPage> {
     final p = await SharedPreferences.getInstance();
     final service = _buildService(p);
     if (service == null) return;
-    setState(() => _resyncingAll = true);
-    for (final u in _friendUsernames) {
+    final all = List<String>.from(_friendUsernames);
+    setState(() { _resyncingAll = true; _resyncDone = 0; _resyncTotal = all.length; });
+    for (final u in all) {
       await FriendsLibraryService.syncFriend(u, service);
+      if (!mounted) return;
+      setState(() => _resyncDone++);
     }
     if (mounted) setState(() => _resyncingAll = false);
   }
@@ -225,9 +255,7 @@ class _SyncPageState extends State<SyncPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                       if (isSyncing) ...[
-                        progress.total > 0
-                            ? M3WavyProgress(value: progress.fraction)
-                            : const Center(child: M3LoadingIndicator(size: 32)),
+                        M3WavyProgress(value: progress.total > 0 ? progress.fraction : 0.06),
                         const SizedBox(height: 8),
                         Text('${L.syncInProgress} ${progress.shortLabel}',
                             style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
@@ -274,14 +302,22 @@ class _SyncPageState extends State<SyncPage> {
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      SettingActionGroup(items: [
-                        ActionGroupItem(
-                          primary: true,
-                          icon: Icons.sync_rounded,
-                          label: tx('ui_resync_everyone'),
-                          onPressed: _resyncingAll ? null : _resyncAllFriends,
+                      if (_resyncingAll) ...[
+                        M3WavyProgress(
+                          value: _resyncTotal > 0 ? _resyncDone / _resyncTotal : 0,
                         ),
-                      ]),
+                        const SizedBox(height: 8),
+                        Text('${L.syncInProgress} $_resyncDone / $_resyncTotal',
+                            style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                      ] else
+                        SettingActionGroup(items: [
+                          ActionGroupItem(
+                            primary: true,
+                            icon: Icons.sync_rounded,
+                            label: tx('ui_resync_everyone'),
+                            onPressed: _resyncAllFriends,
+                          ),
+                        ]),
                       if (_friendUsernames.isNotEmpty) ...[
                         const SizedBox(height: 16),
                         const Divider(height: 1),

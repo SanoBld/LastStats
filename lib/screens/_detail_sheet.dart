@@ -3605,6 +3605,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     return Row(mainAxisSize: MainAxisSize.min, children: [
       btn(Icon(Icons.arrow_back_rounded, color: scheme.onSecondaryContainer, size: 22),
           () => Navigator.pop(ctx), r(true, false)),
+      if (widget.username.toLowerCase() != widget.service.username.toLowerCase())
       Padding(
         padding: const EdgeInsets.only(left: 3),
         child: btn(
