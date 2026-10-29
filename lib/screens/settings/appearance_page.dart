@@ -573,9 +573,9 @@ class _AppearancePageState extends State<AppearancePage> {
         const SizedBox(height: 20),
 
         SettingsSection(label: tx('ap_harmony_title'), children: [
-          for (var i = 0; i < 4; i++) ...[
+          for (var i = 0; i < 5; i++) ...[
             if (i > 0) const Divider(height: 1, indent: 16, endIndent: 16),
-            _harmonyTile(const ['mono', 'classic', 'vivid', 'soft'][i], scheme),
+            _harmonyTile(const ['mono', 'tinted', 'classic', 'vivid', 'soft'][i], scheme),
           ],
         ]),
 

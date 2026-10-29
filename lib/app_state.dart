@@ -334,11 +334,40 @@ ColorScheme monochromeAccents(ColorScheme s) {
   );
 }
 
+/// Gives every neutral role (surfaces, outlines, on-surface text) a faint tint
+/// of the primary hue, so the UI never shows a dead neutral gray.
+/// Lightness is kept, only hue / a little saturation change.
+ColorScheme tintNeutrals(ColorScheme s) {
+  if (isNeutralColor(s.primary)) return s;
+  final h = HSLColor.fromColor(s.primary).hue;
+  final dark = s.brightness == Brightness.dark;
+  Color t(Color c, {double sat = 0.16}) {
+    final l = HSLColor.fromColor(c);
+    // Near-white / near-black keep a smaller tint so they stay readable.
+    final k = (l.lightness > 0.93 || l.lightness < 0.07) ? 0.6 : 1.0;
+    final target = (dark ? sat * 0.8 : sat) * k;
+    return HSLColor.fromAHSL(1, h, l.saturation > target ? l.saturation : target, l.lightness).toColor();
+  }
+  return s.copyWith(
+    outline: t(s.outline, sat: 0.12),
+    outlineVariant: t(s.outlineVariant),
+    surface: t(s.surface), surfaceDim: t(s.surfaceDim), surfaceBright: t(s.surfaceBright),
+    surfaceContainerLowest: t(s.surfaceContainerLowest),
+    surfaceContainerLow: t(s.surfaceContainerLow),
+    surfaceContainer: t(s.surfaceContainer),
+    surfaceContainerHigh: t(s.surfaceContainerHigh),
+    surfaceContainerHighest: t(s.surfaceContainerHighest),
+    onSurface: t(s.onSurface, sat: 0.1),
+    onSurfaceVariant: t(s.onSurfaceVariant, sat: 0.12),
+  );
+}
+
 /// Builds the app color scheme for a seed and a harmony style.
 ColorScheme buildAppScheme(Color seed, Brightness b, String harmony) {
   final variant = switch (harmony) {
     'vivid' => DynamicSchemeVariant.vibrant,
     'soft'  => DynamicSchemeVariant.neutral,
+    'tinted' => DynamicSchemeVariant.tonalSpot,
     _       => DynamicSchemeVariant.tonalSpot,
   };
   final base = neutralizeIfGraySeed(ColorScheme.fromSeed(
@@ -349,6 +378,10 @@ ColorScheme buildAppScheme(Color seed, Brightness b, String harmony) {
   return applyColorHarmony(base, harmony);
 }
 
-/// 'classic' keeps the scheme as is, every other style uses one hue.
-ColorScheme applyColorHarmony(ColorScheme s, String harmony) =>
-    harmony == 'classic' ? s : monochromeAccents(s);
+/// 'classic' keeps the scheme as is, 'tinted' uses one hue and tints every
+/// neutral too, every other style uses one hue.
+ColorScheme applyColorHarmony(ColorScheme s, String harmony) => switch (harmony) {
+      'classic' => s,
+      'tinted'  => tintNeutrals(monochromeAccents(s)),
+      _         => monochromeAccents(s),
+    };

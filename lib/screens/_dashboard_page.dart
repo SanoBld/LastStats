@@ -3149,29 +3149,25 @@ class _NowPlayingCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Row(children: [
 
-          // Static rounded square: no spin, no circle / cookie shape.
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: SizedBox(
-              width: 88, height: 88,
-              child: Stack(fit: StackFit.expand, children: [
-                _SmartImage(
-                  size: 88,
-                  borderRadius: 20,
-                  shaped: false,
-                  initialUrl: rawUrl,
-                  resolver: () => ImageService.resolveTrack(title, artist,
-                      lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null),
-                ),
-                ValueListenableBuilder<bool>(
-                  valueListenable: dashMotionNotifier,
-                  builder: (_, on, _) => (on && motionArtworkNotifier.value && motionUrl != null)
-                      ? MotionArtworkVideo(
-                          key: ValueKey('np_$motionUrl'), url: motionUrl!)
-                      : const SizedBox.shrink(),
-                ),
-              ]),
-            ),
+          // Star shape that spins (follows the shape setting, like the year recap).
+          M3SpinShape(
+            size: 96,
+            builder: (big) => Stack(fit: StackFit.expand, children: [
+              _SmartImage(
+                size: big,
+                borderRadius: 0,
+                shaped: false,
+                initialUrl: rawUrl,
+                resolver: () => ImageService.resolveTrack(title, artist,
+                    lastfmUrl: rawUrl.isNotEmpty ? rawUrl : null),
+              ),
+              ValueListenableBuilder<bool>(
+                valueListenable: dashMotionNotifier,
+                builder: (_, on, _) => (on && motionArtworkNotifier.value && motionUrl != null)
+                    ? MotionArtworkVideo(key: ValueKey('np_$motionUrl'), url: motionUrl!)
+                    : const SizedBox.shrink(),
+              ),
+            ]),
           ),
 
           const SizedBox(width: 14),
@@ -3308,8 +3304,8 @@ class _WeekHighlightStripState extends State<_WeekHighlightStrip> {
           // Header row – period label (bigger) + swipe dots
           Row(children: [
             M3CookieBadge(
-              size: 32, color: scheme.primary,
-              child: Icon(Icons.trending_up_rounded, size: 16, color: scheme.onPrimary),
+              size: 32, color: scheme.primaryContainer,
+              child: Icon(Icons.trending_up_rounded, size: 16, color: scheme.onPrimaryContainer),
             ),
             const SizedBox(width: 10),
             AnimatedSwitcher(

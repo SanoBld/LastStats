@@ -11,7 +11,6 @@ import '../../services/image_service.dart';
 import '../../l10n/l10n.dart';
 import '../../l10n/extra_strings.dart';
 import '../../widgets/m3_components.dart';
-import '../../widgets/motion_artwork_video.dart';
 import '../../services/motion_artwork_service.dart';
 import '../../services/video_disk_cache.dart';
 
@@ -34,6 +33,16 @@ const _videoLimits = [
   (label: '500 MB', bytes: 500 * 1024 * 1024),
   (label: '1 GB',   bytes: 1024 * 1024 * 1024),
   (label: '2 GB',   bytes: 2 * 1024 * 1024 * 1024),
+  (label: '∞',      bytes: 0),
+];
+
+// API data cache presets: 0 = unlimited.
+const _apiLimits = [
+  (label: '10 MB',  bytes: 10 * 1024 * 1024),
+  (label: '25 MB',  bytes: 25 * 1024 * 1024),
+  (label: '50 MB',  bytes: 50 * 1024 * 1024),
+  (label: '100 MB', bytes: 100 * 1024 * 1024),
+  (label: '250 MB', bytes: 250 * 1024 * 1024),
   (label: '∞',      bytes: 0),
 ];
 
@@ -71,6 +80,11 @@ class _CachePageState extends State<CachePage> {
     await _loadStats();
   }
 
+  Future<void> _setApiLimit(int bytes) async {
+    await StorageManager.setApiMaxBytes(bytes);
+    await _loadStats();
+  }
+
   Future<void> _setVideoLimit(int bytes) async {
     await StorageManager.setVideoMaxBytes(bytes);
     await _loadStats();
@@ -79,6 +93,7 @@ class _CachePageState extends State<CachePage> {
   // ── Clear actions ─────────────────────────────────────────────────────────
 
   Future<void> _clearImages() async {
+    if (!await _confirm(tx('cache_confirm_t'), tx('cache_confirm_b', {'name': L.cacheImages}))) return;
     setState(() => _clearing = true);
     await ImageService.clearAllCache();
     await _loadStats();
@@ -86,6 +101,7 @@ class _CachePageState extends State<CachePage> {
   }
 
   Future<void> _clearApiCache() async {
+    if (!await _confirm(tx('cache_confirm_t'), tx('cache_confirm_b', {'name': L.cacheApiData}))) return;
     setState(() => _clearing = true);
     await DataCache.clear();
     await _loadStats();
@@ -104,18 +120,8 @@ class _CachePageState extends State<CachePage> {
     setState(() => _clearing = false);
   }
 
-  Future<void> _releaseVideo() async {
-    setState(() => _clearing = true);
-    await MotionArtworkVideo.releaseAll();
-    MotionArtworkService.clearMemory();
-    await _loadStats();
-    if (!mounted) return;
-    setState(() => _clearing = false);
-    showAppSnackBar(context, 
-        SnackBar(content: Text(tx('cache_video_cleared'))));
-  }
-
   Future<void> _clearVideoDisk() async {
+    if (!await _confirm(tx('cache_confirm_t'), tx('cache_confirm_b', {'name': tx('cache_vid_disk_t')}))) return;
     setState(() => _clearing = true);
     await VideoDiskCache.clear();
     await _loadStats();
@@ -184,28 +190,6 @@ Expanded(
 
                 const SizedBox(height: 20),
 
-                // ── Memory: animated covers (Apple Music video) ────────────
-                SettingsSection(label: tx('cache_memory_section'), children: [
-                  if (_clearing)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      child: Center(child: M3LoadingIndicator()),
-                    )
-                  else
-                    SettingActionRow(
-                      icon: Icons.movie_filter_rounded,
-                      title: tx('cache_video_t'),
-                      subtitle: tx('cache_video_s', {
-                        'mem': StorageManager.formatBytes(MotionArtworkVideo.liveBytes),
-                        'players': '${MotionArtworkVideo.liveCount}',
-                        'links': '${MotionArtworkService.cachedLinks}',
-                      }),
-                      onTap: _releaseVideo,
-                    ),
-                ]),
-
-                const SizedBox(height: 20),
-
                 // ── Storage limit + offline mode ────────────────────────────
                 SettingsSection(label: tx('cache_storage_section'), children: [
                   SettingChoiceRow(
@@ -228,11 +212,13 @@ Expanded(
                     description: tx('cache_vid_limit_s'),
                     onChanged: (v) => _setVideoLimit(int.parse(v)),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-                    child: Text(tx('cache_no_limit_note'),
-                        style: text.bodySmall
-                            ?.copyWith(color: scheme.onSurfaceVariant)),
+                  SettingChoiceRow(
+                    icon: Icons.api_outlined,
+                    title: tx('cache_api_limit_t'),
+                    options: [for (final l in _apiLimits) ('${l.bytes}', l.label, null)],
+                    value: '${StorageManager.apiMaxBytes}',
+                    description: tx('cache_api_limit_s'),
+                    onChanged: (v) => _setApiLimit(int.parse(v)),
                   ),
                 ]),
 
@@ -344,6 +330,7 @@ class _UsageCard extends StatelessWidget {
             color: scheme.error, scheme: scheme, text: text),
         const SizedBox(height: 8),
         _Bar(label: L.cacheApiData, bytes: stats.apiBytes, total: total,
+            limit: stats.apiMaxBytes,
             color: scheme.secondary, scheme: scheme, text: text),
         const SizedBox(height: 8),
         _Bar(label: L.cacheScrobblesShort, bytes: stats.scrobbleBytes, total: total,

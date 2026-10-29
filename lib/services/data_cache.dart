@@ -29,6 +29,10 @@ class DataCache {
   static bool _warmedUp = false;
   static SharedPreferences? _prefs;
 
+  // User-defined size limit in bytes (0 = unlimited). Oldest entries go first.
+  static int maxBytes = 0;
+  static int _writes = 0;
+
   // ── Init ──────────────────────────────────────────────────────────────────
 
   static Future<void> init() async {
@@ -128,6 +132,22 @@ class DataCache {
     try {
       await _prefs!.setString('$_prefix$key', jsonEncode({'ts': ts, 'data': data}));
     } catch (_) { _mem.remove(key); }
+    if (maxBytes > 0 && ++_writes % 20 == 0) await enforce();
+  }
+
+  /// Evicts the oldest entries until the cache fits in [maxBytes].
+  static Future<void> enforce() async {
+    if (maxBytes <= 0) return;
+    await init();
+    var total = estimateDiskBytes();
+    if (total <= maxBytes) return;
+    final sorted = _mem.entries.toList()..sort((a, b) => a.value.ts.compareTo(b.value.ts));
+    for (final e in sorted) {
+      if (total <= maxBytes) break;
+      try { total -= jsonEncode({'ts': 0, 'data': e.value.data}).length * 2; } catch (_) {}
+      _mem.remove(e.key);
+      await _prefs!.remove('$_prefix${e.key}');
+    }
   }
 
   static Future<void> invalidate(String key) async {

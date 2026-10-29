@@ -15,6 +15,7 @@ class StorageStats {
   final int videoBytes;   // Apple Music motion artwork stored on disk
   final int maxBytes;     // photo (image) cache limit, 0 = unlimited
   final int videoMaxBytes; // video cache limit: 0 = unlimited, <0 = off
+  final int apiMaxBytes;   // API data cache limit, 0 = unlimited
 
   const StorageStats({
     required this.imageBytes,
@@ -23,6 +24,7 @@ class StorageStats {
     required this.videoBytes,
     required this.maxBytes,
     required this.videoMaxBytes,
+    this.apiMaxBytes = 0,
   });
 
   int get totalBytes => imageBytes + scrobbleBytes + apiBytes + videoBytes;
@@ -42,18 +44,31 @@ class StorageManager {
   static const _kVideoPref = 'ls_max_video_bytes';
   static const defaultMax      = 500 * 1024 * 1024; // 500 MB
   static const defaultVideoMax = 500 * 1024 * 1024; // 500 MB
+  static const _kApiPref   = 'ls_max_api_bytes';
 
   static int _max      = defaultMax;
   static int _videoMax = defaultVideoMax;
   static int get maxBytes      => _max;
   static int get videoMaxBytes => _videoMax;
+  static int _apiMax = 0; // user-defined, 0 = unlimited
+  static int get apiMaxBytes   => _apiMax;
 
-  // Scrobbles and API data are never limited: only photos and videos are.
+  // Photos, videos and API data have a user-defined limit (scrobble history is never limited).
   static Future<void> init() async {
     final p = await SharedPreferences.getInstance();
     _max      = p.getInt(_kPref) ?? defaultMax;
     _videoMax = p.getInt(_kVideoPref) ?? defaultVideoMax;
+    _apiMax   = p.getInt(_kApiPref) ?? 0;
+    DataCache.maxBytes = _apiMax;
     await VideoDiskCache.init(_videoMax);
+  }
+
+  static Future<void> setApiMaxBytes(int bytes) async {
+    _apiMax = bytes;
+    DataCache.maxBytes = bytes;
+    final p = await SharedPreferences.getInstance();
+    await p.setInt(_kApiPref, bytes);
+    await DataCache.enforce();
   }
 
   static Future<void> setVideoMaxBytes(int bytes) async {
@@ -82,6 +97,7 @@ class StorageManager {
       videoBytes:    video,
       maxBytes:      _max,
       videoMaxBytes: _videoMax,
+      apiMaxBytes:   _apiMax,
     );
   }
 

@@ -125,6 +125,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
       'accent': accentNotifier.value, 'dyn': useDynamicColorNotifier.value, 'np': useNowPlayingColorNotifier.value,
       'art': artworkColorThemeNotifier.value, 'dn': useDayNightAccentNotifier.value,
       'mode': themeModeNotifier.value, 'font': appFontNotifier.value,
+      'harm': colorHarmonyNotifier.value, 'shape': imageShapeNotifier.value,
     };
   }
 
@@ -139,22 +140,41 @@ class _YearRecapPageState extends State<YearRecapPage> {
     useDayNightAccentNotifier.value = b['dn'] as bool;
     themeModeNotifier.value = b['mode'] as ThemeMode;
     appFontNotifier.value = b['font'] as String;
+    colorHarmonyNotifier.value = b['harm'] as String;
+    imageShapeNotifier.value = b['shape'] as String;
   }
 
   void _openStyle() {
     showModalBottomSheet<void>(
       context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
       showDragHandle: true,
       barrierColor: Colors.black26,
       builder: (ctx) {
         final sc = Theme.of(ctx).colorScheme;
-        const colors = [0xFF7C3AED, 0xFFE11D48, 0xFFF97316, 0xFFEAB308, 0xFF16A34A, 0xFF0EA5E9, 0xFF14B8A6, 0xFFEC4899];
-        const fonts = [('GoogleSansFlex', 'Google Sans'), ('Inter', 'Inter'), ('SpaceGrotesk', 'Space Grotesk'), ('RobotoSlab', 'Roboto Slab'), ('DancingScript', 'Dancing Script'), ('Ndot57', 'Ndot 57')];
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(tx('yr_style'), style: TextStyle(color: sc.onSurface, fontSize: 16, fontWeight: FontWeight.w900)),
+        const colors = [0xFF7C3AED, 0xFF6366F1, 0xFF1D4ED8, 0xFF0EA5E9, 0xFF14B8A6, 0xFF16A34A, 0xFFEAB308, 0xFFF97316, 0xFFE11D48, 0xFFEC4899];
+        const fonts = [
+          ('', 'Auto'), ('Inter', 'Inter'), ('SpaceGrotesk', 'Space Grotesk'), ('GoogleSansFlex', 'Google Sans Flex'),
+          ('OpenSans', 'Open Sans'), ('Roboto', 'Roboto'), ('RobotoSlab', 'Roboto Slab'), ('DancingScript', 'Dancing Script'),
+          ('Spirax', 'Spirax'), ('Mynerve', 'Mynerve'), ('SingleDay', 'Single Day'), ('BetaniaPatmosGDL', 'Betania Patmos GDL'),
+          ('Ndot57', 'Nothing Ndot 57'), ('Ndot55', 'Nothing Ndot 55'), ('Ndot77', 'Nothing Ndot 77'), ('NType82', 'Nothing NType 82'),
+        ];
+        const harmonies = ['mono', 'tinted', 'classic', 'vivid', 'soft'];
+        Widget title(String t) => Padding(
+              padding: const EdgeInsets.only(top: 18, bottom: 10),
+              child: Text(t, style: TextStyle(color: sc.onSurface, fontSize: 14, fontWeight: FontWeight.w800)),
+            );
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.6,
+          minChildSize: 0.35,
+          maxChildSize: 0.95,
+          builder: (_, scroll) => ListView(
+            controller: scroll,
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
+            children: [
+              Text(tx('yr_style'), style: TextStyle(color: sc.onSurface, fontSize: 18, fontWeight: FontWeight.w900)),
               const SizedBox(height: 12),
               ValueListenableBuilder<Color>(
                 valueListenable: accentNotifier,
@@ -170,7 +190,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                         accentNotifier.value = Color(c);
                       },
                       child: Container(
-                        width: 38, height: 38,
+                        width: 40, height: 40,
                         decoration: BoxDecoration(
                           color: Color(c), shape: BoxShape.circle,
                           border: Border.all(color: cur.toARGB32() == c ? sc.onSurface : Colors.transparent, width: 3),
@@ -179,7 +199,19 @@ class _YearRecapPageState extends State<YearRecapPage> {
                     ),
                 ]),
               ),
-              const SizedBox(height: 14),
+              title(tx('ap_harmony_title')),
+              ValueListenableBuilder<String>(
+                valueListenable: colorHarmonyNotifier,
+                builder: (_, h, _) => Wrap(spacing: 8, runSpacing: 4, children: [
+                  for (final k in harmonies)
+                    ChoiceChip(
+                      label: Text(tx('ap_harmony_$k')),
+                      selected: h == k,
+                      onSelected: (_) { _backupStyle(); colorHarmonyNotifier.value = k; },
+                    ),
+                ]),
+              ),
+              const SizedBox(height: 18),
               ValueListenableBuilder<ThemeMode>(
                 valueListenable: themeModeNotifier,
                 builder: (_, m, _) => SegmentedButton<ThemeMode>(
@@ -192,19 +224,40 @@ class _YearRecapPageState extends State<YearRecapPage> {
                   onSelectionChanged: (v) { _backupStyle(); themeModeNotifier.value = v.first; },
                 ),
               ),
-              const SizedBox(height: 14),
+              title(tx('shape_title')),
+              ValueListenableBuilder<String>(
+                valueListenable: imageShapeNotifier,
+                builder: (_, mode, _) => Wrap(spacing: 10, runSpacing: 10, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                  for (final m in ['mix', for (var i = 0; i < kM3ImageShapeCount; i++) 'shape:$i'])
+                    GestureDetector(
+                      onTap: () { _backupStyle(); imageShapeNotifier.value = m; },
+                      child: Container(
+                        width: 44, height: 44,
+                        alignment: Alignment.center,
+                        decoration: ShapeDecoration(
+                          color: mode == m ? sc.primary : sc.secondaryContainer,
+                          shape: m == 'mix' ? const CircleBorder() : m3ImageShape(int.parse(m.substring(6)), 44),
+                        ),
+                        child: m == 'mix'
+                            ? Icon(Icons.auto_awesome_rounded, size: 20, color: mode == m ? sc.onPrimary : sc.onSecondaryContainer)
+                            : null,
+                      ),
+                    ),
+                ]),
+              ),
+              title(tx('txt_font')),
               ValueListenableBuilder<String>(
                 valueListenable: appFontNotifier,
                 builder: (_, f, _) => Wrap(spacing: 8, runSpacing: 4, children: [
                   for (final ft in fonts)
                     ChoiceChip(
-                      label: Text(ft.$2, style: TextStyle(fontFamily: ft.$1)),
+                      label: Text(ft.$1.isEmpty ? tx('txt_font_def') : ft.$2, style: ft.$1.isEmpty ? null : TextStyle(fontFamily: ft.$1)),
                       selected: f == ft.$1,
                       onSelected: (_) { _backupStyle(); appFontNotifier.value = ft.$1; },
                     ),
                 ]),
               ),
-            ]),
+            ],
           ),
         );
       },

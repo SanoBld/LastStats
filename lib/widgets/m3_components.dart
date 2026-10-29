@@ -832,6 +832,63 @@ class M3ShapedBox extends StatelessWidget {
   }
 }
 
+
+/// Static [child] clipped by a shape that rotates continuously (star by default).
+/// Follows the image-shape setting: square / circle stay static, "mix" -> star.
+class M3SpinShape extends StatefulWidget {
+  const M3SpinShape({super.key, required this.size, required this.builder});
+  final double size;
+  final Widget Function(double bigSize) builder;
+  @override
+  State<M3SpinShape> createState() => _M3SpinShapeState();
+}
+
+class _M3SpinShapeState extends State<M3SpinShape> with SingleTickerProviderStateMixin {
+  late final AnimationController _c =
+      AnimationController(vsync: this, duration: const Duration(seconds: 10))..repeat();
+  @override
+  void dispose() { _c.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
+    final sz = widget.size;
+    return ValueListenableBuilder<String>(
+      valueListenable: imageShapeNotifier,
+      builder: (_, mode, _) {
+        if (mode == 'square' || mode == 'circle') {
+          return SizedBox(width: sz, height: sz, child: ClipPath(
+            clipper: ShapeBorderClipper(shape: m3ResolveShape(mode, 0, sz)),
+            child: widget.builder(sz)));
+        }
+        final n = mode.startsWith('shape:') ? (int.tryParse(mode.substring(6)) ?? 4) : 4;
+        final inner = sz * 0.74;
+        return SizedBox(width: sz, height: sz, child: Center(child: ClipPath(
+          clipper: _M3RotClipper(m3ImageShape(n, inner), _c),
+          child: SizedBox(width: inner, height: inner, child: OverflowBox(
+            minWidth: 0, minHeight: 0, maxWidth: sz * 1.45, maxHeight: sz * 1.45,
+            child: widget.builder(sz * 1.45))))));
+      });
+  }
+}
+
+class _M3RotClipper extends CustomClipper<Path> {
+  final ShapeBorder shape;
+  final Animation<double> anim;
+  _M3RotClipper(this.shape, this.anim) : super(reclip: anim);
+  @override
+  Path getClip(Size size) {
+    final path = shape.getOuterPath(Offset.zero & size);
+    final c = size.center(Offset.zero);
+    final m = Matrix4.identity()
+      ..translateByDouble(c.dx, c.dy, 0, 1)
+      ..rotateZ(anim.value * 2 * 3.141592653589793)
+      ..translateByDouble(-c.dx, -c.dy, 0, 1);
+    return path.transform(m.storage);
+  }
+  @override
+  bool shouldReclip(covariant _M3RotClipper old) => old.shape != shape;
+}
+
 class M3NetImage extends StatelessWidget {
   const M3NetImage({
     super.key,
