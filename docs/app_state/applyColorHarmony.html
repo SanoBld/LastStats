@@ -64,15 +64,19 @@
     </section>
     
 <section class="desc markdown">
-  <p>'classic' keeps the scheme as is, every other style uses one hue.</p>
+  <p>'classic' keeps the scheme as is, 'tinted' uses one hue and tints every
+neutral too, every other style uses one hue.</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">ColorScheme applyColorHarmony(ColorScheme s, String harmony) =&gt;
-    harmony == &#39;classic&#39; ? s : monochromeAccents(s);</code></pre>
+  <pre class="language-dart"><code class="language-dart">ColorScheme applyColorHarmony(ColorScheme s, String harmony) =&gt; switch (harmony) {
+      &#39;classic&#39; =&gt; s,
+      &#39;tinted&#39;  =&gt; tintNeutrals(monochromeAccents(s)),
+      _         =&gt; monochromeAccents(s),
+    };</code></pre>
 </section>
 
 

@@ -76,6 +76,7 @@
   try {
     await _prefs!.setString(&#39;$_prefix$key&#39;, jsonEncode({&#39;ts&#39;: ts, &#39;data&#39;: data}));
   } catch (_) { _mem.remove(key); }
+  if (maxBytes &gt; 0 &amp;&amp; ++_writes % 20 == 0) await enforce();
 }</code></pre>
 </section>
 

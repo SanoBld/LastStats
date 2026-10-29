@@ -676,7 +676,8 @@
 
 </dt>
 <dd>
-  'classic' keeps the scheme as is, every other style uses one hue.
+  'classic' keeps the scheme as is, 'tinted' uses one hue and tints every
+neutral too, every other style uses one hue.
   
 
 </dd>
@@ -872,6 +873,21 @@ built from an actually-colored seed.
 </dt>
 <dd>
   
+  
+
+</dd>
+
+          <dt id="tintNeutrals" class="callable">
+  <span class="name"><a href="../app_state/tintNeutrals.html">tintNeutrals</a></span><span class="signature">(<wbr><span class="parameter" id="tintNeutrals-param-s"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/material/ColorScheme-class.html">ColorScheme</a></span> <span class="parameter-name">s</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/material/ColorScheme-class.html">ColorScheme</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Gives every neutral role (surfaces, outlines, on-surface text) a faint tint
+of the primary hue, so the UI never shows a dead neutral gray.
+Lightness is kept, only hue / a little saturation change.
   
 
 </dd>

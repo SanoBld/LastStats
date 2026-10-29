@@ -76,6 +76,7 @@
   final variant = switch (harmony) {
     &#39;vivid&#39; =&gt; DynamicSchemeVariant.vibrant,
     &#39;soft&#39;  =&gt; DynamicSchemeVariant.neutral,
+    &#39;tinted&#39; =&gt; DynamicSchemeVariant.tonalSpot,
     _       =&gt; DynamicSchemeVariant.tonalSpot,
   };
   final base = neutralizeIfGraySeed(ColorScheme.fromSeed(
