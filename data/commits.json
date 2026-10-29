@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-29T21:21:00Z",
+  "updated": "2026-10-29T21:53:18Z",
   "commits": [
+    {
+      "sha": "a04e10895d35244631efcfcaf0b3d51fe953a8e5",
+      "message": "feat: ajout de nouveaux messages de salutation personnalisés selon l'heure, les habitudes d'écoute et l'anniversaire du compte, ainsi que des améliorations visuelles dans le tableau de bord",
+      "date": "2026-10-29T21:52:49Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/a04e10895d35244631efcfcaf0b3d51fe953a8e5",
+      "tags": []
+    },
     {
       "sha": "1a0b7cac341485c323a72078c6ed2e6a2a3dcf90",
       "message": "feat: ajout de la gestion de la concurrence pour les déploiements sur gh-pages et amélioration de l'interface utilisateur avec des animations et des comportements de pression cohérents",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/6e2fa42874363273f10ff505835f292afe2e0e35",
-      "tags": []
-    },
-    {
-      "sha": "847a1c7ebf4dc0cb0be538c6313c08da59c5bd8c",
-      "message": "refactor: réorganiser la logique de recherche d'images pour prioriser les sources de meilleure qualité et optimiser la gestion de la mémoire des vignettes",
-      "date": "2026-08-26T10:55:37Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/847a1c7ebf4dc0cb0be538c6313c08da59c5bd8c",
       "tags": []
     }
   ]
