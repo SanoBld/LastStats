@@ -701,8 +701,10 @@ class M3TonalButton extends StatefulWidget {
     this.height = 48,
     this.padding = const EdgeInsets.symmetric(horizontal: 14),
     this.colorDuration,
+    this.pressedRadius,
   });
 
+  final BorderRadius? pressedRadius; // shape while held (default: slightly squared)
   final Duration? colorDuration;
   final Widget child;
   final VoidCallback? onTap;      // null = disabled
@@ -723,7 +725,7 @@ class _M3TonalButtonState extends State<M3TonalButton> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final down = _down && !M3Motion.reduced(context);
-    final r = down ? BorderRadius.circular(12) : widget.radius;
+    final r = down ? (widget.pressedRadius ?? BorderRadius.circular(12)) : widget.radius;
     final base = widget.color ?? scheme.surfaceContainerHigh;
     return AnimatedScale(
       scale: down ? 0.94 : 1.0,

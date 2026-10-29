@@ -1601,10 +1601,15 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                       const SizedBox(height: 5),
                       ClipRRect(
                         borderRadius: BorderRadius.circular(3),
-                        child: LinearProgressIndicator(
-                          value: frac.clamp(0.0, 1.0), minHeight: 4,
-                          color: scheme.primary,
-                          backgroundColor: scheme.primary.withValues(alpha: 0.15),
+                        child: TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0, end: frac.clamp(0.0, 1.0)),
+                          duration: Duration(milliseconds: 700 + i * 70),
+                          curve: Curves.easeOutCubic,
+                          builder: (_, v, _) => LinearProgressIndicator(
+                            value: v, minHeight: 4,
+                            color: scheme.primary,
+                            backgroundColor: scheme.primary.withValues(alpha: 0.15),
+                          ),
                         ),
                       ),
                     ],
@@ -1681,20 +1686,18 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
 
     Widget tab(int i, String label) => Expanded(
           child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: () => _setTrkTab(i),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 220),
-              curve: Curves.easeOutCubic,
+            child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 9),
-              decoration: BoxDecoration(
-                color: _trkTab == i ? scheme.primary : Colors.transparent,
-                borderRadius: BorderRadius.circular(18),
-              ),
               child: Center(
-                child: Text(label,
-                    style: text.labelLarge?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: _trkTab == i ? scheme.onPrimary : scheme.primary)),
+                child: AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 250),
+                  style: (text.labelLarge ?? const TextStyle()).copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: _trkTab == i ? scheme.onPrimary : scheme.primary),
+                  child: Text(label),
+                ),
               ),
             ),
           ),
@@ -1721,9 +1724,27 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                 color: scheme.primary.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(22),
               ),
-              child: Row(children: [
-                tab(0, tx('art_popular')),
-                tab(1, tx('art_recent')),
+              child: Stack(children: [
+                Positioned.fill(
+                  child: AnimatedAlign(
+                    duration: const Duration(milliseconds: 320),
+                    curve: Curves.easeOutBack,
+                    alignment: _trkTab == 0 ? Alignment.centerLeft : Alignment.centerRight,
+                    child: FractionallySizedBox(
+                      widthFactor: 0.5,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: scheme.primary,
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Row(children: [
+                  tab(0, tx('art_popular')),
+                  tab(1, tx('art_recent')),
+                ]),
               ]),
             ),
             const SizedBox(height: 14),
@@ -1733,6 +1754,13 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               alignment: Alignment.topCenter,
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 260),
+                layoutBuilder: (cur, prev) => Stack(
+                  alignment: Alignment.topCenter,
+                  children: [
+                    for (final p in prev) Positioned(top: 0, left: 0, right: 0, child: p),
+                    if (cur != null) cur,
+                  ],
+                ),
                 transitionBuilder: (c, a) => FadeTransition(
                   opacity: a,
                   child: SlideTransition(
@@ -3075,7 +3103,8 @@ class _M3Pill extends StatelessWidget {
         : (filled ? scheme.onPrimaryContainer : scheme.primary);
     return M3TonalButton(
       height: 36,
-      radius: BorderRadius.circular(999),
+      radius: BorderRadius.circular(18),
+      pressedRadius: BorderRadius.circular(12),
       color: bg,
       padding: const EdgeInsets.symmetric(horizontal: 14),
       onTap: onTap,

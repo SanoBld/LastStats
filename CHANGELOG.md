@@ -32,6 +32,10 @@
 
 ## v4.3.0
 
+- Details: the "read more" button keeps rounded corners while pressed
+- Artist page: the top tracks ranking has a sliding tab selector, bars that fill in, and a cleaner switch between "popular" and "recent"
+- Dashboard background: you can now pick an image from your device (kept inside the app, 4 MB max) in addition to a link
+- Dashboard greeting: new messages when a friend catches up with your scrobbles, at Christmas, New Year and Easter, and for each season
 - Dashboard: the accent color now follows the cover of the playing track even when Last.fm has no picture for it (tracks with an animated cover)
 - Dashboard: the greeting next to your profile changes with the time of day, the weekend, what you are listening to, your listening habits and your account anniversary (translated in every language)
 - Dashboard: the now-playing card shows the cover on the left, fading into the card color, with the title on the right (no more spinning shape)

@@ -1,6 +1,8 @@
 // lib/screens/settings/dashboard_settings_page.dart
 
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import '../../services/header_image_service.dart';
 import '../../widgets/m3_components.dart';
 import '../../theme/m3_shapes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -225,7 +227,29 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
             value: _headerSource,
             onChanged: (v) => _setStr('ls_header_source', v, () => _headerSource = v),
           ),
-          if (_headerSource == 'custom')
+          if (_headerSource == 'custom') ...[
+            ValueListenableBuilder<Uint8List?>(
+              valueListenable: HeaderImageService.bytes,
+              builder: (_, b, _) => Column(children: [
+                SettingActionRow(
+                  icon: Icons.add_photo_alternate_outlined,
+                  title: tx('hdr_pick_t'),
+                  subtitle: b == null ? tx('hdr_pick_s') : tx('hdr_pick_set'),
+                  onTap: () async {
+                    final r = await HeaderImageService.pick();
+                    if (!context.mounted || r == null || r == 'cancel') return;
+                    showAppSnackBar(context, SnackBar(content: Text(tx(r == 'size' ? 'hdr_too_big' : 'hdr_invalid'))));
+                  },
+                ),
+                if (b != null)
+                  SettingActionRow(
+                    icon: Icons.delete_outline_rounded,
+                    title: tx('hdr_remove_t'),
+                    danger: true,
+                    onTap: () => HeaderImageService.remove(),
+                  ),
+              ]),
+            ),
             SettingTextRow(
               icon: Icons.link_rounded,
               title: L.settingsHeaderCustomUrl,
@@ -233,6 +257,7 @@ class _DashboardSettingsPageState extends State<DashboardSettingsPage> {
               value: _headerCustomUrl,
               onChanged: (v) => _setStr('ls_header_custom_url', v, () => _headerCustomUrl = v),
             ),
+          ],
           if (isTop)
             SettingChoiceRow(
               icon: Icons.date_range_rounded,

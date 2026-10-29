@@ -13,6 +13,7 @@ class _FriendData {
   final String nowPlayingArtist;
   final String lastTrack;
   final String lastArtist;
+  final int    playcount;
 
   const _FriendData({
     required this.username,
@@ -23,6 +24,7 @@ class _FriendData {
     this.nowPlayingArtist = '',
     this.lastTrack        = '',
     this.lastArtist       = '',
+    this.playcount        = 0,
   });
 }
 
@@ -1148,6 +1150,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
           nowPlayingArtist: isOnline  ? artistName : '',
           lastTrack:        !isOnline ? trackName  : '',
           lastArtist:       !isOnline ? artistName : '',
+          playcount:        int.tryParse((u['playcount'] ?? '0').toString()) ?? 0,
         ));
       }
 
@@ -1349,7 +1352,8 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     String url = '';
     switch (_headerSource) {
       case 'custom':
-        url = _headerCustomUrl;
+        await HeaderImageService.load();
+        url = HeaderImageService.has ? HeaderImageService.marker : _headerCustomUrl;
       case 'nowplaying':
         if (_nowPlaying != null) {
           final rawNpUrl = _extractImage(_nowPlaying!['image']);
@@ -1537,6 +1541,19 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   // ── Greeting that follows the time, the listening and the account age ──
   final int _greetSeed = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
+  // Western Easter Sunday (Gauss algorithm).
+  DateTime _easterSunday(int y) {
+    final a = y % 19, b = y ~/ 100, c = y % 100;
+    final d = b ~/ 4, e = b % 4, f = (b + 8) ~/ 25, g = (b - f + 1) ~/ 3;
+    final h = (19 * a + b - d - g + 15) % 30;
+    final i = c ~/ 4, k = c % 4;
+    final l = (32 + 2 * e + 2 * i - h - k) % 7;
+    final m = (a + 11 * h + 22 * l) ~/ 451;
+    final month = (h + l - 7 * m + 114) ~/ 31;
+    final day = ((h + l - 7 * m + 114) % 31) + 1;
+    return DateTime(y, month, day);
+  }
+
   String _greeting(String name) {
     final now = DateTime.now();
     final h = now.hour;
@@ -1551,7 +1568,29 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         return tx('gr_birthday${_greetSeed % 2 + 1}', {'name': name, 'years': '$years'});
       }
     }
+    final args = {'name': name};
+    // A friend is closing in on our scrobble count.
+    final total = _total();
+    if (total > 0) {
+      for (final f in _friends) {
+        if (f.playcount < total && f.playcount >= total * 0.93) {
+          return tx('gr_catchup${_greetSeed % 2 + 1}', {'name': name, 'friend': f.username});
+        }
+      }
+    }
+    // Special days first.
+    final md = now.month * 100 + now.day;
+    final easter = _easterSunday(now.year);
+    final dEaster = DateTime(now.year, now.month, now.day).difference(easter).inDays;
+    if (md == 1224 || md == 1225) return tx('gr_christmas${_greetSeed % 2 + 1}', args);
+    if (md == 1231 || md == 101)  return tx('gr_newyear${_greetSeed % 2 + 1}', args);
+    if (dEaster >= 0 && dEaster <= 1) return tx('gr_easter${_greetSeed % 2 + 1}', args);
     final pool = <String>[];
+    // Seasons (northern hemisphere), mixed in with the rest.
+    final season = (now.month >= 3 && now.month <= 5) ? 'spring'
+        : (now.month >= 6 && now.month <= 8) ? 'summer'
+        : (now.month >= 9 && now.month <= 11) ? 'autumn' : 'winter';
+    pool.addAll(['gr_${season}1', 'gr_${season}2']);
     final part = h < 5 ? 'night' : h < 12 ? 'morning' : h < 18 ? 'afternoon' : 'evening';
     pool.addAll([for (var i = 1; i <= 3; i++) 'gr_$part$i']);
     if (now.weekday >= 6) pool.addAll(['gr_weekend1', 'gr_weekend2']);
@@ -2563,13 +2602,8 @@ class _BlurredHeaderImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget img = Image.network(
-      url,
-      fit: BoxFit.cover,
-      width: double.infinity,
-      height: double.infinity,
-      errorBuilder: (_, _, _) => _GradientHeader(scheme: scheme),
-    );
+    Widget img = HeaderImageService.image(url,
+        onError: () => _GradientHeader(scheme: scheme));
     if (blur > 0.5) {
       img = ImageFiltered(
         imageFilter: ImageFilter.blur(
@@ -3807,14 +3841,8 @@ class _AmbientHeaderState extends State<_AmbientHeader>
                   sigmaY: ambientBlur,
                   tileMode: TileMode.mirror,
                 ),
-                child: Image.network(
-                  widget.url,
-                  fit: BoxFit.cover,
-                  width:  double.infinity,
-                  height: double.infinity,
-                  errorBuilder: (_, _, _) =>
-                      _GradientHeader(scheme: widget.scheme),
-                ),
+                child: HeaderImageService.image(widget.url,
+                    onError: () => _GradientHeader(scheme: widget.scheme)),
               ))
             : _GradientHeader(scheme: widget.scheme),
       ),

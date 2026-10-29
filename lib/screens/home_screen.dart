@@ -26,6 +26,7 @@ import 'package:flutter/gestures.dart' show TapGestureRecognizer;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData, HapticFeedback, rootBundle, LogicalKeyboardKey;
 import '../services/api_http.dart';
+import '../services/header_image_service.dart';
 import '../services/offline_image_cache.dart';
 import '../services/cache_owner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
