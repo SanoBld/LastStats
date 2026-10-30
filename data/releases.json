@@ -1,7 +1,161 @@
 {
-  "updated": "2026-10-30T22:38:57Z",
+  "updated": "2026-10-30T22:53:04Z",
   "stars": 3,
   "releases": [
+    {
+      "tag_name": "v4.3.0-beta",
+      "name": "LastStats v4.3.0-beta",
+      "published_at": "2026-10-30T22:51:52Z",
+      "prerelease": true,
+      "draft": false,
+      "body": "## LastStats v4.3.0-beta\n\n_(Pas d'\\''entrée trouvée dans CHANGELOG.md pour v4.3.0-beta — ajoute une section \"## v4.3.0-beta\" avant de créer le tag)_\n\n### Android\n| File | Use case |\n|------|----------|\n| `app-universal-release.apk` | Works on any phone (biggest file) |\n| `app-arm64-v8a-release.apk` | Most modern phones (2018+) |\n| `app-armeabi-v7a-release.apk` | Older 32-bit phones |\n| `app-x86_64-release.apk` | Emulators / x86 tablets |\n\n### iOS\n| File | Use case |\n|------|----------|\n| `LastStats-ios.ipa` | Unsigned: install with AltStore / Sideloadly / TrollStore (or re-sign it yourself) |\n\n### Desktop\n| File | Platform |\n|------|----------|\n| `LastStats-Setup-x64.exe` | **Windows (x64) — recommended installer** |\n| `LastStats-Setup-arm64.exe` | **Windows on ARM (Snapdragon) — recommended installer** |\n| `laststats-windows.zip` | Windows (x64), portable / no install |\n| `laststats-windows-arm64.zip` | Windows on ARM, portable / no install |\n| `LastStats-linux-x64.deb` | **Linux x64 (Debian/Ubuntu/Mint) — recommended installer** |\n| `LastStats-linux-arm64.deb` | **Linux ARM64 (Debian/Ubuntu, Raspberry Pi...) — recommended installer** |\n| `LastStats-linux-x64.rpm` | **Linux x64 (Fedora/openSUSE/RHEL) — recommended installer** |\n| `LastStats-linux-arm64.rpm` | **Linux ARM64 (Fedora/openSUSE) — recommended installer** |\n| `install-linux.sh` | Linux, any CPU: picks the right package for your distro |\n| `LastStats-linux-x64.AppImage` | Linux x64, any distro (portable) |\n| `LastStats-linux-arm64.AppImage` | Linux ARM64, any distro (portable) |\n| `laststats-linux.zip`   | Linux x64, manual install |\n| `laststats-linux-arm64.zip` | Linux ARM64, manual install |\n| `LastStats-macos-arm64.dmg` | **macOS Apple Silicon (M1 and later) — recommended installer** (drag to Applications) |\n| `LastStats-macos-x64.dmg` | **macOS Intel — recommended installer** (drag to Applications) |\n| `LastStats-macos.dmg`   | macOS universal (Intel + Apple Silicon) installer |\n| `laststats-macos-arm64.zip` | macOS Apple Silicon, manual install |\n| `laststats-macos-x64.zip` | macOS Intel, manual install |\n| `laststats-macos.zip`   | macOS universal, manual install |\n**Full Changelog**: https://github.com/SanoBld/LastStats/compare/v4.2.1...v4.3.0-beta",
+      "assets": [
+        {
+          "name": "app-arm64-v8a-release.apk",
+          "size": 48380114,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/app-arm64-v8a-release.apk"
+        },
+        {
+          "name": "app-armeabi-v7a-release.apk",
+          "size": 45128842,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/app-armeabi-v7a-release.apk"
+        },
+        {
+          "name": "app-universal-release.apk",
+          "size": 106971112,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/app-universal-release.apk"
+        },
+        {
+          "name": "app-x86_64-release.apk",
+          "size": 51199016,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/app-x86_64-release.apk"
+        },
+        {
+          "name": "install-linux.sh",
+          "size": 1940,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/install-linux.sh"
+        },
+        {
+          "name": "LastStats-ios.ipa",
+          "size": 25589131,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-ios.ipa"
+        },
+        {
+          "name": "LastStats-linux-arm64.AppImage",
+          "size": 17902088,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-linux-arm64.AppImage"
+        },
+        {
+          "name": "LastStats-linux-arm64.deb",
+          "size": 14457582,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-linux-arm64.deb"
+        },
+        {
+          "name": "LastStats-linux-arm64.rpm",
+          "size": 18664845,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-linux-arm64.rpm"
+        },
+        {
+          "name": "laststats-linux-arm64.zip",
+          "size": 18929025,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/laststats-linux-arm64.zip"
+        },
+        {
+          "name": "LastStats-linux-x64.AppImage",
+          "size": 18360824,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-linux-x64.AppImage"
+        },
+        {
+          "name": "LastStats-linux-x64.deb",
+          "size": 14793476,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-linux-x64.deb"
+        },
+        {
+          "name": "LastStats-linux-x64.rpm",
+          "size": 19073161,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-linux-x64.rpm"
+        },
+        {
+          "name": "laststats-linux.zip",
+          "size": 19392944,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/laststats-linux.zip"
+        },
+        {
+          "name": "LastStats-macos-arm64.dmg",
+          "size": 22775652,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-macos-arm64.dmg"
+        },
+        {
+          "name": "laststats-macos-arm64.zip",
+          "size": 229376537,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/laststats-macos-arm64.zip"
+        },
+        {
+          "name": "LastStats-macos-x64.dmg",
+          "size": 24132608,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-macos-x64.dmg"
+        },
+        {
+          "name": "laststats-macos-x64.zip",
+          "size": 230513913,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/laststats-macos-x64.zip"
+        },
+        {
+          "name": "LastStats-macos.dmg",
+          "size": 38560468,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-macos.dmg"
+        },
+        {
+          "name": "laststats-macos.zip",
+          "size": 243008515,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/laststats-macos.zip"
+        },
+        {
+          "name": "LastStats-Setup-arm64.exe",
+          "size": 16247406,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-Setup-arm64.exe"
+        },
+        {
+          "name": "LastStats-Setup-x64.exe",
+          "size": 17065355,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-Setup-x64.exe"
+        },
+        {
+          "name": "laststats-windows-arm64.zip",
+          "size": 21604255,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/laststats-windows-arm64.zip"
+        },
+        {
+          "name": "laststats-windows.zip",
+          "size": 22539683,
+          "download_count": 0,
+          "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/laststats-windows.zip"
+        }
+      ]
+    },
     {
       "tag_name": "v4.2.1",
       "name": "LastStats v4.2.1",
@@ -43,7 +197,7 @@
         {
           "name": "LastStats-ios.ipa",
           "size": 25473603,
-          "download_count": 88,
+          "download_count": 89,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/LastStats-ios.ipa"
         },
         {
