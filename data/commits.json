@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-30T13:31:54Z",
+  "updated": "2026-10-30T14:08:56Z",
   "commits": [
+    {
+      "sha": "bd95b9342075c8d7eb8f946aed7e808edad13434",
+      "message": "feat: ajout de nouveaux éléments de style pour le partage, y compris des formes Material, des logos agrandis et des animations de pression",
+      "date": "2026-10-30T14:05:57Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/bd95b9342075c8d7eb8f946aed7e808edad13434",
+      "tags": []
+    },
     {
       "sha": "362771ba5f97d28100eb2f9905e705fb2b051e6c",
       "message": "feat: amélioration de l'affichage des cartes de partage avec un logo LastStats agrandi et repositionné, et uniformisation des tailles des tuiles de graphique",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/d351b3df8e4b2aba3b0533caa1a7d894357c3f11",
-      "tags": []
-    },
-    {
-      "sha": "e8e6ec63c389f740117f25264d0a27ca4338254c",
-      "message": "Refactor code structure for improved readability and maintainability",
-      "date": "2026-08-27T16:45:10Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/e8e6ec63c389f740117f25264d0a27ca4338254c",
       "tags": []
     }
   ]
