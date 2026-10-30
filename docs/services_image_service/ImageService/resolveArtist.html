@@ -93,7 +93,7 @@
   final mb = await _mbArtistImage(artist);
   if (mb.isNotEmpty) return _persistUrl(key, mb, &#39;musicbrainz&#39;);
 
-  final wiki = await _wikipediaImage(artist, expectName: artist);
+  final wiki = await _wikipediaImage(artist, expectName: artist, artist: true);
   if (wiki.isNotEmpty) return _persistUrl(key, wiki, &#39;wikipedia&#39;);
 
   &#47;&#47; Last.fm last — its own catalog images are usually much lower
