@@ -296,7 +296,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
         for (final t in l) {
           if (((t['preview'] as String?) ?? '').isEmpty) continue;
           final an = '${(t['artist'] as Map?)?['name'] ?? ''}';
-          if (artist == null || artist.isEmpty || _same(an, artist) || an.toLowerCase().contains(artist.toLowerCase()) || (an.isNotEmpty && artist.toLowerCase().contains(an.toLowerCase()))) { best = t; break; }
+          if (artist == null || artist.isEmpty || _same(an, artist)) { best = t; break; }
         }
         if (best == null) return null;
         return _PvRes(best['preview'] as String, '${best['title']} — ${(best['artist'] as Map?)?['name'] ?? ''}');
@@ -305,19 +305,17 @@ class _YearRecapPageState extends State<YearRecapPage> {
         res = pick(list(await get(Uri.https('api.deezer.com', '/search', {'q': 'artist:"${q.artist}" track:"${q.name}"', 'limit': '5'}))), artist: q.artist);
         if (res == null) {
           final l2 = list(await get(Uri.https('api.deezer.com', '/search', {'q': '${q.artist} ${q.name}', 'limit': '8'})));
-          res = pick(l2, artist: q.artist) ?? pick(l2);
+          res = pick(l2, artist: q.artist);
         }
       } else if (q.type == 'artists') {
         final arts = list(await get(Uri.https('api.deezer.com', '/search/artist', {'q': q.name, 'limit': '5'})));
         Map<String, dynamic>? a;
         for (final x in arts) { if (_same('${x['name']}', q.name)) { a = x; break; } }
-        a ??= arts.firstOrNull;
         if (a != null) res = pick(list(await get(Uri.https('api.deezer.com', '/artist/${a['id']}/top', {'limit': '10'}))));
       } else {
         final als = list(await get(Uri.https('api.deezer.com', '/search/album', {'q': '${q.artist} ${q.name}', 'limit': '3'})));
         Map<String, dynamic>? a;
         for (final x in als) { if (_same('${(x['artist'] as Map?)?['name']}', q.artist)) { a = x; break; } }
-        a ??= als.firstOrNull;
         if (a != null) {
           final tr = list(await get(Uri.https('api.deezer.com', '/album/${a['id']}/tracks', {'limit': '10'})));
           // album track endpoint has no artist field: fall back to the album artist

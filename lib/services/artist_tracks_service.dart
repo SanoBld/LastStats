@@ -20,6 +20,12 @@ class ArtistTracksService {
       .replaceAll(RegExp(r'\(.*?\)|\[.*?\]'), '')
       .replaceAll(RegExp(r'[^\p{L}\p{N}]+', unicode: true), '');
 
+  // Exact artist, or a credit like "A & B" / "A feat. B" whose first name is the artist.
+  static bool _credited(String raw, String want) =>
+      _norm(raw) == want ||
+      raw.split(RegExp(r'\s+(?:&|and|feat\.?|ft\.?|x|with)\s+|,', caseSensitive: false))
+          .any((p) => _norm(p) == want);
+
   static Future<List<RecentTrack>> recent(String artist, {int limit = 10}) async {
     final key = artist.toLowerCase();
     if (_cache.containsKey(key)) return _cache[key]!;
@@ -35,7 +41,7 @@ class ArtistTracksService {
         final rows = <Map>[];
         for (final r in results.whereType<Map>()) {
           final a = _norm((r['artistName'] ?? '').toString());
-          if (a.isEmpty || !(a == want || a.contains(want))) continue;
+          if (a.isEmpty || !_credited((r['artistName'] ?? '').toString(), want)) continue;
           final n = _norm((r['trackName'] ?? '').toString());
           if (n.isEmpty || !seen.add(n)) continue;   // same song, other release
           rows.add(r);
