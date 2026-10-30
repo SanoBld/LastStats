@@ -1,6 +1,14 @@
 {
   "items": [
     {
+      "id": "news_1793400156",
+      "title": "Clear the image cache",
+      "body": "We fixed wrong and missing covers and photos. To fetch everything again with the new rules, clear the image cache after updating 4.3.0 (BETA) : Settings > Cache.",
+      "type": "fix",
+      "emoji": "🖼️",
+      "date": "30/10"
+    },
+    {
       "id": "news_1789572708",
       "title": "LastStats Showcase Preview Site",
       "body": "Here is a preview of the new LastStats showcase website. Please note that this is an early draft, so it is still a work in progress and remains subject to minor updates and adjustments. Feel free to check it out!  https://sanobld.github.io/LastStats/",
