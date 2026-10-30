@@ -67,15 +67,15 @@ class ShareCardFrame extends StatelessWidget {
           children: [
             Row(children: [
               Container(
-                width: 52 * k, height: 52 * k,
-                padding: EdgeInsets.all(9 * k),
+                width: 76 * k, height: 76 * k,
+                padding: EdgeInsets.all(13 * k),
                 decoration: BoxDecoration(
                     color: s.primary, shape: BoxShape.circle),
-                child: AppLogo(size: 34 * k, color: s.onPrimary),
+                child: AppLogo(size: 50 * k, color: s.onPrimary),
               ),
-              SizedBox(width: 14 * k),
+              SizedBox(width: 18 * k),
               Text('LastStats', style: TextStyle(
-                  fontSize: 24 * k, fontWeight: FontWeight.w800,
+                  fontSize: 30 * k, fontWeight: FontWeight.w800,
                   letterSpacing: -0.2, color: s.onSurface)),
               const Spacer(),
               if (badge != null && badge!.isNotEmpty)
@@ -101,14 +101,12 @@ class ShareCardFrame extends StatelessWidget {
                 height: 1.1, letterSpacing: -0.5, color: s.onSurface)),
             SizedBox(height: 26 * k),
             child,
-            SizedBox(height: 24 * k),
-            Row(children: [
-              AppLogo(size: 20 * k, color: s.onSurfaceVariant),
-              SizedBox(width: 10 * k),
-              Flexible(child: Text(footer, style: TextStyle(
-                  fontSize: 16 * k, fontWeight: FontWeight.w600,
-                  color: s.onSurfaceVariant))),
-            ]),
+            if (footer.isNotEmpty) ...[
+              SizedBox(height: 24 * k),
+              Text(footer, style: TextStyle(
+                  fontSize: 18 * k, fontWeight: FontWeight.w600,
+                  color: s.onSurfaceVariant)),
+            ],
           ],
         ),
       ),

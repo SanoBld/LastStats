@@ -696,10 +696,10 @@ class _ChartsPageState extends State<_ChartsPage>
                     onTap: () { _haptic(_HapticImpact.selection); Navigator.pop(sh, c.$1); },
                     child: Container(
                       width: (MediaQuery.of(sh).size.width - 16 * 2 - 10) / 2,
+                      height: 96, // same size for every tile
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                         Icon(c.$3, color: scheme.primary, size: 22),
-                        const SizedBox(height: 8),
                         Text(label, maxLines: 2, overflow: TextOverflow.ellipsis,
                             style: txt.labelLarge?.copyWith(fontWeight: FontWeight.w700)),
                       ]),
@@ -785,7 +785,7 @@ class _ChartsPageState extends State<_ChartsPage>
       width: width,
       title: title,
       badge: yearLabel,
-      footer: 'LastStats  ·  ${L.chartsExportGeneratedOn} $dateStr',
+      footer: () { final g = L.chartsExportGeneratedOn; return '${g.isEmpty ? g : g[0].toUpperCase() + g.substring(1)} $dateStr'; }(),
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.all(14 * k),

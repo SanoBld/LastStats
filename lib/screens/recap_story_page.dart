@@ -9,6 +9,7 @@
 import 'dart:convert';
 import '../widgets/skeleton.dart';
 import '../widgets/m3_components.dart';
+import '../widgets/share_card.dart';
 import '../theme/m3_motion.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
@@ -1163,9 +1164,14 @@ class _ShareCard extends StatelessWidget {
             ],
 
           const SizedBox(height: 24),
-          Center(
-            child: Text('LastStats',
-                style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 11, fontWeight: FontWeight.w600)),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Text('LastStats',
+                  style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 11, fontWeight: FontWeight.w600)),
+              const SizedBox(width: 8),
+              AppLogo(size: 26, color: scheme.onSurfaceVariant),
+            ]),
           ),
         ]),
       ),

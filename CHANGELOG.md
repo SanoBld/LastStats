@@ -32,6 +32,8 @@
 
 ## v4.3.0
 
+- Sharing: the LastStats logo now sits in a corner on every shared card, it is bigger, and it no longer appears twice on chart exports (the footer just says when it was generated)
+- Chart export: every chart tile in the picker has the same size
 - Sharing a card: uses your chosen font, bigger info lines (like your scrobbles), and every line starts at the same left edge
 - Sharing a card (friend, track, artist, album): the bottom now fades into the cover's main color, the text switches between black and white to stay readable, and the logo is bigger
 - Dashboard greeting: seasons are reversed for devices set to a southern-hemisphere country

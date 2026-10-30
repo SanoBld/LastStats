@@ -1432,8 +1432,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     final text = Theme.of(context).textTheme;
     final bio  = _showTranslated && _translatedBio.isNotEmpty ? _translatedBio : _bio();
     const maxChars  = 280;
-    final truncated = !_bioExpanded && bio.length > maxChars;
-    final shown     = truncated ? '${bio.substring(0, maxChars)}…' : bio;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -1758,7 +1756,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                   alignment: Alignment.topCenter,
                   children: [
                     for (final p in prev) Positioned(top: 0, left: 0, right: 0, child: p),
-                    if (cur != null) cur,
+                    ?cur,
                   ],
                 ),
                 transitionBuilder: (c, a) => FadeTransition(
@@ -2034,8 +2032,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   Widget _buildLyrics(ColorScheme scheme) {
     final text     = Theme.of(context).textTheme;
     const maxChars = 320;
-    final truncated = !_lyricsExpanded && _lyrics.length > maxChars;
-    final shown     = truncated ? '${_lyrics.substring(0, maxChars)}…' : _lyrics;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -2931,8 +2927,8 @@ class _ShareCardArtState extends State<_ShareCardArt> {
                         Row(children: [
                           Text('LastStats · $source',
                               style: TextStyle(color: fg3, fontSize: 11)),
-                          const SizedBox(width: 8),
-                          AppLogo(size: 28, color: fg2),
+                          const Spacer(),
+                          AppLogo(size: 32, color: fg2),
                         ]),
                       ],
                     ),
@@ -3153,7 +3149,7 @@ class _M3Pill extends StatelessWidget {
           duration: M3Motion.spatialFastDuration,
           switchInCurve: M3Motion.spatialFast,
           transitionBuilder: (c, a) => FadeTransition(opacity: a, child: c),
-          layoutBuilder: (cur, prev) => Stack(alignment: Alignment.center, children: [...prev, if (cur != null) cur]),
+          layoutBuilder: (cur, prev) => Stack(alignment: Alignment.center, children: [...prev, ?cur]),
           child: Row(
             key: ValueKey(label),
             mainAxisSize: MainAxisSize.min,

@@ -362,7 +362,6 @@ ColorScheme tintNeutrals(ColorScheme s) {
     onSurfaceVariant: t(s.onSurfaceVariant, sat: 0.2),
     inverseSurface: t(s.inverseSurface, sat: 0.2),
     onInverseSurface: t(s.onInverseSurface, sat: 0.2),
-    surfaceVariant: t(s.surfaceVariant),
     shadow: t(s.shadow, sat: 0.2),
   );
 }

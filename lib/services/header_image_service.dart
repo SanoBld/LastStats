@@ -2,7 +2,6 @@
 // app (SharedPreferences, base64), so it works on every platform and survives
 // the original file being moved or deleted.
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';

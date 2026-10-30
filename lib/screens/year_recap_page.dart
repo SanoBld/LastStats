@@ -2117,7 +2117,14 @@ class _YrShareCard extends StatelessWidget {
           _list(tx('yr_top_albums'), data.albums, 'albums'),
           ],
           const SizedBox(height: 14),
-          Center(child: Text('LastStats', style: TextStyle(color: _yrSoft(scheme).withValues(alpha: 0.7), fontSize: 11, fontWeight: FontWeight.w700))),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Text('LastStats', style: TextStyle(color: _yrSoft(scheme).withValues(alpha: 0.7), fontSize: 11, fontWeight: FontWeight.w700)),
+              const SizedBox(width: 8),
+              AppLogo(size: 26, color: _yrSoft(scheme).withValues(alpha: 0.7)),
+            ]),
+          ),
         ]))),
       ),
       ]),

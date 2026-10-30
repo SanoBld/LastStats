@@ -4466,7 +4466,7 @@ class _NewsDetailSheetState extends State<_NewsDetailSheet> {
       title: title,
       badge: '${emoji.isNotEmpty ? '$emoji ' : ''}${type.toUpperCase()}',
       accent: color,
-      footer: date.isNotEmpty ? 'LastStats  ·  $date' : 'LastStats',
+      footer: date,
       child: body.isEmpty
           ? const SizedBox.shrink()
           : MarkdownLite(

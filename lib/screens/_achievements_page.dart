@@ -551,9 +551,9 @@ class _ShareBadgeArt extends StatelessWidget {
                   style: const TextStyle(color: Colors.white70, fontSize: 15)),
               const SizedBox(height: 12),
               Row(children: [
-                const AppLogo(size: 14, color: Colors.white38),
-                const SizedBox(width: 6),
-                const Text('LastStats', style: TextStyle(color: Colors.white38, fontSize: 11)),
+                const Text('LastStats', style: TextStyle(color: Colors.white54, fontSize: 11)),
+                const Spacer(),
+                const AppLogo(size: 26, color: Colors.white54),
               ]),
             ],
           ),
