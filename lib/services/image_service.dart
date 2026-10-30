@@ -24,6 +24,7 @@ class ImageService {
   static const _timeout     = Duration(seconds: 6);
   static const _diskPrefix  = 'imgcache_';
   static const _diskTtlMs   = 7 * 24 * 60 * 60 * 1000;
+  static const _artistFixFlag = 'artistimgfix_v1';
 
   // In-memory URL cache (session).
   // BUG FIX: this used to be a plain Map with no size limit. On a long
@@ -65,6 +66,15 @@ class ImageService {
     _diskLoaded = true;
     try {
       _prefs ??= await SharedPreferences.getInstance();
+      // One-time purge: artist photos resolved with the old, too-loose name
+      // matching may be wrong (homonyms, "Drake" -> "Drake Bell"...). Drop
+      // every cached artist photo once so they are re-resolved correctly.
+      if (_prefs!.getBool(_artistFixFlag) != true) {
+        for (final k in _prefs!.getKeys().toList()) {
+          if (k.startsWith('${_diskPrefix}artist|')) await _prefs!.remove(k);
+        }
+        await _prefs!.setBool(_artistFixFlag, true);
+      }
       final now = DateTime.now().millisecondsSinceEpoch;
       for (final k in _prefs!.getKeys()) {
         if (!k.startsWith(_diskPrefix)) continue;
@@ -181,7 +191,7 @@ class ImageService {
     final mb = await _mbArtistImage(artist);
     if (mb.isNotEmpty) return _persistUrl(key, mb, 'musicbrainz');
 
-    final wiki = await _wikipediaImage(artist, expectName: artist);
+    final wiki = await _wikipediaImage(artist, expectName: artist, artist: true);
     if (wiki.isNotEmpty) return _persistUrl(key, wiki, 'wikipedia');
 
     // Last.fm last — its own catalog images are usually much lower
@@ -364,6 +374,22 @@ class ImageService {
     return false;
   }
 
+  // Strict match for ARTIST names. The loose [_similar] accepted any name
+  // that merely contained the other one (>= 4 letters), so "Drake" matched
+  // "Drake Bell", "Queen" matched "Queens of the Stone Age", "Air" ...
+  // — which is why some artists got somebody else's photo. Here the names
+  // must be the same once case, accents, "&"/"and", "the" and a trailing
+  // "(band)" / "[...]" qualifier are ignored.
+  static String _artistKey(String s) {
+    final noQualifier = s.replaceAll(RegExp(r'\s*[\(\[].*?[\)\]]'), '');
+    return _normalize(noQualifier.replaceAll('&', ' and ').replaceAll('+', ' and '));
+  }
+
+  static bool _sameArtist(String expected, String candidate) {
+    final a = _artistKey(expected);
+    return a.isNotEmpty && a == _artistKey(candidate);
+  }
+
   // Searches YouTube Music. No public API exists for this — this hits the
   // same unofficial internal endpoint YouTube Music's own web player uses
   // (the one ytmusicapi/InnerTune/Metrolist rely on). It's not documented
@@ -438,7 +464,7 @@ class ImageService {
           final title = card['title']?['runs']?[0]?['text']?.toString() ?? '';
           final subtitle = card['subtitle']?['runs']?[0]?['text']?.toString() ?? '';
           final match = expectArtist == null ||
-              _similar(expectArtist, type == 'artist' ? title : subtitle);
+              (type == 'artist' ? _sameArtist(expectArtist, title) : _similar(expectArtist, subtitle));
           if (match && (expectTitle == null || _similar(expectTitle, title))) {
             final url = _bestThumbnail(card['thumbnail']);
             if (url.isNotEmpty) return url;
@@ -462,7 +488,7 @@ class ImageService {
         }
 
         if (expectArtist != null &&
-            !_similar(expectArtist, type == 'artist' ? title : subtitleArtist)) {
+            !(type == 'artist' ? _sameArtist(expectArtist, title) : _similar(expectArtist, subtitleArtist))) {
           continue;
         }
         if (expectTitle != null && !_similar(expectTitle, title)) continue;
@@ -527,7 +553,10 @@ class ImageService {
       if (results.isEmpty) return '';
       final item = results.first as Map<String, dynamic>;
 
-      if (expectArtist != null && !_similar(expectArtist, (item['artistName'] ?? '').toString())) return '';
+      if (expectArtist != null) {
+        final nm = (item['artistName'] ?? '').toString();
+        if (!(entity == 'musicArtist' ? _sameArtist(expectArtist, nm) : _similar(expectArtist, nm))) return '';
+      }
       if (expectTitle != null) {
         final titleField = entity == 'song' ? 'trackName' : 'collectionName';
         if (!_similar(expectTitle, (item[titleField] ?? '').toString())) return '';
@@ -542,14 +571,23 @@ class ImageService {
 
   static Future<String> _deezerArtist(String artist) async {
     try {
-      final res = await http.get(Uri.https('api.deezer.com', '/search/artist', {'q': artist, 'limit': '1'}))
+      final res = await http.get(Uri.https('api.deezer.com', '/search/artist', {'q': artist, 'limit': '10'}))
           .timeout(_timeout);
       if (res.statusCode != 200) return '';
       final items = (jsonDecode(utf8.decode(res.bodyBytes))['data'] as List?) ?? [];
-      if (items.isEmpty) return '';
-      final item = items.first;
-      if (!_similar(artist, (item['name'] ?? '').toString())) return '';
-      return (item['picture_xl'] ?? item['picture_big'] ?? '').toString();
+      // Several artists can share a name: keep exact matches only and take
+      // the one with the most fans (the one people actually mean).
+      Map? best;
+      for (final it in items) {
+        if (it is! Map) continue;
+        if (!_sameArtist(artist, (it['name'] ?? '').toString())) continue;
+        final pic = (it['picture_xl'] ?? it['picture_big'] ?? '').toString();
+        // Deezer serves a generic grey silhouette when it has no photo.
+        if (pic.isEmpty || pic.contains('/images/artist//')) continue;
+        if (best == null || ((it['nb_fan'] as num?) ?? 0) > ((best['nb_fan'] as num?) ?? 0)) best = it;
+      }
+      if (best == null) return '';
+      return (best['picture_xl'] ?? best['picture_big'] ?? '').toString();
     } catch (_) { return ''; }
   }
 
@@ -621,9 +659,13 @@ class ImageService {
       if (res.statusCode != 200) return '';
       final artists = (jsonDecode(utf8.decode(res.bodyBytes))['artists'] as List?) ?? [];
       if (artists.isEmpty) return '';
-      final a = artists.first;
-      if (!_similar(artist, (a['strArtist'] ?? '').toString())) return '';
-      return (a['strArtistThumb'] ?? a['strArtistFanart'] ?? '').toString();
+      for (final a in artists) {
+        if (a is! Map) continue;
+        if (!_sameArtist(artist, (a['strArtist'] ?? '').toString())) continue;
+        final img = (a['strArtistThumb'] ?? a['strArtistFanart'] ?? '').toString();
+        if (img.isNotEmpty) return img;
+      }
+      return '';
     } catch (_) { return ''; }
   }
 
@@ -633,15 +675,18 @@ class ImageService {
     try {
       final searchRes = await http.get(
         Uri.https('musicbrainz.org', '/ws/2/artist/', {
-          'query': 'artist:"$artist"', 'limit': '1', 'fmt': 'json',
+          'query': 'artist:"$artist"', 'limit': '5', 'fmt': 'json',
         }),
         headers: {'User-Agent': 'LastStats/2.0 (contact@laststats.app)'},
       ).timeout(_timeout);
       if (searchRes.statusCode != 200) return '';
       final found = (jsonDecode(utf8.decode(searchRes.bodyBytes))['artists'] as List?) ?? [];
       if (found.isEmpty) return '';
-      final candidate = found.first;
-      if (!_similar(artist, (candidate['name'] ?? '').toString())) return '';
+      // Results come sorted by score: first exact name match wins.
+      final candidate = found.firstWhere(
+          (c) => _sameArtist(artist, (c['name'] ?? '').toString()),
+          orElse: () => null);
+      if (candidate == null) return '';
       final mbid = (candidate['id'] ?? '').toString();
       if (mbid.isEmpty) return '';
 
@@ -675,22 +720,25 @@ class ImageService {
   // riskiest source for false positives (a plain text search can land on a
   // totally unrelated page) — validated against the page title and, when
   // available, its short description before the thumbnail is trusted.
-  static Future<String> _wikipediaImage(String query, {required String expectName}) async {
+  static Future<String> _wikipediaImage(String query, {required String expectName, bool artist = false}) async {
     try {
       final res = await http.get(Uri.https('en.wikipedia.org', '/w/api.php', {
         'action': 'query', 'generator': 'search', 'gsrsearch': query,
-        'gsrlimit': '1', 'prop': 'pageimages|pageterms', 'piprop': 'thumbnail',
+        'gsrlimit': '5', 'prop': 'pageimages|pageterms', 'piprop': 'thumbnail',
         'pithumbsize': '600', 'wbptterms': 'description',
         'format': 'json', 'origin': '*',
       })).timeout(_timeout);
       if (res.statusCode != 200) return '';
       final pages = (jsonDecode(utf8.decode(res.bodyBytes))['query']?['pages'] as Map?) ?? {};
-      for (final p in pages.values) {
+      // The pages map is unordered: sort by search relevance first.
+      final ordered = pages.values.toList()
+        ..sort((x, y) => ((x['index'] as num?) ?? 99).compareTo((y['index'] as num?) ?? 99));
+      for (final p in ordered) {
         final thumb = p['thumbnail']?['source'];
         if (thumb == null) continue;
 
         final title = (p['title'] ?? '').toString();
-        if (!_similar(expectName, title)) continue; // page isn't about what we searched
+        if (!(artist ? _sameArtist(expectName, title) : _similar(expectName, title))) continue; // page isn't about what we searched
 
         final descriptions = (p['terms']?['description'] as List?) ?? [];
         final description  = descriptions.isNotEmpty ? descriptions.first.toString().toLowerCase() : '';

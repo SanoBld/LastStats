@@ -2064,6 +2064,15 @@ class _YrShareCard extends StatelessWidget {
           Positioned(top: -60, right: -60, child: ShareBlob(size: 200, color: scheme.primary.withValues(alpha: 0.10))),
           Positioned(bottom: 90, left: -80, child: ShareBlob(size: 170, lobes: 12, color: scheme.tertiary.withValues(alpha: 0.08))),
         ],
+        // Extra background shapes (varied sizes / lobes) so the empty areas
+        // of the poster, mostly on the single-slide shares, don't look bare.
+        Positioned(top: 250, right: -75, child: ShareBlob(size: 190, lobes: 6, amplitude: 0.14, color: scheme.secondary.withValues(alpha: 0.09))),
+        Positioned(bottom: -80, right: -55, child: ShareBlob(size: 240, lobes: 10, amplitude: 0.09, color: scheme.primary.withValues(alpha: 0.08))),
+        if (slide != null) ...[
+          Positioned(top: 205, left: -45, child: ShareBlob(size: 125, lobes: 8, amplitude: 0.10, color: scheme.primary.withValues(alpha: 0.07))),
+          Positioned(top: 430, left: 150, child: ShareBlob(size: 90, lobes: 5, amplitude: 0.20, color: scheme.tertiary.withValues(alpha: 0.07))),
+          Positioned(top: 120, left: 110, child: ShareBlob(size: 60, lobes: 7, amplitude: 0.16, color: scheme.secondary.withValues(alpha: 0.07))),
+        ],
         Container(
         width: 360,
         height: 640, // 9:16 (story format), exported at 3x = 1080x1920

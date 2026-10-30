@@ -32,6 +32,14 @@
 
 ## v4.3.0
 
+- Chart export: the share image is now built from the chart data instead of a screenshot of the screen, so no buttons, zoom controls or tap-only info appear on it
+- Chart export: scrobble progression shows both "by month" and "cumulative" with the peak labelled; weekday, artist, album and genre charts now show counts and percentages directly on the image
+- Chart export: flat single-colour background with soft Material shapes, no gradient and no dark box behind the chart, rounded corners like the artist and album posters
+- Recap and year recap shares: same flat background and rounded corners as the other share images
+- Year recap shares: extra background shapes, especially on single-slide shares where there was a lot of empty space
+- Sharing: the LastStats name and logo now have the same font and size on every share image
+- Fixed wrong artist photos: artist names are now matched exactly (no more "Drake" getting "Drake Bell"), the most popular artist with that exact name is picked, and previously cached artist photos are refreshed once
+
 - Sharing: every share image now uses the same style (Material shapes, same stat tiles, same rank badges, same section labels, logo and name in the bottom-right corner)
 - Chart export: the card header has a bigger logo in a cookie shape and soft corner shapes behind the chart
 - Sharing a card (track, artist, album, friend): the cover now sits in a Material shape that follows your image-shape setting
