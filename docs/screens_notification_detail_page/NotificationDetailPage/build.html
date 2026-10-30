@@ -203,9 +203,10 @@ Widget build(BuildContext context) {
             if (url.isNotEmpty)
               ActionGroupItem(
                 primary: type != &#39;daily&#39; &amp;&amp; type != &#39;weekly&#39;,
-                icon: Icons.open_in_new_rounded,
-                label: L.notifDetailOpenLink,
+                icon: type == &#39;update&#39; ? Icons.download_rounded : Icons.open_in_new_rounded,
+                label: type == &#39;update&#39; ? L.settingsDownload : L.notifDetailOpenLink,
                 onPressed: () async {
+                  if (type == &#39;update&#39;) { await openUpdateUrl(context, url); return; }
                   final uri = Uri.tryParse(url);
                   if (uri != null &amp;&amp; await canLaunchUrl(uri)) {
                     await launchUrl(uri, mode: LaunchMode.externalApplication);
