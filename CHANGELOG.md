@@ -38,6 +38,7 @@
 - Fixed the notification bell: it now stays lit while an update is available and also shows for any new message, even when the stats could not be loaded
 
 **Images and covers**
+- Recommended: clear the image cache after updating (Settings > Cache) so every cover and photo is fetched again with the new matching rules
 - Fixed missing covers for tracks and albums credited under another form of the artist name (for example "Maître Gims" and "GIMS"): the artist is accepted when it shares all its words with the credited one, while the title must still match exactly
 - Fixed wrong album and track covers: titles must now match exactly (editions like "Deluxe" or "Remastered" are still accepted) and the artist is checked on every source; cached covers are refreshed once
 - Fixed wrong artist photos: artist names are now matched exactly (no more "Drake" getting "Drake Bell"), the most popular artist with that exact name is picked, and previously cached artist photos are refreshed once

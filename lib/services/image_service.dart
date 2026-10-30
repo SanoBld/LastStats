@@ -692,7 +692,7 @@ class ImageService {
       for (final item in albums) {
         if (item is! Map) continue;
         if (!_sameTitle(album, (item['strAlbum'] ?? '').toString())) continue;
-        if (!_sameArtist(artist, (item['strArtist'] ?? '').toString())) continue;
+        if (!_creditMatch(artist, (item['strArtist'] ?? '').toString())) continue;
         final img = (item['strAlbumThumb'] ?? '').toString();
         if (img.isNotEmpty) return img;
       }
@@ -713,7 +713,7 @@ class ImageService {
       for (final item in tracks) {
         if (item is! Map) continue;
         if (!_sameTitle(track, (item['strTrack'] ?? '').toString())) continue;
-        if (!_sameArtist(artist, (item['strArtist'] ?? '').toString())) continue;
+        if (!_creditMatch(artist, (item['strArtist'] ?? '').toString())) continue;
         final img = (item['strTrackThumb'] ?? '').toString();
         if (img.isNotEmpty) return img;
       }
