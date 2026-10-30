@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-30T12:18:43Z",
+  "updated": "2026-10-30T13:20:04Z",
   "commits": [
+    {
+      "sha": "362771ba5f97d28100eb2f9905e705fb2b051e6c",
+      "message": "feat: amélioration de l'affichage des cartes de partage avec un logo LastStats agrandi et repositionné, et uniformisation des tailles des tuiles de graphique",
+      "date": "2026-10-30T13:19:33Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/362771ba5f97d28100eb2f9905e705fb2b051e6c",
+      "tags": []
+    },
     {
       "sha": "21fb9e39dccab9efc599117921301f2b424e232c",
       "message": "feat: amélioration de l'affichage des cartes de partage avec une police personnalisée et alignement des lignes",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/e8e6ec63c389f740117f25264d0a27ca4338254c",
-      "tags": []
-    },
-    {
-      "sha": "bc727c581e3ee4e88bdbcdc60d81fc4343a6aef3",
-      "message": "Refactor code structure for improved readability and maintainability",
-      "date": "2026-08-27T16:38:39Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/bc727c581e3ee4e88bdbcdc60d81fc4343a6aef3",
       "tags": []
     }
   ]
