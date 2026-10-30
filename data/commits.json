@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-30T21:56:15Z",
+  "updated": "2026-10-30T22:00:24Z",
   "commits": [
+    {
+      "sha": "2d9db92d2d55f0fc80086b82297346c46d78870b",
+      "message": "feat: amélioration de la correspondance des couvertures d'album et de piste, ajout de vérifications strictes des titres et des artistes, et mise à jour du cache des images",
+      "date": "2026-10-30T21:57:32Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/2d9db92d2d55f0fc80086b82297346c46d78870b",
+      "tags": []
+    },
     {
       "sha": "c3ac22f60c808cf3562f820da73780a44dfdb0cd",
       "message": "feat: amélioration de l'exportation des cartes de partage avec des images basées sur les données du graphique, ajout de formes de fond arrondies et correction des photos d'artistes",
@@ -2703,17 +2712,6 @@
       "avatar": "https://avatars.githubusercontent.com/in/15368?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/b7dcc308df5c9c18ec26fcddfec5ceff9f38ef47",
       "tags": []
-    },
-    {
-      "sha": "b471e20725bd7fa93b0b8888c94da61e88c6d3d6",
-      "message": "fix: corriger le nom de la section \"Inspirations\" en \"Favoris\" dans À propos",
-      "date": "2026-08-27T16:59:53Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/b471e20725bd7fa93b0b8888c94da61e88c6d3d6",
-      "tags": [
-        "v3.2.0"
-      ]
     }
   ]
 }
