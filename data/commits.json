@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-30T20:58:23Z",
+  "updated": "2026-10-30T21:15:04Z",
   "commits": [
+    {
+      "sha": "81011c12e7ad8f881b28dfa181641115c0993c87",
+      "message": "feat: amélioration de l'affichage des cartes de partage avec des couleurs et des coins arrondis, et mise à jour de la taille de la marque",
+      "date": "2026-10-30T21:14:43Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/81011c12e7ad8f881b28dfa181641115c0993c87",
+      "tags": []
+    },
     {
       "sha": "46b342e6bcf7fc9ce7e6c6b598348f4141a157c0",
       "message": "feat: ajout d'une image de partage au style poster avec des formes douces et un fond plat",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/ce03e16f1c25b1ab3d086fba4de47ef9935384a5",
-      "tags": []
-    },
-    {
-      "sha": "6bc69516307775f866881b9038f5d09002941783",
-      "message": "fix: mettre à jour la version des widgets de l'écran d'accueil en BETA pour plus de clarté",
-      "date": "2026-08-27T16:57:01Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/6bc69516307775f866881b9038f5d09002941783",
       "tags": []
     }
   ]
