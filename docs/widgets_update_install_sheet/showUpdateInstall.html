@@ -73,19 +73,7 @@
   <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; showUpdateInstall(BuildContext context,
     {required String url, required DownloadKind kind, String? version}) async {
   if (!_inApp(kind)) return _openExternal(url);
-  final scheme = Theme.of(context).colorScheme;
-  await showModalBottomSheet&lt;void&gt;(
-    sheetAnimationStyle: kM3SheetAnimation,
-    context: context,
-    isScrollControlled: true,
-    isDismissible: false,
-    enableDrag: false,
-    backgroundColor: scheme.surface,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    builder: (_) =&gt; _UpdateSheet(url: url, kind: kind, version: version),
-  );
+  return _showSheet(context, url: url, kind: kind, version: version, save: false);
 }</code></pre>
 </section>
 
@@ -113,7 +101,7 @@
 <footer>
   <span class="no-break">
     laststats_mobile
-      4.2.1+29
+      4.3.0-beta+30
   </span>
   
 </footer>

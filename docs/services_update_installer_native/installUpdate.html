@@ -85,34 +85,14 @@ user must allow installs then tap again) or 'fallback' (open the link instead).<
     return &#39;permission&#39;;
   }
 
-  final dir = Directory(&#39;${(await getTemporaryDirectory()).path}${Platform.pathSeparator}update&#39;);
-  if (await dir.exists()) await dir.delete(recursive: true);
-  await dir.create(recursive: true);
-  final file = File(&#39;${dir.path}${Platform.pathSeparator}${android ? &#39;update.apk&#39; : &#39;LastStats-Setup.exe&#39;}&#39;);
-
-  final client = http.Client();
-  try {
-    final res = await client.send(http.Request(&#39;GET&#39;, Uri.parse(url)));
-    if (res.statusCode != 200) return &#39;fallback&#39;;
-    final total = res.contentLength ?? 0;
-    var got = 0;
-    final sink = file.openWrite();
-    await for (final chunk in res.stream) {
-      sink.add(chunk);
-      got += chunk.length;
-      onProgress(total &gt; 0 ? got &#47; total : null);
-    }
-    await sink.close();
-    if (total &gt; 0 &amp;&amp; got != total) return &#39;fallback&#39;;
-  } catch (_) {
-    return &#39;fallback&#39;;
-  } finally {
-    client.close();
-  }
+  final file = await _fetch(url, android ? &#39;update.apk&#39; : &#39;LastStats-Setup.exe&#39;, &#39;LastStats&#39;, onProgress);
+  if (file == null) return &#39;fallback&#39;;
 
   if (android) {
+    await NotificationService.showDownloadDone(&#39;LastStats&#39;, tx(&#39;ntf_dl_ready&#39;));
     return await _ch.invokeMethod&lt;bool&gt;(&#39;install&#39;, {&#39;path&#39;: file.path}) == true ? &#39;ok&#39; : &#39;fallback&#39;;
   }
+  await NotificationService.cancelDownload();
   await Process.start(file.path,
       [&#39;&#47;SILENT&#39;, &#39;&#47;SUPPRESSMSGBOXES&#39;, &#39;&#47;CLOSEAPPLICATIONS&#39;, &#39;&#47;RESTARTAPPLICATIONS&#39;],
       mode: ProcessStartMode.detached);
@@ -144,7 +124,7 @@ user must allow installs then tap again) or 'fallback' (open the link instead).<
 <footer>
   <span class="no-break">
     laststats_mobile
-      4.2.1+29
+      4.3.0-beta+30
   </span>
   
 </footer>
