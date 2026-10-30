@@ -2013,7 +2013,7 @@ class _YrShareCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: scheme.surface,
+      color: ShareCardFrame.solidColor(scheme),
       borderRadius: BorderRadius.circular(28),
       clipBehavior: Clip.antiAlias,
       child: Stack(children: [
@@ -2068,16 +2068,6 @@ class _YrShareCard extends StatelessWidget {
         width: 360,
         height: 640, // 9:16 (story format), exported at 3x = 1080x1920
         padding: const EdgeInsets.fromLTRB(14, 22, 14, 14),
-        decoration: photo != null
-            ? null
-            : BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [scheme.primaryContainer, scheme.surface],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  stops: const [0, 0.45],
-                ),
-              ),
         // FittedBox shrinks the content if it is ever taller than the card
         child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.topCenter, child: SizedBox(width: 332, child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
           if (slide != null) const SizedBox(height: 28),

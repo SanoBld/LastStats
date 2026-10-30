@@ -1038,8 +1038,9 @@ class _ShareCard extends StatelessWidget {
     ];
 
     return Material(
-      color: scheme.surface,
-      clipBehavior: Clip.hardEdge,
+      color: ShareCardFrame.solidColor(scheme),
+      borderRadius: BorderRadius.circular(28),
+      clipBehavior: Clip.antiAlias,
       child: Stack(children: [
         Positioned(
           top: -60, right: -60,
@@ -1053,16 +1054,8 @@ class _ShareCard extends StatelessWidget {
         Container(
         width: 380,
         padding: const EdgeInsets.fromLTRB(24, 40, 24, 28),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [scheme.primaryContainer, scheme.surface],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            stops: const [0, 0.3],
-          ),
-        ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-          Text('LastStats · $username',
+          Text(username,
               style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13, fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
           Row(crossAxisAlignment: CrossAxisAlignment.end, children: [

@@ -49,7 +49,9 @@ class ShareBlob extends StatelessWidget {
 class ShareMark extends StatelessWidget {
   final Color color;
   final double k;
-  const ShareMark({super.key, required this.color, this.k = 1});
+  // One brand mark for every share image. k = 1.15 is the reference size on a
+  // 360-wide card; wider cards scale it with their width.
+  const ShareMark({super.key, required this.color, this.k = 1.15});
 
   @override
   Widget build(BuildContext context) => Row(
@@ -204,19 +206,7 @@ class ShareCardFrame extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Row(children: [
-                  Container(
-                    width: 92 * k, height: 92 * k,
-                    alignment: Alignment.center,
-                    decoration: ShapeDecoration(
-                      color: s.primary,
-                      shape: const M3CookieBorder(lobes: 8, amplitude: 0.07),
-                    ),
-                    child: AppLogo(size: 60 * k, color: s.onPrimary),
-                  ),
-                  SizedBox(width: 20 * k),
-                  Text('LastStats', style: TextStyle(
-                      fontSize: 36 * k, fontWeight: FontWeight.w800,
-                      letterSpacing: -0.2, color: s.onSurface)),
+                  ShareMark(color: s.onSurfaceVariant, k: 1.15 * width / 360),
                   const Spacer(),
                   if (badge != null && badge!.isNotEmpty)
                     Container(
@@ -259,7 +249,11 @@ class ShareCardFrame extends StatelessWidget {
     return Container(
       width: width,
       clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(color: solidColor(s)),
+      // Same corner ratio as the artist / album posters (28 on a 360 card).
+      decoration: BoxDecoration(
+        color: solidColor(s),
+        borderRadius: BorderRadius.circular(84 * k),
+      ),
       child: Stack(children: [
         Positioned(
           top: -90 * k, right: -90 * k,
@@ -283,19 +277,7 @@ class ShareCardFrame extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Row(children: [
-                Container(
-                  width: 92 * k, height: 92 * k,
-                  alignment: Alignment.center,
-                  decoration: ShapeDecoration(
-                    color: s.primary,
-                    shape: const M3CookieBorder(lobes: 8, amplitude: 0.07),
-                  ),
-                  child: AppLogo(size: 60 * k, color: s.onPrimary),
-                ),
-                SizedBox(width: 20 * k),
-                Text('LastStats', style: TextStyle(
-                    fontSize: 36 * k, fontWeight: FontWeight.w800,
-                    letterSpacing: -0.2, color: s.onSurface)),
+                ShareMark(color: s.onSurfaceVariant, k: 1.15 * width / 360),
                 const Spacer(),
                 if (badge != null && badge!.isNotEmpty)
                   Container(
