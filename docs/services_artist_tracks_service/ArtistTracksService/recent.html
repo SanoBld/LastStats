@@ -83,7 +83,7 @@
       final rows = &lt;Map&gt;[];
       for (final r in results.whereType&lt;Map&gt;()) {
         final a = _norm((r[&#39;artistName&#39;] ?? &#39;&#39;).toString());
-        if (a.isEmpty || !(a == want || a.contains(want))) continue;
+        if (a.isEmpty || !_credited((r[&#39;artistName&#39;] ?? &#39;&#39;).toString(), want)) continue;
         final n = _norm((r[&#39;trackName&#39;] ?? &#39;&#39;).toString());
         if (n.isEmpty || !seen.add(n)) continue;   &#47;&#47; same song, other release
         rows.add(r);
