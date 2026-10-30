@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-30T22:55:34Z",
+  "updated": "2026-10-30T23:18:49Z",
   "commits": [
+    {
+      "sha": "9a902263e7dd81cc73b14f38af34e767af67c932",
+      "message": "feat: ajout de la gestion des téléchargements en arrière-plan avec notifications et sauvegarde dans le dossier Téléchargements",
+      "date": "2026-10-30T23:07:51Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/9a902263e7dd81cc73b14f38af34e767af67c932",
+      "tags": []
+    },
     {
       "sha": "0608210b8529600ca890360dfe3d38e05824f7f0",
       "message": "chore: bump version to 4.3.0-beta [skip ci]",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/efe2ec35a681fad23017c9f0c30e2a8a6cb496ba",
-      "tags": []
-    },
-    {
-      "sha": "b95466398aff1f429de279cd988bd89ced6ca925",
-      "message": "fix: corriger la fonction _logoAsset pour une meilleure gestion des thèmes et de la luminosité",
-      "date": "2026-08-28T19:43:31Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/b95466398aff1f429de279cd988bd89ced6ca925",
       "tags": []
     }
   ]
