@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-30T14:17:40Z",
+  "updated": "2026-10-30T20:44:51Z",
   "commits": [
+    {
+      "sha": "46b342e6bcf7fc9ce7e6c6b598348f4141a157c0",
+      "message": "feat: ajout d'une image de partage au style poster avec des formes douces et un fond plat",
+      "date": "2026-10-30T20:44:28Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/46b342e6bcf7fc9ce7e6c6b598348f4141a157c0",
+      "tags": []
+    },
     {
       "sha": "bd95b9342075c8d7eb8f946aed7e808edad13434",
       "message": "feat: ajout de nouveaux éléments de style pour le partage, y compris des formes Material, des logos agrandis et des animations de pression",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/6bc69516307775f866881b9038f5d09002941783",
-      "tags": []
-    },
-    {
-      "sha": "d351b3df8e4b2aba3b0533caa1a7d894357c3f11",
-      "message": "fix: mettre à jour le lien de l'historique des étoiles pour une meilleure accessibilité",
-      "date": "2026-08-27T16:52:56Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/d351b3df8e4b2aba3b0533caa1a7d894357c3f11",
       "tags": []
     }
   ]
