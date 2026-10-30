@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-30T22:38:00Z",
+  "updated": "2026-10-30T22:38:58Z",
   "commits": [
+    {
+      "sha": "0608210b8529600ca890360dfe3d38e05824f7f0",
+      "message": "chore: bump version to 4.3.0-beta [skip ci]",
+      "date": "2026-10-30T22:38:44Z",
+      "author": "github-actions[bot]",
+      "avatar": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/0608210b8529600ca890360dfe3d38e05824f7f0",
+      "tags": []
+    },
     {
       "sha": "17e2a0d73027537c19052b315154c6c0e0ef7369",
       "message": "feat: mise à jour de la logique de correspondance des artistes dans le service d'images pour une précision accrue",
@@ -8,7 +17,9 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/17e2a0d73027537c19052b315154c6c0e0ef7369",
-      "tags": []
+      "tags": [
+        "v4.3.0-beta"
+      ]
     },
     {
       "sha": "578437225a21acd8e1031fe826cae46a8aebb3c3",
@@ -2702,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/b95466398aff1f429de279cd988bd89ced6ca925",
-      "tags": []
-    },
-    {
-      "sha": "3b3a23b82b58754a6a20c6393c4c4a3f392984f2",
-      "message": "Merge branch 'master' of https://github.com/SanoBld/LastStats",
-      "date": "2026-08-28T19:40:43Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/3b3a23b82b58754a6a20c6393c4c4a3f392984f2",
       "tags": []
     }
   ]
