@@ -4429,7 +4429,7 @@ class _NewsDetailSheetState extends State<_NewsDetailSheet> {
             if (url.isNotEmpty) ...[
               Expanded(
                 child: FilledButton.icon(
-                  onPressed: () => _openUrl(url),
+                  onPressed: () => (item['type'] == 'update') ? openUpdateUrl(context, url) : _openUrl(url),
                   icon:  const Icon(Icons.open_in_new_rounded, size: 18),
                   label: Text(L.notifDetailOpenLink),
                 ),

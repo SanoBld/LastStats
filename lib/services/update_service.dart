@@ -55,6 +55,8 @@ class UpdateService {
   static bool isInstalledRelease(String releaseVersion) =>
       !isDevBuild && !isUnknownVersion && releaseVersion == currentVersion;
 
+  static bool isNewerThanInstalled(String v) => _isNewer(v, currentVersion);
+
   static const _timeout = Duration(seconds: 10);
 
   static Future<UpdateInfo?> checkForUpdate({

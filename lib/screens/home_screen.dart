@@ -21,6 +21,7 @@ import 'dart:ui';
 import 'dart:ui' as ui;
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../widgets/update_install_sheet.dart';
 import '../services/movie_easter_egg.dart';
 import 'package:flutter/gestures.dart' show TapGestureRecognizer;
 import 'package:flutter/rendering.dart';

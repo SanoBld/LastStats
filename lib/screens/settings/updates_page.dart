@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../l10n/l10n.dart';
 import '../../app_state.dart';
 import '../../services/update_service.dart';
+import '../../widgets/update_install_sheet.dart';
 import '../../widgets/markdown_lite.dart';
 import 'update_history_page.dart';
 import 'settings_helpers.dart';
@@ -163,11 +164,7 @@ class _UpdatesPageState extends State<UpdatesPage> {
                   primary: true,
                   icon: _downloadIcon(_updateInfo!.downloadKind),
                   label: _updateInfo!.hasDownload ? L.settingsDownload : L.settingsViewRelease,
-                  onPressed: () async {
-                    final url = Uri.parse(_updateInfo!.hasDownload
-                        ? _updateInfo!.downloadUrl! : _updateInfo!.releaseUrl);
-                    if (await canLaunchUrl(url)) await launchUrl(url, mode: LaunchMode.externalApplication);
-                  },
+                  onPressed: () => installOrOpen(context, _updateInfo!),
                 ),
                 if (_updateInfo!.hasDownload)
                   ActionGroupItem(

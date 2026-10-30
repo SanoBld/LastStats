@@ -32,6 +32,8 @@
 
 ## v4.3.0
 
+- Updates: Download now fetches the update inside the app (animated wavy progress) and opens the installer directly, from the updates page, the version history, the news and the update notification (Android: you only confirm the install; Windows: silent installer, then the app restarts); clear messages if the install permission is missing or the download fails, in all 10 languages
+- Fixed wrong images: recent tracks of an artist now match the exact artist, and year recap audio previews no longer fall back to a homonym artist or album
 - Chart export: the share image is now built from the chart data instead of a screenshot of the screen, so no buttons, zoom controls or tap-only info appear on it
 - Chart export: scrobble progression shows both "by month" and "cumulative" with the peak labelled; weekday, artist, album and genre charts now show counts and percentages directly on the image
 - Chart export: flat single-colour background with soft Material shapes, no gradient and no dark box behind the chart, rounded corners like the artist and album posters

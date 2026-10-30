@@ -1,6 +1,12 @@
 package com.example.laststats_mobile
 
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import android.view.WindowManager
+import androidx.core.content.FileProvider
+import java.io.File
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -8,6 +14,33 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "laststats/installer")
+            .setMethodCallHandler { call, result ->
+                try {
+                    when (call.method) {
+                        "canInstall" -> result.success(
+                            Build.VERSION.SDK_INT < Build.VERSION_CODES.O ||
+                                packageManager.canRequestPackageInstalls())
+                        "openSettings" -> {
+                            startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                                Uri.parse("package:$packageName")))
+                            result.success(true)
+                        }
+                        "install" -> {
+                            val file = File(call.argument<String>("path")!!)
+                            val uri = FileProvider.getUriForFile(this, "$packageName.updatefileprovider", file)
+                            val i = Intent(Intent.ACTION_VIEW)
+                                .setDataAndType(uri, "application/vnd.android.package-archive")
+                                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+                            startActivity(i)
+                            result.success(true)
+                        }
+                        else -> result.notImplemented()
+                    }
+                } catch (e: Exception) {
+                    result.success(false)
+                }
+            }
         // Battery saver: asks Android for a low refresh rate ("low") or the
         // highest one ("high") at the CURRENT resolution. Setting
         // preferredRefreshRate too (not only the mode id) is what makes

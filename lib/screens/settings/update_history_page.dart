@@ -15,6 +15,7 @@ import '../../l10n/l10n.dart';
 import '../../app_state.dart';
 import '../../services/update_service.dart';
 import '../../widgets/markdown_lite.dart';
+import '../../widgets/update_install_sheet.dart';
 
 class UpdateHistoryPage extends StatefulWidget {
   const UpdateHistoryPage({super.key});
@@ -257,7 +258,7 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
                                 label: r.hasDownload
                                     ? (tx('ui_download'))
                                     : (tx('ui_view_release')),
-                                onPressed: () => _open(r.hasDownload ? r.downloadUrl! : r.releaseUrl),
+                                onPressed: () => installOrOpen(context, r),
                               ),
                               if (r.hasDownload)
                                 ActionGroupItem(

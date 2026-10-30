@@ -13,6 +13,7 @@ import '../services/account_manager.dart';
 import '../services/lastfm_service.dart';
 import 'recap_story_page.dart';
 import 'settings/settings_rows.dart';
+import '../widgets/update_install_sheet.dart';
 
 class NotificationDetailPage extends StatelessWidget {
   final Map<String, dynamic> data;
@@ -143,6 +144,7 @@ class NotificationDetailPage extends StatelessWidget {
                   icon: Icons.open_in_new_rounded,
                   label: L.notifDetailOpenLink,
                   onPressed: () async {
+                    if (type == 'update') { await openUpdateUrl(context, url); return; }
                     final uri = Uri.tryParse(url);
                     if (uri != null && await canLaunchUrl(uri)) {
                       await launchUrl(uri, mode: LaunchMode.externalApplication);
