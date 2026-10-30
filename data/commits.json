@@ -1,6 +1,24 @@
 {
-  "updated": "2026-10-30T22:26:06Z",
+  "updated": "2026-10-30T22:38:00Z",
   "commits": [
+    {
+      "sha": "17e2a0d73027537c19052b315154c6c0e0ef7369",
+      "message": "feat: mise à jour de la logique de correspondance des artistes dans le service d'images pour une précision accrue",
+      "date": "2026-10-30T22:37:37Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/17e2a0d73027537c19052b315154c6c0e0ef7369",
+      "tags": []
+    },
+    {
+      "sha": "578437225a21acd8e1031fe826cae46a8aebb3c3",
+      "message": "feat: amélioration de la gestion des notifications et des mises à jour, ajout de la prise en charge des téléchargements et mise à jour des icônes",
+      "date": "2026-10-30T22:35:36Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/578437225a21acd8e1031fe826cae46a8aebb3c3",
+      "tags": []
+    },
     {
       "sha": "b4a73a50c7ea16549b6a01c38f143ecc920a9b94",
       "message": "feat: ajout de la gestion des mises à jour avec téléchargement et installation intégrés, amélioration de l'interface utilisateur pour les mises à jour",
@@ -2693,24 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/3b3a23b82b58754a6a20c6393c4c4a3f392984f2",
-      "tags": []
-    },
-    {
-      "sha": "0e97d99fa439f2c2d45093a7326b366aad32775d",
-      "message": "Update app icons and improve error handling in main.dart\n\n- Replaced app icons across various platforms (Android, iOS, macOS, Windows, web) with new designs.\n- Added SVG logos for different themes in the assets/icons directory.\n- Enhanced error handling in main.dart using runZonedGuarded to prevent crashes on desktop platforms.\n- Updated image caching strategy for better performance on desktop.\n- Modified appearance settings to use SVG logos instead of PNG images.",
-      "date": "2026-08-28T19:38:12Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/0e97d99fa439f2c2d45093a7326b366aad32775d",
-      "tags": []
-    },
-    {
-      "sha": "74dff491d5c3c271f0f329336c309c70f6cd1d95",
-      "message": "Merge branch 'master' of https://github.com/SanoBld/LastStats",
-      "date": "2026-08-28T19:17:10Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/74dff491d5c3c271f0f329336c309c70f6cd1d95",
       "tags": []
     }
   ]
