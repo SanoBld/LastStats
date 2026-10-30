@@ -145,6 +145,9 @@ class ShareCardFrame extends StatelessWidget {
   final Color? accent;      // badge colour (defaults to primary)
   final Widget child;
   final String footer;
+  /// Poster style: one flat colour with the soft shapes drawn on it — no
+  /// gradient and no inner card. Used by the chart export.
+  final bool solid;
   const ShareCardFrame({
     super.key,
     required this.width,
@@ -153,13 +156,19 @@ class ShareCardFrame extends StatelessWidget {
     required this.footer,
     this.badge,
     this.accent,
+    this.solid = false,
   });
+
+  /// Flat background colour of the poster style.
+  static Color solidColor(ColorScheme s) =>
+      Color.alphaBlend(s.primaryContainer.withValues(alpha: 0.45), s.surface);
 
   @override
   Widget build(BuildContext context) {
     final s = Theme.of(context).colorScheme;
     final k = width / 1080;
     final tone = accent ?? s.primary;
+    if (solid) return _buildSolid(context, s, k, tone);
 
     return Container(
       width: width,
@@ -243,6 +252,80 @@ class ShareCardFrame extends StatelessWidget {
           ),
         ]),
       ),
+    );
+  }
+
+  Widget _buildSolid(BuildContext context, ColorScheme s, double k, Color tone) {
+    return Container(
+      width: width,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(color: solidColor(s)),
+      child: Stack(children: [
+        Positioned(
+          top: -90 * k, right: -90 * k,
+          child: ShareBlob(size: 330 * k, color: s.primary.withValues(alpha: 0.12)),
+        ),
+        Positioned(
+          bottom: -110 * k, left: -80 * k,
+          child: ShareBlob(
+              size: 300 * k, lobes: 12, color: s.tertiary.withValues(alpha: 0.11)),
+        ),
+        Positioned(
+          top: 520 * k, right: -120 * k,
+          child: ShareBlob(
+              size: 220 * k, lobes: 6, amplitude: 0.12,
+              color: s.secondary.withValues(alpha: 0.08)),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(64 * k, 64 * k, 64 * k, 56 * k),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(children: [
+                Container(
+                  width: 92 * k, height: 92 * k,
+                  alignment: Alignment.center,
+                  decoration: ShapeDecoration(
+                    color: s.primary,
+                    shape: const M3CookieBorder(lobes: 8, amplitude: 0.07),
+                  ),
+                  child: AppLogo(size: 60 * k, color: s.onPrimary),
+                ),
+                SizedBox(width: 20 * k),
+                Text('LastStats', style: TextStyle(
+                    fontSize: 36 * k, fontWeight: FontWeight.w800,
+                    letterSpacing: -0.2, color: s.onSurface)),
+                const Spacer(),
+                if (badge != null && badge!.isNotEmpty)
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 22 * k, vertical: 11 * k),
+                    decoration: BoxDecoration(
+                      color: s.primary,
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child: Text(badge!, style: TextStyle(
+                        fontSize: 20 * k, fontWeight: FontWeight.w800,
+                        color: s.onPrimary)),
+                  ),
+              ]),
+              SizedBox(height: 40 * k),
+              Text(title, style: TextStyle(
+                  fontSize: 52 * k, fontWeight: FontWeight.w800,
+                  height: 1.1, letterSpacing: -0.5, color: s.onSurface)),
+              SizedBox(height: 36 * k),
+              child,
+              if (footer.isNotEmpty) ...[
+                SizedBox(height: 36 * k),
+                Text(footer, style: TextStyle(
+                    fontSize: 20 * k, fontWeight: FontWeight.w600,
+                    color: s.onSurfaceVariant)),
+              ],
+            ],
+          ),
+        ),
+      ]),
     );
   }
 }

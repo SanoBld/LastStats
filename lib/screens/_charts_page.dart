@@ -757,55 +757,121 @@ class _ChartsPageState extends State<_ChartsPage>
     await _captureAndShare(ctx, chartId, targetYear);
   }
 
-  /// Composes a clean, branded PNG: app name + chart title + active filter
-  /// info as a header above the captured chart, plus a small footer.
-  /// Builds the export card as REAL Flutter widgets (same text rendering,
-  /// same theme, same anti-aliasing as the app itself) instead of hand-drawn
-  /// canvas geometry — this is what was causing the blurry / misaligned
-  /// corners before. It's rendered off-screen via [_renderOffscreen] and
-  /// the result is re-captured as a single flat PNG.
+  /// Poster-style share image: flat background with soft shapes, app mark,
+  /// chart title + period, then the chart itself drawn directly on the
+  /// background (no inner dark card, no screenshot of the live UI).
   Widget _buildExportCard({
-    required ui.Image chartImage,
+    required Widget content,
+    required double designWidth,
     required String title,
     required String yearLabel,
-    required ColorScheme scheme,
   }) {
+    const width = 1080.0;
     final now = DateTime.now();
     final dateStr = '${now.day.toString().padLeft(2, '0')}/'
         '${now.month.toString().padLeft(2, '0')}/${now.year}';
-    // Chart was captured at pixelRatio 3: show it at its real logical size
-    // so text stays sharp, and widen the card for very wide charts.
-    final chartW = chartImage.width / 3.0;
-    final chartH = chartImage.height / 3.0;
-    final width  = (chartW + 2 * (28 + 36 + 14)).clamp(1080.0, 9000.0);
-    final k      = width / 1080;
-    final inner  = width - 2 * (28 + 36) * k;
+    final g = L.chartsExportGeneratedOn;
+    final footer = '${g.isEmpty ? g : g[0].toUpperCase() + g.substring(1)} $dateStr';
+    const inner = width - 2 * 64.0;
 
-    return ShareCardFrame(
-      width: width,
-      title: title,
-      badge: yearLabel,
-      footer: () { final g = L.chartsExportGeneratedOn; return '${g.isEmpty ? g : g[0].toUpperCase() + g.substring(1)} $dateStr'; }(),
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.all(14 * k),
-        decoration: BoxDecoration(
-          color: scheme.surface,
-          borderRadius: BorderRadius.circular(28 * k),
-        ),
+    return Builder(builder: (c) => MediaQuery(
+      // Same size whatever the user's text scale: the poster is a fixed layout.
+      data: MediaQuery.of(c).copyWith(textScaler: TextScaler.noScaling),
+      child: ShareCardFrame(
+        solid: true,
+        width: width,
+        title: title,
+        badge: yearLabel,
+        footer: footer,
         child: SizedBox(
-          width: inner - 28 * k,
-          child: AspectRatio(
-            aspectRatio: chartW / chartH,
-            child: RawImage(
-              image: chartImage,
-              fit: BoxFit.contain,
-              filterQuality: FilterQuality.high,
-            ),
+          width: inner,
+          // The chart is laid out at a phone-like width (so every label and
+          // spacing keeps its proportions) and scaled up to fill the poster.
+          child: FittedBox(
+            fit: BoxFit.fitWidth,
+            alignment: Alignment.topCenter,
+            child: SizedBox(width: designWidth, child: content),
           ),
         ),
       ),
-    );
+    ));
+  }
+
+  /// Static, non-interactive version of a chart for the share image.
+  /// Returns the widget and the width it is designed for, or null when
+  /// there is nothing to show.
+  (Widget, double)? _exportContent(String chartId) {
+    const w = 420.0;
+    final calendarForView = _isAllTime ? _buildAllTimeCalendar() : _calendarData;
+    List<dynamic> topItems(bool artists) {
+      final yearHas = _availableYears.contains(_selectedYear);
+      final yearList = artists ? _topArtistsYear : _topAlbumsYear;
+      final allList  = artists ? _topArtists : _topAlbums;
+      if (_isAllTime) return allList;
+      if (yearList.isNotEmpty) return yearList;
+      return yearHas ? allList : <dynamic>[];
+    }
+
+    switch (chartId) {
+      case 'trend':
+        final m = _isAllTime ? _buildAllTimeMonthly() : (_monthly ?? const <String, int>{});
+        if (m.isEmpty) return null;
+        return (_TrendExport(monthly: m), w);
+      case 'habits':
+        if (_hourlyData == null || _weekdayData == null) return null;
+        return (Column(children: [
+          _ClockChart(data: _hourlyData!),
+          const SizedBox(height: 20),
+          _WeekChart(data: _weekdayData!),
+        ]), w);
+      case 'daypart':
+        if (_hourlyData == null) return null;
+        return (_DaypartChart(data: _hourlyData!), w);
+      case 'weekend':
+        if (_weekdayData == null) return null;
+        return (_WeekendCard(data: _weekdayData!), w);
+      case 'artists':
+      case 'albums':
+        final items = topItems(chartId == 'artists');
+        if (items.isEmpty) return null;
+        return (_ShareDonut(
+          items: items,
+          getLabel: (e) => _sanitizeName((e['name'] ?? '').toString()),
+          getPlays: (e) => int.tryParse((e['playcount'] ?? '0').toString()) ?? 0,
+        ), w);
+      case 'genres':
+        if (_tags.isEmpty) return null;
+        return (_GenreChart(tags: _tags), w);
+      case 'calendar':
+        if (calendarForView == null || calendarForView.isEmpty) return null;
+        final heatmapYears = _isAllTime
+            ? (_availableYears.isNotEmpty ? _availableYears : [DateTime.now().year])
+            : [_selectedYear];
+        final heatmapStart = DateTime(heatmapYears.first, 1, 1);
+        final heatmapEnd   = heatmapYears.last == DateTime.now().year
+            ? DateTime.now()
+            : DateTime(heatmapYears.last, 12, 31);
+        // Widest year decides the width (some years need 54 week columns).
+        int weeksFor(int y) {
+          final yStart = y == heatmapStart.year ? heatmapStart : DateTime(y, 1, 1);
+          final yEnd   = y == heatmapEnd.year   ? heatmapEnd   : DateTime(y, 12, 31);
+          final cells  = (yStart.weekday - 1) + yEnd.difference(yStart).inDays + 1;
+          return (cells / 7).ceil();
+        }
+        final maxWeeks = heatmapYears.map(weeksFor).reduce((a, b) => a > b ? a : b);
+        final natural = (60.0 + maxWeeks * 11.5 + 28).clamp(320.0, 8000.0).toDouble();
+        return (_HeatmapCard(data: calendarForView, start: heatmapStart, end: heatmapEnd), natural);
+      case 'streaks':
+        if (calendarForView == null || calendarForView.isEmpty) return null;
+        return (_StreakCard(data: calendarForView), w);
+      case 'intensity':
+        if (calendarForView == null || calendarForView.isEmpty) return null;
+        return (_IntensityChart(data: calendarForView), w);
+      case 'busiest':
+        if (calendarForView == null || calendarForView.isEmpty) return null;
+        return (_BusiestDays(data: calendarForView), w);
+    }
+    return null;
   }
 
   /// A chart far down the list may never have been scrolled into view, so its
@@ -818,42 +884,6 @@ class _ChartsPageState extends State<_ChartsPage>
     final done = Completer<void>();
     WidgetsBinding.instance.addPostFrameCallback((_) => done.complete());
     await done.future;
-  }
-
-  Future<RenderRepaintBoundary?> _ensureChartLaidOut(String chartId) async {
-    RenderRepaintBoundary? find() =>
-        _xkeys[chartId]?.currentContext?.findRenderObject() as RenderRepaintBoundary?;
-
-    var rb = find();
-    if (rb != null && !rb.size.isEmpty) return rb;
-
-    // ListView is lazy: only visible charts are built. Scroll step by step
-    // until the chart exists, then bring it into view.
-    for (var attempt = 0; attempt < 3; attempt++) {
-      if (_mainScroll.hasClients) {
-        final pos = _mainScroll.position;
-        if (find() == null) {
-          _mainScroll.jumpTo(0);
-          await _nextFrame();
-          final step = (pos.viewportDimension * 0.7).clamp(200.0, 2000.0);
-          while (find() == null && _mainScroll.offset < pos.maxScrollExtent) {
-            _mainScroll.jumpTo(
-                (_mainScroll.offset + step).clamp(0.0, pos.maxScrollExtent));
-            await _nextFrame();
-          }
-        }
-        final c = _xkeys[chartId]?.currentContext;
-        if (c != null && c.mounted) {
-          await Scrollable.ensureVisible(c, duration: Duration.zero);
-        }
-      }
-      await _nextFrame();
-      await _nextFrame();
-      rb = find();
-      if (rb != null && !rb.size.isEmpty) return rb;
-      await Future.delayed(const Duration(milliseconds: 120));
-    }
-    return find();
   }
 
   /// Waits for the async chain triggered by a year switch to fully settle
@@ -874,7 +904,7 @@ class _ChartsPageState extends State<_ChartsPage>
   /// outside the visible viewport) and captures it as an image. Used for
   /// charts that need to show ALL their data unclipped for export, regardless
   /// of their normal on-screen scrolled/clipped state.
-  Future<ui.Image?> _renderOffscreen(BuildContext ctx, Widget child) async {
+  Future<ui.Image?> _renderOffscreen(BuildContext ctx, Widget child, {double pixelRatio = 3.0}) async {
     final key     = GlobalKey();
     final overlay = Overlay.of(ctx, rootOverlay: true);
     late OverlayEntry entry;
@@ -897,7 +927,7 @@ class _ChartsPageState extends State<_ChartsPage>
       }
       final rb = key.currentContext?.findRenderObject() as RenderRepaintBoundary?;
       if (rb == null || rb.size.isEmpty) return null;
-      return await rb.toImage(pixelRatio: 3.0);
+      return await rb.toImage(pixelRatio: pixelRatio);
     } finally {
       entry.remove();
     }
@@ -981,82 +1011,6 @@ class _ChartsPageState extends State<_ChartsPage>
       }
 
       if (!ctx.mounted) return;
-      ui.Image chartImg;
-
-      if (chartId == 'calendar') {
-        // Same problem as monthly/cumul: the heatmap has its own internal
-        // horizontal scroll to fit every year (2025, 2026…) — a live capture
-        // only grabs whatever's currently scrolled into view. Render the
-        // full, unclipped calendar off-screen so every week/year shows.
-        final calendarForView = _isAllTime ? _buildAllTimeCalendar() : _calendarData;
-        final heatmapYears = _isAllTime
-            ? (_availableYears.isNotEmpty ? _availableYears : [DateTime.now().year])
-            : [_selectedYear];
-        final heatmapStart = DateTime(heatmapYears.first, 1, 1);
-        final heatmapEnd   = heatmapYears.last == DateTime.now().year
-            ? DateTime.now()
-            : DateTime(heatmapYears.last, 12, 31);
-
-        // BUG WAS HERE: width used to be capped at a hard-coded 53 weeks,
-        // computed from the total number of days in the WHOLE multi-year
-        // span. That number is basically always > 53, so it always got
-        // clamped down to exactly 53 -- which is only "one year" wide by
-        // luck. Some years actually need 54 week-columns depending on which
-        // weekday Jan 1st falls on, so that year's last column (often
-        // December) got silently cut off the image.
-        // Fix: compute the real number of week-columns for EACH year (same
-        // formula as _yearBlock below) and use the widest one. No guessing.
-        int weeksNeededForYear(int y) {
-          final yStart   = y == heatmapStart.year ? heatmapStart : DateTime(y, 1, 1);
-          final yEnd     = y == heatmapEnd.year   ? heatmapEnd   : DateTime(y, 12, 31);
-          final startWd  = yStart.weekday;
-          final days     = yEnd.difference(yStart).inDays + 1;
-          final cells    = (startWd - 1) + days;
-          return (cells / 7).ceil();
-        }
-        final maxWeeksInAnyYear = heatmapYears.isEmpty
-            ? 53
-            : heatmapYears.map(weeksNeededForYear).reduce((a, b) => a > b ? a : b);
-        final naturalWidth = 60.0 + maxWeeksInAnyYear * 11.5;
-
-        final child = _HeatmapCard(
-          data: calendarForView ?? const <String, int>{},
-          start: heatmapStart, end: heatmapEnd,
-        );
-        final img = await _renderOffscreen(ctx, SizedBox(width: naturalWidth.clamp(320, 8000), child: child));
-        if (img == null) {
-          closeDialog();
-          if (ctx.mounted) {
-            showAppSnackBar(ctx, SnackBar(content: Text(
-                tx('ui_chart_not_available_fo'))));
-          }
-          return;
-        }
-        chartImg = img;
-      } else {
-        final rb = await _ensureChartLaidOut(chartId);
-        if (rb == null || rb.size.isEmpty) {
-          closeDialog();
-          if (ctx.mounted) {
-            showAppSnackBar(ctx, SnackBar(content: Text(
-                tx('ui_chart_not_available_fo'))));
-          }
-          return;
-        }
-        // Let entry animations (bars, donut, radar…) finish before capture.
-        await Future.delayed(const Duration(milliseconds: 1300));
-        if (!rb.attached || rb.size.isEmpty) {
-          closeDialog();
-          if (ctx.mounted) {
-            showAppSnackBar(ctx, SnackBar(content: Text(
-                tx('ui_chart_not_available_fo'))));
-          }
-          return;
-        }
-        chartImg = await rb.toImage(pixelRatio: 3.0);
-      }
-
-      if (!ctx.mounted) return;
       final scheme   = Theme.of(ctx).colorScheme;
       final chartDef = _kCharts.firstWhere((c) => c.$1 == chartId);
       final title    = tx(chartDef.$2);
@@ -1065,19 +1019,38 @@ class _ChartsPageState extends State<_ChartsPage>
           ? tx('ui_all_time')
           : '$year';
 
-      // Compose the final shareable image out of real widgets (not manual
-      // canvas drawing) so text and corners render exactly like the rest of
-      // the app — sharp, correctly rounded, nothing approximated.
-      final exportCard = _buildExportCard(
-        chartImage: chartImg,
-        title:      title,
-        yearLabel:  yearLabel,
-        scheme:     scheme,
-      );
-      final composedImg = await _renderOffscreen(ctx, Theme(
-        data: Theme.of(ctx),
-        child: Material(type: MaterialType.transparency, child: exportCard),
-      ));
+      // The share image is built from the chart data (same widgets, final
+      // state, no buttons) instead of a screenshot of the live screen.
+      final content = _exportContent(chartId);
+      if (content == null) {
+        closeDialog();
+        if (ctx.mounted) {
+          showAppSnackBar(ctx, SnackBar(content: Text(
+              tx('ui_chart_not_available_fo'))));
+        }
+        return;
+      }
+
+      ui.Image? composedImg;
+      _chartExportMode = true;
+      _exportBgColor   = ShareCardFrame.solidColor(scheme);
+      try {
+        composedImg = await _renderOffscreen(ctx, Theme(
+          data: Theme.of(ctx),
+          child: Material(
+            type: MaterialType.transparency,
+            child: _buildExportCard(
+              content: content.$1,
+              designWidth: content.$2,
+              title: title,
+              yearLabel: yearLabel,
+            ),
+          ),
+        ), pixelRatio: 2.0);
+      } finally {
+        _chartExportMode = false;
+        _exportBgColor   = null;
+      }
       if (composedImg == null) {
         closeDialog();
         if (ctx.mounted) {
@@ -1571,11 +1544,15 @@ class _FadeInSectionState extends State<_FadeInSection> with SingleTickerProvide
 // Same tonal card as the settings sections: one flat container colour,
 // big rounded corners, no border, no shadow, no gradient.
 // Card background; an optional accent tint is blended in (theme containers)
-Color _cardBg(ColorScheme s, [Color? tint]) => tint == null
+Color _cardBg(ColorScheme s, [Color? tint]) => (_chartExportMode && _exportBgColor != null)
+    ? _exportBgColor!
+    : tint == null
     ? s.surfaceContainerLow
     : Color.alphaBlend(tint.withValues(alpha: 0.32), s.surfaceContainerLow);
 
-BoxDecoration _chartCardDecoration(ColorScheme s, [Color? tint]) => BoxDecoration(
+BoxDecoration _chartCardDecoration(ColorScheme s, [Color? tint]) => _chartExportMode
+    ? const BoxDecoration()
+    : BoxDecoration(
   color: _cardBg(s, tint),
   borderRadius: BorderRadius.circular(28),
 );

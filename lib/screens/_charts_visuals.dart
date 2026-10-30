@@ -3,6 +3,12 @@ part of 'home_screen.dart';
 
 // New chart widgets for the Charts tab. All colors come from the app theme.
 
+// While a chart is being rendered for the share image, charts draw their
+// final state: no animation, no controls, no hidden info, no card around
+// them (the share poster provides the background).
+bool _chartExportMode = false;
+Color? _exportBgColor;
+
 String _monthShort(String key) {
   final m = RegExp(r'^(\d{4})-(\d{1,2})').firstMatch(key);
   return m == null ? key : '${m.group(2)!.padLeft(2, '0')}/${m.group(1)!.substring(2)}';
@@ -234,6 +240,64 @@ class _TrendChartState extends State<_TrendChart> with SingleTickerProviderState
   }
 }
 
+// Static version of the trend chart for the share image: both views (by
+// month and cumulative) one under the other, no buttons, peak labelled.
+class _TrendExport extends StatelessWidget {
+  final Map<String, int> monthly;
+  const _TrendExport({required this.monthly});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Theme.of(context).colorScheme;
+    final t = Theme.of(context).textTheme;
+    final keys = monthly.keys.toList()..sort();
+    final raw  = [for (final k in keys) monthly[k]!.toDouble()];
+    var acc = 0.0;
+    final cumul = [for (final v in raw) acc += v];
+    final total = raw.fold<double>(0, (a, b) => a + b).round();
+    final avg   = raw.isEmpty ? 0 : (total / raw.length).round();
+    var bestI = 0;
+    for (var i = 0; i < raw.length; i++) { if (raw[i] > raw[bestI]) bestI = i; }
+    final labels = [for (final k in keys) _monthShort(k)];
+    final bg = _exportBgColor ?? _cardBg(s, s.primaryContainer);
+
+    Widget plot(List<double> vals, int sel) => SizedBox(
+      height: 230,
+      child: LayoutBuilder(builder: (_, c) => CustomPaint(
+        size: Size(c.maxWidth, 230),
+        painter: _TrendPainter(
+          v: vals, labels: labels, progress: 1, sel: sel,
+          lo: 0, hi: math.max(0, vals.length - 1).toDouble(),
+          line: s.primary, accent: s.tertiary,
+          grid: s.outlineVariant.withValues(alpha: 0.45),
+          text: s.onSurfaceVariant, surface: bg, onSurface: s.onSurface),
+      )),
+    );
+    Widget head(String text) => Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Text(text, style: t.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
+    );
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Wrap(spacing: 8, runSpacing: 8, children: [
+        _ChipStat(label: tx('ui_total'), value: _fmt(total), s: s, t: t,
+            bg: s.primaryContainer, fg: s.onPrimaryContainer),
+        _ChipStat(label: tx('ui_avg_mo'), value: _fmt(avg), s: s, t: t,
+            bg: s.secondaryContainer, fg: s.onSecondaryContainer),
+        if (raw.isNotEmpty)
+          _ChipStat(label: tx('cx_best_month'), value: labels[bestI], s: s, t: t,
+              bg: s.tertiaryContainer, fg: s.onTertiaryContainer),
+      ]),
+      const SizedBox(height: 18),
+      head(tx('cx_by_month')),
+      plot(raw, bestI),
+      const SizedBox(height: 18),
+      head(tx('cx_cumulative')),
+      plot(cumul, math.max(0, cumul.length - 1)),
+    ]);
+  }
+}
+
 class _TrendPainter extends CustomPainter {
   final List<double> v;
   final List<String> labels;
@@ -397,7 +461,7 @@ class _ClockChartState extends State<_ClockChart> {
               setState(() => _sel = h == _sel ? null : h);
             },
             child: TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0, end: 1),
+              tween: Tween(begin: _chartExportMode ? 1.0 : 0.0, end: 1.0),
               duration: const Duration(milliseconds: 1000),
               curve: Curves.easeOutCubic,
               builder: (_, p, _) => AspectRatio(
@@ -523,7 +587,7 @@ class _WeekChartState extends State<_WeekChart> {
         ]),
         const SizedBox(height: 12),
         TweenAnimationBuilder<double>(
-          tween: Tween(begin: 0, end: 1),
+          tween: Tween(begin: _chartExportMode ? 1.0 : 0.0, end: 1.0),
           duration: const Duration(milliseconds: 700),
           curve: Curves.easeOutCubic,
           builder: (_, p, _) => Column(children: [
@@ -560,8 +624,10 @@ class _WeekChartState extends State<_WeekChart> {
                       ),
                     ]))),
                     const SizedBox(width: 10),
-                    SizedBox(width: 64, child: Text(
-                      isSel ? '${pct.toStringAsFixed(1)}%' : (v > 0 ? _fmt(v) : '–'),
+                    SizedBox(width: _chartExportMode ? 104 : 64, child: Text(
+                      _chartExportMode
+                          ? (v > 0 ? '${_fmt(v)} · ${pct.round()}%' : '–')
+                          : isSel ? '${pct.toStringAsFixed(1)}%' : (v > 0 ? _fmt(v) : '–'),
                       textAlign: TextAlign.end,
                       style: t.labelMedium?.copyWith(
                         color: isPeak ? s.tertiary : s.onSurface,
@@ -607,7 +673,7 @@ class _ShareDonut extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Row(children: [
         TweenAnimationBuilder<double>(
-          tween: Tween(begin: 0, end: 1),
+          tween: Tween(begin: _chartExportMode ? 1.0 : 0.0, end: 1.0),
           duration: const Duration(milliseconds: 1000),
           curve: Curves.easeOutCubic,
           builder: (_, p, _) => SizedBox(
@@ -634,10 +700,11 @@ class _ShareDonut extends StatelessWidget {
                   Container(width: 12, height: 12,
                       decoration: BoxDecoration(color: palette[i], shape: BoxShape.circle)),
                   const SizedBox(width: 8),
-                  Expanded(child: Text(getLabel(top[i]), maxLines: 1, overflow: TextOverflow.ellipsis,
+                  Expanded(child: Text(getLabel(top[i]), maxLines: _chartExportMode ? 2 : 1, overflow: TextOverflow.ellipsis,
                       style: t.bodySmall?.copyWith(fontWeight: FontWeight.w700, color: textColor))),
                   const SizedBox(width: 6),
-                  Text(pct(vals[i]), style: t.labelSmall?.copyWith(color: textColor ?? s.onSurfaceVariant)),
+                  Text(_chartExportMode ? '${pct(vals[i])} · ${_fmt(vals[i])}' : pct(vals[i]),
+                      style: t.labelSmall?.copyWith(color: textColor ?? s.onSurfaceVariant)),
                 ]),
               ),
             ),
@@ -742,13 +809,13 @@ class _GenreChartState extends State<_GenreChart> {
             onTapDown: (d) => pick(d.localPosition, size),
             onPanUpdate: (d) => pick(d.localPosition, size),
             child: TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0, end: 1),
+              tween: Tween(begin: _chartExportMode ? 1.0 : 0.0, end: 1.0),
               duration: const Duration(milliseconds: 1000),
               curve: Curves.easeOutCubic,
               builder: (_, p, _) => AspectRatio(
                 aspectRatio: 1.1,
                 child: CustomPaint(painter: _RadarPainter(
-                  labels: [for (final e in top) e.name.length > 12 ? '${e.name.substring(0, 11)}…' : e.name],
+                  labels: [for (final e in top) e.name.length > 14 ? '${e.name.substring(0, 13)}…' : e.name],
                   values: [for (final e in top) e.count.toDouble()],
                   progress: p, sel: _sel,
                   line: s.primary, fill: s.primary.withValues(alpha: 0.25), dot: s.tertiary,
@@ -758,7 +825,22 @@ class _GenreChartState extends State<_GenreChart> {
           );
         }),
         const SizedBox(height: 8),
-        AnimatedSwitcher(
+        _chartExportMode
+        ? Wrap(
+            alignment: WrapAlignment.center, spacing: 8, runSpacing: 8,
+            children: [
+              for (final e in top)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                      color: s.tertiaryContainer, borderRadius: BorderRadius.circular(20)),
+                  child: Text(
+                    '${e.name}  ·  ${(e.count * 100 / math.max(total, 1)).round()}%',
+                    style: t.labelMedium?.copyWith(
+                        color: s.onTertiaryContainer, fontWeight: FontWeight.w800)),
+                ),
+            ])
+        : AnimatedSwitcher(
           duration: const Duration(milliseconds: 200),
           child: Container(
             key: ValueKey(_sel),
@@ -895,7 +977,7 @@ class _DaypartChart extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Column(children: [
         TweenAnimationBuilder<double>(
-          tween: Tween(begin: 0, end: 1),
+          tween: Tween(begin: _chartExportMode ? 1.0 : 0.0, end: 1.0),
           duration: const Duration(milliseconds: 900),
           curve: Curves.easeOutCubic,
           builder: (_, p, _) => ClipRRect(
@@ -976,7 +1058,7 @@ class _IntensityChartState extends State<_IntensityChart> {
         ]),
         const SizedBox(height: 14),
         TweenAnimationBuilder<double>(
-          tween: Tween(begin: 0, end: 1),
+          tween: Tween(begin: _chartExportMode ? 1.0 : 0.0, end: 1.0),
           duration: const Duration(milliseconds: 800),
           curve: Curves.easeOutCubic,
           builder: (_, p, _) => SizedBox(
@@ -1066,7 +1148,7 @@ class _BusiestDays extends StatelessWidget {
       decoration: _chartCardDecoration(s, s.tertiaryContainer),
       padding: const EdgeInsets.all(16),
       child: TweenAnimationBuilder<double>(
-        tween: Tween(begin: 0, end: 1),
+        tween: Tween(begin: _chartExportMode ? 1.0 : 0.0, end: 1.0),
         duration: const Duration(milliseconds: 900),
         curve: Curves.easeOutCubic,
         builder: (_, p, _) => Column(children: [
