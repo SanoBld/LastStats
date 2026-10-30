@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-30T22:00:24Z",
+  "updated": "2026-10-30T22:07:29Z",
   "commits": [
+    {
+      "sha": "30e1b9f579649fd581b76d9f2fadd58f14adf03f",
+      "message": "feat: amélioration de la vérification des artistes dans le service des pistes, ajout de la gestion des crédits pour une correspondance plus précise",
+      "date": "2026-10-30T22:04:35Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/30e1b9f579649fd581b76d9f2fadd58f14adf03f",
+      "tags": []
+    },
     {
       "sha": "2d9db92d2d55f0fc80086b82297346c46d78870b",
       "message": "feat: amélioration de la correspondance des couvertures d'album et de piste, ajout de vérifications strictes des titres et des artistes, et mise à jour du cache des images",
@@ -2702,15 +2711,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/8a3cae63c9d2f681d084ebb681b3467d9272a36e",
-      "tags": []
-    },
-    {
-      "sha": "b7dcc308df5c9c18ec26fcddfec5ceff9f38ef47",
-      "message": "chore: bump version to 3.2.0 [skip ci]",
-      "date": "2026-08-27T17:00:29Z",
-      "author": "github-actions[bot]",
-      "avatar": "https://avatars.githubusercontent.com/in/15368?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/b7dcc308df5c9c18ec26fcddfec5ceff9f38ef47",
       "tags": []
     }
   ]
