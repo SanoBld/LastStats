@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-30T20:44:48Z",
+  "updated": "2026-10-30T20:58:21Z",
   "stars": 3,
   "releases": [
     {
@@ -13,7 +13,7 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 48051914,
-          "download_count": 4,
+          "download_count": 5,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/app-arm64-v8a-release.apk"
         },
         {
