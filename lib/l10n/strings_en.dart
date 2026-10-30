@@ -1494,4 +1494,11 @@ const Map<String, String> kTxEn = {
   'up_retry': 'Retry',
   'up_browser': 'Open in browser',
   'up_close': 'Close',
+  'up_saved': 'Saved to Downloads',
+  'up_background': 'Continue in background',
+  'ntf_dl_section': 'Downloads',
+  'ntf_dl_title': 'Download notifications',
+  'ntf_dl_sub': 'Progress bar during downloads, even in the background',
+  'ntf_dl_ready': 'Download complete',
+  'ntf_dl_failed': 'Download failed',
 };

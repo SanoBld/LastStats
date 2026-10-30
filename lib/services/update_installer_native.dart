@@ -2,9 +2,51 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import '../l10n/extra_strings.dart';
+import 'notification_service.dart';
 import 'update_service.dart' show DownloadKind;
 
 const _ch = MethodChannel('laststats/installer');
+
+// Downloads [url] into the temp folder. The job does not depend on any widget:
+// closing the sheet keeps it running, and a progress notification (plus an
+// Android foreground service) keeps it alive in the background when the user
+// enabled download notifications.
+Future<File?> _fetch(String url, String tempName, String title, void Function(double?) onProgress) async {
+  final dir = Directory('${(await getTemporaryDirectory()).path}${Platform.pathSeparator}update');
+  if (await dir.exists()) await dir.delete(recursive: true);
+  await dir.create(recursive: true);
+  final file = File('${dir.path}${Platform.pathSeparator}$tempName');
+  final client = http.Client();
+  var lastTick = 0;
+  try {
+    await NotificationService.showDownloadProgress(title, 0);
+    final res = await client.send(http.Request('GET', Uri.parse(url)));
+    if (res.statusCode != 200) throw Exception('http ${res.statusCode}');
+    final total = res.contentLength ?? 0;
+    var got = 0;
+    final sink = file.openWrite();
+    await for (final chunk in res.stream) {
+      sink.add(chunk);
+      got += chunk.length;
+      final p = total > 0 ? got / total : null;
+      onProgress(p);
+      final now = DateTime.now().millisecondsSinceEpoch;
+      if (now - lastTick > 500) {
+        lastTick = now;
+        NotificationService.showDownloadProgress(title, p);
+      }
+    }
+    await sink.close();
+    if (total > 0 && got != total) throw Exception('incomplete');
+    return file;
+  } catch (_) {
+    await NotificationService.showDownloadDone(title, tx('ntf_dl_failed'));
+    return null;
+  } finally {
+    client.close();
+  }
+}
 
 /// Downloads the update then launches its installer.
 /// Returns 'ok' (installer launched), 'permission' (Android settings opened,
@@ -19,36 +61,53 @@ Future<String> installUpdate(String url, DownloadKind kind, void Function(double
     return 'permission';
   }
 
-  final dir = Directory('${(await getTemporaryDirectory()).path}${Platform.pathSeparator}update');
-  if (await dir.exists()) await dir.delete(recursive: true);
-  await dir.create(recursive: true);
-  final file = File('${dir.path}${Platform.pathSeparator}${android ? 'update.apk' : 'LastStats-Setup.exe'}');
-
-  final client = http.Client();
-  try {
-    final res = await client.send(http.Request('GET', Uri.parse(url)));
-    if (res.statusCode != 200) return 'fallback';
-    final total = res.contentLength ?? 0;
-    var got = 0;
-    final sink = file.openWrite();
-    await for (final chunk in res.stream) {
-      sink.add(chunk);
-      got += chunk.length;
-      onProgress(total > 0 ? got / total : null);
-    }
-    await sink.close();
-    if (total > 0 && got != total) return 'fallback';
-  } catch (_) {
-    return 'fallback';
-  } finally {
-    client.close();
-  }
+  final file = await _fetch(url, android ? 'update.apk' : 'LastStats-Setup.exe', 'LastStats', onProgress);
+  if (file == null) return 'fallback';
 
   if (android) {
+    await NotificationService.showDownloadDone('LastStats', tx('ntf_dl_ready'));
     return await _ch.invokeMethod<bool>('install', {'path': file.path}) == true ? 'ok' : 'fallback';
   }
+  await NotificationService.cancelDownload();
   await Process.start(file.path,
       ['/SILENT', '/SUPPRESSMSGBOXES', '/CLOSEAPPLICATIONS', '/RESTARTAPPLICATIONS'],
       mode: ProcessStartMode.detached);
   exit(0);
+}
+
+/// Downloads a release file and puts it in the default Downloads folder
+/// (no browser, no install). Returns 'saved|<where>' or 'fallback'.
+Future<String> saveDownload(String url, String fileName, void Function(double?) onProgress) async {
+  if (Platform.isIOS) return 'fallback';
+  final file = await _fetch(url, fileName, fileName, onProgress);
+  if (file == null) return 'fallback';
+
+  String? saved;
+  try {
+    if (Platform.isAndroid) {
+      saved = await _ch.invokeMethod<String>('saveToDownloads', {'path': file.path, 'name': fileName});
+    } else {
+      final d = await getDownloadsDirectory();
+      if (d != null) {
+        final dot  = fileName.lastIndexOf('.');
+        final base = dot > 0 ? fileName.substring(0, dot) : fileName;
+        final ext  = dot > 0 ? fileName.substring(dot) : '';
+        var dst = File('${d.path}${Platform.pathSeparator}$fileName');
+        var i = 1;
+        while (await dst.exists()) {
+          dst = File('${d.path}${Platform.pathSeparator}$base ($i)$ext');
+          i++;
+        }
+        await file.copy(dst.path);
+        saved = dst.path;
+      }
+    }
+  } catch (_) {}
+
+  if (saved == null || saved.isEmpty) {
+    await NotificationService.showDownloadDone(fileName, tx('ntf_dl_failed'));
+    return 'fallback';
+  }
+  await NotificationService.showDownloadDone(fileName, tx('up_saved'));
+  return 'saved|$saved';
 }

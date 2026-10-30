@@ -258,7 +258,7 @@ class _UpdateHistoryPageState extends State<UpdateHistoryPage> {
                                 label: r.hasDownload
                                     ? (tx('ui_download'))
                                     : (tx('ui_view_release')),
-                                onPressed: () => installOrOpen(context, r),
+                                onPressed: () => downloadToFolder(context, r),
                               ),
                               if (r.hasDownload)
                                 ActionGroupItem(

@@ -1494,4 +1494,11 @@ const Map<String, String> kTxFr = {
   'up_retry': 'Réessayer',
   'up_browser': 'Ouvrir dans le navigateur',
   'up_close': 'Fermer',
+  'up_saved': 'Enregistré dans Téléchargements',
+  'up_background': 'Continuer en arrière-plan',
+  'ntf_dl_section': 'Téléchargements',
+  'ntf_dl_title': 'Notifications de téléchargement',
+  'ntf_dl_sub': 'Barre de progression pendant les téléchargements, même en arrière-plan',
+  'ntf_dl_ready': 'Téléchargement terminé',
+  'ntf_dl_failed': 'Téléchargement échoué',
 };

@@ -1491,4 +1491,11 @@ const Map<String, String> kTxZh = {
   'up_retry': '重试',
   'up_browser': '在浏览器中打开',
   'up_close': '关闭',
+  'up_saved': '已保存到“下载”',
+  'up_background': '在后台继续',
+  'ntf_dl_section': '下载',
+  'ntf_dl_title': '下载通知',
+  'ntf_dl_sub': '下载时显示进度条，后台也可用',
+  'ntf_dl_ready': '下载完成',
+  'ntf_dl_failed': '下载失败',
 };

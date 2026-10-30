@@ -19,6 +19,7 @@
     <!-- Required by WorkManager for background tasks -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <!-- Required on Android 11+ so canLaunchUrl/launchUrl can see target apps -->
     <queries>
@@ -47,6 +48,13 @@
         android:allowBackup="false"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+        <!-- Keeps a download alive in the background (flutter_local_notifications) -->
+        <service
+            android:name="com.dexterous.flutterlocalnotifications.ForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync"
+            android:stopWithTask="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

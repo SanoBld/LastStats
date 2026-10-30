@@ -30,6 +30,11 @@ class NotificationService {
   static String get _chUpdateName => L.settingsUpdates;
   static const _chNewsId        = 'ls_news';
   static String get _chNewsName => L.notifNewsSection;
+  static const _chDlId          = 'ls_download';
+  static String get _chDlName => tx('ntf_dl_section');
+  static const _idDownload      = 20;
+  static bool _dlServiceOn = false;
+
   static const _chSyncId        = 'ls_scrobble_sync';
   static String get _chSyncName => L.notifSyncSection;
 
@@ -488,6 +493,76 @@ class NotificationService {
       ),
       payload: _payload(type: 'sync', title: title, body: body),
     );
+  }
+
+  // ── Downloads (progress bar + foreground service so it runs in background) ─
+
+  static Future<bool> _dlEnabled() async {
+    if (kIsWeb) return false;
+    final p = await SharedPreferences.getInstance();
+    return p.getBool('ls_notif_download_enabled') ?? true;
+  }
+
+  static AndroidNotificationDetails _dlDetails({double? progress, bool done = false}) =>
+      AndroidNotificationDetails(
+        _chDlId, _chDlName,
+        icon:          '@mipmap/ic_launcher',
+        color:         _kLastFmRed,
+        subText:       'LastStats',
+        importance:    Importance.low,
+        priority:      Priority.low,
+        onlyAlertOnce: true,
+        ongoing:       !done,
+        autoCancel:    done,
+        showProgress:  !done,
+        maxProgress:   100,
+        progress:      ((progress ?? 0) * 100).round(),
+        indeterminate: !done && progress == null,
+      );
+
+  static Future<void> showDownloadProgress(String title, double? progress) async {
+    try {
+      if (!await _dlEnabled()) return;
+      final body = progress == null ? tx('up_downloading') : '${(progress * 100).round()} %';
+      final details = _dlDetails(progress: progress);
+      final android = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      if (android != null && !_dlServiceOn) {
+        _dlServiceOn = true;
+        await android.startForegroundService(
+          _idDownload, title, body,
+          notificationDetails: details,
+          foregroundServiceTypes: {AndroidServiceForegroundType.foregroundServiceTypeDataSync},
+        );
+        return;
+      }
+      await _plugin.show(_idDownload, title, body, NotificationDetails(android: details));
+    } catch (_) {}
+  }
+
+  static Future<void> _stopDownloadService() async {
+    if (!_dlServiceOn) return;
+    _dlServiceOn = false;
+    try {
+      await _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()?.stopForegroundService();
+    } catch (_) {}
+  }
+
+  static Future<void> cancelDownload() async {
+    try {
+      await _stopDownloadService();
+      await _plugin.cancel(_idDownload);
+    } catch (_) {}
+  }
+
+  static Future<void> showDownloadDone(String title, String body) async {
+    try {
+      await _stopDownloadService();
+      if (!await _dlEnabled()) { await _plugin.cancel(_idDownload); return; }
+      await _plugin.show(_idDownload, title, body,
+          NotificationDetails(android: _dlDetails(done: true)));
+    } catch (_) {}
   }
 
   static Future<void> showTest() async {

@@ -1465,4 +1465,11 @@ const Map<String, String> kTxAr = {
   'up_retry': 'إعادة المحاولة',
   'up_browser': 'فتح في المتصفح',
   'up_close': 'إغلاق',
+  'up_saved': 'تم الحفظ في التنزيلات',
+  'up_background': 'المتابعة في الخلفية',
+  'ntf_dl_section': 'التنزيلات',
+  'ntf_dl_title': 'إشعارات التنزيل',
+  'ntf_dl_sub': 'شريط تقدم أثناء التنزيل حتى في الخلفية',
+  'ntf_dl_ready': 'اكتمل التنزيل',
+  'ntf_dl_failed': 'فشل التنزيل',
 };

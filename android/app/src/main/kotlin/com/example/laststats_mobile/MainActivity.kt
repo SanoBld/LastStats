@@ -1,8 +1,11 @@
 package com.example.laststats_mobile
 
+import android.content.ContentValues
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
 import android.provider.Settings
 import android.view.WindowManager
 import androidx.core.content.FileProvider
@@ -34,6 +37,33 @@ class MainActivity : FlutterActivity() {
                                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
                             startActivity(i)
                             result.success(true)
+                        }
+                        "saveToDownloads" -> {
+                            val src  = File(call.argument<String>("path")!!)
+                            val name = call.argument<String>("name")!!
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                val mime = if (name.endsWith(".apk", true))
+                                    "application/vnd.android.package-archive" else "application/octet-stream"
+                                val values = ContentValues().apply {
+                                    put(MediaStore.Downloads.DISPLAY_NAME, name)
+                                    put(MediaStore.Downloads.MIME_TYPE, mime)
+                                    put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+                                    put(MediaStore.Downloads.IS_PENDING, 1)
+                                }
+                                val uri = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)!!
+                                contentResolver.openOutputStream(uri)!!.use { out ->
+                                    src.inputStream().use { it.copyTo(out) }
+                                }
+                                values.clear()
+                                values.put(MediaStore.Downloads.IS_PENDING, 0)
+                                contentResolver.update(uri, values, null, null)
+                                result.success("Downloads/$name")
+                            } else {
+                                val dir = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)!!
+                                val dst = File(dir, name)
+                                src.copyTo(dst, true)
+                                result.success(dst.absolutePath)
+                            }
                         }
                         else -> result.notImplemented()
                     }

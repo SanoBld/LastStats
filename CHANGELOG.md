@@ -34,6 +34,8 @@
 
 **Updates**
 - Download now fetches the update inside the app (animated wavy progress) and opens the installer directly, from the updates page, the version history, the news and the update notification (Android: you only confirm the install; Windows: silent installer, then the app restarts); clear messages if the install permission is missing or the download fails, in all 10 languages
+- Version history: Download now saves the file straight into your Downloads folder from inside the app, with no browser
+- Downloads can continue in the background: close the progress sheet and a notification with a progress bar follows the download (new "Download notifications" switch in the notification settings)
 - The update buttons now say "Download" everywhere instead of "Open link"
 - Fixed the notification bell: it now stays lit while an update is available and also shows for any new message, even when the stats could not be loaded
 

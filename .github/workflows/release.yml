@@ -83,7 +83,7 @@ jobs:
           NOTES=$(printf '%s' "$NOTES" | sed -e '/./,$!d' -e :a -e '/^\n*$/{$d;N;ba' -e '}')
 
           if [ -z "$NOTES" ]; then
-            NOTES="_(Pas d'\''entrée trouvée dans CHANGELOG.md pour $TAG — ajoute une section \"## $TAG\" avant de créer le tag)_"
+            NOTES="_(No changelog entry for $TAG)_"
           fi
 
           {

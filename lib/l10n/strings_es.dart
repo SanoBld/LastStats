@@ -1494,4 +1494,11 @@ const Map<String, String> kTxEs = {
   'up_retry': 'Reintentar',
   'up_browser': 'Abrir en el navegador',
   'up_close': 'Cerrar',
+  'up_saved': 'Guardado en Descargas',
+  'up_background': 'Continuar en segundo plano',
+  'ntf_dl_section': 'Descargas',
+  'ntf_dl_title': 'Notificaciones de descarga',
+  'ntf_dl_sub': 'Barra de progreso durante las descargas, incluso en segundo plano',
+  'ntf_dl_ready': 'Descarga completada',
+  'ntf_dl_failed': 'Descarga fallida',
 };

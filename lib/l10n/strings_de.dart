@@ -1465,4 +1465,11 @@ const Map<String, String> kTxDe = {
   'up_retry': 'Erneut versuchen',
   'up_browser': 'Im Browser öffnen',
   'up_close': 'Schließen',
+  'up_saved': 'In Downloads gespeichert',
+  'up_background': 'Im Hintergrund fortsetzen',
+  'ntf_dl_section': 'Downloads',
+  'ntf_dl_title': 'Download-Benachrichtigungen',
+  'ntf_dl_sub': 'Fortschrittsbalken bei Downloads, auch im Hintergrund',
+  'ntf_dl_ready': 'Download abgeschlossen',
+  'ntf_dl_failed': 'Download fehlgeschlagen',
 };

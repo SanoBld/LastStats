@@ -27,6 +27,7 @@ const _kNewsEnabled       = 'ls_notif_news_enabled';
 const _kShowNewsBadge     = 'ls_show_news_badge';
 const _kSyncNotifEnabled  = 'ls_notif_sync_enabled';
 const _kSyncNotifDetail   = 'ls_notif_sync_progress_detail';
+const _kDlNotifEnabled    = 'ls_notif_download_enabled';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -65,6 +66,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   // Background scrobble sync notifications
   bool _syncNotifOn     = true;
+  bool _dlNotifOn       = true;
   bool _syncNotifDetail = true;
 
   // Test-notification feedback
@@ -109,6 +111,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
       _showBadge = prefs.getBool(_kShowNewsBadge) ?? true;
 
       _syncNotifOn     = prefs.getBool(_kSyncNotifEnabled) ?? true;
+      _dlNotifOn       = prefs.getBool(_kDlNotifEnabled) ?? true;
       _syncNotifDetail = prefs.getBool(_kSyncNotifDetail)  ?? true;
 
       _intervalCtrl.text = _milestoneInterval.toString();
@@ -130,6 +133,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
     await prefs.setBool(_kNewsEnabled,       _newsOn);
     notifNewsEnabledNotifier.value = _newsOn;
     await prefs.setBool(_kSyncNotifEnabled, _syncNotifOn);
+    await prefs.setBool(_kDlNotifEnabled, _dlNotifOn);
     await prefs.setBool(_kSyncNotifDetail,  _syncNotifDetail);
     // Re-register WorkManager tasks to reflect new settings
     await NotificationWorker.scheduleAll();
@@ -137,6 +141,11 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   void _setSyncNotif(bool v) {
     setState(() => _syncNotifOn = v);
+    _save();
+  }
+
+  void _setDlNotif(bool v) {
+    setState(() => _dlNotifOn = v);
     _save();
   }
 
@@ -410,6 +419,18 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       onChanged: _setSyncDetail,
                     ),
                   ],
+                ]),
+                const SizedBox(height: 16),
+
+                // ── Section: Downloads ──────────────────────────────────────
+                SettingsSection(label: tx('ntf_dl_section'), children: [
+                  SwitchListTile(
+                    secondary: Icon(Icons.download_rounded, color: scheme.primary),
+                    title:    Text(tx('ntf_dl_title')),
+                    subtitle: Text(tx('ntf_dl_sub')),
+                    value:    _dlNotifOn,
+                    onChanged: _hasPermission ? _setDlNotif : null,
+                  ),
                 ]),
                 const SizedBox(height: 16),
 

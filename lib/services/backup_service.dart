@@ -130,7 +130,7 @@ const _kDashboardKeys = {
 /// Notification preferences and news/loved badges. Own switch on export.
 const _kNotificationKeys = {
   'ls_notif_news_enabled', 'ls_notif_sync_enabled',
-  'ls_notif_sync_progress_detail',
+  'ls_notif_sync_progress_detail', 'ls_notif_download_enabled',
   'ls_notif_daily_enabled', 'ls_notif_daily_hour', 'ls_notif_daily_min',
   'ls_notif_weekly_enabled', 'ls_notif_weekly_day',
   'ls_notif_weekly_hour', 'ls_notif_weekly_min',

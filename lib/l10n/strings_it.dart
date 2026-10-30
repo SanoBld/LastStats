@@ -1465,4 +1465,11 @@ const Map<String, String> kTxIt = {
   'up_retry': 'Riprova',
   'up_browser': 'Apri nel browser',
   'up_close': 'Chiudi',
+  'up_saved': 'Salvato in Download',
+  'up_background': 'Continua in background',
+  'ntf_dl_section': 'Download',
+  'ntf_dl_title': 'Notifiche di download',
+  'ntf_dl_sub': 'Barra di avanzamento durante i download, anche in background',
+  'ntf_dl_ready': 'Download completato',
+  'ntf_dl_failed': 'Download non riuscito',
 };

@@ -1464,4 +1464,11 @@ const Map<String, String> kTxJa = {
   'up_retry': '再試行',
   'up_browser': 'ブラウザで開く',
   'up_close': '閉じる',
+  'up_saved': 'ダウンロードに保存しました',
+  'up_background': 'バックグラウンドで続行',
+  'ntf_dl_section': 'ダウンロード',
+  'ntf_dl_title': 'ダウンロード通知',
+  'ntf_dl_sub': 'バックグラウンドでもダウンロードの進行バーを表示します',
+  'ntf_dl_ready': 'ダウンロード完了',
+  'ntf_dl_failed': 'ダウンロードに失敗しました',
 };

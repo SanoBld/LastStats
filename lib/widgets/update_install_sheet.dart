@@ -20,6 +20,21 @@ bool _inApp(DownloadKind k) =>
     ((defaultTargetPlatform == TargetPlatform.android && k == DownloadKind.apk) ||
         (defaultTargetPlatform == TargetPlatform.windows && k == DownloadKind.installer));
 
+bool _canSave() => !kIsWeb && defaultTargetPlatform != TargetPlatform.iOS;
+
+String _fileNameOf(String url) {
+  final seg = Uri.tryParse(url)?.pathSegments ?? const <String>[];
+  return seg.isNotEmpty && seg.last.isNotEmpty ? seg.last : 'LastStats-update';
+}
+
+/// Downloads the release file into the default Downloads folder (no browser, no install).
+Future<void> downloadToFolder(BuildContext context, UpdateInfo info) async {
+  if (!info.hasDownload || !_canSave()) {
+    return _openExternal(info.hasDownload ? info.downloadUrl! : info.releaseUrl);
+  }
+  return _showSheet(context, url: info.downloadUrl!, kind: info.downloadKind, version: info.version, save: true);
+}
+
 /// Newer release with a downloadable file: in-app install. Otherwise: open the link.
 Future<void> installOrOpen(BuildContext context, UpdateInfo info) async {
   if (info.hasDownload && UpdateService.isNewerThanInstalled(info.version)) {
@@ -41,6 +56,11 @@ Future<void> openUpdateUrl(BuildContext context, String url) {
 Future<void> showUpdateInstall(BuildContext context,
     {required String url, required DownloadKind kind, String? version}) async {
   if (!_inApp(kind)) return _openExternal(url);
+  return _showSheet(context, url: url, kind: kind, version: version, save: false);
+}
+
+Future<void> _showSheet(BuildContext context,
+    {required String url, required DownloadKind kind, String? version, required bool save}) async {
   final scheme = Theme.of(context).colorScheme;
   await showModalBottomSheet<void>(
     sheetAnimationStyle: kM3SheetAnimation,
@@ -52,17 +72,18 @@ Future<void> showUpdateInstall(BuildContext context,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
-    builder: (_) => _UpdateSheet(url: url, kind: kind, version: version),
+    builder: (_) => _UpdateSheet(url: url, kind: kind, version: version, save: save),
   );
 }
 
-enum _Phase { downloading, permission, launching, failed }
+enum _Phase { downloading, permission, launching, saved, failed }
 
 class _UpdateSheet extends StatefulWidget {
-  const _UpdateSheet({required this.url, required this.kind, this.version});
+  const _UpdateSheet({required this.url, required this.kind, this.version, this.save = false});
   final String url;
   final DownloadKind kind;
   final String? version;
+  final bool save;
 
   @override
   State<_UpdateSheet> createState() => _UpdateSheetState();
@@ -71,6 +92,7 @@ class _UpdateSheet extends StatefulWidget {
 class _UpdateSheetState extends State<_UpdateSheet> {
   _Phase _phase = _Phase.downloading;
   double? _p = 0;
+  String _where = '';
 
   @override
   void initState() {
@@ -82,12 +104,15 @@ class _UpdateSheetState extends State<_UpdateSheet> {
     setState(() { _phase = _Phase.downloading; _p = 0; });
     var r = 'fallback';
     try {
-      r = await installUpdate(widget.url, widget.kind, (p) {
-        if (mounted) setState(() => _p = p);
-      });
+      void tick(double? p) { if (mounted) setState(() => _p = p); }
+      r = widget.save
+          ? await saveDownload(widget.url, _fileNameOf(widget.url), tick)
+          : await installUpdate(widget.url, widget.kind, tick);
     } catch (_) {}
     if (!mounted) return;
-    if (r == 'ok') {
+    if (r.startsWith('saved|')) {
+      setState(() { _where = r.substring(6); _phase = _Phase.saved; });
+    } else if (r == 'ok') {
       setState(() => _phase = _Phase.launching);
       await Future.delayed(const Duration(milliseconds: 700));
       if (mounted) Navigator.of(context).pop();
@@ -104,17 +129,20 @@ class _UpdateSheetState extends State<_UpdateSheet> {
       _Phase.downloading => tx('up_downloading'),
       _Phase.permission  => tx('up_perm_title'),
       _Phase.launching   => tx('up_installing'),
+      _Phase.saved       => tx('up_saved'),
       _Phase.failed      => tx('up_failed'),
     };
     final body = switch (_phase) {
       _Phase.downloading => widget.version != null ? 'v${widget.version}' : tx('up_title'),
       _Phase.permission  => tx('up_perm_body'),
       _Phase.launching   => widget.kind == DownloadKind.installer ? tx('up_restart') : tx('up_title'),
+      _Phase.saved       => _where,
       _Phase.failed      => tx('up_failed_body'),
     };
-    final bad = _phase == _Phase.permission || _phase == _Phase.failed;
+    final bad  = _phase == _Phase.permission || _phase == _Phase.failed;
+    final done = _phase == _Phase.saved;
     return PopScope(
-      canPop: bad,
+      canPop: bad || done,
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
@@ -123,7 +151,7 @@ class _UpdateSheetState extends State<_UpdateSheet> {
               size: 64,
               color: bad ? scheme.errorContainer : scheme.primaryContainer,
               child: Icon(
-                bad ? Icons.error_outline_rounded : Icons.system_update_rounded,
+                bad ? Icons.error_outline_rounded : done ? Icons.download_done_rounded : (widget.save ? Icons.download_rounded : Icons.system_update_rounded),
                 size: 30,
                 color: bad ? scheme.onErrorContainer : scheme.onPrimaryContainer,
               ),
@@ -150,6 +178,26 @@ class _UpdateSheetState extends State<_UpdateSheet> {
                     style: text.labelLarge?.copyWith(
                         color: scheme.primary, fontWeight: FontWeight.w700)),
               ],
+              if (_phase == _Phase.downloading) ...[
+                const SizedBox(height: 16),
+                M3TonalButton(
+                  width: double.infinity,
+                  color: scheme.surfaceContainerHighest,
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Text(tx('up_background'),
+                      style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w700)),
+                ),
+              ],
+            ],
+            if (done) ...[
+              const SizedBox(height: 20),
+              M3TonalButton(
+                width: double.infinity,
+                color: scheme.primaryContainer,
+                onTap: () => Navigator.of(context).pop(),
+                child: Text(tx('up_close'),
+                    style: TextStyle(color: scheme.onPrimaryContainer, fontWeight: FontWeight.w700)),
+              ),
             ],
             if (bad) ...[
               const SizedBox(height: 20),

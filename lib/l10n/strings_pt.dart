@@ -1494,4 +1494,11 @@ const Map<String, String> kTxPt = {
   'up_retry': 'Tentar novamente',
   'up_browser': 'Abrir no navegador',
   'up_close': 'Fechar',
+  'up_saved': 'Guardado em Transferências',
+  'up_background': 'Continuar em segundo plano',
+  'ntf_dl_section': 'Transferências',
+  'ntf_dl_title': 'Notificações de transferência',
+  'ntf_dl_sub': 'Barra de progresso durante as transferências, mesmo em segundo plano',
+  'ntf_dl_ready': 'Transferência concluída',
+  'ntf_dl_failed': 'Falha na transferência',
 };
