@@ -1979,28 +1979,18 @@ class _YrShareCard extends StatelessWidget {
   final Uint8List? photo; // profile picture bytes shown as background (null = theme gradient)
   const _YrShareCard({required this.scheme, required this.year, required this.username, required this.data, required this.hours, required this.fmt, this.rankLine, this.photo, this.photoDark = false, this.slide});
 
-  Widget _stat(String label, String value) => Expanded(
-        child: Container(
-          alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
-          decoration: BoxDecoration(color: scheme.primaryContainer.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(14)),
-          child: Column(children: [
-            Text(value, style: TextStyle(color: scheme.primary, fontSize: 20, fontWeight: FontWeight.w900)),
-            const SizedBox(height: 2),
-            Text(label, textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: scheme.onPrimaryContainer, fontSize: 10, fontWeight: FontWeight.w600)),
-          ]),
-        ),
-      );
+  Widget _stat(String label, String value) => Expanded(child: ShareTile(label: label, value: value));
 
   Widget _list(String title, List<_YrRanked> items, String type) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(title.toUpperCase(), style: TextStyle(color: _yrSoft(scheme), fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2)),
+      ShareLabel(title),
       const SizedBox(height: 6),
       for (var i = 0; i < items.length && i < 3; i++)
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 2),
           child: Row(children: [
-            SizedBox(width: 20, child: Text('${i + 1}', style: TextStyle(color: scheme.primary, fontSize: 14, fontWeight: FontWeight.w900))),
+            ShareRank(n: i + 1, size: 22),
+            const SizedBox(width: 8),
             _YrImg(name: items[i].name, artist: items[i].artist, type: type, size: 36, round: type == 'artists'),
             const SizedBox(width: 10),
             Expanded(
@@ -2070,6 +2060,10 @@ class _YrShareCard extends StatelessWidget {
               ),
             ),
           ),
+        if (photo == null) ...[
+          Positioned(top: -60, right: -60, child: ShareBlob(size: 200, color: scheme.primary.withValues(alpha: 0.10))),
+          Positioned(bottom: 90, left: -80, child: ShareBlob(size: 170, lobes: 12, color: scheme.tertiary.withValues(alpha: 0.08))),
+        ],
         Container(
         width: 360,
         height: 640, // 9:16 (story format), exported at 3x = 1080x1920
@@ -2119,11 +2113,7 @@ class _YrShareCard extends StatelessWidget {
           const SizedBox(height: 14),
           Align(
             alignment: Alignment.bottomRight,
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Text('LastStats', style: TextStyle(color: _yrSoft(scheme).withValues(alpha: 0.7), fontSize: 11, fontWeight: FontWeight.w700)),
-              const SizedBox(width: 8),
-              AppLogo(size: 26, color: _yrSoft(scheme).withValues(alpha: 0.7)),
-            ]),
+            child: ShareMark(color: _yrSoft(scheme).withValues(alpha: 0.7)),
           ),
         ]))),
       ),

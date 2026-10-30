@@ -1039,7 +1039,18 @@ class _ShareCard extends StatelessWidget {
 
     return Material(
       color: scheme.surface,
-      child: Container(
+      clipBehavior: Clip.hardEdge,
+      child: Stack(children: [
+        Positioned(
+          top: -60, right: -60,
+          child: ShareBlob(size: 200, color: scheme.primary.withValues(alpha: 0.10)),
+        ),
+        Positioned(
+          bottom: 120, left: -80,
+          child: ShareBlob(
+              size: 170, lobes: 12, color: scheme.tertiary.withValues(alpha: 0.08)),
+        ),
+        Container(
         width: 380,
         padding: const EdgeInsets.fromLTRB(24, 40, 24, 28),
         decoration: BoxDecoration(
@@ -1127,22 +1138,13 @@ class _ShareCard extends StatelessWidget {
           for (final (label, type, items) in sections)
             if (items.isNotEmpty) ...[
               const SizedBox(height: 22),
-              Text(label.toUpperCase(),
-                  style: TextStyle(
-                      color: scheme.primary,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.5)),
+              ShareLabel(label),
               const SizedBox(height: 8),
               for (var i = 0; i < items.take(3).length; i++) ...[
                 if (i > 0) const SizedBox(height: 8),
                 Row(children: [
-                  SizedBox(
-                    width: 16,
-                    child: Text('${i + 1}',
-                        style: TextStyle(color: scheme.primary, fontSize: 14, fontWeight: FontWeight.w900)),
-                  ),
-                  const SizedBox(width: 6),
+                  ShareRank(n: i + 1, size: 24),
+                  const SizedBox(width: 8),
                   M3ShapedBox(
                     size: 34,
                     seed: (items[i]['name'] ?? '').toString(),
@@ -1166,28 +1168,13 @@ class _ShareCard extends StatelessWidget {
           const SizedBox(height: 24),
           Align(
             alignment: Alignment.bottomRight,
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Text('LastStats',
-                  style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 11, fontWeight: FontWeight.w600)),
-              const SizedBox(width: 8),
-              AppLogo(size: 26, color: scheme.onSurfaceVariant),
-            ]),
+            child: ShareMark(color: scheme.onSurfaceVariant),
           ),
         ]),
       ),
+      ]),
     );
   }
 
-  Widget _stat(String label, String value) => Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          color: scheme.surfaceContainerHigh,
-          borderRadius: AppRadius.mdR,
-        ),
-        child: Column(children: [
-          Text(value, style: TextStyle(color: scheme.onSurface, fontSize: 15, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 1),
-          Text(label, style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 10)),
-        ]),
-      );
+  Widget _stat(String label, String value) => ShareTile(label: label, value: value);
 }

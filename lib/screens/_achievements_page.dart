@@ -534,7 +534,22 @@ class _ShareBadgeArt extends StatelessWidget {
             ),
           ),
         ),
-        Center(child: Icon(icon, size: 72, color: tierOnColor(a.def.tier))),
+        Positioned(
+          top: -50, right: -50,
+          child: ShareBlob(size: 190, color: Colors.white.withValues(alpha: 0.10)),
+        ),
+        Align(
+          alignment: const Alignment(0, -0.25),
+          child: Container(
+            width: 168, height: 168,
+            alignment: Alignment.center,
+            decoration: ShapeDecoration(
+              color: Colors.white.withValues(alpha: 0.18),
+              shape: const M3CookieBorder(lobes: 8, amplitude: 0.07),
+            ),
+            child: Icon(icon, size: 80, color: tierOnColor(a.def.tier)),
+          ),
+        ),
         Positioned(
           left: 24, right: 24, bottom: 22,
           child: Column(
@@ -550,11 +565,10 @@ class _ShareBadgeArt extends StatelessWidget {
               Text('${a.current} / ${a.def.threshold}',
                   style: const TextStyle(color: Colors.white70, fontSize: 15)),
               const SizedBox(height: 12),
-              Row(children: [
-                const Text('LastStats', style: TextStyle(color: Colors.white54, fontSize: 11)),
-                const Spacer(),
-                const AppLogo(size: 26, color: Colors.white54),
-              ]),
+              const Align(
+                alignment: Alignment.bottomRight,
+                child: ShareMark(color: Colors.white60),
+              ),
             ],
           ),
         ),

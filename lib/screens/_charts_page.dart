@@ -1744,7 +1744,7 @@ class _MonthlyCardState extends State<_MonthlyCard> {
         width: _colW,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: () => setState(() => _touchIdx = touched ? null : idx),
+          onTap: () { _haptic(_HapticImpact.selection); setState(() => _touchIdx = touched ? null : idx); },
           child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.end,
@@ -2353,8 +2353,8 @@ class _DonutDistributionCard extends StatelessWidget {
               final plays = getPlays(e.value);
               final pct   = total > 0 ? (plays / total * 100).round() : 0;
               final color = palette[e.key % palette.length];
-              return GestureDetector(
-                onTap: () => onTap(e.value),
+              return _PressScale(
+                onTap: () { _haptic(_HapticImpact.light); onTap(e.value); },
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 7),
                   child: Row(children: [
@@ -2631,8 +2631,8 @@ class _TopHorizontalBarCard extends StatelessWidget {
               ? barColor
               : Color.lerp(s.surfaceContainerHigh, barColor, 0.6)!;
 
-          return GestureDetector(
-            onTap: () => onTap(e.value),
+          return _PressScale(
+            onTap: () { _haptic(_HapticImpact.light); onTap(e.value); },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Row(

@@ -2879,21 +2879,24 @@ class _ShareCardArtState extends State<_ShareCardArt> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.network(url, fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => const ColoredBox(color: Color(0xFF222222))),
-            // Cover fades into its own dominant color at the bottom, so the
-            // text there always reads well.
-            DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                  stops: const [0.0, 0.42, 0.78, 1.0],
-                  colors: [
-                    _tint.withValues(alpha: 0),
-                    _tint.withValues(alpha: 0),
-                    _tint.withValues(alpha: 0.88),
-                    _tint,
-                  ],
+            // Solid dominant color behind everything, so text always reads well.
+            ColoredBox(color: _tint),
+            Positioned(
+              top: -60, right: -60,
+              child: ShareBlob(size: 200, color: fg.withValues(alpha: 0.08)),
+            ),
+            // Cover in a Material shape (follows the image-shape setting).
+            Positioned(
+              top: 26, left: 0, right: 0,
+              child: Center(
+                child: M3ShapedBox(
+                  size: 230,
+                  seed: title,
+                  child: SizedBox(
+                    width: 230, height: 230,
+                    child: Image.network(url, fit: BoxFit.cover,
+                        errorBuilder: (_, _, _) => const ColoredBox(color: Color(0xFF222222))),
+                  ),
                 ),
               ),
             ),
@@ -2925,10 +2928,10 @@ class _ShareCardArtState extends State<_ShareCardArt> {
                         ],
                         const SizedBox(height: 14),
                         Row(children: [
-                          Text('LastStats · $source',
+                          Text(source,
                               style: TextStyle(color: fg3, fontSize: 11)),
                           const Spacer(),
-                          AppLogo(size: 32, color: fg2),
+                          ShareMark(color: fg2, k: 1.15),
                         ]),
                       ],
                     ),

@@ -32,6 +32,11 @@
 
 ## v4.3.0
 
+- Sharing: every share image now uses the same style (Material shapes, same stat tiles, same rank badges, same section labels, logo and name in the bottom-right corner)
+- Chart export: the card header has a bigger logo in a cookie shape and soft corner shapes behind the chart
+- Sharing a card (track, artist, album, friend): the cover now sits in a Material shape that follows your image-shape setting
+- Badge share: the icon sits in a cookie shape
+- Charts: tapping a legend row or bar gives a small vibration and a soft press animation
 - Sharing: the LastStats logo now sits in a corner on every shared card, it is bigger, and it no longer appears twice on chart exports (the footer just says when it was generated)
 - Chart export: every chart tile in the picker has the same size
 - Sharing a card: uses your chosen font, bigger info lines (like your scrobbles), and every line starts at the same left edge
