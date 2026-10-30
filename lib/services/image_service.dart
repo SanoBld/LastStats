@@ -390,12 +390,31 @@ class ImageService {
 
   // Credit line of an album / track ("A", "A & B", "A feat. B"): matches when
   // the whole credit or one of the credited artists is the expected artist.
+  // Words of a name without accents/punctuation/qualifiers.
+  static Set<String> _words(String s) => s
+      .replaceAll(RegExp(r'[\(\[].*?[\)\]]'), ' ')
+      .split(RegExp(r'[^\p{L}\p{N}]+', unicode: true))
+      .map(_normalize)
+      .where((w) => w.isNotEmpty)
+      .toSet();
+
+  // "Gims" vs "Maître Gims": every word of the shorter name is in the longer one.
+  // Only used for album / track credits, where the title already matches exactly.
+  static bool _sharesAllWords(String a, String b) {
+    final x = _words(a), y = _words(b);
+    if (x.isEmpty || y.isEmpty) return false;
+    final small = x.length <= y.length ? x : y;
+    final big   = identical(small, x) ? y : x;
+    return small.join().length >= 3 && small.every(big.contains);
+  }
+
   static bool _creditMatch(String expected, String candidate) {
     if (_sameArtist(expected, candidate)) return true;
+    if (_sharesAllWords(expected, candidate)) return true;
     final parts = candidate.split(RegExp(
         r'\s*(?:,|&|;|/|\bfeat\.?|\bft\.?|\bfeaturing\b|\bwith\b|\bx\b|\band\b)\s*',
         caseSensitive: false));
-    return parts.any((p) => p.trim().isNotEmpty && _sameArtist(expected, p));
+    return parts.any((p) => p.trim().isNotEmpty && (_sameArtist(expected, p) || _sharesAllWords(expected, p)));
   }
 
   // Strict match for ARTIST names. The loose [_similar] accepted any name

@@ -141,8 +141,8 @@ class NotificationDetailPage extends StatelessWidget {
               if (url.isNotEmpty)
                 ActionGroupItem(
                   primary: type != 'daily' && type != 'weekly',
-                  icon: Icons.open_in_new_rounded,
-                  label: L.notifDetailOpenLink,
+                  icon: type == 'update' ? Icons.download_rounded : Icons.open_in_new_rounded,
+                  label: type == 'update' ? L.settingsDownload : L.notifDetailOpenLink,
                   onPressed: () async {
                     if (type == 'update') { await openUpdateUrl(context, url); return; }
                     final uri = Uri.tryParse(url);

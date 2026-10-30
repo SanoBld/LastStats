@@ -256,6 +256,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
       _load();
       if (favoritesEnabled) _loadFavorites();
     }
+    _fetchNews();   // independent of the stats load, so the bell also works offline / on errors
   }
 
   Future<void> _loadFavorites() async {
@@ -1334,7 +1335,11 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     // ── 3. Badge count ────────────────────────────────────────────────────
     final p      = await SharedPreferences.getInstance();
     final seen   = Set<String>.from(p.getStringList('ls_news_seen') ?? []);
-    final unread = allItems.where((i) => !seen.contains(i['id'] ?? '')).length;
+    // An available update keeps the bell lit until it is installed.
+    final unread = allItems.where((i) {
+      final id = (i['id'] ?? '').toString();
+      return id.startsWith('update_v') || !seen.contains(id);
+    }).length;
 
     if (mounted) setState(() { _newsItems = allItems; _unreadCount = unread; });
   }
@@ -1343,9 +1348,11 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   Future<void> _markNewsRead() async {
     if (_newsItems.isEmpty) return;
     final p   = await SharedPreferences.getInstance();
-    final ids = _newsItems.map((i) => (i['id'] ?? '').toString()).toList();
+    final ids = _newsItems.map((i) => (i['id'] ?? '').toString())
+        .where((id) => !id.startsWith('update_v')).toList();
     await p.setStringList('ls_news_seen', ids);
-    if (mounted) setState(() => _unreadCount = 0);
+    final pending = _newsItems.where((i) => (i['id'] ?? '').toString().startsWith('update_v')).length;
+    if (mounted) setState(() => _unreadCount = pending);
   }
 
   Future<void> _resolveHeaderImage() async {
@@ -4430,8 +4437,8 @@ class _NewsDetailSheetState extends State<_NewsDetailSheet> {
               Expanded(
                 child: FilledButton.icon(
                   onPressed: () => (item['type'] == 'update') ? openUpdateUrl(context, url) : _openUrl(url),
-                  icon:  const Icon(Icons.open_in_new_rounded, size: 18),
-                  label: Text(L.notifDetailOpenLink),
+                  icon:  Icon(item['type'] == 'update' ? Icons.download_rounded : Icons.open_in_new_rounded, size: 18),
+                  label: Text(item['type'] == 'update' ? L.settingsDownload : L.notifDetailOpenLink),
                 ),
               ),
               const SizedBox(width: 10),
