@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-30T21:26:01Z",
+  "updated": "2026-10-30T21:56:15Z",
   "commits": [
+    {
+      "sha": "c3ac22f60c808cf3562f820da73780a44dfdb0cd",
+      "message": "feat: amélioration de l'exportation des cartes de partage avec des images basées sur les données du graphique, ajout de formes de fond arrondies et correction des photos d'artistes",
+      "date": "2026-10-30T21:53:34Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/c3ac22f60c808cf3562f820da73780a44dfdb0cd",
+      "tags": []
+    },
     {
       "sha": "81011c12e7ad8f881b28dfa181641115c0993c87",
       "message": "feat: amélioration de l'affichage des cartes de partage avec des couleurs et des coins arrondis, et mise à jour de la taille de la marque",
@@ -2705,15 +2714,6 @@
       "tags": [
         "v3.2.0"
       ]
-    },
-    {
-      "sha": "ce03e16f1c25b1ab3d086fba4de47ef9935384a5",
-      "message": "fix: mettre à jour la section des cartes d'œuvres 3D pour inclure les options de partage modernisées",
-      "date": "2026-08-27T16:58:49Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/ce03e16f1c25b1ab3d086fba4de47ef9935384a5",
-      "tags": []
     }
   ]
 }

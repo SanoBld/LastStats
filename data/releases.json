@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-30T21:25:59Z",
+  "updated": "2026-10-30T21:56:12Z",
   "stars": 3,
   "releases": [
     {
@@ -25,7 +25,7 @@
         {
           "name": "app-universal-release.apk",
           "size": 105922012,
-          "download_count": 2,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/app-universal-release.apk"
         },
         {
