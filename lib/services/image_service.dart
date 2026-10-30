@@ -25,6 +25,7 @@ class ImageService {
   static const _diskPrefix  = 'imgcache_';
   static const _diskTtlMs   = 7 * 24 * 60 * 60 * 1000;
   static const _artistFixFlag = 'artistimgfix_v1';
+  static const _titleFixFlag  = 'titleimgfix_v1';
 
   // In-memory URL cache (session).
   // BUG FIX: this used to be a plain Map with no size limit. On a long
@@ -74,6 +75,16 @@ class ImageService {
           if (k.startsWith('${_diskPrefix}artist|')) await _prefs!.remove(k);
         }
         await _prefs!.setBool(_artistFixFlag, true);
+      }
+      // Same for album and track covers (old matching accepted any title
+      // that merely contained the searched one, and never checked the artist).
+      if (_prefs!.getBool(_titleFixFlag) != true) {
+        for (final k in _prefs!.getKeys().toList()) {
+          if (k.startsWith('${_diskPrefix}album|') || k.startsWith('${_diskPrefix}track|')) {
+            await _prefs!.remove(k);
+          }
+        }
+        await _prefs!.setBool(_titleFixFlag, true);
       }
       final now = DateTime.now().millisecondsSinceEpoch;
       for (final k in _prefs!.getKeys()) {
@@ -356,22 +367,35 @@ class ImageService {
       n = n.replaceAll(accents[i], plain[i]);
     }
     n = n.replaceFirst(RegExp(r'^(the|a|le|la|les)\s+'), '');
-    return n.replaceAll(RegExp(r'[^a-z0-9]'), '');
+    return n.replaceAll(RegExp(r'[^\p{L}\p{N}]', unicode: true), '');
   }
 
-  // Loose "is this actually about what we searched for" check — used to
-  // reject mismatched results from third-party sources (the cause of
-  // unrelated images showing up) rather than blindly trusting whatever
-  // each API returns first.
-  static bool _similar(String expected, String candidate) {
-    final a = _normalize(expected);
-    final b = _normalize(candidate);
-    if (a.isEmpty || b.isEmpty) return false;
-    if (a == b) return true;
-    final shorter = a.length <= b.length ? a : b;
-    final longer  = a.length <= b.length ? b : a;
-    if (shorter.length >= 4 && longer.contains(shorter)) return true;
-    return false;
+  // Album / track titles: equal once edition noise is ignored — "(Deluxe
+  // Edition)", "(Remastered 2011)", "- Single", "- EP", "feat. X"... — but
+  // NOT merely "contains": "Love" must not match "Love Over Gold".
+  static String _titleKey(String s) {
+    var t = s.replaceAll(RegExp(r'\s*[\(\[].*?[\)\]]'), '');
+    t = t.replaceAll(RegExp(
+        r'\s+[-–—]\s+(single|ep|deluxe|remaster\w*|live|mono|stereo|version|edition|bonus|expanded|anniversary|\d{4}).*$',
+        caseSensitive: false), '');
+    t = t.replaceAll(RegExp(r'\s+(feat\.?|ft\.?|featuring)\s.*$', caseSensitive: false), '');
+    final k = _normalize(t);
+    return k.isEmpty ? _normalize(s) : k;
+  }
+
+  static bool _sameTitle(String expected, String candidate) {
+    final a = _titleKey(expected);
+    return a.isNotEmpty && a == _titleKey(candidate);
+  }
+
+  // Credit line of an album / track ("A", "A & B", "A feat. B"): matches when
+  // the whole credit or one of the credited artists is the expected artist.
+  static bool _creditMatch(String expected, String candidate) {
+    if (_sameArtist(expected, candidate)) return true;
+    final parts = candidate.split(RegExp(
+        r'\s*(?:,|&|;|/|\bfeat\.?|\bft\.?|\bfeaturing\b|\bwith\b|\bx\b|\band\b)\s*',
+        caseSensitive: false));
+    return parts.any((p) => p.trim().isNotEmpty && _sameArtist(expected, p));
   }
 
   // Strict match for ARTIST names. The loose [_similar] accepted any name
@@ -462,10 +486,12 @@ class ImageService {
         final card = section['musicCardShelfRenderer'];
         if (card != null) {
           final title = card['title']?['runs']?[0]?['text']?.toString() ?? '';
-          final subtitle = card['subtitle']?['runs']?[0]?['text']?.toString() ?? '';
+          final cardRuns = (card['subtitle']?['runs'] as List?) ?? const [];
           final match = expectArtist == null ||
-              (type == 'artist' ? _sameArtist(expectArtist, title) : _similar(expectArtist, subtitle));
-          if (match && (expectTitle == null || _similar(expectTitle, title))) {
+              (type == 'artist'
+                  ? _sameArtist(expectArtist, title)
+                  : cardRuns.any((r) => _creditMatch(expectArtist, (r['text'] ?? '').toString())));
+          if (match && (expectTitle == null || _sameTitle(expectTitle, title))) {
             final url = _bestThumbnail(card['thumbnail']);
             if (url.isNotEmpty) return url;
           }
@@ -473,28 +499,35 @@ class ImageService {
 
         final items = section['musicShelfRenderer']?['contents'] as List?;
         if (items == null || items.isEmpty) continue;
-        final item = items.first['musicResponsiveListItemRenderer'];
-        if (item == null) continue;
+        // Look at the first few results, not only the first one.
+        for (final entry in items.take(5)) {
+          final item = entry['musicResponsiveListItemRenderer'];
+          if (item == null) continue;
 
-        // First flex column = title (song/album) or artist name.
-        final flexCols = item['flexColumns'] as List?;
-        final title = flexCols?[0]?['musicResponsiveListItemFlexColumnRenderer']
-            ?['text']?['runs']?[0]?['text']?.toString() ?? '';
-        String subtitleArtist = '';
-        if (flexCols != null && flexCols.length > 1) {
-          final runs = flexCols[1]['musicResponsiveListItemFlexColumnRenderer']
-              ?['text']?['runs'] as List?;
-          if (runs != null && runs.isNotEmpty) subtitleArtist = runs.first['text']?.toString() ?? '';
+          // First flex column = title (song/album) or artist name.
+          final flexCols = item['flexColumns'] as List?;
+          final title = flexCols?[0]?['musicResponsiveListItemFlexColumnRenderer']
+              ?['text']?['runs']?[0]?['text']?.toString() ?? '';
+          // Second column mixes type / artist / album / year / duration
+          // (the order differs between songs and albums), so every run is
+          // checked instead of assuming the first one is the artist.
+          var subRuns = const <dynamic>[];
+          if (flexCols != null && flexCols.length > 1) {
+            subRuns = (flexCols[1]['musicResponsiveListItemFlexColumnRenderer']
+                ?['text']?['runs'] as List?) ?? const [];
+          }
+
+          if (expectArtist != null) {
+            final okArtist = type == 'artist'
+                ? _sameArtist(expectArtist, title)
+                : subRuns.any((r) => _creditMatch(expectArtist, (r['text'] ?? '').toString()));
+            if (!okArtist) continue;
+          }
+          if (expectTitle != null && !_sameTitle(expectTitle, title)) continue;
+
+          final url = _bestThumbnail(item['thumbnail']);
+          if (url.isNotEmpty) return url;
         }
-
-        if (expectArtist != null &&
-            !(type == 'artist' ? _sameArtist(expectArtist, title) : _similar(expectArtist, subtitleArtist))) {
-          continue;
-        }
-        if (expectTitle != null && !_similar(expectTitle, title)) continue;
-
-        final url = _bestThumbnail(item['thumbnail']);
-        if (url.isNotEmpty) return url;
       }
       debugLog('[ytmusic] no matching result for "$term" ($type, expectArtist=$expectArtist, expectTitle=$expectTitle)');
       return '';
@@ -545,27 +578,29 @@ class ImageService {
     String? expectTitle,
   ]) async {
     try {
-      final params = <String, String>{'term': term, 'entity': entity, 'limit': '1', 'media': 'music'};
+      final params = <String, String>{'term': term, 'entity': entity, 'limit': '8', 'media': 'music'};
       if (attribute != null) params['attribute'] = attribute;
       final res = await http.get(Uri.https('itunes.apple.com', '/search', params)).timeout(_timeout);
       if (res.statusCode != 200) return '';
       final results = (jsonDecode(utf8.decode(res.bodyBytes))['results'] as List?) ?? [];
-      if (results.isEmpty) return '';
-      final item = results.first as Map<String, dynamic>;
-
-      if (expectArtist != null) {
-        final nm = (item['artistName'] ?? '').toString();
-        if (!(entity == 'musicArtist' ? _sameArtist(expectArtist, nm) : _similar(expectArtist, nm))) return '';
+      // First result that really is the expected artist AND title.
+      for (final r in results) {
+        if (r is! Map) continue;
+        if (expectArtist != null) {
+          final nm = (r['artistName'] ?? '').toString();
+          if (!(entity == 'musicArtist' ? _sameArtist(expectArtist, nm) : _creditMatch(expectArtist, nm))) continue;
+        }
+        if (expectTitle != null) {
+          final titleField = entity == 'song' ? 'trackName' : 'collectionName';
+          if (!_sameTitle(expectTitle, (r[titleField] ?? '').toString())) continue;
+        }
+        final raw = (r['artworkUrl100'] ?? '').toString();
+        if (raw.isEmpty) continue;
+        return raw
+            .replaceAll('100x100bb', '3000x3000bb')
+            .replaceAll('100x100',   '3000x3000');
       }
-      if (expectTitle != null) {
-        final titleField = entity == 'song' ? 'trackName' : 'collectionName';
-        if (!_similar(expectTitle, (item[titleField] ?? '').toString())) return '';
-      }
-
-      final raw = (item['artworkUrl100'] ?? '').toString();
-      return raw.isEmpty ? '' : raw
-          .replaceAll('100x100bb', '3000x3000bb')
-          .replaceAll('100x100',   '3000x3000');
+      return '';
     } catch (_) { return ''; }
   }
 
@@ -593,29 +628,37 @@ class ImageService {
 
   static Future<String> _deezerAlbum(String album, String artist) async {
     try {
-      final res = await http.get(Uri.https('api.deezer.com', '/search/album', {'q': '$artist $album', 'limit': '1'}))
+      final res = await http.get(Uri.https('api.deezer.com', '/search/album', {'q': '$artist $album', 'limit': '10'}))
           .timeout(_timeout);
       if (res.statusCode != 200) return '';
       final items = (jsonDecode(utf8.decode(res.bodyBytes))['data'] as List?) ?? [];
-      if (items.isEmpty) return '';
-      final item = items.first;
-      if (!_similar(album, (item['title'] ?? '').toString())) return '';
-      return (item['cover_xl'] ?? item['cover_big'] ?? '').toString();
+      for (final it in items) {
+        if (it is! Map) continue;
+        if (!_sameTitle(album, (it['title'] ?? '').toString())) continue;
+        if (!_creditMatch(artist, (it['artist']?['name'] ?? '').toString())) continue;
+        final cover = (it['cover_xl'] ?? it['cover_big'] ?? '').toString();
+        if (cover.isNotEmpty && !cover.contains('/images/cover//')) return cover;
+      }
+      return '';
     } catch (_) { return ''; }
   }
 
   // Track search response embeds the parent album object with cover URLs.
   static Future<String> _deezerTrack(String track, String artist) async {
     try {
-      final res = await http.get(Uri.https('api.deezer.com', '/search/track', {'q': '$artist $track', 'limit': '1'}))
+      final res = await http.get(Uri.https('api.deezer.com', '/search/track', {'q': '$artist $track', 'limit': '10'}))
           .timeout(_timeout);
       if (res.statusCode != 200) return '';
       final items = (jsonDecode(utf8.decode(res.bodyBytes))['data'] as List?) ?? [];
-      if (items.isEmpty) return '';
-      final item = items.first;
-      if (!_similar(track, (item['title'] ?? '').toString())) return '';
-      final album = item['album'] as Map<String, dynamic>?;
-      return (album?['cover_xl'] ?? album?['cover_big'] ?? '').toString();
+      for (final it in items) {
+        if (it is! Map) continue;
+        if (!_sameTitle(track, (it['title'] ?? '').toString())) continue;
+        if (!_creditMatch(artist, (it['artist']?['name'] ?? '').toString())) continue;
+        final album = it['album'];
+        final cover = (album is Map ? (album['cover_xl'] ?? album['cover_big'] ?? '') : '').toString();
+        if (cover.isNotEmpty && !cover.contains('/images/cover//')) return cover;
+      }
+      return '';
     } catch (_) { return ''; }
   }
 
@@ -627,9 +670,14 @@ class ImageService {
       if (res.statusCode != 200) return '';
       final albums = (jsonDecode(utf8.decode(res.bodyBytes))['album'] as List?) ?? [];
       if (albums.isEmpty) return '';
-      final item = albums.first;
-      if (!_similar(album, (item['strAlbum'] ?? '').toString())) return '';
-      return (item['strAlbumThumb'] ?? '').toString();
+      for (final item in albums) {
+        if (item is! Map) continue;
+        if (!_sameTitle(album, (item['strAlbum'] ?? '').toString())) continue;
+        if (!_sameArtist(artist, (item['strArtist'] ?? '').toString())) continue;
+        final img = (item['strAlbumThumb'] ?? '').toString();
+        if (img.isNotEmpty) return img;
+      }
+      return '';
     } catch (_) { return ''; }
   }
 
@@ -643,9 +691,14 @@ class ImageService {
       if (res.statusCode != 200) return '';
       final tracks = (jsonDecode(utf8.decode(res.bodyBytes))['track'] as List?) ?? [];
       if (tracks.isEmpty) return '';
-      final item = tracks.first;
-      if (!_similar(track, (item['strTrack'] ?? '').toString())) return '';
-      return (item['strTrackThumb'] ?? '').toString();
+      for (final item in tracks) {
+        if (item is! Map) continue;
+        if (!_sameTitle(track, (item['strTrack'] ?? '').toString())) continue;
+        if (!_sameArtist(artist, (item['strArtist'] ?? '').toString())) continue;
+        final img = (item['strTrackThumb'] ?? '').toString();
+        if (img.isNotEmpty) return img;
+      }
+      return '';
     } catch (_) { return ''; }
   }
 
@@ -738,7 +791,7 @@ class ImageService {
         if (thumb == null) continue;
 
         final title = (p['title'] ?? '').toString();
-        if (!(artist ? _sameArtist(expectName, title) : _similar(expectName, title))) continue; // page isn't about what we searched
+        if (!(artist ? _sameArtist(expectName, title) : _sameTitle(expectName, title))) continue; // page isn't about what we searched
 
         final descriptions = (p['terms']?['description'] as List?) ?? [];
         final description  = descriptions.isNotEmpty ? descriptions.first.toString().toLowerCase() : '';
@@ -761,23 +814,34 @@ class ImageService {
       final searchRes = await http.get(
         Uri.https('musicbrainz.org', '/ws/2/release/', {
           'query': 'release:"$album" AND artist:"$artist"',
-          'limit': '1', 'fmt': 'json',
+          'limit': '6', 'fmt': 'json',
         }),
         headers: {'User-Agent': 'LastStats/2.0 (contact@laststats.app)'},
       ).timeout(_timeout);
       if (searchRes.statusCode != 200) return '';
       final releases = (jsonDecode(utf8.decode(searchRes.bodyBytes))['releases'] as List?) ?? [];
-      if (releases.isEmpty) return '';
-      final candidate = releases.first;
-      if (!_similar(album, (candidate['title'] ?? '').toString())) return '';
-      final mbid = (candidate['id'] ?? '').toString();
-      if (mbid.isEmpty) return '';
-      final coverRes = await http.get(Uri.https('coverartarchive.org', '/release/$mbid/front')).timeout(_timeout);
-      if (coverRes.statusCode == 200 || coverRes.statusCode == 307) {
-        final loc = coverRes.headers['location'];
-        if (loc != null && loc.isNotEmpty) return loc;
+      for (final c in releases) {
+        if (c is! Map) continue;
+        if (!_sameTitle(album, (c['title'] ?? '').toString())) continue;
+        // The release's credited artists must include the expected one.
+        final credits = (c['artist-credit'] as List?) ?? const [];
+        final okArtist = credits.any((ac) =>
+            ac is Map &&
+            (_creditMatch(artist, (ac['name'] ?? '').toString()) ||
+             _creditMatch(artist, (ac['artist']?['name'] ?? '').toString())));
+        if (!okArtist) continue;
+        final mbid = (c['id'] ?? '').toString();
+        if (mbid.isEmpty) continue;
+        // Only trust a cover that actually exists (many releases have none).
+        final coverRes = await http.get(Uri.https('coverartarchive.org', '/release/$mbid/front'))
+            .timeout(_timeout);
+        if (coverRes.statusCode == 200 || coverRes.statusCode == 307) {
+          final loc = coverRes.headers['location'];
+          if (loc != null && loc.isNotEmpty) return loc;
+          return 'https://coverartarchive.org/release/$mbid/front-500';
+        }
       }
-      return 'https://coverartarchive.org/release/$mbid/front-500';
+      return '';
     } catch (_) { return ''; }
   }
 

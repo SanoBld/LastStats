@@ -38,6 +38,7 @@
 - Recap and year recap shares: same flat background and rounded corners as the other share images
 - Year recap shares: extra background shapes, especially on single-slide shares where there was a lot of empty space
 - Sharing: the LastStats name and logo now have the same font and size on every share image
+- Fixed wrong album and track covers: titles must now match exactly (editions like "Deluxe" or "Remastered" are still accepted) and the artist is checked on every source; cached covers are refreshed once
 - Fixed wrong artist photos: artist names are now matched exactly (no more "Drake" getting "Drake Bell"), the most popular artist with that exact name is picked, and previously cached artist photos are refreshed once
 
 - Sharing: every share image now uses the same style (Material shapes, same stat tiles, same rank badges, same section labels, logo and name in the bottom-right corner)
