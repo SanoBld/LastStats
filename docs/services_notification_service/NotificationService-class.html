@@ -217,6 +217,20 @@ the caller can navigate to the detail page once the app is ready.
 
 </dd>
 
+        <dt id="handleAction" class="callable">
+  <span class="name"><a href="../services_notification_service/NotificationService/handleAction.html">handleAction</a></span><span class="signature">(<wbr><span class="parameter" id="handleAction-param-r"><span class="type-annotation"><a href="https://pub.dev/documentation/flutter_local_notifications_platform_interface/9.1.0/flutter_local_notifications_platform_interface/NotificationResponse-class.html">NotificationResponse</a></span> <span class="parameter-name">r</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Runs when the user taps an action button on a notification (also from the
+background isolate, see <a href="../services_notification_service/notificationBackgroundHandler.html">notificationBackgroundHandler</a>).
+  
+
+</dd>
+
         <dt id="hasPermission" class="callable">
   <span class="name"><a href="../services_notification_service/NotificationService/hasPermission.html">hasPermission</a></span><span class="signature">(<wbr>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
@@ -270,7 +284,7 @@ the caller can navigate to the detail page once the app is ready.
 </dd>
 
         <dt id="showDownloadDone" class="callable">
-  <span class="name"><a href="../services_notification_service/NotificationService/showDownloadDone.html">showDownloadDone</a></span><span class="signature">(<wbr><span class="parameter" id="showDownloadDone-param-title"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">title</span>, </span><span class="parameter" id="showDownloadDone-param-body"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">body</span></span>)
+  <span class="name"><a href="../services_notification_service/NotificationService/showDownloadDone.html">showDownloadDone</a></span><span class="signature">(<wbr><span class="parameter" id="showDownloadDone-param-title"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">title</span>, </span><span class="parameter" id="showDownloadDone-param-body"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">body</span>, {</span><span class="parameter" id="showDownloadDone-param-payload"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">payload</span>, </span><span class="parameter" id="showDownloadDone-param-install"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">install</span> = <span class="default-value">false</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
   </span>
   
@@ -408,6 +422,19 @@ launches <code>downloadUrl</code> — it's no longer launched automatically.
         <dt id="showYearRecap" class="callable">
   <span class="name"><a href="../services_notification_service/NotificationService/showYearRecap.html">showYearRecap</a></span><span class="signature">(<wbr><span class="parameter" id="showYearRecap-param-year"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">year</span></span>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="simplePayload" class="callable">
+  <span class="name"><a href="../services_notification_service/NotificationService/simplePayload.html">simplePayload</a></span><span class="signature">(<wbr><span class="parameter" id="simplePayload-param-type"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">type</span>, </span><span class="parameter" id="simplePayload-param-path"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
   </span>
   
 

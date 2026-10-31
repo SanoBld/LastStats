@@ -67,7 +67,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; init() async {
-  const android = AndroidInitializationSettings(&#39;@mipmap&#47;ic_launcher&#39;);
+  const android = AndroidInitializationSettings(&#39;ic_stat_laststats&#39;);
   const ios = DarwinInitializationSettings(
     requestAlertPermission: false,
     requestBadgePermission: false,
@@ -85,8 +85,13 @@
     &#47;&#47; Opens the in-app detail page so the user sees the full notification
     &#47;&#47; (title + body, larger) and can follow a link if there is one.
     onDidReceiveNotificationResponse: (details) async {
+      if (details.notificationResponseType == NotificationResponseType.selectedNotificationAction) {
+        await handleAction(details);
+        return;
+      }
       await _handleTap(details.payload);
     },
+    onDidReceiveBackgroundNotificationResponse: notificationBackgroundHandler,
   );
 
   final androidImpl = _plugin.resolvePlatformSpecificImplementation&lt;

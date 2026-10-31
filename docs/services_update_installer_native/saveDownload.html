@@ -105,7 +105,9 @@
     await NotificationService.showDownloadDone(fileName, tx(&#39;ntf_dl_failed&#39;));
     return &#39;fallback&#39;;
   }
-  await NotificationService.showDownloadDone(fileName, tx(&#39;up_saved&#39;));
+  try { await file.delete(); } catch (_) {}
+  await NotificationService.showDownloadDone(fileName, tx(&#39;up_saved&#39;),
+      payload: NotificationService.simplePayload(&#39;downloads&#39;, saved));
   return &#39;saved|$saved&#39;;
 }</code></pre>
 </section>

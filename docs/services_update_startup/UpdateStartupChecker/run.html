@@ -70,6 +70,7 @@
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; run(GlobalKey&lt;NavigatorState&gt; navigatorKey) async {
   if (kIsWeb) return; &#47;&#47; web always serves the latest build
   await Future.delayed(const Duration(milliseconds: 800));
+  await cleanupUpdateFiles();   &#47;&#47; remove the downloaded installer once installed
   final prefs     = await SharedPreferences.getInstance();
   final wantsBeta = prefs.getBool(&#39;ls_beta_channel&#39;) ?? false;
   final channel   = wantsBeta ? UpdateChannel.beta : UpdateChannel.stable;

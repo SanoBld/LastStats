@@ -77,7 +77,9 @@
     NotificationDetails(
       android: AndroidNotificationDetails(
         _chGrandId, _chGrandName,
-        icon:       &#39;@mipmap&#47;ic_launcher&#39;,
+        actions: _readActions(read: false),
+        icon:       &#39;ic_stat_laststats&#39;,
+        largeIcon: _kLargeIcon,
         color:      _kLastFmRed,
         subText:    &#39;LastStats&#39;,
         importance: Importance.high,

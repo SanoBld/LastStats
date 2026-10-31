@@ -83,7 +83,9 @@ launches <code>downloadUrl</code> — it's no longer launched automatically.</p>
     NotificationDetails(
       android: AndroidNotificationDetails(
         _chUpdateId, _chUpdateName,
-        icon:       &#39;@mipmap&#47;ic_launcher&#39;,
+        actions: _updateActions(),
+        icon:       &#39;ic_stat_laststats&#39;,
+        largeIcon: _kLargeIcon,
         color:      _kLastFmRed,
         subText:    &#39;LastStats&#39;,
         importance: Importance.high,
@@ -97,6 +99,7 @@ launches <code>downloadUrl</code> — it's no longer launched automatically.</p>
     ),
     payload: _payload(
       type: &#39;update&#39;, title: title, body: body, url: downloadUrl,
+      id: &#39;update_v$version&#39;,
     ),
   );
 }</code></pre>

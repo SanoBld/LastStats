@@ -55,11 +55,12 @@
     <section class="multi-line-signature">
         
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span>
-<span class="name ">installUpdate</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="installUpdate-param-url"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">url</span>, </span></li>
+<span class="name ">installUpdate</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="installUpdate-param-url"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">url</span>, </span></li>
 <li><span class="parameter" id="installUpdate-param-kind"><span class="type-annotation"><a href="../services_update_service/DownloadKind.html">DownloadKind</a></span> <span class="parameter-name">kind</span>, </span></li>
 <li><span class="parameter" id="installUpdate-param-onProgress"><span class="type-annotation">void</span> <span class="parameter-name">onProgress</span>(<ol class="parameter-list single-line"> <li><span class="parameter" id="param-"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a>?</span></span></li>
-</ol>)</span></li>
-</ol>)
+</ol>), {</span></li>
+<li><span class="parameter" id="installUpdate-param-version"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">version</span>, </span></li>
+</ol>})
 
         
 
@@ -75,7 +76,7 @@ user must allow installs then tap again) or 'fallback' (open the link instead).<
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;String&gt; installUpdate(String url, DownloadKind kind, void Function(double?) onProgress) async {
+  <pre class="language-dart"><code class="language-dart">Future&lt;String&gt; installUpdate(String url, DownloadKind kind, void Function(double?) onProgress, {String? version}) async {
   final android = Platform.isAndroid &amp;&amp; kind == DownloadKind.apk;
   final windows = Platform.isWindows &amp;&amp; kind == DownloadKind.installer;
   if (!android &amp;&amp; !windows) return &#39;fallback&#39;;
@@ -89,7 +90,10 @@ user must allow installs then tap again) or 'fallback' (open the link instead).<
   if (file == null) return &#39;fallback&#39;;
 
   if (android) {
-    await NotificationService.showDownloadDone(&#39;LastStats&#39;, tx(&#39;ntf_dl_ready&#39;));
+    final p = await SharedPreferences.getInstance();
+    if (version != null) await p.setString(&#39;ls_update_pending_ver&#39;, version);
+    await NotificationService.showDownloadDone(tx(&#39;ntf_dl_ready&#39;), tx(&#39;ntf_dl_install_hint&#39;),
+        payload: NotificationService.simplePayload(&#39;install&#39;, file.path), install: true);
     return await _ch.invokeMethod&lt;bool&gt;(&#39;install&#39;, {&#39;path&#39;: file.path}) == true ? &#39;ok&#39; : &#39;fallback&#39;;
   }
   await NotificationService.cancelDownload();

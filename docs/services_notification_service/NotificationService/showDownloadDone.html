@@ -55,9 +55,11 @@
     <section class="multi-line-signature">
       
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
-<span class="name ">showDownloadDone</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="showDownloadDone-param-title"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">title</span>, </span></li>
-<li><span class="parameter" id="showDownloadDone-param-body"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">body</span></span></li>
-</ol>)
+<span class="name ">showDownloadDone</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="showDownloadDone-param-title"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">title</span>, </span></li>
+<li><span class="parameter" id="showDownloadDone-param-body"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">body</span>, {</span></li>
+<li><span class="parameter" id="showDownloadDone-param-payload"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">payload</span>, </span></li>
+<li><span class="parameter" id="showDownloadDone-param-install"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">install</span> = <span class="default-value">false</span>, </span></li>
+</ol>})
 
       
 
@@ -68,12 +70,20 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; showDownloadDone(String title, String body) async {
+  <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; showDownloadDone(String title, String body,
+    {String? payload, bool install = false}) async {
   try {
     await _stopDownloadService();
     if (!await _dlEnabled()) { await _plugin.cancel(_idDownload); return; }
+    final actions = [
+      if (install)
+        AndroidNotificationAction(&#39;install&#39;, tx(&#39;ntf_act_install&#39;),
+            showsUserInterface: true, cancelNotification: true),
+      AndroidNotificationAction(&#39;mark_all&#39;, tx(&#39;ntf_act_read_all&#39;), cancelNotification: true),
+    ];
     await _plugin.show(_idDownload, title, body,
-        NotificationDetails(android: _dlDetails(done: true)));
+        NotificationDetails(android: _dlDetails(done: true, actions: actions)),
+        payload: payload);
   } catch (_) {}
 }</code></pre>
 </section>

@@ -86,7 +86,8 @@ Colors match the in-app news sheet so the experience is consistent.</p>
   String date  = &#39;&#39;,
 }) {
   final color    = _newsColor(type);
-  final fullTitle = emoji.isNotEmpty ? &#39;$emoji $title&#39; : title;
+  final em        = emoji.isNotEmpty ? emoji : _newsEmoji(type);
+  final fullTitle = &#39;$em $title&#39;;
   return _plugin.show(
     _idNews(id),
     fullTitle,
@@ -94,7 +95,9 @@ Colors match the in-app news sheet so the experience is consistent.</p>
     NotificationDetails(
       android: AndroidNotificationDetails(
         _chNewsId, _chNewsName,
-        icon:    &#39;@mipmap&#47;ic_launcher&#39;,
+        actions: _readActions(read: true),
+        icon:    &#39;ic_stat_laststats&#39;,
+        largeIcon: _kLargeIcon,
         color:   color,
         subText: &#39;LastStats&#39;,
         styleInformation: BigTextStyleInformation(
@@ -106,7 +109,7 @@ Colors match the in-app news sheet so the experience is consistent.</p>
     ),
     payload: _payload(
       type: &#39;news&#39;, title: title, body: body,
-      date: date, newsType: type, emoji: emoji,
+      date: date, newsType: type, emoji: em, id: id,
     ),
   );
 }</code></pre>
