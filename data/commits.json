@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-31T21:14:14Z",
+  "updated": "2026-10-31T21:31:56Z",
   "commits": [
+    {
+      "sha": "ae1d799106842013e64c2d4504dbd48e5c1ed2b6",
+      "message": "Match Wikipedia music pages to artist and title\n\nRequire exact title matches for albums and tracks, and reject pages that don't mention the artist. Add music-related hints in more languages to improve page filtering.",
+      "date": "2026-10-31T21:21:31Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/ae1d799106842013e64c2d4504dbd48e5c1ed2b6",
+      "tags": []
+    },
     {
       "sha": "63d22b49c63ab581c44664fcfa69dcb493bc1445",
       "message": "feat: Améliorer la récupération des paroles avec des recherches plus robustes et un nettoyage des titres",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/49c5bcb3bb1341e42fc9b7727ce233a8e4c7d069",
-      "tags": []
-    },
-    {
-      "sha": "7b7db7231742453256b9f989d6de72677fdfdea2",
-      "message": "feat: ajouter un mode d'export pour le graphique horaire, permettant de rendre toutes les 24 heures sans défilement",
-      "date": "2026-09-11T10:17:25Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/7b7db7231742453256b9f989d6de72677fdfdea2",
       "tags": []
     }
   ]
