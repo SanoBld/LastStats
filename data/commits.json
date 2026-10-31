@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-31T20:55:20Z",
+  "updated": "2026-10-31T21:05:23Z",
   "commits": [
+    {
+      "sha": "63d22b49c63ab581c44664fcfa69dcb493bc1445",
+      "message": "feat: Améliorer la récupération des paroles avec des recherches plus robustes et un nettoyage des titres",
+      "date": "2026-10-31T21:02:26Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/63d22b49c63ab581c44664fcfa69dcb493bc1445",
+      "tags": []
+    },
     {
       "sha": "b6bbcb41dde0c20c95603b9e70cc7490bdc3fa23",
       "message": "feat: Améliorer la gestion des images en cache avec une copie en mémoire pour éviter les flashes de placeholder",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/7b7db7231742453256b9f989d6de72677fdfdea2",
-      "tags": []
-    },
-    {
-      "sha": "c8162dacc830f49738017c7b23dfd90f8e85904c",
-      "message": "feat: ajouter des animations de transition pour améliorer l'expérience utilisateur dans plusieurs pages",
-      "date": "2026-09-11T08:24:40Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/c8162dacc830f49738017c7b23dfd90f8e85904c",
       "tags": []
     }
   ]
