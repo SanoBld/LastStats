@@ -1982,14 +1982,14 @@ class _YrShareCard extends StatelessWidget {
   Widget _list(String title, List<_YrRanked> items, String type) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       ShareLabel(title),
-      const SizedBox(height: 6),
+      const SizedBox(height: 4),
       for (var i = 0; i < items.length && i < 3; i++)
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 3),
+          padding: const EdgeInsets.symmetric(vertical: 2),
           child: Row(children: [
-            ShareRank(n: i + 1, size: 24),
+            ShareRank(n: i + 1, size: 22),
             const SizedBox(width: 8),
-            _YrImg(name: items[i].name, artist: items[i].artist, type: type, size: 38, round: type == 'artists'),
+            _YrImg(name: items[i].name, artist: items[i].artist, type: type, size: 34, round: type == 'artists'),
             const SizedBox(width: 10),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -2021,7 +2021,7 @@ class _YrShareCard extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            height: slide != null ? 170 : 134, // full recap: ends in the middle of the stat tiles
+            height: slide != null ? 170 : 118, // full recap: ends in the middle of the stat tiles
             child: ShaderMask(
               blendMode: BlendMode.dstIn,
               shaderCallback: (r) => const LinearGradient(
@@ -2047,7 +2047,7 @@ class _YrShareCard extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            height: slide != null ? 170 : 134,
+            height: slide != null ? 170 : 118,
             child: DecoratedBox(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
@@ -2105,7 +2105,7 @@ class _YrShareCard extends StatelessWidget {
           Expanded(
             child: Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start, children: [
               SizedBox(
-                height: 54,
+                height: 60,
                 child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                   Expanded(child: ShareTile(label: tx('yr_scrobbles'), value: fmt(data.total), k: 1.0)),
                   const SizedBox(width: 8),

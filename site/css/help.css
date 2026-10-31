@@ -159,3 +159,79 @@
 /* links inside legal blocks (contact, etc.) */
 .legal-block a { color: var(--md-primary); font-weight: 500; text-decoration: underline; text-underline-offset: 2px; transition: opacity .2s var(--m3-standard); }
 .legal-block a:hover { opacity: .8; }
+
+
+/* ==========================================================
+   Help page: theme hub (js/help-hub.js)
+   Pick a theme tile, only that theme is shown. Without JS everything is shown.
+   ========================================================== */
+.help-js .help-block { display: none; }
+.help-js .help-block.is-current { display: block; margin-bottom: 1rem; }
+.help-hub[hidden], .help-topic-bar[hidden], .help-hub-grid[hidden], .help-hub-results[hidden],
+.help-hub-empty[hidden], .rel-layout[hidden] { display: none !important; }
+
+.help-hub { max-width: 900px; margin: 0 auto; }
+.help-hub-title {
+  font-family: var(--font-display); font-weight: 500; font-size: clamp(1.3rem, 3vw, 1.7rem);
+  color: var(--md-on-background); margin: 0 0 1.1rem; text-align: left;
+}
+.help-hub-search { position: relative; margin-bottom: 1.2rem; }
+.help-hub-search .ms {
+  position: absolute; left: 1.1rem; top: 50%; transform: translateY(-50%);
+  font-size: 1.3rem; color: var(--md-on-surface-variant); pointer-events: none;
+}
+.help-hub-search .rel-search { min-height: 52px; margin: 0; padding: 0 1.3rem 0 3.1rem; border-radius: 26px; font-size: .95rem; }
+
+/* tiles */
+.help-hub-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem; }
+.help-tile {
+  position: relative; overflow: hidden; display: flex; align-items: center; gap: 1rem;
+  padding: 1.2rem 1.3rem; border-radius: var(--r-tile); text-align: left; text-decoration: none;
+  background: var(--md-surface-container-low); color: var(--md-on-surface);
+  transition: transform .35s var(--spring-fast), background-color .2s var(--effects), border-radius .5s var(--spring-default);
+}
+.help-tile-icon {
+  flex: none; display: grid; place-items: center; width: 52px; height: 52px; border-radius: var(--r-chip);
+  background: var(--md-primary-container); color: var(--md-on-primary-container);
+}
+.help-tile-icon .ms { font-size: 26px; }
+.help-tile-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .2rem; }
+.help-tile-title { font-family: var(--font-display); font-weight: 500; font-size: 1.05rem; line-height: 1.25; }
+.help-tile-desc { font-size: .85rem; line-height: 1.45; color: var(--md-on-surface-variant); }
+.help-tile-count {
+  align-self: flex-start; margin-top: .35rem; padding: .15rem .6rem; border-radius: var(--r-chip);
+  font-size: .72rem; font-weight: 600; background: var(--md-secondary-container); color: var(--md-on-secondary-container);
+}
+.help-tile-arrow { flex: none; color: var(--md-on-surface-variant); transition: transform .35s var(--spring-fast); }
+@media (hover: hover) {
+  .help-tile:hover { background: var(--md-surface-container-high); transform: translateY(-4px); }
+  .help-tile:hover .help-tile-arrow { transform: translateX(4px); }
+}
+.help-tile:active { transform: scale(.98); border-radius: var(--r-card); }
+.help-tile:focus-visible, .help-result:focus-visible { outline: 2px solid var(--md-primary); outline-offset: 2px; }
+
+/* search results (flat list of cards / questions) */
+.help-hub-results { display: flex; flex-direction: column; gap: 2px; }
+.help-result {
+  position: relative; overflow: hidden; display: flex; flex-direction: column; gap: .15rem;
+  padding: 1rem 1.3rem; text-align: left; text-decoration: none; border-radius: var(--r-inner);
+  background: var(--md-surface-container-low); color: var(--md-on-surface);
+  transition: background-color .2s var(--effects), border-radius .5s var(--spring-default);
+}
+.help-result:first-child { border-radius: var(--r-card) var(--r-card) var(--r-inner) var(--r-inner); }
+.help-result:last-child { border-radius: var(--r-inner) var(--r-inner) var(--r-card) var(--r-card); }
+.help-result:only-child { border-radius: var(--r-card); }
+@media (hover: hover) { .help-result:hover { background: var(--md-surface-container-high); border-radius: var(--r-hover); } }
+.help-result-title { font-weight: 600; font-size: .95rem; }
+.help-result-theme { font-size: .78rem; color: var(--md-on-surface-variant); }
+.help-hub-empty { text-align: center; color: var(--md-on-surface-variant); padding: 2rem 0; }
+
+/* bar shown above an open theme */
+.help-topic-bar { max-width: 900px; margin: 0 auto 1.2rem; }
+.help-topic-bar .back-link { min-height: var(--btn-h, 44px); }
+.help-js .help-block > h2:first-child { margin-top: .2rem; }
+
+@media (max-width: 700px) {
+  .help-hub-grid { grid-template-columns: 1fr; }
+  .help-tile { padding: 1rem 1.1rem; }
+}
