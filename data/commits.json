@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-31T14:51:54Z",
+  "updated": "2026-10-31T15:06:52Z",
   "commits": [
+    {
+      "sha": "e46b31ebb6b953cc91bb9f45131f99033cc7a625",
+      "message": "feat: Améliorer la gestion des couleurs des widgets et des sauvegardes, incluant des options de restauration et de synchronisation",
+      "date": "2026-10-31T14:56:13Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/e46b31ebb6b953cc91bb9f45131f99033cc7a625",
+      "tags": []
+    },
     {
       "sha": "88f0338d2099a563b5f4b62e81c66b314a86bf3b",
       "message": "feat: Ajouter une option de fond de widget avec plusieurs thèmes et mise à jour instantanée des changements de thème",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/b95c420079786d8b59468382ba901ebba035822f",
-      "tags": []
-    },
-    {
-      "sha": "1601fcebb1cad6b0e0b64ef1ae84274c3477c3f3",
-      "message": "feat: corriger la gestion des semaines dans le graphique et ajouter un pager pour afficher plusieurs années",
-      "date": "2026-09-08T20:06:27Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/1601fcebb1cad6b0e0b64ef1ae84274c3477c3f3",
       "tags": []
     }
   ]
