@@ -1,6 +1,24 @@
 {
-  "updated": "2026-10-31T22:08:07Z",
+  "updated": "2026-10-31T22:25:57Z",
   "commits": [
+    {
+      "sha": "d1408b0cd25ed85b030d1a9d365eba26b5756a6f",
+      "message": "feat: Ajouter un message d'introduction pour le total des écoutes de l'année dans plusieurs langues",
+      "date": "2026-10-31T22:25:38Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/d1408b0cd25ed85b030d1a9d365eba26b5756a6f",
+      "tags": []
+    },
+    {
+      "sha": "4cba33faecee3912ee63976dc0223bbab3069ebb",
+      "message": "feat(help-hub): implement interactive help hub with theme tiles and search functionality",
+      "date": "2026-10-31T22:15:04Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/4cba33faecee3912ee63976dc0223bbab3069ebb",
+      "tags": []
+    },
     {
       "sha": "05698c706f191a3c2031965f2372b50d30c74401",
       "message": "feat: Améliorer l'interface utilisateur en ajustant les espacements et les transitions des boutons",
@@ -2695,24 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/da4bd10e4e7604b66d069364347d15febf36564f",
-      "tags": []
-    },
-    {
-      "sha": "e2b7386cd08f0d21b6db47b04aced82c28b927ee",
-      "message": "feat: ajouter la gestion des dossiers dans la page des favoris, permettant de créer, modifier et supprimer des dossiers pour organiser les pistes aimées",
-      "date": "2026-09-11T20:38:39Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/e2b7386cd08f0d21b6db47b04aced82c28b927ee",
-      "tags": []
-    },
-    {
-      "sha": "fb056b8fadd4f9df87e2c1af3a1aae438d6400ee",
-      "message": "feat: ajouter un service de journalisation des erreurs et intégrer des fonctionnalités de partage et de gestion du journal dans les paramètres",
-      "date": "2026-09-11T20:17:38Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/fb056b8fadd4f9df87e2c1af3a1aae438d6400ee",
       "tags": []
     }
   ]

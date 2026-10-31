@@ -9,8 +9,7 @@
 <script src="js/palette.js"></script>
 <link rel="icon" href="assets/img/favicon-light.png" media="(prefers-color-scheme: light)">
 <link rel="icon" href="assets/img/favicon-dark.png" media="(prefers-color-scheme: dark)">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('help-js')</script>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/project.css">
 <link rel="stylesheet" href="css/help.css">
@@ -52,12 +51,27 @@
   </section>
 
   <div class="help-section toc-page">
-    <div class="rel-layout">
+    <!-- topic hub: pick a theme, then only that theme is shown (built by js/help-hub.js) -->
+    <div class="help-hub" id="help-hub" hidden>
+      <h2 class="help-hub-title" data-i18n="hp.hub.pick">Choisissez un thème</h2>
+      <div class="help-hub-search">
+        <span class="ms" aria-hidden="true">search</span>
+        <input type="search" class="rel-search" id="help-search" autocomplete="off" spellcheck="false" placeholder="Rechercher dans l'aide…" aria-label="Rechercher">
+      </div>
+      <div class="help-hub-grid" id="help-hub-grid"></div>
+      <div class="help-hub-results" id="help-hub-results" hidden></div>
+      <p class="help-hub-empty" id="help-hub-empty" hidden data-i18n="releases.no_match">Aucun résultat</p>
+    </div>
+    <div class="help-topic-bar" id="help-topic-bar" hidden>
+      <a href="#" class="back-link md-ripple" id="help-topic-back">
+        <span class="ms" style="font-size:16px" aria-hidden="true">chevron_left</span>
+        <span data-i18n="hp.hub.back">Tous les thèmes</span>
+      </a>
+    </div>
+    <div class="rel-layout" id="help-layout">
       <aside class="rel-rail" id="toc-rail" aria-label="Sommaire" hidden>
         <h2 class="rel-rail-title" data-i18n="releases.toc">Sommaire</h2>
-        <input type="search" class="rel-search" id="toc-search" autocomplete="off" spellcheck="false" placeholder="Rechercher…" aria-label="Rechercher">
         <div class="rel-rail-scroll"><div class="rel-rail-inner" id="toc-inner"><div class="rel-rail-fill" id="toc-fill"></div></div></div>
-        <p class="rel-rail-empty" id="toc-empty" hidden data-i18n="releases.no_match">Aucun résultat</p>
       </aside>
       <div class="rel-main toc-main" id="toc-main">
 <section class="help-block" id="start" data-toc="h2"><h2 class="gallery-section-title reveal" data-i18n="hp.sec.start">Démarrage et tutoriel</h2><div class="help-card reveal" id="tuto" data-toc="h3"><h3 data-i18n="hp.tuto.t">Tutoriel : de zéro à vos premières stats</h3><p data-i18n-html="hp.tuto.intro">Ce guide suit le chemin complet, du compte Last.fm jusqu'à l'écran de stats. Comptez quelques minutes si vous avez déjà un compte, un peu plus si vous partez de zéro.</p><ol class="help-steps"><li data-i18n-html="hp.tuto.s.1"><strong>Créez un compte Last.fm</strong> (gratuit) sur <a href="https://www.last.fm/join" target="_blank" rel="noopener">last.fm/join</a>. Retenez bien votre <em>nom d'utilisateur</em> : c'est lui que LastStats vous demandera.</li><li data-i18n-html="hp.tuto.s.2"><strong>Installez un scrobbler</strong> pour que vos écoutes soient envoyées à Last.fm. Le choix dépend de votre appareil : voir la section <a href="#scrobblers">Scrobbler sa musique</a>.</li><li data-i18n-html="hp.tuto.s.3"><strong>Vérifiez que ça marche</strong> : écoutez un titre, puis ouvrez votre profil sur <a href="https://www.last.fm" target="_blank" rel="noopener">last.fm</a>. Il doit apparaître dans vos écoutes récentes. Tant que ce n'est pas le cas, LastStats n'aura rien à afficher.</li><li data-i18n-html="hp.tuto.s.4"><strong>Créez une clé API</strong> sur <a href="https://www.last.fm/api/account/create" target="_blank" rel="noopener">la page de création de clé API</a> de Last.fm : donnez un nom et une description de votre choix à l'application, puis copiez la clé affichée à la fin.</li><li data-i18n-html="hp.tuto.s.5"><strong>Ouvrez LastStats</strong>, saisissez votre nom d'utilisateur Last.fm et la clé API, puis validez.</li><li data-i18n-html="hp.tuto.s.6"><strong>Optionnel : les favoris.</strong> Renseignez aussi la clé secrète Last.fm, sur le même écran ou plus tard dans Paramètres > Compte.</li><li data-i18n-html="hp.tuto.s.7"><strong>Laissez l'app charger votre historique.</strong> Le premier chargement dépend de la taille de votre historique ; ensuite le cache local rend l'affichage plus rapide.</li></ol><p class="help-src"><span data-i18n="hp.tuto.src">Sources :</span> <a href="https://www.last.fm/join" target="_blank" rel="noopener">Last.fm : inscription</a> · <a href="https://www.last.fm/api/account/create" target="_blank" rel="noopener">Last.fm : créer une clé API</a> · <a href="https://www.last.fm/api" target="_blank" rel="noopener">Last.fm API</a></p></div><div class="help-card reveal" id="how" data-toc="h3"><h3 data-i18n="hp.how.t">Comment ça marche ?</h3><p data-i18n-html="hp.how.p1">Trois maillons, chacun indépendant des autres : <strong>1.</strong> votre lecteur de musique (ou un scrobbler) envoie chaque écoute à <strong>Last.fm</strong> ; <strong>2.</strong> Last.fm conserve l'historique sur votre compte ; <strong>3.</strong> LastStats lit cet historique via l'API publique de Last.fm et le transforme en statistiques.</p><p data-i18n-html="hp.how.p2">LastStats n'a pas de serveur : le cache de vos écoutes et vos identifiants restent sur votre appareil (détails dans les <a href="legal.html">mentions légales</a>). Conséquence pratique : si une écoute n'est pas sur Last.fm, elle n'apparaîtra jamais dans LastStats.</p></div><div class="help-card reveal" id="account" data-toc="h3"><h3 data-i18n="hp.acct.t">Créer et gérer son compte Last.fm</h3><p data-i18n-html="hp.acct.p1">L'inscription se fait sur <a href="https://www.last.fm/join" target="_blank" rel="noopener">last.fm/join</a>. Les réglages de votre compte (profil, confidentialité, applications connectées) sont regroupés dans <a href="https://www.last.fm/settings" target="_blank" rel="noopener">vos paramètres Last.fm</a>.</p><ul class="help-list"><li data-i18n-html="hp.acct.l.1">Les services reliés à votre compte (par exemple Spotify) se gèrent dans <a href="https://www.last.fm/settings/applications" target="_blank" rel="noopener">Applications</a>.</li><li data-i18n-html="hp.acct.l.2">Le nom d'utilisateur Last.fm est celui qu'il faut saisir dans LastStats, pas votre nom d'affichage.</li><li data-i18n-html="hp.acct.l.3">Pour changer de compte dans LastStats : Paramètres > Compte, déconnexion, puis nouvelle connexion.</li></ul><p class="help-src"><span data-i18n="hp.acct.src">Sources :</span> <a href="https://www.last.fm/settings" target="_blank" rel="noopener">Last.fm : paramètres</a> · <a href="https://www.last.fm/settings/applications" target="_blank" rel="noopener">Last.fm : applications</a></p></div><div class="help-card reveal" id="keys" data-toc="h3"><h3 data-i18n="hp.keys.t">Clé API et clé secrète : à quoi ça sert ?</h3><ul class="help-list"><li data-i18n-html="hp.keys.l.1"><strong>Clé API</strong> : identifie l'application auprès de Last.fm et permet de lire votre historique. Indispensable pour utiliser LastStats.</li><li data-i18n-html="hp.keys.l.2"><strong>Clé secrète</strong> : optionnelle, nécessaire seulement pour les actions qui écrivent sur votre compte, comme les favoris.</li><li data-i18n-html="hp.keys.l.3">Ne partagez jamais ces clés. Une sauvegarde exportée peut les contenir : la clé secrète n'y est incluse que si vous le choisissez.</li></ul></div></section>  <!-- ================= Understanding Last fm & scrobbling ================= -->
@@ -282,6 +296,6 @@
   <script src="js/ripple.js"></script>
   <script src="js/expressive.js"></script>
   <script src="js/nav-autohide.js"></script>
-  <script src="js/toc.js"></script>
+  <script src="js/help-hub.js"></script>
 </body>
 </html>

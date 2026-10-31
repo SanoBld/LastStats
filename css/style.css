@@ -1,3 +1,10 @@
+/* Google Sans Flex: the same font the app uses by default (self-hosted, no Google Fonts request) */
+@font-face { font-family: 'Google Sans Flex'; font-style: normal; font-weight: 300; font-display: swap; src: url(../assets/fonts/GoogleSansFlex-Light.woff2) format('woff2'); }
+@font-face { font-family: 'Google Sans Flex'; font-style: normal; font-weight: 400; font-display: swap; src: url(../assets/fonts/GoogleSansFlex-Regular.woff2) format('woff2'); }
+@font-face { font-family: 'Google Sans Flex'; font-style: normal; font-weight: 500; font-display: swap; src: url(../assets/fonts/GoogleSansFlex-Medium.woff2) format('woff2'); }
+@font-face { font-family: 'Google Sans Flex'; font-style: normal; font-weight: 600; font-display: swap; src: url(../assets/fonts/GoogleSansFlex-SemiBold.woff2) format('woff2'); }
+@font-face { font-family: 'Google Sans Flex'; font-style: normal; font-weight: 700; font-display: swap; src: url(../assets/fonts/GoogleSansFlex-Bold.woff2) format('woff2'); }
+
 /* ==========================================================
    MATERIAL DESIGN 3 — Design tokens (seed color: teal-blue #10617D)
    ========================================================== */
@@ -40,8 +47,8 @@
   --shape-xl: 28px;
   --shape-full: 999px;
 
-  --font-display: 'Google Sans Display', 'Space Grotesk', sans-serif;
-  --font-body: 'Roboto', 'Inter', sans-serif;
+  --font-display: 'Google Sans Flex', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Google Sans Flex', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
 [data-theme="dark"] {
