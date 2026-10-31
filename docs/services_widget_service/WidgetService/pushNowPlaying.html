@@ -83,8 +83,14 @@ every poll tick (every 10–30s) and keeps the widget genuinely live.</p>
       artistName = (np[&#39;artist&#39;] is Map)
           ? (np[&#39;artist&#39;][&#39;#text&#39;]?.toString() ?? &#39;&#39;)
           : np[&#39;artist&#39;]?.toString() ?? &#39;&#39;;
-      trackArt = _pickImage(np[&#39;image&#39;]);
       isPlaying = np[&#39;@attr&#39;]?[&#39;nowplaying&#39;] == &#39;true&#39;;
+    }
+    &#47;&#47; Nothing changed since the last push: do not wake the widgets.
+    final sig = &#39;$trackName|$artistName|$isPlaying&#39;;
+    if (sig == _lastNp) return;
+    _lastNp = sig;
+    if (np != null) {
+      trackArt = _pickImage(np[&#39;image&#39;]);
       if (trackArt.isEmpty &amp;&amp; trackName.isNotEmpty) {
         trackArt = await ImageService.resolveTrack(trackName, artistName);
       }

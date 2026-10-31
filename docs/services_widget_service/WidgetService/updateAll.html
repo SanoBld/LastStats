@@ -55,22 +55,27 @@
     <section class="multi-line-signature">
       
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
-<span class="name ">updateAll</span>(<wbr>)
+<span class="name ">updateAll</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="updateAll-param-force"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">force</span> = <span class="default-value">true</span>, </span></li>
+</ol>})
 
       
 
     </section>
     
 <section class="desc markdown">
-  <p>Fetch fresh data and refresh every widget currently on the home screen.</p>
+  <p>Fetch fresh data and refresh every widget currently on the home screen.
+<code>force</code> false = skipped if it already ran in the last 2 minutes (saves battery).</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; updateAll() async {
+  <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; updateAll({bool force = true}) async {
   if (kIsWeb) return;
+  final t = DateTime.now().millisecondsSinceEpoch;
+  if (!force &amp;&amp; t - _lastFull &lt; 120000) return;
+  _lastFull = t;
   try {
     final prefs = await SharedPreferences.getInstance();
     final username = prefs.getString(&#39;ls_username&#39;) ?? &#39;&#39;;

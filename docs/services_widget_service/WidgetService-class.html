@@ -177,7 +177,7 @@ every poll tick (every 10–30s) and keeps the widget genuinely live.
 </dd>
 
         <dt id="updateAll" class="callable">
-  <span class="name"><a href="../services_widget_service/WidgetService/updateAll.html">updateAll</a></span><span class="signature">(<wbr>)
+  <span class="name"><a href="../services_widget_service/WidgetService/updateAll.html">updateAll</a></span><span class="signature">(<wbr>{<span class="parameter" id="updateAll-param-force"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">force</span> = <span class="default-value">true</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
   </span>
   
@@ -185,6 +185,7 @@ every poll tick (every 10–30s) and keeps the widget genuinely live.
 </dt>
 <dd>
   Fetch fresh data and refresh every widget currently on the home screen.
+<code>force</code> false = skipped if it already ran in the last 2 minutes (saves battery).
   
 
 </dd>
