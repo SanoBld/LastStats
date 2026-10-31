@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-31T11:13:27Z",
+  "updated": "2026-10-31T11:21:38Z",
   "commits": [
+    {
+      "sha": "7923c15f396a7d08744afcc006e7d07d7d076ce0",
+      "message": "feat: Implement widget data refresh mechanism and enhance layout consistency",
+      "date": "2026-10-31T11:18:54Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/7923c15f396a7d08744afcc006e7d07d7d076ce0",
+      "tags": []
+    },
     {
       "sha": "db755fe8fc3ddca9072024c82fcd9f1f72b6bd5f",
       "message": "Refactor widget providers to improve background rendering and layout consistency\n\n- Introduced a new `WidgetBackground` class to handle the rendering of widget backgrounds with a poster style.\n- Updated `RecapWidgetProvider`, `ScrobbleCountWidgetProvider`, and `WeeklyScrobblesWidgetProvider` to utilize the new background rendering logic.\n- Enhanced widget layouts to include image tiles for total, weekly, and loved scrobbles.\n- Added new color attributes to `WidgetPalette` for better theming options.\n- Updated XML layouts for various widgets to improve visual consistency and added scale type for images.\n- Localized new string resources for widget labels and descriptions in multiple languages.",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/31a575c509032fd59e997140e3e67a88f0c455f3",
-      "tags": []
-    },
-    {
-      "sha": "64e90725b91115aa59e652b6bf8589cc02ec2bd8",
-      "message": "feat: remplacer les styles de texte par des styles partagés pour améliorer la cohérence visuelle",
-      "date": "2026-09-08T18:28:23Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/64e90725b91115aa59e652b6bf8589cc02ec2bd8",
       "tags": []
     }
   ]
