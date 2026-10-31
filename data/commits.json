@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-31T11:49:55Z",
+  "updated": "2026-10-31T13:48:07Z",
   "commits": [
+    {
+      "sha": "fe75d076e97518ecb948a1cb83018177cd5f8404",
+      "message": "Add adaptive icons and custom font for widgets\n\n- Created adaptive icons for various themes (black, white, blue, red, and nothing) in mipmap-anydpi-v26.\n- Added a custom font family for widgets in widget_font.xml.\n- Defined widget styles in values and values-v26 for consistent text appearance.\n- Introduced color resources for icon backgrounds in ic_launcher_colors.xml.",
+      "date": "2026-10-31T13:36:47Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/fe75d076e97518ecb948a1cb83018177cd5f8404",
+      "tags": []
+    },
     {
       "sha": "7923c15f396a7d08744afcc006e7d07d7d076ce0",
       "message": "feat: Implement widget data refresh mechanism and enhance layout consistency",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/a580015bbe7db4a918e6e0914f18f3bc3d0f74f3",
-      "tags": []
-    },
-    {
-      "sha": "31a575c509032fd59e997140e3e67a88f0c455f3",
-      "message": "feat: ajouter la gestion des nouvelles histoires avec marquage et vérification",
-      "date": "2026-09-08T18:45:11Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/31a575c509032fd59e997140e3e67a88f0c455f3",
       "tags": []
     }
   ]
