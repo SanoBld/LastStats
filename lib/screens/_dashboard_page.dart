@@ -896,8 +896,12 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         Widget tile(String id, IconData icon, String label, {Color? color, int badge = 0}) {
           final fg = color ?? sc.onSecondaryContainer;
           return Material(
-            color: sc.secondaryContainer.withValues(alpha: 0.55),
-            borderRadius: BorderRadius.circular(18),
+            // Solid colour + thin outline so the tiles stand out from the dialog.
+            color: sc.secondaryContainer,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+              side: BorderSide(color: sc.outline.withValues(alpha: 0.4), width: 1.2),
+            ),
             clipBehavior: Clip.antiAlias,
             child: M3InkWell(
             borderRadius: BorderRadius.circular(18),

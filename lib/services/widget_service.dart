@@ -20,6 +20,11 @@ class WidgetService {
   static const _providerRecap = 'RecapWidgetProvider';
   static const _providerHeatmap = 'HeatmapWidgetProvider';
 
+  static const _all = [
+    _providerScrobbles, _providerNowPlaying, _providerLoved,
+    _providerWeekly, _providerRecap, _providerHeatmap,
+  ];
+
   static const _appGroupId = 'group.com.example.laststats_mobile';
 
   static int _lastFull = 0;
@@ -27,11 +32,13 @@ class WidgetService {
 
   /// Fetch fresh data and refresh every widget currently on the home screen.
   /// [force] false = skipped if it already ran in the last 2 minutes (saves battery).
-  static Future<void> updateAll({bool force = true}) async {
+  static Future<void> updateAll({bool force = true, bool themeOnly = false}) async {
     if (kIsWeb) return;
     final t = DateTime.now().millisecondsSinceEpoch;
-    if (!force && t - _lastFull < 120000) return;
-    _lastFull = t;
+    if (!themeOnly) {
+      if (!force && t - _lastFull < 120000) return;
+      _lastFull = t;
+    }
     try {
       final prefs = await SharedPreferences.getInstance();
       final username = prefs.getString('ls_username') ?? '';
@@ -54,6 +61,15 @@ class WidgetService {
       await HomeWidget.saveWidgetData<bool>('widget_tint', widgetTint);
       await HomeWidget.saveWidgetData<bool>(
           'use_dynamic_color', prefs.getBool('ls_use_dynamic_color') ?? false);
+
+      await HomeWidget.saveWidgetData<String>(
+          'widget_bg', prefs.getString('ls_widget_bg') ?? 'poster');
+      await HomeWidget.saveWidgetData<String>('username', username);
+      // Theme changed: redraw right away, before any network call.
+      for (final name in _all) {
+        await HomeWidget.updateWidget(name: name, androidName: name);
+      }
+      if (themeOnly) return;
 
       final api = LastFmService(apiKey: apiKey, username: username);
 

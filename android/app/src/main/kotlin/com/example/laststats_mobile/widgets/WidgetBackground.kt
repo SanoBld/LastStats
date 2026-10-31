@@ -103,6 +103,20 @@ object WidgetBackground {
 
     /** Sets the poster-style background on [views] for widget [id]. */
     fun apply(context: Context, manager: AppWidgetManager, id: Int, views: RemoteViews, p: WidgetPalette) {
+        // User choice: "poster" (theme shapes), "plain" (black / white) or "none".
+        val mode = try {
+            es.antonborri.home_widget.HomeWidgetPlugin.getData(context).getString("widget_bg", "poster")
+        } catch (_: Throwable) { "poster" }
+        if (mode == "plain" || mode == "none") {
+            views.setImageViewResource(R.id.card_bg, R.drawable.widget_card_shape)
+            if (mode == "none") {
+                views.setInt(R.id.card_bg, "setImageAlpha", 0)
+            } else {
+                views.setInt(R.id.card_bg, "setColorFilter",
+                    if (p.dark) Color.BLACK else Color.WHITE)
+            }
+            return
+        }
         try {
             val (w, h, f) = sizePx(context, manager, id)
             views.setImageViewBitmap(R.id.card_bg, cached(context, p, w, h, f))

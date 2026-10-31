@@ -169,27 +169,28 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final shape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(14));
-    final pad = const EdgeInsets.symmetric(vertical: 14, horizontal: 16);
-    final child = Text(label, textAlign: TextAlign.center);
-    final btn = switch (style) {
-      _BtnStyle.filled => FilledButton.icon(
-          onPressed: onPressed,
-          icon: Icon(icon, size: 20),
-          label: child,
-          style: FilledButton.styleFrom(padding: pad, shape: shape)),
-      _BtnStyle.tonal => FilledButton.tonalIcon(
-          onPressed: onPressed,
-          icon: Icon(icon, size: 20),
-          label: child,
-          style: FilledButton.styleFrom(padding: pad, shape: shape)),
-      _BtnStyle.outlined => OutlinedButton.icon(
-          onPressed: onPressed,
-          icon: Icon(icon, size: 20),
-          label: child,
-          style: OutlinedButton.styleFrom(padding: pad, shape: shape)),
+    final sc = Theme.of(context).colorScheme;
+    // App Material buttons: solid colours that stay visible on any card.
+    final (bg, fg) = switch (style) {
+      _BtnStyle.filled   => (sc.primary, sc.onPrimary),
+      _BtnStyle.tonal    => (sc.secondaryContainer, sc.onSecondaryContainer),
+      _BtnStyle.outlined => (sc.surfaceContainerHighest, sc.onSurface),
     };
-    return SizedBox(width: double.infinity, child: btn);
+    return SizedBox(
+      width: double.infinity,
+      child: M3TonalButton(
+        width: double.infinity,
+        height: 52,
+        color: bg,
+        onTap: onPressed,
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(icon, size: 20, color: fg),
+          const SizedBox(width: 8),
+          Flexible(child: Text(label, textAlign: TextAlign.center,
+              style: TextStyle(color: fg, fontWeight: FontWeight.w700))),
+        ]),
+      ),
+    );
   }
 }
 

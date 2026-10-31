@@ -18,7 +18,8 @@ data class WidgetPalette(
     val onChip: Int = text,
     val tertiary: Int = accent,   // poster blobs (like the share images)
     val secondary: Int = accent,
-    val posterMix: Float = 0.45f   // how much container color the poster card gets
+    val posterMix: Float = 0.45f,
+    val dark: Boolean = false   // how much container color the poster card gets
 )
 
 object WidgetTheme {
@@ -100,7 +101,7 @@ object WidgetTheme {
             val base = if (dynamic && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S)
                 materialYou(context, isDark)
             else schemePalette(data, isDark) ?: accentPalette(data, isDark)
-            return base.copy(posterMix = if (tint) 0.45f else 0.18f)
+            return base.copy(posterMix = if (tint) 0.45f else 0.18f, dark = isDark)
         }
         val accent = if (style == "nothing") {
             Color.parseColor("#FF2020")
@@ -124,7 +125,7 @@ object WidgetTheme {
         val text = if (isDark) Color.parseColor("#F5F5F5") else Color.parseColor("#0D0D0D")
         val muted = if (isDark) Color.parseColor("#9A9A9A") else Color.parseColor("#6B6B6B")
 
-        return WidgetPalette(surface, chip, text, muted, accent)
+        return WidgetPalette(surface, chip, text, muted, accent, dark = isDark)
     }
 
     // Mixes `overlay` into `base` by `ratio` (0 = pure base, 1 = pure overlay).

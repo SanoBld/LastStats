@@ -73,7 +73,7 @@ class _LastfmLoginPageState extends State<LastfmLoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(tx('lfm_login_t'))),
+      appBar: M3AppBar(title: tx('lfm_login_t')),
       body: Column(children: [
         if (_progress < 1)
           Padding(
@@ -113,12 +113,21 @@ class _LastfmLoginPageState extends State<LastfmLoginPage> {
                     onSubmitted: (_) => _submitManual(),
                     decoration: InputDecoration(
                         labelText: tx('lfm_manual_label'),
-                        border: const OutlineInputBorder()),
+                        filled: true,
+                        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
+                            borderSide: BorderSide(color: Theme.of(context).colorScheme.outline))),
                   ),
                 ),
                 const SizedBox(width: 8),
-                FilledButton(
-                    onPressed: _submitManual, child: Text(tx('conn_connect'))),
+                M3TonalButton(
+                    color: Theme.of(context).colorScheme.primary,
+                    onTap: _submitManual,
+                    child: Text(tx('conn_connect'),
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            fontWeight: FontWeight.w700))),
               ]),
             ]),
           ),

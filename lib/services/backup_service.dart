@@ -99,6 +99,7 @@ const _kThemeKeys = {
   'ls_rail_collapsed',
   'ls_pc_mode',
   'ls_widget_tint',
+  'ls_widget_bg',
   'ls_use_daynight_accent',
   'ls_accent_dark',
   'ls_daynight_use_hours',

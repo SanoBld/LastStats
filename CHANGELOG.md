@@ -33,6 +33,8 @@
 ## v4.3.0
 
 **Widgets**
+- New option "Widget background": Poster (theme shapes), Plain (black or white following light/dark) or None (transparent)
+- Theme changes (colours, style, light/dark) now reach the widgets right away instead of after the next data refresh
 - New calendar widget: one square per day, like GitHub, in the app colours; today's number refreshes on its own
 - All logos removed from the widgets
 - Widgets use the app font, ask Last.fm only for what they show and redraw less often to save battery

@@ -226,6 +226,19 @@ Future<void> _mainImpl() async {
       WidgetService.updateAll();
       // ...and every time the app comes back to the foreground.
       WidgetsBinding.instance.addObserver(_WidgetRefreshObserver());
+      // Any theme change: redraw the widgets after a short delay (so the
+      // new settings are already saved).
+      Timer? themeTimer;
+      void onTheme() {
+        themeTimer?.cancel();
+        themeTimer = Timer(const Duration(milliseconds: 600),
+            () => WidgetService.updateAll(themeOnly: true));
+      }
+      for (final n in <Listenable>[
+        themeModeNotifier, accentNotifier, accentDarkNotifier, themeStyleNotifier,
+        useDynamicColorNotifier, colorHarmonyNotifier, oledModeNotifier,
+        useDayNightAccentNotifier, nothingAccentNotifier,
+      ]) { n.addListener(onTheme); }
     }
   }
 

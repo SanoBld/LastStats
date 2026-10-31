@@ -166,7 +166,7 @@ class _AccountPageState extends State<AccountPage> {
         title: Text(L.acctRemoveTitle),
         content: Text(L.acctRemoveBody(acc.username)),
         actions: [
-          TextButton(
+          FilledButton.tonal(
             onPressed: () => Navigator.pop(ctx, false),
             child: Text(L.commonCancel),
           ),
@@ -301,7 +301,7 @@ class _AccountPageState extends State<AccountPage> {
         title: Text(L.settingsLogoutTitle),
         content: Text(L.acctLogoutAllBody),
         actions: [
-          TextButton(
+          FilledButton.tonal(
             onPressed: () => Navigator.pop(ctx, false),
             child: Text(L.commonCancel),
           ),
@@ -608,7 +608,7 @@ class _AccountPageState extends State<AccountPage> {
                               color: scheme.onSurfaceVariant)),
                   trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                     if (!isAct)
-                      TextButton(
+                      FilledButton.tonal(
                         onPressed: () => _switchTo(idx),
                         child: Text(L.acctSwitch),
                       ),
@@ -865,7 +865,7 @@ class _AddAccountDialogState extends State<_AddAccountDialog> {
         ]),
       ),
       actions: [
-        TextButton(
+        FilledButton.tonal(
           onPressed: () => Navigator.pop(context),
           child: Text(L.commonCancel),
         ),
@@ -1022,7 +1022,7 @@ class _ChangeKeyDialogState extends State<_ChangeKeyDialog> {
         ),
       ),
       actions: [
-        TextButton(
+        FilledButton.tonal(
           onPressed: _checking ? null : () => Navigator.pop(context),
           child: Text(L.commonCancel),
         ),

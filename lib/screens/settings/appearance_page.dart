@@ -52,6 +52,7 @@ class _AppearancePageState extends State<AppearancePage> {
   int    _dayStartHour         = 7;
   int    _nightStartHour       = 20;
   bool   _widgetTint           = false;
+  String _widgetBg             = 'poster';
 
   @override
   void initState() {
@@ -89,6 +90,7 @@ class _AppearancePageState extends State<AppearancePage> {
       _keepLastArtworkColor = p.getBool('ls_keep_last_artwork_color')   ?? false;
       _oledMode             = p.getBool('ls_oled_mode')                 ?? false;
       _widgetTint           = p.getBool('ls_widget_tint')               ?? false;
+      _widgetBg             = p.getString('ls_widget_bg')               ?? 'poster';
       final fbHex = p.getString('ls_nowplaying_fallback_color');
       _fallbackAccent = fbHex != null
           ? accentFromString(fbHex)
@@ -959,6 +961,25 @@ class _AppearancePageState extends State<AppearancePage> {
                 WidgetService.updateAll();
               },
             ),
+            ListTile(
+              leading: Icon(Icons.wallpaper_rounded, color: scheme.primary),
+              title: Text(tx('ui_widget_bg')),
+              subtitle: Text(tx('ui_widget_bg_d')),
+            ),
+            M3ButtonGroup<String>(
+              items: [
+                ('poster', tx('ui_widget_bg_poster')),
+                ('plain',  tx('ui_widget_bg_plain')),
+                ('none',   tx('ui_widget_bg_none')),
+              ],
+              selected: _widgetBg,
+              onSelected: (v) async {
+                await _set('ls_widget_bg', v);
+                setState(() => _widgetBg = v);
+                WidgetService.updateAll(themeOnly: true);
+              },
+            ),
+            const SizedBox(height: 12),
           ],
         ),
 

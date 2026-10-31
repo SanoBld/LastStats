@@ -43,7 +43,7 @@ class _SpotifyLoginPageState extends State<SpotifyLoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(tx('sp_login_t'))),
+      appBar: M3AppBar(title: tx('sp_login_t')),
       body: Column(children: [
         if (_progress < 1)
           Padding(
