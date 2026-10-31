@@ -19,10 +19,11 @@ class WikiBioService {
       .replaceAll(RegExp(r'\(.*?\)'), '')
       .replaceAll(RegExp(r'[^\p{L}\p{N}]+', unicode: true), '');
 
-  static bool _similar(String a, String b) {
+  static bool _similar(String a, String b, {bool exact = false}) {
     final x = _norm(a), y = _norm(b);
     if (x.isEmpty || y.isEmpty) return false;
     if (x == y) return true;
+    if (exact) return false; // albums / tracks: "Dangerous" != "Dangerous Woman"
     final s = x.length <= y.length ? x : y, l = x.length <= y.length ? y : x;
     return s.length >= 4 && l.contains(s);
   }
@@ -30,6 +31,11 @@ class WikiBioService {
   static const _hints = [
     'music', 'singer', 'band', 'rapper', 'album', 'song', 'single', 'musician',
     'record', 'group', 'duo', 'dj', 'composer',
+    // other languages
+    'chant', 'musique', 'groupe', 'chanson', 'rappeu', 'musicien', 'disque',
+    'sänger', 'musik', 'lied', 'cantante', 'música', 'canción', 'canzone',
+    'musica', 'cantor', 'música', 'певец', 'песня', 'альбом', 'музык',
+    '歌手', '音楽', 'アルバム', '专辑', '歌曲', 'مغني', 'ألبوم', 'أغنية',
   ];
 
   /// [type] = artists | albums | tracks. Tries the app language first, then English.
@@ -52,7 +58,8 @@ class WikiBioService {
     ];
     WikiBio? out;
     for (final h in hosts) {
-      out = await _search(h, query, name, strictMusic: h == 'en');
+      out = await _search(h, query, name,
+          artist: type == 'artists' ? '' : artist);
       if (out != null) break;
     }
     _cache[key] = out;
@@ -60,7 +67,11 @@ class WikiBioService {
   }
 
   static Future<WikiBio?> _search(String host, String query, String expect,
-      {required bool strictMusic}) async {
+      {String artist = ''}) async {
+    // First artist only ("A, B" / "A feat. B").
+    final mainArtist = artist
+        .split(RegExp(r',|\s+feat\.?\s+|\s+ft\.?\s+|\s+&\s+', caseSensitive: false))
+        .first;
     try {
       final res = await http.get(Uri.https('$host.wikipedia.org', '/w/api.php', {
         'action': 'query', 'generator': 'search', 'gsrsearch': query,
@@ -75,11 +86,15 @@ class WikiBioService {
       for (final p in list) {
         final title   = (p['title'] ?? '').toString();
         final extract = (p['extract'] ?? '').toString().trim();
-        if (extract.length < 60 || !_similar(expect, title)) continue;
-        if (strictMusic) {
-          final low = extract.toLowerCase();
-          if (!_hints.any(low.contains)) continue;
-        }
+        if (extract.length < 60 || !_similar(expect, title, exact: artist.isNotEmpty)) continue;
+        // Must be about music, in every language (a same-name page about
+        // something else, or another artist, is rejected).
+        final low = extract.toLowerCase();
+        if (!_hints.any(low.contains)) continue;
+        // For albums and tracks the page must name the artist, otherwise
+        // "Dangerous Woman" by someone else gets Ariana Grande's text.
+        if (_norm(mainArtist).isNotEmpty &&
+            !_norm('$title $extract').contains(_norm(mainArtist))) continue;
         return WikiBio(extract, (p['fullurl'] ?? 'https://$host.wikipedia.org').toString());
       }
     } catch (_) {}
