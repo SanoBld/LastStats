@@ -1506,4 +1506,12 @@ const Map<String, String> kTxEs = {
   'ntf_act_install': 'Instalar',
   'ntf_dl_install_hint': 'Toca para instalar la actualización',
   'up_open_downloads': 'Abrir Descargas',
+  'ic_title': 'Icono de la app',
+  'ic_note': 'El icono puede tardar unos segundos en cambiar y algunos lanzadores cierran la app durante el cambio.',
+  'ic_default': 'Clásico',
+  'ic_white': 'Claro',
+  'ic_nothing_black': 'Nothing oscuro',
+  'ic_nothing_white': 'Nothing claro',
+  'ic_blue': 'Azul',
+  'ic_red': 'Rojo',
 };

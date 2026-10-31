@@ -96,6 +96,7 @@
 - Sync: "Sync now" shows the wavy progress bar, and friends sync includes all your Last.fm friends, not only favourites and scanned profiles
 
 **Settings and cache**
+- Android: choose the app icon in Settings > Appearance (Classic, Light, Nothing dark, Nothing light, Blue, Red)
 - New "Tinted" color style where even backgrounds, borders and text carry a faint tint of your accent, and the descriptions of the other color styles are rewritten
 - Cache: new size limit for stored API data, the redundant "animated covers in memory" block is removed, and clearing any cache asks for confirmation
 

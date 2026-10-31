@@ -1477,4 +1477,12 @@ const Map<String, String> kTxRu = {
   'ntf_act_install': 'Установить',
   'ntf_dl_install_hint': 'Нажми, чтобы установить обновление',
   'up_open_downloads': 'Открыть «Загрузки»',
+  'ic_title': 'Значок приложения',
+  'ic_note': 'Значок может меняться несколько секунд, а некоторые лаунчеры закрывают приложение при смене.',
+  'ic_default': 'Классический',
+  'ic_white': 'Светлый',
+  'ic_nothing_black': 'Nothing тёмный',
+  'ic_nothing_white': 'Nothing светлый',
+  'ic_blue': 'Синий',
+  'ic_red': 'Красный',
 };

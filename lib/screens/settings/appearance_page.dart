@@ -18,6 +18,7 @@ import '../../services/library_merge.dart';
 import 'settings_helpers.dart';
 import 'settings_rows.dart';
 import 'pc_mode_section.dart';
+import 'app_icon_section.dart';
 
 // Local haptic helper for appearance page.
 void _apHaptic() {
@@ -528,6 +529,8 @@ class _AppearancePageState extends State<AppearancePage> {
           ),
         ]),
         const SizedBox(height: 12),
+
+        const AppIconSection(),
 
         //  Theme — ALWAYS active (Nothing supports light + dark)
         // ══════════════════════════════════════════════════════════════════

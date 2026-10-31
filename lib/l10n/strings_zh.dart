@@ -1503,4 +1503,12 @@ const Map<String, String> kTxZh = {
   'ntf_act_install': '安装',
   'ntf_dl_install_hint': '点按以安装更新',
   'up_open_downloads': '打开“下载”',
+  'ic_title': '应用图标',
+  'ic_note': '图标可能需要几秒钟才会更换，部分启动器会在切换时关闭应用。',
+  'ic_default': '经典',
+  'ic_white': '浅色',
+  'ic_nothing_black': 'Nothing 深色',
+  'ic_nothing_white': 'Nothing 浅色',
+  'ic_blue': '蓝色',
+  'ic_red': '红色',
 };

@@ -1506,4 +1506,12 @@ const Map<String, String> kTxPt = {
   'ntf_act_install': 'Instalar',
   'ntf_dl_install_hint': 'Toca para instalar a atualização',
   'up_open_downloads': 'Abrir Transferências',
+  'ic_title': 'Ícone da app',
+  'ic_note': 'O ícone pode demorar alguns segundos a mudar e alguns lançadores fecham a app durante a troca.',
+  'ic_default': 'Clássico',
+  'ic_white': 'Claro',
+  'ic_nothing_black': 'Nothing escuro',
+  'ic_nothing_white': 'Nothing claro',
+  'ic_blue': 'Azul',
+  'ic_red': 'Vermelho',
 };

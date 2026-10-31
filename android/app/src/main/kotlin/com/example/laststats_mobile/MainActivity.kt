@@ -1,7 +1,9 @@
 package com.example.laststats_mobile
 
 import android.app.DownloadManager
+import android.content.ComponentName
 import android.content.ContentValues
+import android.content.pm.PackageManager
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -70,6 +72,42 @@ class MainActivity : FlutterActivity() {
                                 src.copyTo(dst, true)
                                 result.success(dst.absolutePath)
                             }
+                        }
+                        else -> result.notImplemented()
+                    }
+                } catch (e: Exception) {
+                    result.success(false)
+                }
+            }
+        // Selectable launcher icon: one activity-alias per icon, only one enabled.
+        val iconAliases = linkedMapOf(
+            "default" to "IconDefault", "white" to "IconWhite",
+            "nothing_black" to "IconNothingBlack", "nothing_white" to "IconNothingWhite",
+            "blue" to "IconBlue", "red" to "IconRed")
+        fun aliasName(a: String) = ComponentName(packageName, "com.example.laststats_mobile.$a")
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "laststats/appicon")
+            .setMethodCallHandler { call, result ->
+                try {
+                    when (call.method) {
+                        "get" -> {
+                            val cur = iconAliases.entries.firstOrNull {
+                                val st = packageManager.getComponentEnabledSetting(aliasName(it.value))
+                                st == PackageManager.COMPONENT_ENABLED_STATE_ENABLED ||
+                                    (st == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT && it.key == "default")
+                            }?.key ?: "default"
+                            result.success(cur)
+                        }
+                        "set" -> {
+                            val key = call.argument<String>("key") ?: "default"
+                            val target = iconAliases[key] ?: "IconDefault"
+                            // enable the new one first so there is always a launcher entry
+                            packageManager.setComponentEnabledSetting(aliasName(target),
+                                PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
+                            for (a in iconAliases.values) if (a != target) {
+                                packageManager.setComponentEnabledSetting(aliasName(a),
+                                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
+                            }
+                            result.success(true)
                         }
                         else -> result.notImplemented()
                     }

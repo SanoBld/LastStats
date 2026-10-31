@@ -1477,4 +1477,12 @@ const Map<String, String> kTxAr = {
   'ntf_act_install': 'تثبيت',
   'ntf_dl_install_hint': 'اضغط لتثبيت التحديث',
   'up_open_downloads': 'فتح التنزيلات',
+  'ic_title': 'أيقونة التطبيق',
+  'ic_note': 'قد تستغرق الأيقونة بضع ثوانٍ لتتغير، وبعض المشغّلات تُغلق التطبيق أثناء التبديل.',
+  'ic_default': 'كلاسيكي',
+  'ic_white': 'فاتح',
+  'ic_nothing_black': 'Nothing داكن',
+  'ic_nothing_white': 'Nothing فاتح',
+  'ic_blue': 'أزرق',
+  'ic_red': 'أحمر',
 };

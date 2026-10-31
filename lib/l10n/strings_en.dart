@@ -1506,4 +1506,12 @@ const Map<String, String> kTxEn = {
   'ntf_act_install': 'Install',
   'ntf_dl_install_hint': 'Tap to install the update',
   'up_open_downloads': 'Open Downloads',
+  'ic_title': 'App icon',
+  'ic_note': 'The icon can take a few seconds to change, and some launchers close the app during the switch.',
+  'ic_default': 'Classic',
+  'ic_white': 'Light',
+  'ic_nothing_black': 'Nothing dark',
+  'ic_nothing_white': 'Nothing light',
+  'ic_blue': 'Blue',
+  'ic_red': 'Red',
 };

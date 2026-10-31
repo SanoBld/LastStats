@@ -2,7 +2,7 @@ name: laststats_mobile
 description: "LastStats — Your Last.fm stats, reinvented."
 publish_to: 'none'
 
-version: 4.3.0-beta+30
+version: 4.2.1+29
 
 environment:
   sdk: ^3.11.5
@@ -69,6 +69,7 @@ flutter:
     - assets/images/
     - assets/fonts/
     - assets/icons/
+    - assets/app_icons/
     - README.md
 
   fonts:
