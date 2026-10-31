@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-31T10:21:16Z",
+  "updated": "2026-10-31T10:37:17Z",
   "commits": [
+    {
+      "sha": "f323e047172534aadcc83c38c1b0f793f8afbf1b",
+      "message": "feat: Update widget layouts and strings for improved user experience\n\n- Replaced launcher icon with custom widget glyph in various widget layouts.\n- Added default text values for scrobble counts and labels in multiple widget layouts.\n- Updated widget descriptions in Arabic, German, Spanish, French, Italian, Japanese, Portuguese, Russian, and Chinese for better localization.\n- Modified widget info XML files to include new descriptions for scrobble, now playing, loved, weekly, and recap widgets.\n- Enhanced settings page to conditionally display options based on platform (mobile vs web).\n- Introduced new drawable resources for widget backgrounds and icons.\n- Added dimension resources for consistent widget styling across different screen sizes.",
+      "date": "2026-10-31T10:34:21Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/f323e047172534aadcc83c38c1b0f793f8afbf1b",
+      "tags": []
+    },
     {
       "sha": "52afebc15b1d287d7323b00c153c143e3d6e1384",
       "message": "feat: add app icon picker in settings and implement app icon service\n\n- Introduced AppIconSection widget for selecting app icons in the settings under Appearance (Android only).\n- Implemented AppIconService to manage selectable launcher icons with a method channel for Android.\n- Added new app icons: red.png and white.png to the assets/app_icons directory.",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/090c8904f2d59c2405335235ac1c4795c9eea578",
-      "tags": []
-    },
-    {
-      "sha": "c8c4f304926b2cbc36d5868ac0919f9e3237c334",
-      "message": "feat: ajouter un champ 'recapTop10' pour les statistiques des 10 meilleurs éléments dans les langues prises en charge",
-      "date": "2026-09-07T20:31:46Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/c8c4f304926b2cbc36d5868ac0919f9e3237c334",
       "tags": []
     }
   ]
