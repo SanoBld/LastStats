@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-31T10:59:06Z",
+  "updated": "2026-10-31T11:01:27Z",
   "commits": [
+    {
+      "sha": "db755fe8fc3ddca9072024c82fcd9f1f72b6bd5f",
+      "message": "Refactor widget providers to improve background rendering and layout consistency\n\n- Introduced a new `WidgetBackground` class to handle the rendering of widget backgrounds with a poster style.\n- Updated `RecapWidgetProvider`, `ScrobbleCountWidgetProvider`, and `WeeklyScrobblesWidgetProvider` to utilize the new background rendering logic.\n- Enhanced widget layouts to include image tiles for total, weekly, and loved scrobbles.\n- Added new color attributes to `WidgetPalette` for better theming options.\n- Updated XML layouts for various widgets to improve visual consistency and added scale type for images.\n- Localized new string resources for widget labels and descriptions in multiple languages.",
+      "date": "2026-10-31T11:01:08Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/db755fe8fc3ddca9072024c82fcd9f1f72b6bd5f",
+      "tags": []
+    },
     {
       "sha": "54b0a8a5d31a3ff8e7ec8ffae88f9c9bd6040a4d",
       "message": "feat: Enhance widget functionality and app icon management\n\n- Redesigned Android widgets to support Material You dynamic colors, light/dark mode, and accent color options.\n- Fixed issues with small widgets displaying clipped numbers and empty spaces in the recap widget.\n- Improved app icon management by allowing users to pin app icons to the home screen.\n- Updated widget layouts to include new color filters and icon adjustments based on user preferences.\n- Added support for dynamic color usage in widgets and improved text visibility across different themes.\n- Enhanced localization strings for better user guidance on app icon changes and shortcuts.",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/64e90725b91115aa59e652b6bf8589cc02ec2bd8",
-      "tags": []
-    },
-    {
-      "sha": "507d316a7b0f6097b7b8b6fa85bc64a13ca8ceb8",
-      "message": "feat: appliquer des styles partagés pour les éléments de l'interface utilisateur et améliorer la cohérence visuelle",
-      "date": "2026-09-08T18:11:18Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/507d316a7b0f6097b7b8b6fa85bc64a13ca8ceb8",
       "tags": []
     }
   ]
