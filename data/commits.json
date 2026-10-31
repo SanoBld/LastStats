@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-31T04:30:10Z",
+  "updated": "2026-10-31T10:05:17Z",
   "commits": [
+    {
+      "sha": "fb828c88b02b4af6962919ea48c27e7059d93ead",
+      "message": "feat: Enhance update installer functionality and cleanup\n\n- Added support for version tracking in installUpdate function.\n- Implemented SharedPreferences to store pending update version.\n- Introduced methods to install APKs and open the Downloads folder.\n- Added cleanupUpdateFiles to remove unnecessary update files after installation.\n- Updated update_installer_stub.dart to match new method signatures.\n- Modified update_startup.dart to call cleanupUpdateFiles on startup.\n- Enhanced update_install_sheet.dart to include a button for opening Downloads.\n- Added new drawable resources for notification icons across different densities.",
+      "date": "2026-10-31T10:03:05Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/fb828c88b02b4af6962919ea48c27e7059d93ead",
+      "tags": []
+    },
     {
       "sha": "9a902263e7dd81cc73b14f38af34e767af67c932",
       "message": "feat: ajout de la gestion des téléchargements en arrière-plan avec notifications et sauvegarde dans le dossier Téléchargements",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/112c2dab782885b6935b5f8e959e3a9c09852457",
-      "tags": []
-    },
-    {
-      "sha": "efe2ec35a681fad23017c9f0c30e2a8a6cb496ba",
-      "message": "feat: ajouter une page de récapitulatif avec des statistiques journalières, hebdomadaires et mensuelles",
-      "date": "2026-09-07T19:23:22Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/efe2ec35a681fad23017c9f0c30e2a8a6cb496ba",
       "tags": []
     }
   ]
