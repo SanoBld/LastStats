@@ -88,7 +88,11 @@
     await HomeWidget.saveWidgetData&lt;String&gt;(&#39;theme_mode&#39;, themeMode);
     await HomeWidget.saveWidgetData&lt;String&gt;(&#39;accent_light&#39;, accentLight);
     await HomeWidget.saveWidgetData&lt;String&gt;(&#39;accent_dark&#39;, accentDark);
+    await HomeWidget.saveWidgetData&lt;String&gt;(&#39;api_key&#39;, apiKey); &#47;&#47; native refresh
+    await _saveScheme(prefs);
     await HomeWidget.saveWidgetData&lt;bool&gt;(&#39;widget_tint&#39;, widgetTint);
+    await HomeWidget.saveWidgetData&lt;bool&gt;(
+        &#39;use_dynamic_color&#39;, prefs.getBool(&#39;ls_use_dynamic_color&#39;) ?? false);
 
     final api = LastFmService(apiKey: apiKey, username: username);
 
