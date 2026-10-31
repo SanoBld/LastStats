@@ -1478,7 +1478,7 @@ const Map<String, String> kTxIt = {
   'ntf_dl_install_hint': 'Tocca per installare l’aggiornamento',
   'up_open_downloads': 'Apri Download',
   'ic_title': 'Icona dell’app',
-  'ic_note': 'L’icona può impiegare qualche secondo a cambiare e alcuni launcher chiudono l’app durante il cambio.',
+  'ic_note': 'L’icona cambia quando esci dall’app; il launcher può impiegare qualche secondo ad aggiornarla.',
   'ic_default': 'Classica',
   'ic_white': 'Chiara',
   'ic_nothing_black': 'Nothing scuro',

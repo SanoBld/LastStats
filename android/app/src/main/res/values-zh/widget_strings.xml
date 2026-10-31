@@ -15,4 +15,9 @@
     <string name="widget_recap_total">总计</string>
     <string name="widget_recap_week">本周</string>
     <string name="widget_recap_loved">喜爱</string>
+    <string name="widget_desc_scrobbles">你的总 scrobble 数</string>
+    <string name="widget_desc_now_playing">正在播放的曲目及封面</string>
+    <string name="widget_desc_loved">你喜欢的曲目数量</string>
+    <string name="widget_desc_weekly">最近 7 天的 scrobble</string>
+    <string name="widget_desc_recap">总计、本周和喜欢的曲目一览</string>
 </resources>

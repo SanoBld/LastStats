@@ -15,4 +15,9 @@
     <string name="widget_recap_total">всего</string>
     <string name="widget_recap_week">за неделю</string>
     <string name="widget_recap_loved">любимые</string>
+    <string name="widget_desc_scrobbles">Общее число скробблов</string>
+    <string name="widget_desc_now_playing">Текущий трек с обложкой</string>
+    <string name="widget_desc_loved">Сколько треков тебе понравилось</string>
+    <string name="widget_desc_weekly">Скробблы за последние 7 дней</string>
+    <string name="widget_desc_recap">Всего, за неделю и любимые — одним взглядом</string>
 </resources>

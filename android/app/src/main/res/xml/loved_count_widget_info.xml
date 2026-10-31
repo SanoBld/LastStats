@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/widget_desc_loved"
     android:minWidth="60dp"
     android:minHeight="60dp"
     android:minResizeWidth="40dp"
@@ -7,7 +8,7 @@
     android:targetCellWidth="1"
     android:targetCellHeight="1"
     android:updatePeriodMillis="1800000"
-    android:initialLayout="@layout/widget_loved_count_nothing"
-    android:previewLayout="@layout/widget_loved_count_nothing"
+    android:initialLayout="@layout/widget_loved_count_default"
+    android:previewLayout="@layout/widget_loved_count_default"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen" />

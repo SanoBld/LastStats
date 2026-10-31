@@ -91,12 +91,17 @@
 - The side rail on large screens slides smoothly when collapsed or expanded
 - New central file lib/theme/m3_interaction.dart for press and top-bar style
 
+**Widgets**
+- Android widgets redesigned in Material You: system dynamic colors (wallpaper-based on Android 12+), system corner radius, follows the system light/dark mode, rounded square album art, themed LastStats glyph, picker descriptions in every language and a real preview
+- Now-playing widget: new layout with the cover on the left, and the cover now loads even when Last.fm has none (same sources as the app)
+
 **Battery and sync**
 - Battery saver: the screen really drops to ~60 Hz (native refresh-rate control, works on adaptive 120 Hz phones) and goes back to the highest rate when turned off; the animated dashboard background is paused and the blurred image is cached
 - Sync: "Sync now" shows the wavy progress bar, and friends sync includes all your Last.fm friends, not only favourites and scanned profiles
 
 **Settings and cache**
-- Android: choose the app icon in Settings > Appearance (Classic, Light, Nothing dark, Nothing light, Blue, Red)
+- Android: choose the app icon in Settings > Appearance (Classic, Light, Nothing dark, Nothing light, Blue, Red); the change applies when you leave the app
+- Settings that only exist on some platforms are now hidden elsewhere: battery saver and its quick toggle (phones/tablets only), notifications (not on web), the Android widgets option (Android with the Nothing style only)
 - New "Tinted" color style where even backgrounds, borders and text carry a faint tint of your accent, and the descriptions of the other color styles are rewritten
 - Cache: new size limit for stored API data, the redundant "animated covers in memory" block is removed, and clearing any cache asks for confirmation
 

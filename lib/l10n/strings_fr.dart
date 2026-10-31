@@ -1507,7 +1507,7 @@ const Map<String, String> kTxFr = {
   'ntf_dl_install_hint': 'Touche pour installer la mise à jour',
   'up_open_downloads': 'Ouvrir Téléchargements',
   'ic_title': 'Icône de l’application',
-  'ic_note': 'L’icône peut mettre quelques secondes à changer, et certains lanceurs ferment l’app pendant le changement.',
+  'ic_note': 'L’icône change quand tu quittes l’app ; le lanceur peut ensuite mettre quelques secondes à la mettre à jour.',
   'ic_default': 'Classique',
   'ic_white': 'Clair',
   'ic_nothing_black': 'Nothing sombre',

@@ -15,4 +15,9 @@
     <string name="widget_recap_total">合計</string>
     <string name="widget_recap_week">今週</string>
     <string name="widget_recap_loved">お気に入り</string>
+    <string name="widget_desc_scrobbles">累計スクロブル数</string>
+    <string name="widget_desc_now_playing">再生中の曲とジャケット</string>
+    <string name="widget_desc_loved">お気に入りの曲数</string>
+    <string name="widget_desc_weekly">過去7日間のスクロブル</string>
+    <string name="widget_desc_recap">合計・今週・お気に入りをひと目で</string>
 </resources>

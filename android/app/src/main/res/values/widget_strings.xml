@@ -17,4 +17,9 @@
     <string name="widget_recap_total">total</string>
     <string name="widget_recap_week">this week</string>
     <string name="widget_recap_loved">loved</string>
+    <string name="widget_desc_scrobbles">Your total scrobble count</string>
+    <string name="widget_desc_now_playing">The track playing now, with its cover</string>
+    <string name="widget_desc_loved">How many tracks you loved</string>
+    <string name="widget_desc_weekly">Your scrobbles over the last 7 days</string>
+    <string name="widget_desc_recap">Total, this week and loved tracks at a glance</string>
 </resources>

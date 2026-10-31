@@ -15,4 +15,9 @@
     <string name="widget_recap_total">total</string>
     <string name="widget_recap_week">esta semana</string>
     <string name="widget_recap_loved">favoritas</string>
+    <string name="widget_desc_scrobbles">O teu total de scrobbles</string>
+    <string name="widget_desc_now_playing">A faixa atual com a capa</string>
+    <string name="widget_desc_loved">Quantas faixas adoraste</string>
+    <string name="widget_desc_weekly">Os teus scrobbles dos últimos 7 dias</string>
+    <string name="widget_desc_recap">Total, semana e favoritas num relance</string>
 </resources>

@@ -33,11 +33,12 @@
                 android:layout_width="13dp"
                 android:layout_height="13dp"
                 android:layout_gravity="center"
-                android:src="@mipmap/ic_launcher" />
+                android:src="@drawable/widget_glyph" />
         </FrameLayout>
 
         <TextView
             android:id="@+id/widget_value"
+        android:text="12 345"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:maxLines="1"
@@ -50,6 +51,7 @@
 
         <TextView
             android:id="@+id/widget_label"
+        android:text="scrobbles"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"

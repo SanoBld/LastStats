@@ -4,6 +4,15 @@
 // ══════════════════════════════════════════════════════════════════════════
 part of 'home_screen.dart';
 
+// Platform gating: hide settings that only make sense on some platforms.
+bool get _isMobileApp =>
+    !kIsWeb && (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS);
+bool _quickToggleAvailable(String prefKey) => switch (prefKey) {
+      'ls_eco_mode_manual'      => _isMobileApp,   // battery saver
+      'ls_notif_news_enabled'   => !kIsWeb,        // notifications
+      _                         => true,
+    };
+
 // ── Quick search results ──────────────────────────────────────────────────
 //
 // A quick toggle is a single boolean setting from anywhere in the app,
@@ -290,7 +299,7 @@ class _SettingsPageState extends State<_SettingsPage> {
     bool matches(List<String> hay) => _settingMatches(q, hay);
 
     // Global-notifier-backed toggles — one entry per item in `_quickToggles`.
-    for (final t in _quickToggles) {
+    for (final t in _quickToggles.where((t) => _quickToggleAvailable(t.prefKey))) {
       if (!matches([tx(t.titleKey), tx(t.subKey), ...t.keywords])) continue;
       items.add(ValueListenableBuilder<bool>(
         valueListenable: t.notifier,
@@ -490,8 +499,8 @@ class _SettingsPageState extends State<_SettingsPage> {
       subtitle: () => L.settingsCardStartupSub,
       pageBuilder: (_) => const StartupPage(),
     ),
-    // 3 — Notifications
-    _SettingsCardData(
+    // 3 — Notifications (not on web)
+    if (!kIsWeb) _SettingsCardData(
       keywords: ['notification', 'notif', 'palier', 'milestone', 'récap', 'recap', 'actualité', 'news', 'notificación', 'benachrichtigung', 'уведомление', '通知', 'إشعار'],
       icon: Icons.notifications_rounded,
       iconBgColor: (s) => Color.lerp(s.primaryContainer, s.tertiaryContainer, 0.5)!,
@@ -510,8 +519,8 @@ class _SettingsPageState extends State<_SettingsPage> {
       subtitle: () => L.settingsCardSyncSub,
       pageBuilder: (_) => const SyncPage(),
     ),
-    // 3c — Battery saver
-    _SettingsCardData(
+    // 3c — Battery saver (phones / tablets only)
+    if (_isMobileApp) _SettingsCardData(
       keywords: ['batterie', 'battery', 'éco', 'eco', 'batería', 'akku', 'batteria', 'bateria', 'батарея', 'バッテリー', '电池', 'بطارية'],
       icon: Icons.battery_saver_rounded,
       iconBgColor: (s) => s.tertiaryContainer,

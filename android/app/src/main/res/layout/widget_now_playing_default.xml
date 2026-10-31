@@ -2,63 +2,76 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:clipToOutline="true"
-    android:outlineProvider="background"
-    android:background="@drawable/widget_card_shape">
+    android:layout_height="match_parent">
 
-    <!-- Full-bleed album art -->
     <ImageView
-        android:id="@+id/widget_art"
+        android:id="@+id/card_bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/widget_art_placeholder"
-        android:scaleType="centerCrop" />
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_card_shape" />
 
-    <!-- Dark scrim so text stays readable over any art -->
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/widget_art_scrim" />
-
-    <!-- Status pill, top-left -->
-    <TextView
-        android:id="@+id/widget_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|start"
-        android:layout_margin="14dp"
-        android:textColor="#FFFFFF"
-        android:textSize="10sp"
-        android:textAllCaps="true"
-        android:letterSpacing="0.06"
-        android:textStyle="bold" />
-
-    <!-- Track info, bottom-left -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
-        android:orientation="vertical"
-        android:padding="14dp">
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
 
-        <TextView
-            android:id="@+id/widget_track"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:textColor="#FFFFFF"
-            android:textSize="19sp"
-            android:textStyle="bold" />
+        <!-- Album art: square, rounded in code once loaded -->
+        <ImageView
+            android:id="@+id/widget_art"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/widget_art_placeholder_m3" />
 
-        <TextView
-            android:id="@+id/widget_artist"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:textColor="#D8D8D8"
-            android:textSize="13sp" />
+            android:layout_weight="1"
+            android:layout_marginStart="14dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/widget_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/widget_chip_pill"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"
+                android:text="NOW PLAYING"
+                android:textAllCaps="true"
+                android:letterSpacing="0.06"
+                android:textColor="@color/widget_on_chip"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_track"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="Song title"
+                android:textColor="@color/widget_on_surface"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_artist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Artist"
+                android:textColor="@color/widget_on_surface_variant"
+                android:textSize="13sp" />
+        </LinearLayout>
     </LinearLayout>
 </FrameLayout>

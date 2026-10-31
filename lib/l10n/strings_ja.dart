@@ -1477,7 +1477,7 @@ const Map<String, String> kTxJa = {
   'ntf_dl_install_hint': 'タップしてアップデートをインストール',
   'up_open_downloads': 'ダウンロードを開く',
   'ic_title': 'アプリアイコン',
-  'ic_note': 'アイコンの変更には数秒かかることがあり、ランチャーによっては切り替え中にアプリが終了します。',
+  'ic_note': 'アプリを離れるとアイコンが変わります。ランチャーの更新に数秒かかることがあります。',
   'ic_default': 'クラシック',
   'ic_white': 'ライト',
   'ic_nothing_black': 'Nothing ダーク',

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:width="96dp" android:height="96dp">
+        <shape>
+            <solid android:color="@color/widget_chip_bg" />
+            <corners android:radius="@dimen/widget_inner_corner" />
+        </shape>
+    </item>
+    <item android:width="32dp" android:height="32dp" android:gravity="center">
+        <bitmap android:src="@drawable/ic_stat_laststats" android:tint="@color/widget_on_chip" />
+    </item>
+</layer-list>

@@ -32,11 +32,12 @@
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_gravity="center"
-                android:src="@mipmap/ic_launcher" />
+                android:src="@drawable/widget_glyph" />
         </FrameLayout>
 
         <TextView
             android:id="@+id/widget_value"
+        android:text="12 345"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"

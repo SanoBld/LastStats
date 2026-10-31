@@ -2,6 +2,7 @@
 
 import '../../l10n/extra_strings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import '../../widgets/m3_components.dart';
 import '../../theme/m3_motion.dart';
 import '../../theme/m3_shapes.dart';
@@ -944,7 +945,7 @@ class _AppearancePageState extends State<AppearancePage> {
 
         const SizedBox(height: 20),
 
-        SettingsSection(
+        if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android && _isNothing) SettingsSection(
           label: tx('ui_android_widgets'),
           children: [
             SwitchListTile(

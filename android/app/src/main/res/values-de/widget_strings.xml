@@ -15,4 +15,9 @@
     <string name="widget_recap_total">gesamt</string>
     <string name="widget_recap_week">diese Woche</string>
     <string name="widget_recap_loved">favoriten</string>
+    <string name="widget_desc_scrobbles">Deine gesamten Scrobbles</string>
+    <string name="widget_desc_now_playing">Der aktuelle Titel mit Cover</string>
+    <string name="widget_desc_loved">Wie viele Titel du geliebt hast</string>
+    <string name="widget_desc_weekly">Deine Scrobbles der letzten 7 Tage</string>
+    <string name="widget_desc_recap">Gesamt, Woche und Lieblingstitel im Überblick</string>
 </resources>

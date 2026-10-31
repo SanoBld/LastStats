@@ -1478,7 +1478,7 @@ const Map<String, String> kTxDe = {
   'ntf_dl_install_hint': 'Tippen, um das Update zu installieren',
   'up_open_downloads': 'Downloads öffnen',
   'ic_title': 'App-Symbol',
-  'ic_note': 'Das Symbol kann einige Sekunden brauchen, und manche Launcher schließen die App beim Wechsel.',
+  'ic_note': 'Das Symbol wechselt, sobald du die App verlässt; der Launcher braucht danach ein paar Sekunden.',
   'ic_default': 'Klassisch',
   'ic_white': 'Hell',
   'ic_nothing_black': 'Nothing dunkel',

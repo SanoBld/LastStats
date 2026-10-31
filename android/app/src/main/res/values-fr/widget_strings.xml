@@ -15,4 +15,9 @@
     <string name="widget_recap_total">total</string>
     <string name="widget_recap_week">cette semaine</string>
     <string name="widget_recap_loved">aimés</string>
+    <string name="widget_desc_scrobbles">Ton nombre total de scrobbles</string>
+    <string name="widget_desc_now_playing">Le titre en cours, avec sa pochette</string>
+    <string name="widget_desc_loved">Le nombre de titres que tu as aimés</string>
+    <string name="widget_desc_weekly">Tes scrobbles des 7 derniers jours</string>
+    <string name="widget_desc_recap">Total, semaine et titres aimés en un coup d’œil</string>
 </resources>

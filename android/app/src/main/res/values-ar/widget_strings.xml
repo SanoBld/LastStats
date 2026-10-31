@@ -15,4 +15,9 @@
     <string name="widget_recap_total">الإجمالي</string>
     <string name="widget_recap_week">هذا الأسبوع</string>
     <string name="widget_recap_loved">المفضلة</string>
+    <string name="widget_desc_scrobbles">إجمالي السكروبلات لديك</string>
+    <string name="widget_desc_now_playing">المقطع الجاري تشغيله مع غلافه</string>
+    <string name="widget_desc_loved">عدد المقاطع التي أحببتها</string>
+    <string name="widget_desc_weekly">سكروبلاتك خلال آخر 7 أيام</string>
+    <string name="widget_desc_recap">الإجمالي والأسبوع والمفضلة بنظرة واحدة</string>
 </resources>

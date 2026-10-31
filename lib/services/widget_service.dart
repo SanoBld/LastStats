@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'lastfm_service.dart';
+import 'image_service.dart';
 
 class WidgetService {
   // Must match the Kotlin provider class names (App Widget IDs).
@@ -62,6 +63,10 @@ class WidgetService {
             : t['artist']?.toString() ?? '';
         trackArt = _pickImage(t['image']);
         isPlaying = t['@attr']?['nowplaying'] == 'true';
+        // Last.fm often has no cover: use the same sources as the app.
+        if (trackArt.isEmpty && trackName.isNotEmpty) {
+          trackArt = await ImageService.resolveTrack(trackName, artistName);
+        }
       }
 
       // Loved tracks count
@@ -129,6 +134,9 @@ class WidgetService {
             : np['artist']?.toString() ?? '';
         trackArt = _pickImage(np['image']);
         isPlaying = np['@attr']?['nowplaying'] == 'true';
+        if (trackArt.isEmpty && trackName.isNotEmpty) {
+          trackArt = await ImageService.resolveTrack(trackName, artistName);
+        }
       }
       await HomeWidget.saveWidgetData<String>('track_name', trackName);
       await HomeWidget.saveWidgetData<String>('artist_name', artistName);

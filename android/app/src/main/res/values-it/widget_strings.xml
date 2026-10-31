@@ -15,4 +15,9 @@
     <string name="widget_recap_total">totale</string>
     <string name="widget_recap_week">questa settimana</string>
     <string name="widget_recap_loved">preferiti</string>
+    <string name="widget_desc_scrobbles">Il totale dei tuoi scrobble</string>
+    <string name="widget_desc_now_playing">Il brano in riproduzione con la copertina</string>
+    <string name="widget_desc_loved">Quanti brani ti piacciono</string>
+    <string name="widget_desc_weekly">I tuoi scrobble degli ultimi 7 giorni</string>
+    <string name="widget_desc_recap">Totale, settimana e brani preferiti a colpo d’occhio</string>
 </resources>

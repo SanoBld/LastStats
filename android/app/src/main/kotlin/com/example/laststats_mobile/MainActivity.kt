@@ -18,6 +18,43 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
+
+    private val iconAliases = linkedMapOf(
+        "default" to "IconDefault", "white" to "IconWhite",
+        "nothing_black" to "IconNothingBlack", "nothing_white" to "IconNothingWhite",
+        "blue" to "IconBlue", "red" to "IconRed")
+    private var pendingIcon: String? = null
+
+    private fun aliasName(a: String) = ComponentName(packageName, "com.example.laststats_mobile.$a")
+
+    private fun currentIcon(): String = iconAliases.entries.firstOrNull {
+        val st = packageManager.getComponentEnabledSetting(aliasName(it.value))
+        st == PackageManager.COMPONENT_ENABLED_STATE_ENABLED ||
+            (st == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT && it.key == "default")
+    }?.key ?: "default"
+
+    private fun applyIcon(key: String) {
+        val target = iconAliases[key] ?: return
+        if (currentIcon() == key) return
+        // enable the new entry first so there is always a launcher entry
+        packageManager.setComponentEnabledSetting(aliasName(target),
+            PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
+        for (a in iconAliases.values) if (a != target) {
+            packageManager.setComponentEnabledSetting(aliasName(a),
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        val prefs = getSharedPreferences("app_icon", MODE_PRIVATE)
+        val key = pendingIcon ?: prefs.getString("pending", null)
+        if (key != null) {
+            try { applyIcon(key) } catch (_: Exception) {}
+            pendingIcon = null
+            prefs.edit().remove("pending").apply()
+        }
+    }
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "laststats/installer")
@@ -79,34 +116,17 @@ class MainActivity : FlutterActivity() {
                     result.success(false)
                 }
             }
-        // Selectable launcher icon: one activity-alias per icon, only one enabled.
-        val iconAliases = linkedMapOf(
-            "default" to "IconDefault", "white" to "IconWhite",
-            "nothing_black" to "IconNothingBlack", "nothing_white" to "IconNothingWhite",
-            "blue" to "IconBlue", "red" to "IconRed")
-        fun aliasName(a: String) = ComponentName(packageName, "com.example.laststats_mobile.$a")
+        // Selectable launcher icon: the change is applied when the app goes to the
+        // background (changing the launcher entry of the running app can kill it).
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "laststats/appicon")
             .setMethodCallHandler { call, result ->
                 try {
                     when (call.method) {
-                        "get" -> {
-                            val cur = iconAliases.entries.firstOrNull {
-                                val st = packageManager.getComponentEnabledSetting(aliasName(it.value))
-                                st == PackageManager.COMPONENT_ENABLED_STATE_ENABLED ||
-                                    (st == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT && it.key == "default")
-                            }?.key ?: "default"
-                            result.success(cur)
-                        }
+                        "get" -> result.success(pendingIcon ?: currentIcon())
                         "set" -> {
-                            val key = call.argument<String>("key") ?: "default"
-                            val target = iconAliases[key] ?: "IconDefault"
-                            // enable the new one first so there is always a launcher entry
-                            packageManager.setComponentEnabledSetting(aliasName(target),
-                                PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
-                            for (a in iconAliases.values) if (a != target) {
-                                packageManager.setComponentEnabledSetting(aliasName(a),
-                                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
-                            }
+                            pendingIcon = call.argument<String>("key") ?: "default"
+                            getSharedPreferences("app_icon", MODE_PRIVATE).edit()
+                                .putString("pending", pendingIcon).apply()
                             result.success(true)
                         }
                         else -> result.notImplemented()
