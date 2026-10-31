@@ -13,6 +13,7 @@
 //  file picker and reads the .json directly.
 // ══════════════════════════════════════════════════════════════════════════
 
+import 'widget_service.dart';
 import 'dart:convert';
 import 'dart:io' show File, Platform;
 import 'dart:typed_data';
@@ -100,6 +101,7 @@ const _kThemeKeys = {
   'ls_pc_mode',
   'ls_widget_tint',
   'ls_widget_bg',
+  'ls_year_share_profile',
   'ls_use_daynight_accent',
   'ls_accent_dark',
   'ls_daynight_use_hours',
@@ -138,6 +140,8 @@ const _kNotificationKeys = {
   'ls_notif_milestone_enabled', 'ls_notif_milestone_interval',
   'ls_notif_grand_enabled',
   'ls_show_news_badge', 'ls_show_loved_badge',
+  'ls_auto_update_check', 'ls_beta_channel',
+  'ls_scrobble_sync_enabled', 'ls_scrobble_sync_freq_hours',
 };
 
 /// Favourite profiles chosen in the app. Own switch on export.
@@ -673,5 +677,7 @@ class BackupService {
     if (fallbackHex != null) {
       nowPlayingFallbackColorNotifier.value = accentFromString(fallbackHex);
     }
+    // Restored look: push it to the home screen widgets too.
+    WidgetService.updateAll(themeOnly: true);
   }
 }

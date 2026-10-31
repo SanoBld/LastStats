@@ -32,6 +32,10 @@
 
 ## v4.3.0
 
+**Settings and backups**
+- Fixed: with "colour from the music", the colour chosen for when nothing plays is used again at app start and by the widgets (it fell back to the default accent)
+- Backups now also include the update channel, the auto-update check, the scrobble sync options and the year recap share option; restoring a backup refreshes the widgets
+
 **Widgets**
 - New option "Widget background": Poster (theme shapes), Plain (black or white following light/dark) or None (transparent)
 - Theme changes (colours, style, light/dark) now reach the widgets right away instead of after the next data refresh

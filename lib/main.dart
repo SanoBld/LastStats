@@ -159,6 +159,16 @@ Future<void> _mainImpl() async {
   final fallbackHex = prefs.getString('ls_nowplaying_fallback_color');
   nowPlayingFallbackColorNotifier.value =
       fallbackHex != null ? accentFromString(fallbackHex) : accentNotifier.value;
+  // "Colour from the music" is on: start with the colour used when nothing
+  // plays (or the last cover colour), not with the plain theme accent.
+  if (useNowPlayingColorNotifier.value) {
+    final lastHex = prefs.getString('ls_last_artwork_color');
+    if ((prefs.getBool('ls_keep_last_artwork_color') ?? false) && lastHex != null) {
+      accentNotifier.value = accentFromString(lastHex);
+    } else if (fallbackHex != null) {
+      accentNotifier.value = accentFromString(fallbackHex);
+    }
+  }
 
   pcModeNotifier.value   = prefs.getString('ls_pc_mode') ?? 'auto';
   navLabelNotifier.value     = prefs.getBool('ls_nav_labels')      ?? true;

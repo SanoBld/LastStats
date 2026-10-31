@@ -4,12 +4,12 @@
 // Keep it simple: fetch, save keys, ask Android to redraw each widget.
 
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter/material.dart' show Brightness, ColorScheme, Colors;
+import 'package:flutter/material.dart' show Brightness, Color, ColorScheme, Colors;
 import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'lastfm_service.dart';
 import 'image_service.dart';
-import '../app_state.dart' show accentFromString, buildAppScheme, isNightByHour;
+import '../app_state.dart' show accentFromString, accentNotifier, buildAppScheme, isNightByHour, useNowPlayingColorNotifier;
 
 class WidgetService {
   // Must match the Kotlin provider class names (App Widget IDs).
@@ -154,9 +154,23 @@ class WidgetService {
   static Future<void> _saveScheme(SharedPreferences prefs) async {
     try {
       final harmony = prefs.getString('ls_color_harmony') ?? 'mono';
-      final accent = accentFromString(prefs.getString('ls_accent'));
+      var accent = accentFromString(prefs.getString('ls_accent'));
       final darkRaw = prefs.getString('ls_accent_dark');
-      final accentDark = darkRaw != null ? accentFromString(darkRaw) : accent;
+      var accentDark = darkRaw != null ? accentFromString(darkRaw) : accent;
+      // Colour from the music: widgets follow the colour the app really shows.
+      if (prefs.getBool('ls_use_nowplaying_color') ?? false) {
+        Color? live;
+        if (useNowPlayingColorNotifier.value) {
+          live = accentNotifier.value; // app is running
+        } else {
+          final lastHex = prefs.getString('ls_last_artwork_color');
+          final fbHex = prefs.getString('ls_nowplaying_fallback_color');
+          final keep = prefs.getBool('ls_keep_last_artwork_color') ?? false;
+          final hex = (keep && lastHex != null) ? lastHex : fbHex;
+          if (hex != null) live = accentFromString(hex);
+        }
+        if (live != null) { accent = live; accentDark = live; }
+      }
       final dayNight = prefs.getBool('ls_use_daynight_accent') ?? false;
       final hours = prefs.getBool('ls_daynight_use_hours') ?? false;
       final night = hours
