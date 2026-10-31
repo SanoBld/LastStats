@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-31T22:25:57Z",
+  "updated": "2026-10-31T22:36:44Z",
   "commits": [
+    {
+      "sha": "00c19e23d62709cef47f7b33386a615a050eaae3",
+      "message": "chore: bump version to 4.3.0 [skip ci]",
+      "date": "2026-10-31T22:34:37Z",
+      "author": "github-actions[bot]",
+      "avatar": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/00c19e23d62709cef47f7b33386a615a050eaae3",
+      "tags": []
+    },
     {
       "sha": "d1408b0cd25ed85b030d1a9d365eba26b5756a6f",
       "message": "feat: Ajouter un message d'introduction pour le total des écoutes de l'année dans plusieurs langues",
@@ -8,7 +17,9 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/d1408b0cd25ed85b030d1a9d365eba26b5756a6f",
-      "tags": []
+      "tags": [
+        "v4.3.0"
+      ]
     },
     {
       "sha": "4cba33faecee3912ee63976dc0223bbab3069ebb",
@@ -2704,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/72f3fa7570558396684272fa176490efec32debe",
-      "tags": []
-    },
-    {
-      "sha": "da4bd10e4e7604b66d069364347d15febf36564f",
-      "message": "feat: Introduce Folders feature for organizing favorites\n\n- Added a new Folders tab in the search page to manage saved items (tracks, albums, artists).\n- Implemented folder creation, editing, and assignment functionality.\n- Updated the Favorites page to remove folder-related features, as they are now handled in the Folders tab.\n- Enhanced the UI to display folder badges and buttons for items saved in folders.\n- Refactored FavoritesFoldersService to support item metadata and folder assignments for various item types.\n- Ensured that the folder management integrates seamlessly with existing favorites functionality.",
-      "date": "2026-09-11T21:17:17Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/da4bd10e4e7604b66d069364347d15febf36564f",
       "tags": []
     }
   ]
