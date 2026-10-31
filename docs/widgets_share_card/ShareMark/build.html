@@ -113,9 +113,9 @@ Widget build(BuildContext context) =&gt; Row(
       children: [
         Text(&#39;LastStats&#39;, style: TextStyle(
             color: color, fontSize: 11 * k, fontWeight: FontWeight.w700)),
-        SizedBox(width: 2 * k),
+        SizedBox(width: 5 * k),
         &#47;&#47; The logo file has wide empty side margins: crop them so the
-        &#47;&#47; gap to the text is small.
+        &#47;&#47; gap to the text stays small (but not glued to the text).
         Align(widthFactor: 0.4, child: AppLogo(size: 30 * k, color: color)),
       ],
     );</code></pre>

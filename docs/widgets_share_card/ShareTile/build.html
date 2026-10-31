@@ -122,10 +122,13 @@ Widget build(BuildContext context) {
           style: TextStyle(color: s.onPrimaryContainer,
               fontSize: 18 * k, fontWeight: FontWeight.w900)),
       SizedBox(height: 2 * k),
-      Text(label, maxLines: 2, textAlign: TextAlign.center,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(color: s.onPrimaryContainer.withValues(alpha: 0.8),
-              fontSize: 10 * k, fontWeight: FontWeight.w600)),
+      &#47;&#47; One line only: the label shrinks to fit the tile instead of wrapping
+      FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(label, maxLines: 1, textAlign: TextAlign.center,
+            style: TextStyle(color: s.onPrimaryContainer.withValues(alpha: 0.8),
+                fontSize: 10 * k, fontWeight: FontWeight.w600)),
+      ),
     ]),
   );
 }</code></pre>
