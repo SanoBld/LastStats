@@ -56,6 +56,7 @@
       
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
 <span class="name ">updateAll</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="updateAll-param-force"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">force</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="updateAll-param-themeOnly"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">themeOnly</span> = <span class="default-value">false</span>, </span></li>
 </ol>})
 
       
@@ -71,11 +72,13 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; updateAll({bool force = true}) async {
+  <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; updateAll({bool force = true, bool themeOnly = false}) async {
   if (kIsWeb) return;
   final t = DateTime.now().millisecondsSinceEpoch;
-  if (!force &amp;&amp; t - _lastFull &lt; 120000) return;
-  _lastFull = t;
+  if (!themeOnly) {
+    if (!force &amp;&amp; t - _lastFull &lt; 120000) return;
+    _lastFull = t;
+  }
   try {
     final prefs = await SharedPreferences.getInstance();
     final username = prefs.getString(&#39;ls_username&#39;) ?? &#39;&#39;;
@@ -98,6 +101,15 @@
     await HomeWidget.saveWidgetData&lt;bool&gt;(&#39;widget_tint&#39;, widgetTint);
     await HomeWidget.saveWidgetData&lt;bool&gt;(
         &#39;use_dynamic_color&#39;, prefs.getBool(&#39;ls_use_dynamic_color&#39;) ?? false);
+
+    await HomeWidget.saveWidgetData&lt;String&gt;(
+        &#39;widget_bg&#39;, prefs.getString(&#39;ls_widget_bg&#39;) ?? &#39;poster&#39;);
+    await HomeWidget.saveWidgetData&lt;String&gt;(&#39;username&#39;, username);
+    &#47;&#47; Theme changed: redraw right away, before any network call.
+    for (final name in _all) {
+      await HomeWidget.updateWidget(name: name, androidName: name);
+    }
+    if (themeOnly) return;
 
     final api = LastFmService(apiKey: apiKey, username: username);
 
