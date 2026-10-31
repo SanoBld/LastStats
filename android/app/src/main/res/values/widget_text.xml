@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App font for widget texts (API 26+ only, see values-v26) -->
+    <style name="WidgetText" />
+</resources>

@@ -89,11 +89,23 @@ object WidgetBackground {
         return bmp
     }
 
+    // The tiny / pill / full layouts of one widget share the same background, so
+    // draw it once and reuse it (less CPU, less memory, less battery).
+    private val cache = object : LinkedHashMap<String, Bitmap>(8, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Bitmap>?) = size > 6
+    }
+
+    @Synchronized
+    private fun cached(context: Context, p: WidgetPalette, w: Int, h: Int, f: Float): Bitmap {
+        val key = "$w:$h:${p.surface}:${p.chip}:${p.accent}:${p.tertiary}:${p.secondary}:${p.posterMix}"
+        return cache.getOrPut(key) { render(context, p, w, h, f) }
+    }
+
     /** Sets the poster-style background on [views] for widget [id]. */
     fun apply(context: Context, manager: AppWidgetManager, id: Int, views: RemoteViews, p: WidgetPalette) {
         try {
             val (w, h, f) = sizePx(context, manager, id)
-            views.setImageViewBitmap(R.id.card_bg, render(context, p, w, h, f))
+            views.setImageViewBitmap(R.id.card_bg, cached(context, p, w, h, f))
         } catch (_: Throwable) {
             views.setInt(R.id.card_bg, "setColorFilter", p.surface)
         }

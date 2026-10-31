@@ -21,9 +21,16 @@ class WidgetService {
 
   static const _appGroupId = 'group.com.example.laststats_mobile';
 
+  static int _lastFull = 0;
+  static String _lastNp = '';
+
   /// Fetch fresh data and refresh every widget currently on the home screen.
-  static Future<void> updateAll() async {
+  /// [force] false = skipped if it already ran in the last 2 minutes (saves battery).
+  static Future<void> updateAll({bool force = true}) async {
     if (kIsWeb) return;
+    final t = DateTime.now().millisecondsSinceEpoch;
+    if (!force && t - _lastFull < 120000) return;
+    _lastFull = t;
     try {
       final prefs = await SharedPreferences.getInstance();
       final username = prefs.getString('ls_username') ?? '';
@@ -176,8 +183,14 @@ class WidgetService {
         artistName = (np['artist'] is Map)
             ? (np['artist']['#text']?.toString() ?? '')
             : np['artist']?.toString() ?? '';
-        trackArt = _pickImage(np['image']);
         isPlaying = np['@attr']?['nowplaying'] == 'true';
+      }
+      // Nothing changed since the last push: do not wake the widgets.
+      final sig = '$trackName|$artistName|$isPlaying';
+      if (sig == _lastNp) return;
+      _lastNp = sig;
+      if (np != null) {
+        trackArt = _pickImage(np['image']);
         if (trackArt.isEmpty && trackName.isNotEmpty) {
           trackArt = await ImageService.resolveTrack(trackName, artistName);
         }

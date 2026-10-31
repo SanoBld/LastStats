@@ -46,6 +46,7 @@
                     android:src="@drawable/widget_card_pill" />
 
                 <TextView
+style="@style/WidgetText"
                     android:id="@+id/widget_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -61,6 +62,7 @@
             </FrameLayout>
 
             <TextView
+style="@style/WidgetText"
                 android:id="@+id/widget_track"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -73,6 +75,7 @@
                 android:textStyle="bold" />
 
             <TextView
+style="@style/WidgetText"
                 android:id="@+id/widget_artist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

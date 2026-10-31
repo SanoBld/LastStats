@@ -38,6 +38,7 @@
         </FrameLayout>
 
         <TextView
+style="@style/WidgetText"
             android:id="@+id/widget_value"
         android:text="12 345"
             android:layout_width="0dp"

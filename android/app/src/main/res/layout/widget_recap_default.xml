@@ -31,6 +31,7 @@
                 android:scaleType="centerCrop" />
 
             <TextView
+style="@style/WidgetText"
                 android:id="@+id/recap_now"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -92,6 +93,7 @@
                     android:paddingBottom="8dp">
 
                     <TextView
+style="@style/WidgetText"
                         android:id="@+id/recap_total"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -102,6 +104,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+style="@style/WidgetText"
                         android:id="@+id/recap_lbl_total"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -139,6 +142,7 @@
                     android:paddingBottom="8dp">
 
                     <TextView
+style="@style/WidgetText"
                         android:id="@+id/recap_weekly"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -149,6 +153,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+style="@style/WidgetText"
                         android:id="@+id/recap_lbl_week"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -186,6 +191,7 @@
                     android:paddingBottom="8dp">
 
                     <TextView
+style="@style/WidgetText"
                         android:id="@+id/recap_loved"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -196,6 +202,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+style="@style/WidgetText"
                         android:id="@+id/recap_lbl_loved"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

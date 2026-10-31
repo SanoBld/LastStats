@@ -16,7 +16,7 @@ class NowPlayingWidgetProvider : AppWidgetProvider() {
         draw(context, manager, ids)
         // Pull fresh data straight from Last.fm so the widget is never stale.
         val pending = try { goAsync() } catch (_: Throwable) { null }
-        WidgetRefresher.refresh(context) { changed ->
+        WidgetRefresher.refresh(context, NowPlayingWidgetProvider::class.java, track = true) { changed ->
             try { if (changed) draw(context, manager, ids) } finally { pending?.finish() }
         }
     }

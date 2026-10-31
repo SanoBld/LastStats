@@ -320,7 +320,7 @@ Future<void> _mainImpl() async {
 class _WidgetRefreshObserver extends WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) WidgetService.updateAll();
+    if (state == AppLifecycleState.resumed) WidgetService.updateAll(force: false);
   }
 }
 
