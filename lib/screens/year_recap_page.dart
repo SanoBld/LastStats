@@ -2100,19 +2100,20 @@ class _YrShareCard extends StatelessWidget {
           // of the three stat tiles; the lists are spread over the free space.
           : SizedBox(width: 332, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           _header(true),
-          const SizedBox(height: 20),
-          SizedBox(
-            height: 70,
-            child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              Expanded(child: ShareTile(label: tx('yr_scrobbles'), value: fmt(data.total), k: 1.25)),
-              const SizedBox(width: 8),
-              Expanded(child: ShareTile(label: tx('yr_card_hours').replaceAll(RegExp(r'\s*[\(（][^\)）]*[\)）]'), ''), value: fmt(hours), k: 1.25)),
-              const SizedBox(width: 8),
-              Expanded(child: ShareTile(label: tx('yr_card_streak'), value: '${data.longestStreak}', k: 1.25)),
-            ]),
-          ),
+          // Tiles + lists share the free space evenly, so the tiles sit exactly
+          // halfway between the title and "Top artists".
           Expanded(
             child: Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              SizedBox(
+                height: 54,
+                child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                  Expanded(child: ShareTile(label: tx('yr_scrobbles'), value: fmt(data.total), k: 1.0)),
+                  const SizedBox(width: 8),
+                  Expanded(child: ShareTile(label: tx('yr_card_hours').replaceAll(RegExp(r'\s*[\(（][^\)）]*[\)）]'), ''), value: fmt(hours), k: 1.0)),
+                  const SizedBox(width: 8),
+                  Expanded(child: ShareTile(label: tx('yr_card_streak'), value: '${data.longestStreak}', k: 1.0)),
+                ]),
+              ),
               _list(tx('yr_top_artists'), data.artists, 'artists'),
               _list(tx('yr_top_tracks'), data.tracks, 'tracks'),
               _list(tx('yr_top_albums'), data.albums, 'albums'),

@@ -2,7 +2,8 @@
 // moment so even a quick tap shows the morph (CSS :active alone flashes too fast).
 (function () {
   const SEL = '.project-actions a, .project-actions button, .contact-links a, .about-cta, ' +
-    '.lang-toggle, .theme-toggle, .nav-logo, .back-link, .help-external-link, .dl-option, .dl-back, .cm-btn, .cm-sha, .feature-chips span, .project-tags span';
+    '.lang-toggle, .theme-toggle, .nav-logo, .back-link, .help-external-link, .dl-option, .dl-back, .cm-btn, .cm-sha, .feature-chips span, .project-tags span, ' +
+    '.footer .footer-links.footer-buttons a, .rel-filter-btn, .rel-gh, .rel-more, .rel-toggle, .rel-asset, .rel-plat-sum, .cm-tr-btn, .color-random, .m3-carousel-btn';
   document.addEventListener('pointerdown', (e) => {
     const el = e.target.closest(SEL);
     if (!el) return;

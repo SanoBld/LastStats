@@ -59,9 +59,9 @@ class ShareMark extends StatelessWidget {
         children: [
           Text('LastStats', style: TextStyle(
               color: color, fontSize: 11 * k, fontWeight: FontWeight.w700)),
-          SizedBox(width: 2 * k),
+          SizedBox(width: 5 * k),
           // The logo file has wide empty side margins: crop them so the
-          // gap to the text is small.
+          // gap to the text stays small (but not glued to the text).
           Align(widthFactor: 0.4, child: AppLogo(size: 30 * k, color: color)),
         ],
       );
@@ -130,10 +130,13 @@ class ShareTile extends StatelessWidget {
             style: TextStyle(color: s.onPrimaryContainer,
                 fontSize: 18 * k, fontWeight: FontWeight.w900)),
         SizedBox(height: 2 * k),
-        Text(label, maxLines: 2, textAlign: TextAlign.center,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: s.onPrimaryContainer.withValues(alpha: 0.8),
-                fontSize: 10 * k, fontWeight: FontWeight.w600)),
+        // One line only: the label shrinks to fit the tile instead of wrapping
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(label, maxLines: 1, textAlign: TextAlign.center,
+              style: TextStyle(color: s.onPrimaryContainer.withValues(alpha: 0.8),
+                  fontSize: 10 * k, fontWeight: FontWeight.w600)),
+        ),
       ]),
     );
   }
