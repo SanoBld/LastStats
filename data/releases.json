@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-30T23:18:47Z",
+  "updated": "2026-10-31T04:30:09Z",
   "stars": 3,
   "releases": [
     {
@@ -13,25 +13,25 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 48380114,
-          "download_count": 4,
+          "download_count": 6,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 45128842,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 106971112,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 51199016,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/app-x86_64-release.apk"
         },
         {
@@ -43,115 +43,115 @@
         {
           "name": "LastStats-ios.ipa",
           "size": 25589131,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-ios.ipa"
         },
         {
           "name": "LastStats-linux-arm64.AppImage",
           "size": 17902088,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-linux-arm64.AppImage"
         },
         {
           "name": "LastStats-linux-arm64.deb",
           "size": 14457582,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-linux-arm64.deb"
         },
         {
           "name": "LastStats-linux-arm64.rpm",
           "size": 18664845,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-linux-arm64.rpm"
         },
         {
           "name": "laststats-linux-arm64.zip",
           "size": 18929025,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/laststats-linux-arm64.zip"
         },
         {
           "name": "LastStats-linux-x64.AppImage",
           "size": 18360824,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-linux-x64.AppImage"
         },
         {
           "name": "LastStats-linux-x64.deb",
           "size": 14793476,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-linux-x64.deb"
         },
         {
           "name": "LastStats-linux-x64.rpm",
           "size": 19073161,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-linux-x64.rpm"
         },
         {
           "name": "laststats-linux.zip",
           "size": 19392944,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/laststats-linux.zip"
         },
         {
           "name": "LastStats-macos-arm64.dmg",
           "size": 22775652,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-macos-arm64.dmg"
         },
         {
           "name": "laststats-macos-arm64.zip",
           "size": 229376537,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/laststats-macos-arm64.zip"
         },
         {
           "name": "LastStats-macos-x64.dmg",
           "size": 24132608,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-macos-x64.dmg"
         },
         {
           "name": "laststats-macos-x64.zip",
           "size": 230513913,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/laststats-macos-x64.zip"
         },
         {
           "name": "LastStats-macos.dmg",
           "size": 38560468,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-macos.dmg"
         },
         {
           "name": "laststats-macos.zip",
           "size": 243008515,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/laststats-macos.zip"
         },
         {
           "name": "LastStats-Setup-arm64.exe",
           "size": 16247406,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-Setup-arm64.exe"
         },
         {
           "name": "LastStats-Setup-x64.exe",
           "size": 17065355,
-          "download_count": 1,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/LastStats-Setup-x64.exe"
         },
         {
           "name": "laststats-windows-arm64.zip",
           "size": 21604255,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/laststats-windows-arm64.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 22539683,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0-beta/laststats-windows.zip"
         }
       ]
@@ -167,145 +167,145 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 48051914,
-          "download_count": 6,
+          "download_count": 7,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 44767874,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 105922012,
-          "download_count": 3,
+          "download_count": 5,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 50838048,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/app-x86_64-release.apk"
         },
         {
           "name": "install-linux.sh",
           "size": 1940,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/install-linux.sh"
         },
         {
           "name": "LastStats-ios.ipa",
           "size": 25473603,
-          "download_count": 89,
+          "download_count": 92,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/LastStats-ios.ipa"
         },
         {
           "name": "LastStats-linux-arm64.AppImage",
           "size": 17799688,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/LastStats-linux-arm64.AppImage"
         },
         {
           "name": "LastStats-linux-arm64.deb",
           "size": 14328698,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/LastStats-linux-arm64.deb"
         },
         {
           "name": "LastStats-linux-arm64.rpm",
           "size": 18539830,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/LastStats-linux-arm64.rpm"
         },
         {
           "name": "laststats-linux-arm64.zip",
           "size": 18805169,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/laststats-linux-arm64.zip"
         },
         {
           "name": "LastStats-linux-x64.AppImage",
           "size": 18250232,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/LastStats-linux-x64.AppImage"
         },
         {
           "name": "LastStats-linux-x64.deb",
           "size": 14694076,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/LastStats-linux-x64.deb"
         },
         {
           "name": "LastStats-linux-x64.rpm",
           "size": 18949166,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/LastStats-linux-x64.rpm"
         },
         {
           "name": "laststats-linux.zip",
           "size": 19267972,
-          "download_count": 0,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/laststats-linux.zip"
         },
         {
           "name": "LastStats-macos-arm64.dmg",
           "size": 22631497,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/LastStats-macos-arm64.dmg"
         },
         {
           "name": "laststats-macos-arm64.zip",
           "size": 228782329,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/laststats-macos-arm64.zip"
         },
         {
           "name": "LastStats-macos-x64.dmg",
           "size": 23984208,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/LastStats-macos-x64.dmg"
         },
         {
           "name": "laststats-macos-x64.zip",
           "size": 229910108,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/laststats-macos-x64.zip"
         },
         {
           "name": "LastStats-macos.dmg",
           "size": 38885366,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/LastStats-macos.dmg"
         },
         {
           "name": "laststats-macos.zip",
           "size": 242279342,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/laststats-macos.zip"
         },
         {
           "name": "LastStats-Setup-arm64.exe",
           "size": 16174986,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/LastStats-Setup-arm64.exe"
         },
         {
           "name": "LastStats-Setup-x64.exe",
           "size": 16990189,
-          "download_count": 1,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/LastStats-Setup-x64.exe"
         },
         {
           "name": "laststats-windows-arm64.zip",
           "size": 21472342,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/laststats-windows-arm64.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 22412552,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/laststats-windows.zip"
         }
       ]
@@ -321,25 +321,25 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 48051914,
-          "download_count": 5,
+          "download_count": 7,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 44767874,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 105922012,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 50838048,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/app-x86_64-release.apk"
         },
         {
@@ -351,115 +351,115 @@
         {
           "name": "LastStats-ios.ipa",
           "size": 25469868,
-          "download_count": 15,
+          "download_count": 18,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-ios.ipa"
         },
         {
           "name": "LastStats-linux-arm64.AppImage",
           "size": 17799688,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-linux-arm64.AppImage"
         },
         {
           "name": "LastStats-linux-arm64.deb",
           "size": 14323558,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-linux-arm64.deb"
         },
         {
           "name": "LastStats-linux-arm64.rpm",
           "size": 18539820,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-linux-arm64.rpm"
         },
         {
           "name": "laststats-linux-arm64.zip",
           "size": 18804595,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/laststats-linux-arm64.zip"
         },
         {
           "name": "LastStats-linux-x64.AppImage",
           "size": 18250232,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-linux-x64.AppImage"
         },
         {
           "name": "LastStats-linux-x64.deb",
           "size": 14693268,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-linux-x64.deb"
         },
         {
           "name": "LastStats-linux-x64.rpm",
           "size": 18948913,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-linux-x64.rpm"
         },
         {
           "name": "laststats-linux.zip",
           "size": 19267366,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/laststats-linux.zip"
         },
         {
           "name": "LastStats-macos-arm64.dmg",
           "size": 22632970,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-macos-arm64.dmg"
         },
         {
           "name": "laststats-macos-arm64.zip",
           "size": 228783252,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/laststats-macos-arm64.zip"
         },
         {
           "name": "LastStats-macos-x64.dmg",
           "size": 23985207,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-macos-x64.dmg"
         },
         {
           "name": "laststats-macos-x64.zip",
           "size": 229910225,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/laststats-macos-x64.zip"
         },
         {
           "name": "LastStats-macos.dmg",
           "size": 38885703,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-macos.dmg"
         },
         {
           "name": "laststats-macos.zip",
           "size": 242280635,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/laststats-macos.zip"
         },
         {
           "name": "LastStats-Setup-arm64.exe",
           "size": 16173139,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-Setup-arm64.exe"
         },
         {
           "name": "LastStats-Setup-x64.exe",
           "size": 16976519,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/LastStats-Setup-x64.exe"
         },
         {
           "name": "laststats-windows-arm64.zip",
           "size": 21471957,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/laststats-windows-arm64.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 22412340,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/laststats-windows.zip"
         }
       ]
@@ -475,25 +475,25 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 47397418,
-          "download_count": 3,
+          "download_count": 5,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 43982306,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 103825728,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 50183552,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/app-x86_64-release.apk"
         },
         {
@@ -505,115 +505,115 @@
         {
           "name": "LastStats-ios.ipa",
           "size": 25144981,
-          "download_count": 4,
+          "download_count": 6,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-ios.ipa"
         },
         {
           "name": "LastStats-linux-arm64.AppImage",
           "size": 17496584,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-linux-arm64.AppImage"
         },
         {
           "name": "LastStats-linux-arm64.deb",
           "size": 14098758,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-linux-arm64.deb"
         },
         {
           "name": "LastStats-linux-arm64.rpm",
           "size": 18219725,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-linux-arm64.rpm"
         },
         {
           "name": "laststats-linux-arm64.zip",
           "size": 18482956,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/laststats-linux-arm64.zip"
         },
         {
           "name": "LastStats-linux-x64.AppImage",
           "size": 17951224,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-linux-x64.AppImage"
         },
         {
           "name": "LastStats-linux-x64.deb",
           "size": 14450744,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-linux-x64.deb"
         },
         {
           "name": "LastStats-linux-x64.rpm",
           "size": 18625664,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-linux-x64.rpm"
         },
         {
           "name": "laststats-linux.zip",
           "size": 18941036,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/laststats-linux.zip"
         },
         {
           "name": "LastStats-macos-arm64.dmg",
           "size": 22280248,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-macos-arm64.dmg"
         },
         {
           "name": "laststats-macos-arm64.zip",
           "size": 227435365,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/laststats-macos-arm64.zip"
         },
         {
           "name": "LastStats-macos-x64.dmg",
           "size": 23631326,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-macos-x64.dmg"
         },
         {
           "name": "laststats-macos-x64.zip",
           "size": 228559691,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/laststats-macos-x64.zip"
         },
         {
           "name": "LastStats-macos.dmg",
           "size": 37604283,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-macos.dmg"
         },
         {
           "name": "laststats-macos.zip",
           "size": 240600941,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/laststats-macos.zip"
         },
         {
           "name": "LastStats-Setup-arm64.exe",
           "size": 15962777,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-Setup-arm64.exe"
         },
         {
           "name": "LastStats-Setup-x64.exe",
           "size": 16787670,
-          "download_count": 1,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/LastStats-Setup-x64.exe"
         },
         {
           "name": "laststats-windows-arm64.zip",
           "size": 21145104,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/laststats-windows-arm64.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 22087012,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.1.0/laststats-windows.zip"
         }
       ]
@@ -629,25 +629,25 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 44245029,
-          "download_count": 11,
+          "download_count": 12,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 40813533,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 99870519,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 47031163,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/app-x86_64-release.apk"
         },
         {
@@ -659,115 +659,115 @@
         {
           "name": "LastStats-ios.ipa",
           "size": 21733689,
-          "download_count": 3,
+          "download_count": 4,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/LastStats-ios.ipa"
         },
         {
           "name": "LastStats-linux-arm64.AppImage",
           "size": 15075848,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/LastStats-linux-arm64.AppImage"
         },
         {
           "name": "LastStats-linux-arm64.deb",
           "size": 12385008,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/LastStats-linux-arm64.deb"
         },
         {
           "name": "LastStats-linux-arm64.rpm",
           "size": 15538176,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/LastStats-linux-arm64.rpm"
         },
         {
           "name": "laststats-linux-arm64.zip",
           "size": 15785796,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/laststats-linux-arm64.zip"
         },
         {
           "name": "LastStats-linux-x64.AppImage",
           "size": 15530488,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/LastStats-linux-x64.AppImage"
         },
         {
           "name": "LastStats-linux-x64.deb",
           "size": 12734850,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/LastStats-linux-x64.deb"
         },
         {
           "name": "LastStats-linux-x64.rpm",
           "size": 15942521,
-          "download_count": 1,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/LastStats-linux-x64.rpm"
         },
         {
           "name": "laststats-linux.zip",
           "size": 16242451,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/laststats-linux.zip"
         },
         {
           "name": "LastStats-macos-arm64.dmg",
           "size": 18672638,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/LastStats-macos-arm64.dmg"
         },
         {
           "name": "laststats-macos-arm64.zip",
           "size": 211208475,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/laststats-macos-arm64.zip"
         },
         {
           "name": "LastStats-macos-x64.dmg",
           "size": 19960547,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/LastStats-macos-x64.dmg"
         },
         {
           "name": "laststats-macos-x64.zip",
           "size": 212283030,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/laststats-macos-x64.zip"
         },
         {
           "name": "LastStats-macos.dmg",
           "size": 33021334,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/LastStats-macos.dmg"
         },
         {
           "name": "laststats-macos.zip",
           "size": 223528361,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/laststats-macos.zip"
         },
         {
           "name": "LastStats-Setup-arm64.exe",
           "size": 14180455,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/LastStats-Setup-arm64.exe"
         },
         {
           "name": "LastStats-Setup-x64.exe",
           "size": 14982005,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/LastStats-Setup-x64.exe"
         },
         {
           "name": "laststats-windows-arm64.zip",
           "size": 17945332,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/laststats-windows-arm64.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 18851669,
-          "download_count": 0,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.0.0/laststats-windows.zip"
         }
       ]
@@ -783,25 +783,25 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 43194969,
-          "download_count": 10,
+          "download_count": 11,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 39632397,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 96592235,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 45981103,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/app-x86_64-release.apk"
         },
         {
@@ -813,115 +813,115 @@
         {
           "name": "LastStats-ios.ipa",
           "size": 21211687,
-          "download_count": 6,
+          "download_count": 7,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-ios.ipa"
         },
         {
           "name": "LastStats-linux-arm64.AppImage",
           "size": 14625288,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-linux-arm64.AppImage"
         },
         {
           "name": "LastStats-linux-arm64.deb",
           "size": 11989570,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-linux-arm64.deb"
         },
         {
           "name": "LastStats-linux-arm64.rpm",
           "size": 15040598,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-linux-arm64.rpm"
         },
         {
           "name": "laststats-linux-arm64.zip",
           "size": 15284204,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/laststats-linux-arm64.zip"
         },
         {
           "name": "LastStats-linux-x64.AppImage",
           "size": 15075832,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-linux-x64.AppImage"
         },
         {
           "name": "LastStats-linux-x64.deb",
           "size": 12337362,
-          "download_count": 1,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-linux-x64.deb"
         },
         {
           "name": "LastStats-linux-x64.rpm",
           "size": 15449887,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-linux-x64.rpm"
         },
         {
           "name": "laststats-linux.zip",
           "size": 15738446,
-          "download_count": 0,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/laststats-linux.zip"
         },
         {
           "name": "LastStats-macos-arm64.dmg",
           "size": 18002133,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-macos-arm64.dmg"
         },
         {
           "name": "laststats-macos-arm64.zip",
           "size": 209317650,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/laststats-macos-arm64.zip"
         },
         {
           "name": "LastStats-macos-x64.dmg",
           "size": 19372472,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-macos-x64.dmg"
         },
         {
           "name": "laststats-macos-x64.zip",
           "size": 210384271,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/laststats-macos-x64.zip"
         },
         {
           "name": "LastStats-macos.dmg",
           "size": 32526955,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-macos.dmg"
         },
         {
           "name": "laststats-macos.zip",
           "size": 221110814,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/laststats-macos.zip"
         },
         {
           "name": "LastStats-Setup-arm64.exe",
           "size": 13835752,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-Setup-arm64.exe"
         },
         {
           "name": "LastStats-Setup-x64.exe",
           "size": 14630767,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/LastStats-Setup-x64.exe"
         },
         {
           "name": "laststats-windows-arm64.zip",
           "size": 17435739,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/laststats-windows-arm64.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 18341260,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.6.0-beta/laststats-windows.zip"
         }
       ]
@@ -937,61 +937,61 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 40397751,
-          "download_count": 16,
+          "download_count": 17,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.5.0/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 36720495,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.5.0/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 92697289,
-          "download_count": 1,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.5.0/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 43118353,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.5.0/app-x86_64-release.apk"
         },
         {
           "name": "laststats-linux.zip",
           "size": 15515706,
-          "download_count": 3,
+          "download_count": 4,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.5.0/laststats-linux.zip"
         },
         {
           "name": "laststats-macos.zip",
           "size": 320083712,
-          "download_count": 4,
+          "download_count": 5,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.5.0/laststats-macos.zip"
         },
         {
           "name": "LastStats-Setup-arm64.exe",
           "size": 13680593,
-          "download_count": 1,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.5.0/LastStats-Setup-arm64.exe"
         },
         {
           "name": "LastStats-Setup-x64.exe",
           "size": 14470607,
-          "download_count": 2,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.5.0/LastStats-Setup-x64.exe"
         },
         {
           "name": "laststats-windows-arm64.zip",
           "size": 17174296,
-          "download_count": 0,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.5.0/laststats-windows-arm64.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 18116797,
-          "download_count": 1,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.5.0/laststats-windows.zip"
         }
       ]
@@ -1007,61 +1007,61 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 41163790,
-          "download_count": 16,
+          "download_count": 17,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.2.0/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 37453770,
-          "download_count": 1,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.2.0/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 92775204,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.2.0/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 43884392,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.2.0/app-x86_64-release.apk"
         },
         {
           "name": "laststats-linux.zip",
           "size": 16308778,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.2.0/laststats-linux.zip"
         },
         {
           "name": "laststats-macos.zip",
           "size": 323975925,
-          "download_count": 2,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.2.0/laststats-macos.zip"
         },
         {
           "name": "LastStats-Setup-arm64.exe",
           "size": 14501930,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.2.0/LastStats-Setup-arm64.exe"
         },
         {
           "name": "LastStats-Setup-x64.exe",
           "size": 15299747,
-          "download_count": 1,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.2.0/LastStats-Setup-x64.exe"
         },
         {
           "name": "laststats-windows-arm64.zip",
           "size": 17945669,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.2.0/laststats-windows-arm64.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 18890483,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.2.0/laststats-windows.zip"
         }
       ]
@@ -1077,61 +1077,61 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 39440448,
-          "download_count": 7,
+          "download_count": 9,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.1.0/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 35697656,
-          "download_count": 3,
+          "download_count": 4,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.1.0/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 90888018,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.1.0/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 42161042,
-          "download_count": 4,
+          "download_count": 5,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.1.0/app-x86_64-release.apk"
         },
         {
           "name": "laststats-linux.zip",
           "size": 16268479,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.1.0/laststats-linux.zip"
         },
         {
           "name": "laststats-macos.zip",
           "size": 323489338,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.1.0/laststats-macos.zip"
         },
         {
           "name": "LastStats-Setup-arm64.exe",
           "size": 14475872,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.1.0/LastStats-Setup-arm64.exe"
         },
         {
           "name": "LastStats-Setup-x64.exe",
           "size": 15261407,
-          "download_count": 1,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.1.0/LastStats-Setup-x64.exe"
         },
         {
           "name": "laststats-windows-arm64.zip",
           "size": 17912514,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.1.0/laststats-windows-arm64.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 18849597,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.1.0/laststats-windows.zip"
         }
       ]
@@ -1147,61 +1147,61 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 32288236,
-          "download_count": 14,
+          "download_count": 17,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.0.0/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 30044932,
-          "download_count": 2,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.0.0/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 73871090,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.0.0/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 33746056,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.0.0/app-x86_64-release.apk"
         },
         {
           "name": "laststats-linux.zip",
           "size": 16425066,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.0.0/laststats-linux.zip"
         },
         {
           "name": "laststats-macos.zip",
           "size": 317510207,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.0.0/laststats-macos.zip"
         },
         {
           "name": "LastStats-Setup-arm64.exe",
           "size": 14758236,
-          "download_count": 1,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.0.0/LastStats-Setup-arm64.exe"
         },
         {
           "name": "LastStats-Setup-x64.exe",
           "size": 15541416,
-          "download_count": 2,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.0.0/LastStats-Setup-x64.exe"
         },
         {
           "name": "laststats-windows-arm64.zip",
           "size": 18205869,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.0.0/laststats-windows-arm64.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 19129738,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v3.0.0/laststats-windows.zip"
         }
       ]
@@ -1217,61 +1217,61 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 32090372,
-          "download_count": 4,
+          "download_count": 5,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.9-beta/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 29879836,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.9-beta/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 73378314,
-          "download_count": 1,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.9-beta/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 33613728,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.9-beta/app-x86_64-release.apk"
         },
         {
           "name": "laststats-linux.zip",
           "size": 16362812,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.9-beta/laststats-linux.zip"
         },
         {
           "name": "laststats-macos.zip",
           "size": 316592365,
-          "download_count": 0,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.9-beta/laststats-macos.zip"
         },
         {
           "name": "LastStats-Setup-arm64.exe",
           "size": 14714991,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.9-beta/LastStats-Setup-arm64.exe"
         },
         {
           "name": "LastStats-Setup-x64.exe",
           "size": 15479240,
-          "download_count": 1,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.9-beta/LastStats-Setup-x64.exe"
         },
         {
           "name": "laststats-windows-arm64.zip",
           "size": 18140187,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.9-beta/laststats-windows-arm64.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 19065220,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.9-beta/laststats-windows.zip"
         }
       ]
@@ -1287,43 +1287,43 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 31893148,
-          "download_count": 2,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.6-beta/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 29617072,
-          "download_count": 0,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.6-beta/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 72722338,
-          "download_count": 6,
+          "download_count": 7,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.6-beta/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 33416508,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.6-beta/app-x86_64-release.apk"
         },
         {
           "name": "laststats-linux.zip",
           "size": 16191190,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.6-beta/laststats-linux.zip"
         },
         {
           "name": "laststats-macos.zip",
           "size": 314052096,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.6-beta/laststats-macos.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 18897662,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.6-beta/laststats-windows.zip"
         }
       ]
@@ -1339,43 +1339,43 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 30986705,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5.1-beta/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 28612197,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5.1-beta/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 69947655,
-          "download_count": 7,
+          "download_count": 9,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5.1-beta/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 32444065,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5.1-beta/app-x86_64-release.apk"
         },
         {
           "name": "laststats-linux.zip",
           "size": 15723252,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5.1-beta/laststats-linux.zip"
         },
         {
           "name": "laststats-macos.zip",
           "size": 307934308,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5.1-beta/laststats-macos.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 18214786,
-          "download_count": 1,
+          "download_count": 4,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5.1-beta/laststats-windows.zip"
         }
       ]
@@ -1391,43 +1391,43 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 30986705,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 28612197,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 69947651,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 32444061,
-          "download_count": 0,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5/app-x86_64-release.apk"
         },
         {
           "name": "laststats-linux.zip",
           "size": 15723164,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5/laststats-linux.zip"
         },
         {
           "name": "laststats-macos.zip",
           "size": 307934653,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5/laststats-macos.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 18214782,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.5/laststats-windows.zip"
         }
       ]
@@ -1443,43 +1443,43 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 27717155,
-          "download_count": 1,
+          "download_count": 4,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.2/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 25342647,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.2/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 66678105,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.2/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 29174515,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.2/app-x86_64-release.apk"
         },
         {
           "name": "laststats-linux.zip",
           "size": 12447785,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.2/laststats-linux.zip"
         },
         {
           "name": "laststats-macos.zip",
           "size": 288306494,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.2/laststats-macos.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 14972945,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.2/laststats-windows.zip"
         }
       ]
@@ -1495,43 +1495,43 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 27717155,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.1/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 25342647,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.1/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 66678101,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.1/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 29174511,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.1/app-x86_64-release.apk"
         },
         {
           "name": "laststats-linux.zip",
           "size": 12447851,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.1/laststats-linux.zip"
         },
         {
           "name": "laststats-macos.zip",
           "size": 288305606,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.1/laststats-macos.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 14973010,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4.1/laststats-windows.zip"
         }
       ]
@@ -1547,37 +1547,37 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 27650607,
-          "download_count": 2,
+          "download_count": 4,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 25341843,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 66611329,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 29173279,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4/app-x86_64-release.apk"
         },
         {
           "name": "laststats-linux.zip",
           "size": 12444765,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4/laststats-linux.zip"
         },
         {
           "name": "laststats-macos.zip",
           "size": 288296108,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.4/laststats-macos.zip"
         },
         {
@@ -1599,43 +1599,43 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 27650023,
-          "download_count": 2,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.3/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 25259343,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.3/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 66528829,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.3/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 29172695,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.3/app-x86_64-release.apk"
         },
         {
           "name": "laststats-linux.zip",
           "size": 12422609,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.3/laststats-linux.zip"
         },
         {
           "name": "laststats-macos.zip",
           "size": 287989035,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.3/laststats-macos.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 14951749,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.3/laststats-windows.zip"
         }
       ]
@@ -1651,43 +1651,43 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 27518343,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.2/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 25209583,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.2/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 66216925,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.2/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 29041015,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.2/app-x86_64-release.apk"
         },
         {
           "name": "laststats-linux.zip",
           "size": 12403984,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.2/laststats-linux.zip"
         },
         {
           "name": "laststats-macos.zip",
           "size": 287738702,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.2/laststats-macos.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 14928824,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.2/laststats-windows.zip"
         }
       ]
@@ -1703,43 +1703,43 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 27452655,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.1/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 25111123,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.1/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 65987397,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.1/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 28975327,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.1/app-x86_64-release.apk"
         },
         {
           "name": "laststats-linux.zip",
           "size": 12367159,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.1/laststats-linux.zip"
         },
         {
           "name": "laststats-macos.zip",
           "size": 287242232,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.1/laststats-macos.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 14888554,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.1/laststats-windows.zip"
         }
       ]
@@ -1755,43 +1755,43 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 27452543,
-          "download_count": 1,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.0/app-arm64-v8a-release.apk"
         },
         {
           "name": "app-armeabi-v7a-release.apk",
           "size": 25094627,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.0/app-armeabi-v7a-release.apk"
         },
         {
           "name": "app-universal-release.apk",
           "size": 65970897,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.0/app-universal-release.apk"
         },
         {
           "name": "app-x86_64-release.apk",
           "size": 28975215,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.0/app-x86_64-release.apk"
         },
         {
           "name": "laststats-linux.zip",
           "size": 12358424,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.0/laststats-linux.zip"
         },
         {
           "name": "laststats-macos.zip",
           "size": 287178816,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.0/laststats-macos.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 14886479,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.9.0/laststats-windows.zip"
         }
       ]
@@ -1807,25 +1807,25 @@
         {
           "name": "app-release.apk",
           "size": 64920593,
-          "download_count": 6,
+          "download_count": 7,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.6.0/app-release.apk"
         },
         {
           "name": "laststats-linux.zip",
           "size": 12217826,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.6.0/laststats-linux.zip"
         },
         {
           "name": "laststats-macos.zip",
           "size": 285212349,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.6.0/laststats-macos.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 14447056,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.6.0/laststats-windows.zip"
         }
       ]
@@ -1841,25 +1841,25 @@
         {
           "name": "app-release.apk",
           "size": 58336480,
-          "download_count": 10,
+          "download_count": 12,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.5.0/app-release.apk"
         },
         {
           "name": "linux.zip",
           "size": 11959779,
-          "download_count": 2,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.5.0/linux.zip"
         },
         {
           "name": "macos.zip",
           "size": 277544590,
-          "download_count": 4,
+          "download_count": 7,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.5.0/macos.zip"
         },
         {
           "name": "windows.zip",
           "size": 14233900,
-          "download_count": 3,
+          "download_count": 5,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.5.0/windows.zip"
         }
       ]
@@ -1875,25 +1875,25 @@
         {
           "name": "app-release.apk",
           "size": 57025238,
-          "download_count": 5,
+          "download_count": 6,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.1.0/app-release.apk"
         },
         {
           "name": "laststats-linux.zip",
           "size": 11880169,
-          "download_count": 2,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.1.0/laststats-linux.zip"
         },
         {
           "name": "laststats-macos.zip",
           "size": 276106767,
-          "download_count": 2,
+          "download_count": 4,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.1.0/laststats-macos.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 14126922,
-          "download_count": 2,
+          "download_count": 4,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.1.0/laststats-windows.zip"
         }
       ]
@@ -1909,31 +1909,31 @@
         {
           "name": "app-release.apk",
           "size": 54651414,
-          "download_count": 1,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.0.1/app-release.apk"
         },
         {
           "name": "laststats-linux.zip",
           "size": 10773686,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.0.1/laststats-linux.zip"
         },
         {
           "name": "laststats-macos.zip",
           "size": 268124873,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.0.1/laststats-macos.zip"
         },
         {
           "name": "laststats-web.zip",
           "size": 14362029,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.0.1/laststats-web.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 13016747,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.0.1/laststats-windows.zip"
         }
       ]
@@ -1949,31 +1949,31 @@
         {
           "name": "app-release.apk",
           "size": 54421794,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.0.0/app-release.apk"
         },
         {
           "name": "laststats-linux.zip",
           "size": 10741503,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.0.0/laststats-linux.zip"
         },
         {
           "name": "laststats-macos.zip",
           "size": 267731912,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.0.0/laststats-macos.zip"
         },
         {
           "name": "laststats-web.zip",
           "size": 14352067,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.0.0/laststats-web.zip"
         },
         {
           "name": "laststats-windows.zip",
           "size": 12989021,
-          "download_count": 1,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v2.0.0/laststats-windows.zip"
         }
       ]
@@ -1989,31 +1989,31 @@
         {
           "name": "laststats-android-apk.zip",
           "size": 24800742,
-          "download_count": 2,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v1.2.0/laststats-android-apk.zip"
         },
         {
           "name": "laststats-linux-app.zip",
           "size": 19597666,
-          "download_count": 0,
+          "download_count": 1,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v1.2.0/laststats-linux-app.zip"
         },
         {
           "name": "laststats-macos-app.zip",
           "size": 262411010,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v1.2.0/laststats-macos-app.zip"
         },
         {
           "name": "laststats-web-app.zip",
           "size": 12540752,
-          "download_count": 0,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v1.2.0/laststats-web-app.zip"
         },
         {
           "name": "laststats-windows-app.zip",
           "size": 12960269,
-          "download_count": 0,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v1.2.0/laststats-windows-app.zip"
         }
       ]
