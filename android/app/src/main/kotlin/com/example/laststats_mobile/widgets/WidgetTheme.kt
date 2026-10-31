@@ -17,7 +17,8 @@ data class WidgetPalette(
     val accent: Int,
     val onChip: Int = text,
     val tertiary: Int = accent,   // poster blobs (like the share images)
-    val secondary: Int = accent
+    val secondary: Int = accent,
+    val posterMix: Float = 0.45f   // how much container color the poster card gets
 )
 
 object WidgetTheme {
@@ -65,6 +66,21 @@ object WidgetTheme {
             Color.HSVToColor(t), Color.HSVToColor(sec))
     }
 
+    // Exact colors of the app's own ColorScheme (computed in Dart: accent, day/night
+    // accent, color harmony, OLED...) so widgets match the app and the share images.
+    private fun schemePalette(data: SharedPreferences, dark: Boolean): WidgetPalette? {
+        val pre = if (dark) "sc_d_" else "sc_l_"
+        fun col(k: String): Int? = data.getString(pre + k, null)?.toLongOrNull()?.toInt()
+        val surface = col("surface") ?: return null
+        val container = col("container") ?: return null
+        val text = col("on_surface") ?: return null
+        val muted = col("on_variant") ?: return null
+        val primary = col("primary") ?: return null
+        val onContainer = col("on_container") ?: return null
+        return WidgetPalette(surface, container, text, muted, primary, onContainer,
+            col("tertiary") ?: primary, col("secondary") ?: primary)
+    }
+
     fun resolve(context: Context, data: SharedPreferences): WidgetPalette {
         val style = data.getString("theme_style", "default") ?: "default"
         val mode = data.getString("theme_mode", "system") ?: "system"
@@ -80,8 +96,11 @@ object WidgetTheme {
 
         if (style != "nothing") {
             val dynamic = data.getBoolean("use_dynamic_color", false)
-            return if (dynamic && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S)
-                materialYou(context, isDark) else accentPalette(data, isDark)
+            val tint = data.getBoolean("widget_tint", false)
+            val base = if (dynamic && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S)
+                materialYou(context, isDark)
+            else schemePalette(data, isDark) ?: accentPalette(data, isDark)
+            return base.copy(posterMix = if (tint) 0.45f else 0.18f)
         }
         val accent = if (style == "nothing") {
             Color.parseColor("#FF2020")

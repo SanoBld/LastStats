@@ -10,7 +10,23 @@ import com.example.laststats_mobile.R
 import es.antonborri.home_widget.HomeWidgetPlugin
 
 class WeeklyScrobblesWidgetProvider : AppWidgetProvider() {
-    override fun onUpdate(
+    override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
+        draw(context, manager, ids)
+        // Pull fresh data straight from Last.fm so the widget is never stale.
+        val pending = try { goAsync() } catch (_: Throwable) { null }
+        WidgetRefresher.refresh(context) { changed ->
+            try { if (changed) draw(context, manager, ids) } finally { pending?.finish() }
+        }
+    }
+
+    // Resizing: redraw so the card background matches the new size (keeps corners round).
+    override fun onAppWidgetOptionsChanged(
+        context: Context, manager: AppWidgetManager, id: Int, newOptions: android.os.Bundle
+    ) {
+        draw(context, manager, intArrayOf(id))
+    }
+
+    private fun draw(
         context: Context,
         manager: AppWidgetManager,
         ids: IntArray

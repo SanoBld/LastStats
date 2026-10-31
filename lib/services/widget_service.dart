@@ -4,10 +4,12 @@
 // Keep it simple: fetch, save keys, ask Android to redraw each widget.
 
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart' show Brightness, ColorScheme, Colors;
 import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'lastfm_service.dart';
 import 'image_service.dart';
+import '../app_state.dart' show accentFromString, buildAppScheme, isNightByHour;
 
 class WidgetService {
   // Must match the Kotlin provider class names (App Widget IDs).
@@ -39,6 +41,8 @@ class WidgetService {
       await HomeWidget.saveWidgetData<String>('theme_mode', themeMode);
       await HomeWidget.saveWidgetData<String>('accent_light', accentLight);
       await HomeWidget.saveWidgetData<String>('accent_dark', accentDark);
+      await HomeWidget.saveWidgetData<String>('api_key', apiKey); // native refresh
+      await _saveScheme(prefs);
       await HomeWidget.saveWidgetData<bool>('widget_tint', widgetTint);
       await HomeWidget.saveWidgetData<bool>(
           'use_dynamic_color', prefs.getBool('ls_use_dynamic_color') ?? false);
@@ -118,6 +122,44 @@ class WidgetService {
     } catch (_) {
       // Widgets are best-effort — never crash the caller (worker or app).
     }
+  }
+
+  // Same ColorScheme the app builds (accent, day/night accent, harmony, OLED), so the
+  // widgets match the app and the share images exactly.
+  static Future<void> _saveScheme(SharedPreferences prefs) async {
+    try {
+      final harmony = prefs.getString('ls_color_harmony') ?? 'mono';
+      final accent = accentFromString(prefs.getString('ls_accent'));
+      final darkRaw = prefs.getString('ls_accent_dark');
+      final accentDark = darkRaw != null ? accentFromString(darkRaw) : accent;
+      final dayNight = prefs.getBool('ls_use_daynight_accent') ?? false;
+      final hours = prefs.getBool('ls_daynight_use_hours') ?? false;
+      final night = hours
+          ? isNightByHour(prefs.getInt('ls_daynight_day_start_hour') ?? 7,
+              prefs.getInt('ls_daynight_night_start_hour') ?? 20)
+          : false;
+      final lightAccent = !dayNight ? accent : (hours ? (night ? accentDark : accent) : accent);
+      final darkAccent = !dayNight ? accent : (hours ? (night ? accentDark : accent) : accentDark);
+      final light = buildAppScheme(lightAccent, Brightness.light, harmony);
+      var dark = buildAppScheme(darkAccent, Brightness.dark, harmony);
+      if (prefs.getBool('ls_oled_mode') ?? false) {
+        dark = dark.copyWith(surface: Colors.black);
+      }
+      Future<void> put(String p, ColorScheme c) async {
+        Future<void> w(String k, int v) =>
+            HomeWidget.saveWidgetData<String>('sc_${p}_$k', '$v');
+        await w('surface', c.surface.toARGB32());
+        await w('container', c.primaryContainer.toARGB32());
+        await w('on_surface', c.onSurface.toARGB32());
+        await w('on_variant', c.onSurfaceVariant.toARGB32());
+        await w('primary', c.primary.toARGB32());
+        await w('on_container', c.onPrimaryContainer.toARGB32());
+        await w('tertiary', c.tertiary.toARGB32());
+        await w('secondary', c.secondary.toARGB32());
+      }
+      await put('l', light);
+      await put('d', dark);
+    } catch (_) {}
   }
 
   /// Lightweight push — no network call. Reuses now-playing data the app

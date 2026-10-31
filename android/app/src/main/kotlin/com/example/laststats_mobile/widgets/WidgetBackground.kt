@@ -74,7 +74,7 @@ object WidgetBackground {
             context.resources.getDimension(R.dimen.widget_corner) * scale,
             min(w, h) / 2f)
         // flat poster color: surface + a touch of the container color
-        paint.color = blend(p.surface, p.chip, 0.45f)
+        paint.color = blend(p.surface, p.chip, p.posterMix)
         c.drawRoundRect(RectF(0f, 0f, w.toFloat(), h.toFloat()), corner, corner, paint)
 
         // blobs only where the card is already drawn (keeps the rounded corners)

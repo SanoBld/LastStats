@@ -50,7 +50,7 @@
             android:includeFontPadding="false"
             android:autoSizeTextType="uniform"
             android:autoSizeMinTextSize="14sp"
-            android:autoSizeMaxTextSize="34sp"
+            android:autoSizeMaxTextSize="48sp"
             android:textStyle="bold" />
     </LinearLayout>
 </FrameLayout>
