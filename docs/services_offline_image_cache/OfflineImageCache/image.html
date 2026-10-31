@@ -83,6 +83,26 @@
   final ph = placeholder ?? M3ImagePlaceholder(width: width, height: height);
   if (url.isEmpty) return placeholder ?? const SizedBox.shrink();
 
+  &#47;&#47; Fast path: already in memory → show it in the same frame, no
+  &#47;&#47; placeholder flash and no disk read.
+  final hot = _mem[url];
+  if (hot != null &amp;&amp; _meta.containsKey(url)) {
+    return Builder(builder: (context) {
+      final dpr = MediaQuery.of(context).devicePixelRatio;
+      return Image.memory(
+        hot,
+        width: width,
+        height: height,
+        fit: fit,
+        cacheWidth:  width  != null ? (width * dpr).round()  : null,
+        cacheHeight: height != null ? (height * dpr).round() : null,
+        gaplessPlayback: true,
+        errorBuilder: (_, _, _) =&gt;
+            errorWidget ?? placeholder ?? const SizedBox.shrink(),
+      );
+    });
+  }
+
   &#47;&#47; Cache checked FIRST (offline or online) — network is only a fallback.
   return FutureBuilder&lt;Uint8List?&gt;(
     future: _ensureMeta().then((_) =&gt; _getBytes(url)),

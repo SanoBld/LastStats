@@ -84,6 +84,8 @@
     freed      += kv.value.size;
     _totalBytes -= kv.value.size;
     _meta.remove(kv.key);
+    final m = _mem.remove(kv.key);
+    if (m != null) _memBytes -= m.length;
   }
   await _saveMeta();
 }</code></pre>

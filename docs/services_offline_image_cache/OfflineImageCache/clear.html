@@ -67,6 +67,8 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; clear() async {
+  _mem.clear();
+  _memBytes = 0;
   _meta.clear();
   _totalBytes = 0;
   _nextId     = 0;

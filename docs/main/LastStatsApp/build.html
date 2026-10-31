@@ -200,9 +200,9 @@ Widget build(BuildContext context) {
                                   return ValueListenableBuilder&lt;int&gt;(
                                     valueListenable: nightStartHourNotifier,
                                     builder: (_, nightStartHour, _) {
-                                      return ValueListenableBuilder&lt;int&gt;(
-                                        valueListenable: minuteTickNotifier,
-                                        builder: (_, _, _) {
+                                      return ListenableBuilder(
+                                        listenable: Listenable.merge([minuteTickNotifier, useNowPlayingColorNotifier]),
+                                        builder: (_, _) {
                   &#47;&#47; Resolve which accent feeds the light theme and which
                   &#47;&#47; feeds the dark theme. With hour-based switching on,
                   &#47;&#47; both themes get the *same* accent (the one matching
@@ -211,10 +211,13 @@ Widget build(BuildContext context) {
                   final bool nightNow = useHours
                       ? isNightByHour(dayStartHour, nightStartHour)
                       : false;
-                  final Color lightAccent = !useDayNight
+                  &#47;&#47; &quot;Colour from the music&quot; on: the base accent options are
+                  &#47;&#47; greyed out, so they must not be used (day&#47;night included).
+                  final bool np = useNowPlayingColorNotifier.value &amp;&amp; !useDynamic;
+                  final Color lightAccent = (!useDayNight || np)
                       ? accent
                       : (useHours ? (nightNow ? accentDark : accent) : accent);
-                  final Color darkAccent = !useDayNight
+                  final Color darkAccent = (!useDayNight || np)
                       ? accent
                       : (useHours ? (nightNow ? accentDark : accent) : accentDark);
                   return ValueListenableBuilder&lt;ThemeMode&gt;(

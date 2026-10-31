@@ -71,33 +71,46 @@
   <pre class="language-dart"><code class="language-dart">static Future&lt;String&gt; getLyrics(String artist, String track) async {
   if (artist.isEmpty || track.isEmpty) return &#39;&#39;;
 
-  &#47;&#47; 1 — lrclib.net
-  try {
-    final uri = Uri.https(&#39;lrclib.net&#39;, &#39;&#47;api&#47;get&#39;, {
-      &#39;artist_name&#39;: artist,
-      &#39;track_name&#39;:  track,
-    });
-    final res = await ApiHttp.get(uri).timeout(_timeout);
-    if (res.statusCode == 200) {
-      final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map&lt;String, dynamic&gt;;
-      final plain = (data[&#39;plainLyrics&#39;] as String? ?? &#39;&#39;).trim();
-      if (plain.isNotEmpty) return plain;
-    }
-  } catch (_) {}
+  &#47;&#47; Try the original names first, then the cleaned ones (if different).
+  final pairs = &lt;(String, String)&gt;[(artist, track)];
+  final cA = _mainArtist(artist), cT = _cleanTitle(track);
+  if ((cA, cT) != (artist, track) &amp;&amp; cT.isNotEmpty) pairs.add((cA, cT));
 
-  &#47;&#47; 2 — lyrics.ovh fallback
-  try {
-    final uri = Uri.https(
-      &#39;api.lyrics.ovh&#39;,
-      &#39;&#47;v1&#47;${Uri.encodeComponent(artist)}&#47;${Uri.encodeComponent(track)}&#39;,
-    );
-    final res = await ApiHttp.get(uri).timeout(_timeout);
-    if (res.statusCode == 200) {
-      final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map&lt;String, dynamic&gt;;
-      return (data[&#39;lyrics&#39;] as String? ?? &#39;&#39;).trim();
-    }
-  } catch (_) {}
+  for (final (a, t) in pairs) {
+    &#47;&#47; 1 — lrclib exact match
+    try {
+      final res = await ApiHttp.get(Uri.https(&#39;lrclib.net&#39;, &#39;&#47;api&#47;get&#39;,
+          {&#39;artist_name&#39;: a, &#39;track_name&#39;: t})).timeout(_timeout);
+      if (res.statusCode == 200) {
+        final r = _fromLrclib(jsonDecode(utf8.decode(res.bodyBytes)) as Map&lt;String, dynamic&gt;);
+        if (r.isNotEmpty) return r;
+      }
+    } catch (_) {}
 
+    &#47;&#47; 2 — lrclib search (finds tracks the exact match misses)
+    try {
+      final res = await ApiHttp.get(Uri.https(&#39;lrclib.net&#39;, &#39;&#47;api&#47;search&#39;,
+          {&#39;artist_name&#39;: a, &#39;track_name&#39;: t})).timeout(_timeout);
+      if (res.statusCode == 200) {
+        final list = jsonDecode(utf8.decode(res.bodyBytes)) as List;
+        for (final e in list.take(5)) {
+          final r = _fromLrclib(e as Map&lt;String, dynamic&gt;);
+          if (r.isNotEmpty) return r;
+        }
+      }
+    } catch (_) {}
+
+    &#47;&#47; 3 — lyrics.ovh (plain text only)
+    try {
+      final res = await ApiHttp.get(Uri.https(&#39;api.lyrics.ovh&#39;,
+          &#39;&#47;v1&#47;${Uri.encodeComponent(a)}&#47;${Uri.encodeComponent(t)}&#39;)).timeout(_timeout);
+      if (res.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map&lt;String, dynamic&gt;;
+        final r = (data[&#39;lyrics&#39;] as String? ?? &#39;&#39;).trim();
+        if (r.isNotEmpty) return r;
+      }
+    } catch (_) {}
+  }
   return &#39;&#39;;
 }</code></pre>
 </section>

@@ -82,6 +82,7 @@
       size:    bytes.length,
     );
     await ImageCacheBackend.write(old.fileKey, bytes);
+    _memPut(url, bytes);
     await _saveMeta();
     return;
   }
@@ -101,6 +102,7 @@
   );
   _totalBytes += bytes.length;
   await ImageCacheBackend.write(key, bytes);
+  _memPut(url, bytes);
   await _saveMeta();
 }</code></pre>
 </section>
