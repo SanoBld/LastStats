@@ -32,6 +32,26 @@
 
 ## v4.3.0
 
+**Widgets**
+- New calendar widget: one square per day, like GitHub, in the app colours; today's number refreshes on its own
+- All logos removed from the widgets
+- Widgets use the app font, ask Last.fm only for what they show and redraw less often to save battery
+- The stats logo is now centred in widgets and notifications
+
+**News and notifications**
+- "Mark all as read" in the news page; unread items have a coloured frame and are marked read when opened
+- "Mark all as read" on a notification now also clears the other LastStats notifications and the update notification
+- Download / Share in the news sheet use the connected Material buttons; the update sheet buttons sit higher, away from the navigation bar
+
+**App icon**
+- Real adaptive icons for each icon variant (better on Nothing Phone launchers)
+
+**Share images**
+- Year recap: new layout using the full 9:16 height, bigger stat tiles, picture ending in the middle of the tiles
+- Artist, album, track and friend posters are now 9:16 instead of square-ish
+- Smaller gap between "LastStats" and the logo on every share image
+
+
 **Updates**
 - Download now fetches the update inside the app (animated wavy progress) and opens the installer directly, from the updates page, the version history, the news and the update notification (Android: you only confirm the install; Windows: silent installer, then the app restarts); clear messages if the install permission is missing or the download fails, in all 10 languages
 - Version history: Download now saves the file straight into your Downloads folder from inside the app, with no browser

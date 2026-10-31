@@ -59,8 +59,10 @@ class ShareMark extends StatelessWidget {
         children: [
           Text('LastStats', style: TextStyle(
               color: color, fontSize: 11 * k, fontWeight: FontWeight.w700)),
-          SizedBox(width: 8 * k),
-          AppLogo(size: 26 * k, color: color),
+          SizedBox(width: 2 * k),
+          // The logo file has wide empty side margins: crop them so the
+          // gap to the text is small.
+          Align(widthFactor: 0.4, child: AppLogo(size: 30 * k, color: color)),
         ],
       );
 }

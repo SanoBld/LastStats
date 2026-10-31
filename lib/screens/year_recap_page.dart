@@ -1985,11 +1985,11 @@ class _YrShareCard extends StatelessWidget {
       const SizedBox(height: 6),
       for (var i = 0; i < items.length && i < 3; i++)
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2),
+          padding: const EdgeInsets.symmetric(vertical: 3),
           child: Row(children: [
-            ShareRank(n: i + 1, size: 22),
+            ShareRank(n: i + 1, size: 24),
             const SizedBox(width: 8),
-            _YrImg(name: items[i].name, artist: items[i].artist, type: type, size: 36, round: type == 'artists'),
+            _YrImg(name: items[i].name, artist: items[i].artist, type: type, size: 38, round: type == 'artists'),
             const SizedBox(width: 10),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -2021,7 +2021,7 @@ class _YrShareCard extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            height: 170, // top quarter of the card
+            height: slide != null ? 170 : 134, // full recap: ends in the middle of the stat tiles
             child: ShaderMask(
               blendMode: BlendMode.dstIn,
               shaderCallback: (r) => const LinearGradient(
@@ -2047,7 +2047,7 @@ class _YrShareCard extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            height: 170,
+            height: slide != null ? 170 : 134,
             child: DecoratedBox(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
@@ -2074,15 +2074,13 @@ class _YrShareCard extends StatelessWidget {
         Container(
         width: 360,
         height: 640, // 9:16 (story format), exported at 3x = 1080x1920
-        padding: const EdgeInsets.fromLTRB(14, 22, 14, 14),
-        // FittedBox shrinks the content if it is ever taller than the card
-        child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.topCenter, child: SizedBox(width: 332, child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-          if (slide != null) const SizedBox(height: 28),
-          Text(displayNameNotifier.value.trim().isNotEmpty ? displayNameNotifier.value.trim() : username, style: TextStyle(color: photo == null ? _yrSoft(scheme) : (photoDark ? Colors.white : const Color(0xFF111111)), fontSize: 12, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 4),
-          Text(tx('yr_intro_h', {'year': '$year'}), style: TextStyle(color: photo == null ? scheme.onSurface : (photoDark ? Colors.white : const Color(0xFF111111)), fontSize: 22, fontWeight: FontWeight.w900, height: 1.1)),
+        padding: EdgeInsets.fromLTRB(14, slide != null ? 22 : 30, 14, 18),
+        child: slide != null
+          // FittedBox shrinks the content if it is ever taller than the card
+          ? FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.topCenter, child: SizedBox(width: 332, child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+          const SizedBox(height: 28),
+          _header(false),
           const SizedBox(height: 10),
-          if (slide != null)
             SizedBox(
               height: 452,
               width: 332,
@@ -2091,31 +2089,58 @@ class _YrShareCard extends StatelessWidget {
                 alignment: (slide is _YrSlide && (slide as _YrSlide).compact) ? Alignment.topCenter : Alignment.center,
                 child: SizedBox(width: 332, child: slide),
               ),
-            )
-          else ...[
-          IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            _stat(tx('yr_scrobbles'), fmt(data.total)),
-            const SizedBox(width: 8),
-            _stat(tx('yr_card_hours').replaceAll(RegExp(r'\s*[\(（][^\)）]*[\)）]'), ''), fmt(hours)),
-            const SizedBox(width: 8),
-            _stat(tx('yr_card_streak'), '${data.longestStreak}'),
-          ])),
-          const SizedBox(height: 10),
-          _list(tx('yr_top_artists'), data.artists, 'artists'),
-          const SizedBox(height: 10),
-          _list(tx('yr_top_tracks'), data.tracks, 'tracks'),
-          const SizedBox(height: 10),
-          _list(tx('yr_top_albums'), data.albums, 'albums'),
-          ],
+            ),
           const SizedBox(height: 14),
           Align(
             alignment: Alignment.bottomRight,
             child: ShareMark(color: _yrSoft(scheme).withValues(alpha: 0.7)),
           ),
-        ]))),
+        ])))
+          // Full recap: uses the whole height. The picture ends in the middle
+          // of the three stat tiles; the lists are spread over the free space.
+          : SizedBox(width: 332, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _header(true),
+          const SizedBox(height: 20),
+          SizedBox(
+            height: 70,
+            child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Expanded(child: ShareTile(label: tx('yr_scrobbles'), value: fmt(data.total), k: 1.25)),
+              const SizedBox(width: 8),
+              Expanded(child: ShareTile(label: tx('yr_card_hours').replaceAll(RegExp(r'\s*[\(（][^\)）]*[\)）]'), ''), value: fmt(hours), k: 1.25)),
+              const SizedBox(width: 8),
+              Expanded(child: ShareTile(label: tx('yr_card_streak'), value: '${data.longestStreak}', k: 1.25)),
+            ]),
+          ),
+          Expanded(
+            child: Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              _list(tx('yr_top_artists'), data.artists, 'artists'),
+              _list(tx('yr_top_tracks'), data.tracks, 'tracks'),
+              _list(tx('yr_top_albums'), data.albums, 'albums'),
+            ]),
+          ),
+          const SizedBox(height: 6),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: ShareMark(color: _yrSoft(scheme).withValues(alpha: 0.7)),
+          ),
+        ])),
       ),
       ]),
     );
+  }
+
+  // Name + title. The title is forced on one line so the stat tiles always
+  // start at the same height (needed to centre the picture edge on them).
+  Widget _header(bool full) {
+    final c1 = photo == null ? _yrSoft(scheme) : (photoDark ? Colors.white : const Color(0xFF111111));
+    final c2 = photo == null ? scheme.onSurface : (photoDark ? Colors.white : const Color(0xFF111111));
+    final name = displayNameNotifier.value.trim().isNotEmpty ? displayNameNotifier.value.trim() : username;
+    final t = Text(tx('yr_intro_h', {'year': '$year'}), maxLines: 1, style: TextStyle(color: c2, fontSize: full ? 23 : 22, fontWeight: FontWeight.w900, height: 1.1));
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(name, style: TextStyle(color: c1, fontSize: 12, fontWeight: FontWeight.w700)),
+      const SizedBox(height: 4),
+      full ? SizedBox(height: 26, child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: t)) : t,
+    ]);
   }
 }
 

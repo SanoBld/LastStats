@@ -2875,7 +2875,7 @@ class _ShareCardArtState extends State<_ShareCardArt> {
       child: ClipRRect(
       borderRadius: BorderRadius.circular(28),
       child: SizedBox(
-        width: 360, height: 506,
+        width: 360, height: 640, // 9:16
         child: Stack(
           fit: StackFit.expand,
           children: [
@@ -2887,13 +2887,13 @@ class _ShareCardArtState extends State<_ShareCardArt> {
             ),
             // Cover in a Material shape (follows the image-shape setting).
             Positioned(
-              top: 26, left: 0, right: 0,
+              top: 64, left: 0, right: 0,
               child: Center(
                 child: M3ShapedBox(
-                  size: 230,
+                  size: 280,
                   seed: title,
                   child: SizedBox(
-                    width: 230, height: 230,
+                    width: 280, height: 280,
                     child: Image.network(url, fit: BoxFit.cover,
                         errorBuilder: (_, _, _) => const ColoredBox(color: Color(0xFF222222))),
                   ),
@@ -2901,7 +2901,7 @@ class _ShareCardArtState extends State<_ShareCardArt> {
               ),
             ),
             Positioned(
-              left: 24, right: 24, bottom: 22,
+              left: 28, right: 28, bottom: 36,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
