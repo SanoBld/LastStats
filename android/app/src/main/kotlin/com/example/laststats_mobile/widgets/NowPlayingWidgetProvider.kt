@@ -47,6 +47,10 @@ class NowPlayingWidgetProvider : AppWidgetProvider() {
             // Material You layout: colors come from the system color resources;
             // only the card surface is tinted here.
             views.setInt(R.id.card_bg, "setColorFilter", palette.surface)
+            views.setInt(R.id.status_bg, "setColorFilter", palette.chip)
+            views.setTextColor(R.id.widget_status, palette.onChip)
+            views.setTextColor(R.id.widget_track, palette.text)
+            views.setTextColor(R.id.widget_artist, palette.muted)
         }
         WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
         for (id in ids) manager.updateAppWidget(id, views)

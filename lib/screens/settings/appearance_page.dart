@@ -945,7 +945,7 @@ class _AppearancePageState extends State<AppearancePage> {
 
         const SizedBox(height: 20),
 
-        if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android && _isNothing) SettingsSection(
+        if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) SettingsSection(
           label: tx('ui_android_widgets'),
           children: [
             SwitchListTile(

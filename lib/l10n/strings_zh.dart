@@ -1504,11 +1504,12 @@ const Map<String, String> kTxZh = {
   'ntf_dl_install_hint': '点按以安装更新',
   'up_open_downloads': '打开“下载”',
   'ic_title': '应用图标',
-  'ic_note': '离开应用后图标才会更换，启动器可能还需要几秒钟刷新。',
+  'ic_note': '离开应用后图标会在应用列表中更换。主屏幕上请重新放置应用，或用下方按钮添加快捷方式。',
   'ic_default': '经典',
   'ic_white': '浅色',
   'ic_nothing_black': 'Nothing 深色',
   'ic_nothing_white': 'Nothing 浅色',
   'ic_blue': '蓝色',
   'ic_red': '红色',
+  'ic_pin': '添加到主屏幕',
 };

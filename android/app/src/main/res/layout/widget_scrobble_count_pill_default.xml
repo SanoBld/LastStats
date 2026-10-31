@@ -29,10 +29,11 @@
                 android:layout_height="26dp"
                 android:src="@drawable/widget_chip_circle" />
             <ImageView
+                android:id="@+id/icon_glyph"
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_gravity="center"
-                android:src="@drawable/widget_glyph" />
+                android:src="@drawable/ic_stat_laststats" />
         </FrameLayout>
 
         <TextView

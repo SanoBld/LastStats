@@ -28,6 +28,11 @@ class _AppIconSectionState extends State<AppIconSection> {
     if (ok && mounted) setState(() => _current = key);
   }
 
+  Future<void> _pin() async {
+    HapticFeedback.selectionClick();
+    await AppIconService.pin(_current);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!AppIconService.supported) return const SizedBox.shrink();
@@ -47,9 +52,17 @@ class _AppIconSectionState extends State<AppIconSection> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
           child: Text(tx('ic_note'),
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+          child: FilledButton.tonalIcon(
+            onPressed: _pin,
+            icon: const Icon(Icons.add_to_home_screen_rounded),
+            label: Text(tx('ic_pin')),
+          ),
         ),
       ]),
       const SizedBox(height: 12),

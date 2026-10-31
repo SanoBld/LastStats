@@ -2,6 +2,10 @@ package com.example.laststats_mobile
 
 import android.app.DownloadManager
 import android.content.ComponentName
+import android.util.Log
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.core.graphics.drawable.IconCompat
 import android.content.ContentValues
 import android.content.pm.PackageManager
 import android.content.Intent
@@ -27,15 +31,28 @@ class MainActivity : FlutterActivity() {
 
     private fun aliasName(a: String) = ComponentName(packageName, "com.example.laststats_mobile.$a")
 
-    private fun currentIcon(): String = iconAliases.entries.firstOrNull {
-        val st = packageManager.getComponentEnabledSetting(aliasName(it.value))
-        st == PackageManager.COMPONENT_ENABLED_STATE_ENABLED ||
-            (st == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT && it.key == "default")
-    }?.key ?: "default"
+    // BUG FIX: the default alias is enabled via the manifest, so its state is
+    // DEFAULT even after another alias was switched on. The old check therefore
+    // always reported "default" and switching back / re-applying did nothing.
+    private fun isAliasEnabled(key: String, alias: String): Boolean {
+        return when (packageManager.getComponentEnabledSetting(aliasName(alias))) {
+            PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> true
+            PackageManager.COMPONENT_ENABLED_STATE_DEFAULT -> key == "default"
+            else -> false
+        }
+    }
+
+    private fun currentIcon(): String {
+        // an explicitly enabled non-default alias wins over the manifest default
+        for ((k, a) in iconAliases) if (k != "default" &&
+            packageManager.getComponentEnabledSetting(aliasName(a)) ==
+            PackageManager.COMPONENT_ENABLED_STATE_ENABLED) return k
+        return if (isAliasEnabled("default", iconAliases["default"]!!)) "default"
+        else iconAliases.keys.firstOrNull { isAliasEnabled(it, iconAliases[it]!!) } ?: "default"
+    }
 
     private fun applyIcon(key: String) {
         val target = iconAliases[key] ?: return
-        if (currentIcon() == key) return
         // enable the new entry first so there is always a launcher entry
         packageManager.setComponentEnabledSetting(aliasName(target),
             PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
@@ -45,16 +62,28 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    override fun onStop() {
-        super.onStop()
+    private fun applyPendingIcon() {
         val prefs = getSharedPreferences("app_icon", MODE_PRIVATE)
-        val key = pendingIcon ?: prefs.getString("pending", null)
-        if (key != null) {
-            try { applyIcon(key) } catch (_: Exception) {}
+        val key = pendingIcon ?: prefs.getString("pending", null) ?: return
+        try {
+            applyIcon(key)
             pendingIcon = null
             prefs.edit().remove("pending").apply()
+        } catch (e: Exception) {
+            Log.e("LastStats", "app icon switch failed", e)
         }
     }
+
+    override fun onStop() {
+        super.onStop()
+        applyPendingIcon()
+    }
+
+    override fun onDestroy() {
+        applyPendingIcon()
+        super.onDestroy()
+    }
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "laststats/installer")
@@ -128,6 +157,21 @@ class MainActivity : FlutterActivity() {
                             getSharedPreferences("app_icon", MODE_PRIVATE).edit()
                                 .putString("pending", pendingIcon).apply()
                             result.success(true)
+                        }
+                        "pin" -> {
+                            val key = call.argument<String>("key") ?: "default"
+                            val resId = resources.getIdentifier(
+                                if (key == "default") "ic_launcher" else "ic_launcher_$key",
+                                "mipmap", packageName)
+                            if (resId != 0 && ShortcutManagerCompat.isRequestPinShortcutSupported(this)) {
+                                val intent = Intent(this, MainActivity::class.java).setAction(Intent.ACTION_MAIN)
+                                val info = ShortcutInfoCompat.Builder(this, "icon_$key")
+                                    .setShortLabel("LastStats")
+                                    .setIcon(IconCompat.createWithResource(this, resId))
+                                    .setIntent(intent)
+                                    .build()
+                                result.success(ShortcutManagerCompat.requestPinShortcut(this, info, null))
+                            } else result.success(false)
                         }
                         else -> result.notImplemented()
                     }

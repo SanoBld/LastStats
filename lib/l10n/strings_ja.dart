@@ -1477,11 +1477,12 @@ const Map<String, String> kTxJa = {
   'ntf_dl_install_hint': 'タップしてアップデートをインストール',
   'up_open_downloads': 'ダウンロードを開く',
   'ic_title': 'アプリアイコン',
-  'ic_note': 'アプリを離れるとアイコンが変わります。ランチャーの更新に数秒かかることがあります。',
+  'ic_note': 'アプリを離れると、アプリ一覧のアイコンが変わります。ホーム画面ではアプリを置き直すか、下のボタンでショートカットを追加してください。',
   'ic_default': 'クラシック',
   'ic_white': 'ライト',
   'ic_nothing_black': 'Nothing ダーク',
   'ic_nothing_white': 'Nothing ライト',
   'ic_blue': 'ブルー',
   'ic_red': 'レッド',
+  'ic_pin': 'ホーム画面に追加',
 };

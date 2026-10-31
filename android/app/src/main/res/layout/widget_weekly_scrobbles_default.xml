@@ -30,23 +30,25 @@
                 android:layout_height="24dp"
                 android:src="@drawable/widget_chip_circle" />
             <ImageView
+                android:id="@+id/icon_glyph"
                 android:layout_width="13dp"
                 android:layout_height="13dp"
                 android:layout_gravity="center"
-                android:src="@drawable/widget_glyph" />
+                android:src="@drawable/ic_stat_laststats" />
         </FrameLayout>
 
         <TextView
             android:id="@+id/widget_value"
         android:text="12 345"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="44dp"
+            android:gravity="bottom|start"
             android:maxLines="1"
             android:ellipsize="end"
             android:includeFontPadding="false"
             android:autoSizeTextType="uniform"
-            android:autoSizeMinTextSize="22sp"
-            android:autoSizeMaxTextSize="30sp"
+            android:autoSizeMinTextSize="16sp"
+            android:autoSizeMaxTextSize="32sp"
             android:textStyle="bold" />
 
         <TextView

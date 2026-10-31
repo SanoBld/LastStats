@@ -25,4 +25,14 @@ class AppIconService {
       return false;
     }
   }
+
+  /// Adds a home-screen shortcut using the given icon (works on every launcher).
+  static Future<bool> pin(String key) async {
+    if (!supported) return false;
+    try {
+      return await _ch.invokeMethod<bool>('pin', {'key': key}) == true;
+    } catch (_) {
+      return false;
+    }
+  }
 }

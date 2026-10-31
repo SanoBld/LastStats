@@ -1478,11 +1478,12 @@ const Map<String, String> kTxDe = {
   'ntf_dl_install_hint': 'Tippen, um das Update zu installieren',
   'up_open_downloads': 'Downloads öffnen',
   'ic_title': 'App-Symbol',
-  'ic_note': 'Das Symbol wechselt, sobald du die App verlässt; der Launcher braucht danach ein paar Sekunden.',
+  'ic_note': 'Das Symbol wechselt, sobald du die App verlässt, in der App-Liste. Auf dem Startbildschirm: App neu platzieren oder mit der Schaltfläche unten eine Verknüpfung hinzufügen.',
   'ic_default': 'Klassisch',
   'ic_white': 'Hell',
   'ic_nothing_black': 'Nothing dunkel',
   'ic_nothing_white': 'Nothing hell',
   'ic_blue': 'Blau',
   'ic_red': 'Rot',
+  'ic_pin': 'Zum Startbildschirm hinzufügen',
 };

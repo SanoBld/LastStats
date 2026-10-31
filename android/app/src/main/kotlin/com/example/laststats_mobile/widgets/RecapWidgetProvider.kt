@@ -24,6 +24,7 @@ class RecapWidgetProvider : AppWidgetProvider() {
         val artist = data.getString("artist_name", "") ?: ""
         val artUrl = data.getString("track_art", "") ?: ""
         val palette = WidgetTheme.resolve(context, data)
+        val nothing = data.getString("theme_style", "default") == "nothing"
         val layout = WidgetTheme.layoutFor(
             data, R.layout.widget_recap_nothing, R.layout.widget_recap_default
         )
@@ -31,6 +32,7 @@ class RecapWidgetProvider : AppWidgetProvider() {
         val views = RemoteViews(context.packageName, layout)
         views.setInt(R.id.card_bg, "setColorFilter", palette.surface)
         views.setInt(R.id.icon_chip, "setColorFilter", palette.chip)
+        if (!nothing) views.setInt(R.id.icon_glyph, "setColorFilter", palette.onChip)
         views.setTextViewText(R.id.recap_total, total)
         views.setTextViewText(R.id.recap_weekly, weekly)
         views.setTextViewText(R.id.recap_loved, loved)
@@ -42,6 +44,11 @@ class RecapWidgetProvider : AppWidgetProvider() {
             if (track.isEmpty()) context.getString(R.string.widget_no_scrobble) else "$track — $artist"
         )
         views.setTextColor(R.id.recap_now, palette.text)
+        if (!nothing) {
+            for (i in intArrayOf(R.id.recap_lbl_total, R.id.recap_lbl_week, R.id.recap_lbl_loved)) {
+                views.setTextColor(i, palette.muted)
+            }
+        }
         WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
         for (id in ids) manager.updateAppWidget(id, views)
 

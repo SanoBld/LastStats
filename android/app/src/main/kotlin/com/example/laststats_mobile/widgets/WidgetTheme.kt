@@ -14,36 +14,50 @@ data class WidgetPalette(
     val chip: Int,      // small icon-chip background
     val text: Int,
     val muted: Int,
-    val accent: Int
+    val accent: Int,
+    val onChip: Int = text
 )
 
 object WidgetTheme {
     // Material You: follows the system light/dark mode and, on Android 12+, the
     // wallpaper-based system colors. Older versions get the M3 baseline palette.
-    private fun materialYou(context: Context): WidgetPalette {
-        val night = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        val dark = night == Configuration.UI_MODE_NIGHT_YES
+    private fun materialYou(context: Context, dark: Boolean): WidgetPalette {
         return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             fun c(id: Int) = context.getColor(id)
             if (dark) WidgetPalette(
                 c(android.R.color.system_neutral1_900), c(android.R.color.system_accent1_700),
                 c(android.R.color.system_neutral1_100), c(android.R.color.system_neutral2_200),
-                c(android.R.color.system_accent1_200))
+                c(android.R.color.system_accent1_200), c(android.R.color.system_accent1_100))
             else WidgetPalette(
                 c(android.R.color.system_neutral1_10), c(android.R.color.system_accent1_100),
                 c(android.R.color.system_neutral1_900), c(android.R.color.system_neutral2_700),
-                c(android.R.color.system_accent1_600))
+                c(android.R.color.system_accent1_600), c(android.R.color.system_accent1_900))
         } else if (dark) WidgetPalette(
             Color.parseColor("#141218"), Color.parseColor("#4F378B"),
-            Color.parseColor("#E6E0E9"), Color.parseColor("#CAC4D0"), Color.parseColor("#D0BCFF"))
+            Color.parseColor("#E6E0E9"), Color.parseColor("#CAC4D0"), Color.parseColor("#D0BCFF"),
+            Color.parseColor("#EADDFF"))
         else WidgetPalette(
             Color.parseColor("#FEF7FF"), Color.parseColor("#EADDFF"),
-            Color.parseColor("#1D1B20"), Color.parseColor("#49454F"), Color.parseColor("#6750A4"))
+            Color.parseColor("#1D1B20"), Color.parseColor("#49454F"), Color.parseColor("#6750A4"),
+            Color.parseColor("#21005D"))
+    }
+
+    // Palette from the app accent (dynamic color off): honours the app's
+    // light/dark choice and the "colored widgets" switch.
+    private fun accentPalette(data: SharedPreferences, dark: Boolean): WidgetPalette {
+        val accent = parseAccent(data.getString(if (dark) "accent_dark" else "accent_light", ""))
+        val tint = data.getBoolean("widget_tint", false)
+        val base = if (dark) Color.parseColor("#1C1B1F") else Color.parseColor("#FFFBFE")
+        val surface = blend(base, accent, if (tint) (if (dark) 0.16f else 0.10f) else 0.03f)
+        val chip = blend(base, accent, if (tint) (if (dark) 0.50f else 0.28f) else (if (dark) 0.40f else 0.20f))
+        val onChip = blend(if (dark) Color.WHITE else Color.BLACK, accent, if (dark) 0.25f else 0.35f)
+        val text = blend(if (dark) Color.parseColor("#E6E1E5") else Color.parseColor("#1C1B1F"), accent, 0.06f)
+        val muted = blend(if (dark) Color.parseColor("#CAC4D0") else Color.parseColor("#49454F"), accent, 0.12f)
+        return WidgetPalette(surface, chip, text, muted, accent, onChip)
     }
 
     fun resolve(context: Context, data: SharedPreferences): WidgetPalette {
         val style = data.getString("theme_style", "default") ?: "default"
-        if (style != "nothing") return materialYou(context)
         val mode = data.getString("theme_mode", "system") ?: "system"
         val isDark = when (mode) {
             "dark" -> true
@@ -55,6 +69,11 @@ object WidgetTheme {
             }
         }
 
+        if (style != "nothing") {
+            val dynamic = data.getBoolean("use_dynamic_color", false)
+            return if (dynamic && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S)
+                materialYou(context, isDark) else accentPalette(data, isDark)
+        }
         val accent = if (style == "nothing") {
             Color.parseColor("#FF2020")
         } else {

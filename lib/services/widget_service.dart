@@ -40,6 +40,8 @@ class WidgetService {
       await HomeWidget.saveWidgetData<String>('accent_light', accentLight);
       await HomeWidget.saveWidgetData<String>('accent_dark', accentDark);
       await HomeWidget.saveWidgetData<bool>('widget_tint', widgetTint);
+      await HomeWidget.saveWidgetData<bool>(
+          'use_dynamic_color', prefs.getBool('ls_use_dynamic_color') ?? false);
 
       final api = LastFmService(apiKey: apiKey, username: username);
 

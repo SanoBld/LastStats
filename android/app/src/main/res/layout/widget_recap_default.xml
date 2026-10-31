@@ -50,12 +50,18 @@
                     android:layout_height="22dp"
                     android:src="@drawable/widget_chip_circle" />
                 <ImageView
+                    android:id="@+id/icon_glyph"
                     android:layout_width="13dp"
                     android:layout_height="13dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/widget_glyph" />
+                    android:src="@drawable/ic_stat_laststats" />
             </FrameLayout>
         </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -79,6 +85,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:id="@+id/recap_lbl_total"
                     android:text="@string/widget_recap_total"
                     android:layout_marginTop="2dp"
                     android:maxLines="1"
@@ -104,6 +111,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:id="@+id/recap_lbl_week"
                     android:text="@string/widget_recap_week"
                     android:layout_marginTop="2dp"
                     android:maxLines="1"
@@ -129,6 +137,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:id="@+id/recap_lbl_loved"
                     android:text="@string/widget_recap_loved"
                     android:layout_marginTop="2dp"
                     android:maxLines="1"
