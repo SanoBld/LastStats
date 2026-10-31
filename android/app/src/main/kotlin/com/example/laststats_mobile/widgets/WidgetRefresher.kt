@@ -54,6 +54,7 @@ object WidgetRefresher {
         total: Boolean = false,
         loved: Boolean = false,
         weekly: Boolean = false,
+        today: Boolean = false,
         done: (Boolean) -> Unit
     ) {
         val data = HomeWidgetPlugin.getData(context)
@@ -65,7 +66,8 @@ object WidgetRefresher {
         val doTotal = total && now - data.getLong("native_total_at", 0L) >= COUNTS_EVERY_MS
         val doLoved = loved && now - data.getLong("native_loved_at", 0L) >= COUNTS_EVERY_MS
         val doWeekly = weekly && now - data.getLong("native_weekly_at", 0L) >= COUNTS_EVERY_MS
-        if (!doTrack && !doTotal && !doLoved && !doWeekly) { done(false); return }
+        val doToday = today && now - data.getLong("native_today_at", 0L) >= 5 * 60_000L
+        if (!doTrack && !doTotal && !doLoved && !doWeekly && !doToday) { done(false); return }
         thread {
             var changed = false
             try {
@@ -125,6 +127,21 @@ object WidgetRefresher {
                             edit.putString("weekly_scrobbles", it)
                         }
                 }
+                if (doToday) {
+                    edit.putLong("native_today_at", now)
+                    val cal = java.util.Calendar.getInstance()
+                    val dayKey = String.format("%04d-%02d-%02d", cal.get(java.util.Calendar.YEAR),
+                        cal.get(java.util.Calendar.MONTH) + 1, cal.get(java.util.Calendar.DAY_OF_MONTH))
+                    cal.set(java.util.Calendar.HOUR_OF_DAY, 0); cal.set(java.util.Calendar.MINUTE, 0)
+                    cal.set(java.util.Calendar.SECOND, 0)
+                    val from = cal.timeInMillis / 1000
+                    api("user.getrecenttracks", user, key, "&limit=1&from=$from")?.optJSONObject("recenttracks")
+                        ?.optJSONObject("@attr")?.optString("total")?.toIntOrNull()?.let { n ->
+                            val j = try { JSONObject(data.getString("heatmap_days", "{}") ?: "{}") } catch (_: Throwable) { JSONObject() }
+                            if (j.optInt(dayKey, -1) != n) { j.put(dayKey, n); changed = true }
+                            edit.putString("heatmap_days", j.toString())
+                        }
+                }
                 edit.apply()
             } catch (_: Throwable) { }
             if (changed) redrawOthers(context, caller)
@@ -140,7 +157,7 @@ object WidgetRefresher {
             for (cls in listOf(
                 NowPlayingWidgetProvider::class.java, ScrobbleCountWidgetProvider::class.java,
                 LovedCountWidgetProvider::class.java, WeeklyScrobblesWidgetProvider::class.java,
-                RecapWidgetProvider::class.java)) {
+                RecapWidgetProvider::class.java, HeatmapWidgetProvider::class.java)) {
                 if (cls == caller) continue
                 val ids = manager.getAppWidgetIds(ComponentName(context, cls))
                 if (ids.isEmpty()) continue

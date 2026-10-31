@@ -401,6 +401,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     if (cached != null) {
       setState(() {
         _dashChartCalendar = Map<String, int>.from(cached['calendar'] as Map);
+        WidgetService.pushHeatmap(_dashChartCalendar!);
         _dashChartMonthly  = Map<String, int>.from(cached['monthly']  as Map);
         _dashChartLoaded   = true;
       });
@@ -460,6 +461,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
       if (!mounted) return;
       setState(() {
         _dashChartCalendar = calendarData;
+        WidgetService.pushHeatmap(calendarData);
         _dashChartMonthly  = monthlyData;
         _dashChartLoading  = false;
         _dashChartLoaded   = true;
@@ -1274,10 +1276,9 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
 
   void _openNewsSheet() {
     _haptic(_HapticImpact.light);
-    _markNewsRead();
     Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => _NewsPage(items: _newsItems),
-    ));
+    )).then((_) => _recountUnread());
   }
 
   // Fetch in-app news from gh-pages JSON.
@@ -1335,24 +1336,22 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     // ── 3. Badge count ────────────────────────────────────────────────────
     final p      = await SharedPreferences.getInstance();
     final seen   = Set<String>.from(p.getStringList('ls_news_seen') ?? []);
-    // An available update keeps the bell lit until it is installed.
     final unread = allItems.where((i) {
       final id = (i['id'] ?? '').toString();
-      return id.startsWith('update_v') || !seen.contains(id);
+      return !seen.contains(id);
     }).length;
 
     if (mounted) setState(() { _newsItems = allItems; _unreadCount = unread; });
   }
 
-  // Mark all news as read and persist.
-  Future<void> _markNewsRead() async {
-    if (_newsItems.isEmpty) return;
-    final p   = await SharedPreferences.getInstance();
-    final ids = _newsItems.map((i) => (i['id'] ?? '').toString())
-        .where((id) => !id.startsWith('update_v')).toList();
-    await p.setStringList('ls_news_seen', ids);
-    final pending = _newsItems.where((i) => (i['id'] ?? '').toString().startsWith('update_v')).length;
-    if (mounted) setState(() => _unreadCount = pending);
+  // Recount unread items (after the news page was closed).
+  Future<void> _recountUnread() async {
+    final p    = await SharedPreferences.getInstance();
+    await p.reload();
+    final seen = Set<String>.from(p.getStringList('ls_news_seen') ?? []);
+    final unread = _newsItems
+        .where((i) => !seen.contains((i['id'] ?? '').toString())).length;
+    if (mounted) setState(() => _unreadCount = unread);
   }
 
   Future<void> _resolveHeaderImage() async {
@@ -3894,6 +3893,33 @@ class _NewsPageState extends State<_NewsPage> {
   bool _searching = false;
   Timer? _debounce;
 
+  // Ids already read (saved in prefs). Unread items get a highlighted frame.
+  Set<String> _seen = {};
+
+  Future<void> _loadSeen() async {
+    final p = await SharedPreferences.getInstance();
+    await p.reload();
+    if (mounted) setState(() => _seen = Set<String>.from(p.getStringList('ls_news_seen') ?? []));
+  }
+
+  String _idOf(Map<String, dynamic> e) => (e['id'] ?? '').toString();
+
+  Future<void> _markOne(Map<String, dynamic> e) async {
+    final id = _idOf(e);
+    if (id.isEmpty || _seen.contains(id)) return;
+    setState(() => _seen = {..._seen, id});
+    final p = await SharedPreferences.getInstance();
+    await p.setStringList('ls_news_seen', _seen.toList());
+  }
+
+  Future<void> _markAll() async {
+    _haptic(_HapticImpact.light);
+    final ids = widget.items.map(_idOf).where((i) => i.isNotEmpty).toList();
+    setState(() => _seen = {..._seen, ...ids});
+    // Also clears the notifications still in the status bar.
+    await NotificationService.markAllRead(ids);
+  }
+
   // Auto-translation: on by default, one icon button turns it off.
   // Results are cached per item id + language so reopening is instant.
   static final Map<String, Map<String, String>> _translationCache = {};
@@ -3906,6 +3932,7 @@ class _NewsPageState extends State<_NewsPage> {
   @override
   void initState() {
     super.initState();
+    _loadSeen();
     _translateAll();
   }
 
@@ -4046,6 +4073,12 @@ class _NewsPageState extends State<_NewsPage> {
       appBar: M3AppBar(
         title: L.newsWhatsNew,
         actions: [
+          if (widget.items.any((e) => !_seen.contains(_idOf(e))))
+            IconButton(
+              icon: const Icon(Icons.done_all_rounded),
+              tooltip: tx('ntf_act_read_all'),
+              onPressed: _markAll,
+            ),
           // Compact translate toggle (icon only), same idea as the bio button
           _translatingNews
               ? const Padding(
@@ -4158,7 +4191,8 @@ Padding(
                       index: i, count: filtered.length,
                       title: title, body: body, type: type, date: date,
                       emoji: emoji, icon: icon, color: color,
-                      onTap: () => showModalBottomSheet(
+                      unread: !_seen.contains(_idOf(item)),
+                      onTap: () { _markOne(item); showModalBottomSheet(
     sheetAnimationStyle: kM3SheetAnimation,
                         context: context,
                         isScrollControlled: true,
@@ -4167,7 +4201,7 @@ Padding(
                           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                         ),
                         builder: (_) => _NewsDetailSheet(item: item),
-                      ),
+                      ); },
                     ));
                   },
                 ),
@@ -4185,6 +4219,7 @@ class _NewsListTile extends StatefulWidget {
   final IconData   icon;
   final Color      color;
   final VoidCallback onTap;
+  final bool unread;
   final int index, count; // position in the grouped list (segment corners)
 
   const _NewsListTile({
@@ -4198,6 +4233,7 @@ class _NewsListTile extends StatefulWidget {
     required this.icon,
     required this.color,
     required this.onTap,
+    this.unread = false,
   });
 
   @override
@@ -4228,6 +4264,10 @@ class _NewsListTileState extends State<_NewsListTile> {
           decoration: BoxDecoration(
             color:        scheme.secondaryContainer.withValues(alpha: 0.45),
             borderRadius: m3SegmentRadius(widget.index, widget.count),
+            // Unread: colored frame around the card.
+            border: widget.unread
+                ? Border.all(color: scheme.primary, width: 2)
+                : null,
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -4349,7 +4389,7 @@ class _NewsDetailSheetState extends State<_NewsDetailSheet> {
       maxChildSize:     0.9,
       builder: (ctx, scroll) => SingleChildScrollView(
         controller: scroll,
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+        padding: EdgeInsets.fromLTRB(20, 20, 20, 28 + MediaQuery.of(ctx).padding.bottom + 24),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
           // Drag handle
@@ -4432,22 +4472,46 @@ class _NewsDetailSheetState extends State<_NewsDetailSheet> {
           ],
 
           const SizedBox(height: 20),
+          // Connected Material buttons (same style as the download buttons).
           Row(children: [
             if (url.isNotEmpty) ...[
               Expanded(
-                child: FilledButton.icon(
-                  onPressed: () => (item['type'] == 'update') ? openUpdateUrl(context, url) : _openUrl(url),
-                  icon:  Icon(item['type'] == 'update' ? Icons.download_rounded : Icons.open_in_new_rounded, size: 18),
-                  label: Text(item['type'] == 'update' ? L.settingsDownload : L.notifDetailOpenLink),
+                child: M3TonalButton(
+                  color: scheme.primary,
+                  radius: const BorderRadius.horizontal(
+                      left: Radius.circular(24), right: Radius.circular(6)),
+                  onTap: () => (item['type'] == 'update')
+                      ? openUpdateUrl(context, url)
+                      : _openUrl(url),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Icon(item['type'] == 'update'
+                        ? Icons.download_rounded : Icons.open_in_new_rounded,
+                        size: 18, color: scheme.onPrimary),
+                    const SizedBox(width: 8),
+                    Flexible(child: Text(
+                      item['type'] == 'update' ? L.settingsDownload : L.notifDetailOpenLink,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: scheme.onPrimary, fontWeight: FontWeight.w700))),
+                  ]),
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 4),
             ],
             Expanded(
-              child: OutlinedButton.icon(
-                onPressed: () => _shareAsImage(context, scheme),
-                icon:  const Icon(Icons.ios_share_rounded, size: 18),
-                label: Text(L.commonShare),
+              child: M3TonalButton(
+                color: scheme.secondaryContainer,
+                radius: url.isNotEmpty
+                    ? const BorderRadius.horizontal(
+                        left: Radius.circular(6), right: Radius.circular(24))
+                    : const BorderRadius.all(Radius.circular(24)),
+                onTap: () => _shareAsImage(context, scheme),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(Icons.ios_share_rounded, size: 18, color: scheme.onSecondaryContainer),
+                  const SizedBox(width: 8),
+                  Flexible(child: Text(L.commonShare,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: scheme.onSecondaryContainer, fontWeight: FontWeight.w700))),
+                ]),
               ),
             ),
           ]),

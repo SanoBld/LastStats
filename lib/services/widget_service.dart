@@ -18,6 +18,7 @@ class WidgetService {
   static const _providerLoved = 'LovedCountWidgetProvider';
   static const _providerWeekly = 'WeeklyScrobblesWidgetProvider';
   static const _providerRecap = 'RecapWidgetProvider';
+  static const _providerHeatmap = 'HeatmapWidgetProvider';
 
   static const _appGroupId = 'group.com.example.laststats_mobile';
 
@@ -120,6 +121,7 @@ class WidgetService {
         _providerLoved,
         _providerWeekly,
         _providerRecap,
+        _providerHeatmap,
       ]) {
         await HomeWidget.updateWidget(
           name: name,
@@ -208,6 +210,23 @@ class WidgetService {
     } catch (_) {
       // Best-effort — never disrupt the app's own polling loop.
     }
+  }
+
+  /// Sends the daily scrobble counts ("yyyy-MM-dd" -> count) to the calendar
+  /// widget. Skipped when nothing changed.
+  static String _lastHeat = '';
+  static Future<void> pushHeatmap(Map<String, int> days) async {
+    if (kIsWeb || days.isEmpty) return;
+    try {
+      final sig = '${days.length}|${days.values.fold(0, (a, b) => a + b)}';
+      if (sig == _lastHeat) return;
+      _lastHeat = sig;
+      await HomeWidget.setAppGroupId(_appGroupId);
+      final json = '{${days.entries.map((e) => '"${e.key}":${e.value}').join(',')}}';
+      await HomeWidget.saveWidgetData<String>('heatmap_days', json);
+      await HomeWidget.updateWidget(
+          name: _providerHeatmap, androidName: _providerHeatmap);
+    } catch (_) {}
   }
 
   static String _pickImage(dynamic images) {

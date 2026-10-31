@@ -202,7 +202,7 @@ class NotificationService {
 
   static Future<void> _markSeen(Map<String, dynamic>? data) async {
     final id = data?['id']?.toString() ?? '';
-    if (id.isEmpty || id.startsWith('update_v')) return;
+    if (id.isEmpty) return;
     final prefs = await SharedPreferences.getInstance();
     await prefs.reload();
     final seen = (prefs.getStringList('ls_news_seen') ?? <String>[]).toList();
@@ -214,10 +214,13 @@ class NotificationService {
 
   /// Marks every shown message as read and clears LastStats notifications
   /// (a download still in progress and sync progress are kept).
-  static Future<void> _markAllRead() async {
+  static Future<void> _markAllRead([List<String> extraIds = const []]) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.reload();
     final seen = (prefs.getStringList('ls_news_seen') ?? <String>[]).toList();
+    for (final id in extraIds) {
+      if (id.isNotEmpty && !seen.contains(id)) seen.add(id);
+    }
     try {
       final android = _plugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
@@ -228,12 +231,20 @@ class NotificationService {
         if (n.channelId == _chSyncId) continue;
         if (n.channelId == _chDlId && RegExp(r'^\d+ %$').hasMatch(n.body ?? '')) continue;
         final mid = decodePayload(n.payload)?['id']?.toString() ?? '';
-        if (mid.isNotEmpty && !mid.startsWith('update_v') && !seen.contains(mid)) seen.add(mid);
+        if (mid.isNotEmpty && !seen.contains(mid)) seen.add(mid);
         await _plugin.cancel(nid);
       }
     } catch (_) {}
+    // Fallback: in the background isolate the list above can be empty, so
+    // also cancel the fixed ids directly.
+    for (final id in [_idMilestone, _idDailyRecap, _idWeeklyRecap, _idGrand, _idUpdate, _idYearRecap]) {
+      try { await _plugin.cancel(id); } catch (_) {}
+    }
     await prefs.setStringList('ls_news_seen', seen);
   }
+
+  /// Public: marks [ids] (all in-app news) as read and clears notifications.
+  static Future<void> markAllRead(List<String> ids) => _markAllRead(ids);
 
   // ── Tap handling ─────────────────────────────────────────────────────────
 

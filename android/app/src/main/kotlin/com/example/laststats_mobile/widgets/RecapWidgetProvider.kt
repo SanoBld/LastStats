@@ -57,8 +57,6 @@ class RecapWidgetProvider : AppWidgetProvider() {
                     views.setInt(t, "setImageAlpha", 180)
                 }
             }
-            views.setInt(R.id.icon_chip, "setColorFilter", palette.chip)
-            if (!nothing) views.setInt(R.id.icon_glyph, "setColorFilter", palette.onChip)
             views.setTextViewText(R.id.recap_total, total)
             views.setTextViewText(R.id.recap_weekly, weekly)
             views.setTextViewText(R.id.recap_loved, loved)

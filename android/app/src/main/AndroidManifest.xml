@@ -244,6 +244,15 @@
                 android:resource="@xml/weekly_scrobbles_widget_info" />
         </receiver>
 
+        <receiver android:name=".widgets.HeatmapWidgetProvider" android:exported="false" android:label="@string/widget_name_heatmap">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/heatmap_widget_info" />
+        </receiver>
+
         <receiver android:name=".widgets.RecapWidgetProvider" android:exported="false" android:label="@string/widget_name_recap">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

@@ -42,22 +42,6 @@ style="@style/WidgetText"
                 android:ellipsize="end"
                 android:textSize="14sp"
                 android:textStyle="bold" />
-
-            <FrameLayout
-                android:layout_width="22dp"
-                android:layout_height="22dp">
-                <ImageView
-                    android:id="@+id/icon_chip"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:src="@drawable/widget_chip_circle" />
-                <ImageView
-                    android:id="@+id/icon_glyph"
-                    android:layout_width="13dp"
-                    android:layout_height="13dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_stat_laststats" />
-            </FrameLayout>
         </LinearLayout>
 
         <FrameLayout

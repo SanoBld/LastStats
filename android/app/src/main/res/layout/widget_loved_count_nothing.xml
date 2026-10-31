@@ -20,22 +20,6 @@
         android:gravity="bottom"
         android:padding="12dp">
 
-        <FrameLayout
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginBottom="6dp">
-            <ImageView
-                android:id="@+id/icon_chip"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/widget_chip_circle" />
-            <ImageView
-                android:layout_width="13dp"
-                android:layout_height="13dp"
-                android:layout_gravity="center"
-                android:src="@mipmap/ic_launcher" />
-        </FrameLayout>
-
         <TextView
             android:id="@+id/widget_value"
             android:layout_width="match_parent"

@@ -20,27 +20,11 @@
         android:paddingStart="16dp"
         android:paddingEnd="18dp">
 
-        <FrameLayout
-            android:layout_width="26dp"
-            android:layout_height="26dp">
-            <ImageView
-                android:id="@+id/icon_chip"
-                android:layout_width="26dp"
-                android:layout_height="26dp"
-                android:src="@drawable/widget_chip_circle" />
-            <ImageView
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:layout_gravity="center"
-                android:src="@mipmap/ic_launcher" />
-        </FrameLayout>
-
         <TextView
             android:id="@+id/widget_value"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_marginStart="10dp"
             android:gravity="center_vertical|start"
             android:maxLines="1"
             android:ellipsize="end"

@@ -145,7 +145,7 @@ class _UpdateSheetState extends State<_UpdateSheet> {
       canPop: bad || done,
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             M3CookieBadge(
               size: 64,

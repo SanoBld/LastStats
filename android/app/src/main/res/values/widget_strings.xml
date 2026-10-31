@@ -25,4 +25,6 @@
     <string name="widget_preview_scrobbles">scrobbles</string>
     <string name="widget_preview_track">Song title</string>
     <string name="widget_preview_artist">Artist</string>
+    <string name="widget_name_heatmap">LastStats — Calendar</string>
+    <string name="widget_desc_heatmap">Your listening calendar, one square per day</string>
 </resources>
