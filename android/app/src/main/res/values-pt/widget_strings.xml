@@ -20,4 +20,7 @@
     <string name="widget_desc_loved">Quantas faixas adoraste</string>
     <string name="widget_desc_weekly">Os teus scrobbles dos últimos 7 dias</string>
     <string name="widget_desc_recap">Total, semana e favoritas num relance</string>
+    <string name="widget_preview_scrobbles">scrobbles</string>
+    <string name="widget_preview_track">Faixa</string>
+    <string name="widget_preview_artist">Artista</string>
 </resources>

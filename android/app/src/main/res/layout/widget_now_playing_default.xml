@@ -8,7 +8,7 @@
         android:id="@+id/card_bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="fitXY"
+       android:scaleType="fitXY"
         android:src="@drawable/widget_card_shape" />
 
     <LinearLayout
@@ -53,7 +53,7 @@
                     android:paddingEnd="10dp"
                     android:paddingTop="3dp"
                     android:paddingBottom="3dp"
-                    android:text="NOW PLAYING"
+                    android:text="@string/widget_now_playing_status"
                     android:textAllCaps="true"
                     android:letterSpacing="0.06"
                     android:textSize="10sp"
@@ -67,7 +67,7 @@
                 android:layout_marginTop="8dp"
                 android:ellipsize="end"
                 android:maxLines="2"
-                android:text="Song title"
+                android:text="@string/widget_preview_track"
                 android:textColor="@color/widget_on_surface"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -79,7 +79,7 @@
                 android:layout_marginTop="2dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Artist"
+                android:text="@string/widget_preview_artist"
                 android:textColor="@color/widget_on_surface_variant"
                 android:textSize="13sp" />
         </LinearLayout>

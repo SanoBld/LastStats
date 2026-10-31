@@ -20,4 +20,7 @@
     <string name="widget_desc_loved">Wie viele Titel du geliebt hast</string>
     <string name="widget_desc_weekly">Deine Scrobbles der letzten 7 Tage</string>
     <string name="widget_desc_recap">Gesamt, Woche und Lieblingstitel im Überblick</string>
+    <string name="widget_preview_scrobbles">Scrobbles</string>
+    <string name="widget_preview_track">Titel</string>
+    <string name="widget_preview_artist">Künstler</string>
 </resources>

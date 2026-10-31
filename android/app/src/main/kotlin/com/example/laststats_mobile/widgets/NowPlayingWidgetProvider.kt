@@ -5,6 +5,7 @@ package com.example.laststats_mobile.widgets
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
+import android.graphics.Bitmap
 import android.widget.RemoteViews
 import com.example.laststats_mobile.R
 import es.antonborri.home_widget.HomeWidgetPlugin
@@ -27,39 +28,40 @@ class NowPlayingWidgetProvider : AppWidgetProvider() {
         )
 
         val nothing = (data.getString("theme_style", "default") ?: "default") == "nothing"
-        val views = RemoteViews(context.packageName, layout)
-        if (track.isEmpty()) {
-            views.setTextViewText(R.id.widget_track, context.getString(R.string.widget_no_scrobble))
-            views.setTextViewText(R.id.widget_artist, "")
-        } else {
-            views.setTextViewText(R.id.widget_track, track)
-            views.setTextViewText(R.id.widget_artist, artist)
+        fun build(id: Int, art: Bitmap?): RemoteViews {
+            val views = RemoteViews(context.packageName, layout)
+            if (track.isEmpty()) {
+                views.setTextViewText(R.id.widget_track, context.getString(R.string.widget_no_scrobble))
+                views.setTextViewText(R.id.widget_artist, "")
+            } else {
+                views.setTextViewText(R.id.widget_track, track)
+                views.setTextViewText(R.id.widget_artist, artist)
+            }
+            views.setTextViewText(
+                R.id.widget_status,
+                if (playing) context.getString(R.string.widget_now_playing_status)
+                else context.getString(R.string.widget_last_played_status)
+            )
+            if (nothing) {
+                // Text sits over a photo + dark scrim in the Nothing layout.
+                views.setTextColor(R.id.widget_status, palette.accent)
+            } else {
+                WidgetBackground.apply(context, manager, id, views, palette)
+                views.setInt(R.id.status_bg, "setColorFilter", palette.chip)
+                views.setTextColor(R.id.widget_status, palette.onChip)
+                views.setTextColor(R.id.widget_track, palette.text)
+                views.setTextColor(R.id.widget_artist, palette.muted)
+            }
+            if (art != null) views.setImageViewBitmap(R.id.widget_art, art)
+            WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
+            return views
         }
-        views.setTextViewText(
-            R.id.widget_status,
-            if (playing) context.getString(R.string.widget_now_playing_status)
-            else context.getString(R.string.widget_last_played_status)
-        )
-        if (nothing) {
-            // Text sits over a photo + dark scrim in the Nothing layout.
-            views.setTextColor(R.id.widget_status, palette.accent)
-        } else {
-            // Material You layout: colors come from the system color resources;
-            // only the card surface is tinted here.
-            views.setInt(R.id.card_bg, "setColorFilter", palette.surface)
-            views.setInt(R.id.status_bg, "setColorFilter", palette.chip)
-            views.setTextColor(R.id.widget_status, palette.onChip)
-            views.setTextColor(R.id.widget_track, palette.text)
-            views.setTextColor(R.id.widget_artist, palette.muted)
-        }
-        WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
-        for (id in ids) manager.updateAppWidget(id, views)
+        for (id in ids) manager.updateAppWidget(id, build(id, null))
 
         // Album art loads async — push a second update once it's ready.
         thread {
             val bitmap = (if (nothing) WidgetImageLoader.fetch(artUrl, 720, 0f) else WidgetImageLoader.fetch(artUrl)) ?: return@thread
-            views.setImageViewBitmap(R.id.widget_art, bitmap)
-            for (id in ids) manager.updateAppWidget(id, views)
+            for (id in ids) manager.updateAppWidget(id, build(id, bitmap))
         }
     }
 }

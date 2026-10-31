@@ -5,6 +5,7 @@ package com.example.laststats_mobile.widgets
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
+import android.graphics.Bitmap
 import android.widget.RemoteViews
 import com.example.laststats_mobile.R
 import es.antonborri.home_widget.HomeWidgetPlugin
@@ -29,35 +30,46 @@ class RecapWidgetProvider : AppWidgetProvider() {
             data, R.layout.widget_recap_nothing, R.layout.widget_recap_default
         )
 
-        val views = RemoteViews(context.packageName, layout)
-        views.setInt(R.id.card_bg, "setColorFilter", palette.surface)
-        views.setInt(R.id.icon_chip, "setColorFilter", palette.chip)
-        if (!nothing) views.setInt(R.id.icon_glyph, "setColorFilter", palette.onChip)
-        views.setTextViewText(R.id.recap_total, total)
-        views.setTextViewText(R.id.recap_weekly, weekly)
-        views.setTextViewText(R.id.recap_loved, loved)
-        for (i in intArrayOf(R.id.recap_total, R.id.recap_weekly, R.id.recap_loved)) {
-            views.setTextColor(i, palette.text)
-        }
-        views.setTextViewText(
-            R.id.recap_now,
-            if (track.isEmpty()) context.getString(R.string.widget_no_scrobble) else "$track — $artist"
-        )
-        views.setTextColor(R.id.recap_now, palette.text)
-        if (!nothing) {
-            for (i in intArrayOf(R.id.recap_lbl_total, R.id.recap_lbl_week, R.id.recap_lbl_loved)) {
-                views.setTextColor(i, palette.muted)
+        fun build(id: Int, art: Bitmap?): RemoteViews {
+            val views = RemoteViews(context.packageName, layout)
+            if (nothing) views.setInt(R.id.card_bg, "setColorFilter", palette.surface)
+            else {
+                WidgetBackground.apply(context, manager, id, views, palette)
+                // stat tiles, like ShareTile in the app
+                for (t in intArrayOf(R.id.recap_tile_total, R.id.recap_tile_week, R.id.recap_tile_loved)) {
+                    views.setInt(t, "setColorFilter", palette.chip)
+                    views.setInt(t, "setImageAlpha", 180)
+                }
             }
+            views.setInt(R.id.icon_chip, "setColorFilter", palette.chip)
+            if (!nothing) views.setInt(R.id.icon_glyph, "setColorFilter", palette.onChip)
+            views.setTextViewText(R.id.recap_total, total)
+            views.setTextViewText(R.id.recap_weekly, weekly)
+            views.setTextViewText(R.id.recap_loved, loved)
+            for (i in intArrayOf(R.id.recap_total, R.id.recap_weekly, R.id.recap_loved)) {
+                views.setTextColor(i, if (nothing) palette.text else palette.onChip)
+            }
+            views.setTextViewText(
+                R.id.recap_now,
+                if (track.isEmpty()) context.getString(R.string.widget_no_scrobble) else "$track — $artist"
+            )
+            views.setTextColor(R.id.recap_now, palette.text)
+            if (!nothing) {
+                for (i in intArrayOf(R.id.recap_lbl_total, R.id.recap_lbl_week, R.id.recap_lbl_loved)) {
+                    views.setTextColor(i, palette.onChip)
+                }
+            }
+            if (art != null) views.setImageViewBitmap(R.id.recap_art, art)
+            WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
+            return views
         }
-        WidgetUtils.setOpenAppIntent(context, views, R.id.widget_root)
-        for (id in ids) manager.updateAppWidget(id, views)
+        for (id in ids) manager.updateAppWidget(id, build(id, null))
 
         thread {
             val bitmap = WidgetImageLoader.fetch(artUrl)?.let {
                 WidgetImageLoader.roundCorners(it, 14f)
             } ?: return@thread
-            views.setImageViewBitmap(R.id.recap_art, bitmap)
-            for (id in ids) manager.updateAppWidget(id, views)
+            for (id in ids) manager.updateAppWidget(id, build(id, bitmap))
         }
     }
 }

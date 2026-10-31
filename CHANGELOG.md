@@ -93,7 +93,7 @@
 
 **Widgets**
 - Android widgets redesigned in Material You: system dynamic colors (wallpaper-based on Android 12+), system corner radius, follows the system light/dark mode, rounded square album art, themed LastStats glyph, picker descriptions in every language and a real preview
-- Widgets follow the app options: light/dark mode, accent color, dynamic color (Material You) and the "colored widgets" switch; fixed clipped numbers on the small widgets and the empty space in the recap widget
+- Widgets use the same poster style as the share images (flat color, soft cookie shapes, stat tiles) and follow the app options: light/dark mode, accent color, dynamic color (Material You) and the "colored widgets" switch; fixed clipped numbers on the small widgets and the empty space in the recap widget
 - Now-playing widget: new layout with the cover on the left, and the cover now loads even when Last.fm has none (same sources as the app)
 
 **Battery and sync**

@@ -20,4 +20,7 @@
     <string name="widget_desc_loved">お気に入りの曲数</string>
     <string name="widget_desc_weekly">過去7日間のスクロブル</string>
     <string name="widget_desc_recap">合計・今週・お気に入りをひと目で</string>
+    <string name="widget_preview_scrobbles">スクロブル</string>
+    <string name="widget_preview_track">曲名</string>
+    <string name="widget_preview_artist">アーティスト</string>
 </resources>

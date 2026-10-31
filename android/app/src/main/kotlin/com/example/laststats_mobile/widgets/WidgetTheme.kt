@@ -15,7 +15,9 @@ data class WidgetPalette(
     val text: Int,
     val muted: Int,
     val accent: Int,
-    val onChip: Int = text
+    val onChip: Int = text,
+    val tertiary: Int = accent,   // poster blobs (like the share images)
+    val secondary: Int = accent
 )
 
 object WidgetTheme {
@@ -27,19 +29,21 @@ object WidgetTheme {
             if (dark) WidgetPalette(
                 c(android.R.color.system_neutral1_900), c(android.R.color.system_accent1_700),
                 c(android.R.color.system_neutral1_100), c(android.R.color.system_neutral2_200),
-                c(android.R.color.system_accent1_200), c(android.R.color.system_accent1_100))
+                c(android.R.color.system_accent1_200), c(android.R.color.system_accent1_100),
+                c(android.R.color.system_accent3_200), c(android.R.color.system_accent2_200))
             else WidgetPalette(
                 c(android.R.color.system_neutral1_10), c(android.R.color.system_accent1_100),
                 c(android.R.color.system_neutral1_900), c(android.R.color.system_neutral2_700),
-                c(android.R.color.system_accent1_600), c(android.R.color.system_accent1_900))
+                c(android.R.color.system_accent1_600), c(android.R.color.system_accent1_900),
+                c(android.R.color.system_accent3_600), c(android.R.color.system_accent2_600))
         } else if (dark) WidgetPalette(
             Color.parseColor("#141218"), Color.parseColor("#4F378B"),
             Color.parseColor("#E6E0E9"), Color.parseColor("#CAC4D0"), Color.parseColor("#D0BCFF"),
-            Color.parseColor("#EADDFF"))
+            Color.parseColor("#EADDFF"), Color.parseColor("#EFB8C8"), Color.parseColor("#CCC2DC"))
         else WidgetPalette(
             Color.parseColor("#FEF7FF"), Color.parseColor("#EADDFF"),
             Color.parseColor("#1D1B20"), Color.parseColor("#49454F"), Color.parseColor("#6750A4"),
-            Color.parseColor("#21005D"))
+            Color.parseColor("#21005D"), Color.parseColor("#7D5260"), Color.parseColor("#625B71"))
     }
 
     // Palette from the app accent (dynamic color off): honours the app's
@@ -53,7 +57,12 @@ object WidgetTheme {
         val onChip = blend(if (dark) Color.WHITE else Color.BLACK, accent, if (dark) 0.25f else 0.35f)
         val text = blend(if (dark) Color.parseColor("#E6E1E5") else Color.parseColor("#1C1B1F"), accent, 0.06f)
         val muted = blend(if (dark) Color.parseColor("#CAC4D0") else Color.parseColor("#49454F"), accent, 0.12f)
-        return WidgetPalette(surface, chip, text, muted, accent, onChip)
+        // tertiary = accent hue shifted, secondary = softened accent (like Material schemes)
+        val hsv = FloatArray(3); Color.colorToHSV(accent, hsv)
+        val t = floatArrayOf((hsv[0] + 60f) % 360f, hsv[1], hsv[2])
+        val sec = floatArrayOf(hsv[0], hsv[1] * 0.4f, hsv[2])
+        return WidgetPalette(surface, chip, text, muted, accent, onChip,
+            Color.HSVToColor(t), Color.HSVToColor(sec))
     }
 
     fun resolve(context: Context, data: SharedPreferences): WidgetPalette {

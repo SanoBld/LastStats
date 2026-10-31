@@ -8,6 +8,7 @@
         android:id="@+id/card_bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:scaleType="fitXY"
         android:src="@drawable/widget_card_shape" />
 
     <!-- Sequential vertical flow — icon, then number, then label.
@@ -53,7 +54,7 @@
 
         <TextView
             android:id="@+id/widget_label"
-        android:text="scrobbles"
+        android:text="@string/widget_weekly_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"

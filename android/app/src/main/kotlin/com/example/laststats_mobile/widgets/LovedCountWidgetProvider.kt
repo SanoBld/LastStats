@@ -20,15 +20,17 @@ class LovedCountWidgetProvider : AppWidgetProvider() {
         val palette = WidgetTheme.resolve(context, data)
         val nothing = data.getString("theme_style", "default") == "nothing"
 
-        fun build(tinyRes: Int, pillRes: Int, fullRes: Int): RemoteViews {
+        fun build(id: Int, tinyRes: Int, pillRes: Int, fullRes: Int): RemoteViews {
             val tiny = RemoteViews(context.packageName, tinyRes)
-            tiny.setInt(R.id.card_bg, "setColorFilter", palette.surface)
+            if (nothing) tiny.setInt(R.id.card_bg, "setColorFilter", palette.surface)
+            else WidgetBackground.apply(context, manager, id, tiny, palette)
             tiny.setTextViewText(R.id.widget_value, loved)
             tiny.setTextColor(R.id.widget_value, palette.text)
             WidgetUtils.setOpenAppIntent(context, tiny, R.id.widget_root)
 
             val pill = RemoteViews(context.packageName, pillRes)
-            pill.setInt(R.id.card_bg, "setColorFilter", palette.surface)
+            if (nothing) pill.setInt(R.id.card_bg, "setColorFilter", palette.surface)
+            else WidgetBackground.apply(context, manager, id, pill, palette)
             pill.setInt(R.id.icon_chip, "setColorFilter", palette.chip)
             if (!nothing) pill.setInt(R.id.icon_glyph, "setColorFilter", palette.onChip)
             pill.setTextViewText(R.id.widget_value, loved)
@@ -36,7 +38,8 @@ class LovedCountWidgetProvider : AppWidgetProvider() {
             WidgetUtils.setOpenAppIntent(context, pill, R.id.widget_root)
 
             val full = RemoteViews(context.packageName, fullRes)
-            full.setInt(R.id.card_bg, "setColorFilter", palette.surface)
+            if (nothing) full.setInt(R.id.card_bg, "setColorFilter", palette.surface)
+            else WidgetBackground.apply(context, manager, id, full, palette)
             full.setInt(R.id.icon_chip, "setColorFilter", palette.chip)
             if (!nothing) full.setInt(R.id.icon_glyph, "setColorFilter", palette.onChip)
             full.setTextViewText(R.id.widget_value, loved)
@@ -48,11 +51,13 @@ class LovedCountWidgetProvider : AppWidgetProvider() {
             return WidgetUtils.responsiveViews(context, tiny, pill, full)
         }
 
+        for (id in ids) {
         val views = if (nothing) {
-            build(R.layout.widget_loved_count_tiny_nothing, R.layout.widget_loved_count_pill_nothing, R.layout.widget_loved_count_nothing)
+            build(id, R.layout.widget_loved_count_tiny_nothing, R.layout.widget_loved_count_pill_nothing, R.layout.widget_loved_count_nothing)
         } else {
-            build(R.layout.widget_loved_count_tiny_default, R.layout.widget_loved_count_pill_default, R.layout.widget_loved_count_default)
+            build(id, R.layout.widget_loved_count_tiny_default, R.layout.widget_loved_count_pill_default, R.layout.widget_loved_count_default)
         }
-        for (id in ids) manager.updateAppWidget(id, views)
+        manager.updateAppWidget(id, views)
+        }
     }
 }
