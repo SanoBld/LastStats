@@ -33,6 +33,9 @@
 ## v4.3.0
 
 **Settings and backups**
+- Fixed: with "colour from the music", the greyed-out base accent (and the day/night accent) is never used any more
+- Fixed: cached images no longer flash a placeholder when a list redraws (they are now kept in memory, and the cache index is written less often)
+- Artist page: the Popular / Recent switch now uses the Material You segmented button
 - Fixed: with "colour from the music", the colour chosen for when nothing plays is used again at app start and by the widgets (it fell back to the default accent)
 - Backups now also include the update channel, the auto-update check, the scrobble sync options and the year recap share option; restoring a backup refreshes the widgets
 

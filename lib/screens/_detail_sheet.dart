@@ -1682,25 +1682,6 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       ));
     }
 
-    Widget tab(int i, String label) => Expanded(
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () => _setTrkTab(i),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 9),
-              child: Center(
-                child: AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 250),
-                  style: (text.labelLarge ?? const TextStyle()).copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: _trkTab == i ? scheme.onPrimary : scheme.primary),
-                  child: Text(label),
-                ),
-              ),
-            ),
-          ),
-        );
-
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: _AccentCard(
@@ -1716,34 +1697,14 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             Text(L.detailTopTracks,
                 style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
             const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: scheme.primary.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(22),
-              ),
-              child: Stack(children: [
-                Positioned.fill(
-                  child: AnimatedAlign(
-                    duration: const Duration(milliseconds: 320),
-                    curve: Curves.easeOutBack,
-                    alignment: _trkTab == 0 ? Alignment.centerLeft : Alignment.centerRight,
-                    child: FractionallySizedBox(
-                      widthFactor: 0.5,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: scheme.primary,
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Row(children: [
-                  tab(0, tx('art_popular')),
-                  tab(1, tx('art_recent')),
-                ]),
-              ]),
+            // Same Material You switch as the other tabs of the app.
+            M3SegmentedButton<int>(
+              segments: [
+                ButtonSegment<int>(value: 0, label: Text(tx('art_popular'))),
+                ButtonSegment<int>(value: 1, label: Text(tx('art_recent'))),
+              ],
+              selected: {_trkTab},
+              onSelectionChanged: (v) => _setTrkTab(v.first),
             ),
             const SizedBox(height: 14),
             AnimatedSize(

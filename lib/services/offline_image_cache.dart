@@ -8,6 +8,7 @@
 //   final provider = await OfflineImageCache.imageProvider(url);
 //   Image(image: provider, ...)
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -53,6 +54,32 @@ class OfflineImageCache {
   static bool _loaded     = false;
 
   static const _timeout = Duration(seconds: 8);
+
+  // In-memory copy of recently used images. Without it every rebuild re-read
+  // the file from disk (and flashed the placeholder), even for cached images.
+  // The SAME Uint8List instance is reused, so Flutter's decoded-image cache
+  // also hits and nothing is decoded twice.
+  static final Map<String, Uint8List> _mem = {};
+  static int _memBytes = 0;
+  static const _memMaxBytes   = 64 * 1024 * 1024;
+  static const _memMaxEntries = 400;
+
+  static void _memPut(String url, Uint8List bytes) {
+    final old = _mem.remove(url);
+    if (old != null) _memBytes -= old.length;
+    _mem[url] = bytes;
+    _memBytes += bytes.length;
+    while ((_memBytes > _memMaxBytes || _mem.length > _memMaxEntries) && _mem.isNotEmpty) {
+      final k = _mem.keys.first;
+      _memBytes -= _mem.remove(k)!.length;
+    }
+  }
+
+  static Timer? _saveTimer;
+  static void _saveMetaLater() {
+    _saveTimer?.cancel();
+    _saveTimer = Timer(const Duration(seconds: 5), () => _saveMeta().ignore());
+  }
 
   // ── Metadata persistence ──────────────────────────────────────────────────
 
@@ -129,21 +156,26 @@ class OfflineImageCache {
     final entry = _meta[url];
     if (entry == null) return null;
 
-    final bytes = await ImageCacheBackend.read(entry.fileKey);
-    if (bytes == null) {
-      // File gone — remove from meta.
-      _totalBytes -= entry.size;
-      _meta.remove(url);
-      return null;
+    var bytes = _mem[url];
+    if (bytes != null) {
+      _memPut(url, bytes); // bump: most recently used goes last
+    } else {
+      bytes = await ImageCacheBackend.read(entry.fileKey);
+      if (bytes == null) {
+        // File gone — remove from meta.
+        _totalBytes -= entry.size;
+        _meta.remove(url);
+        return null;
+      }
+      _memPut(url, bytes);
     }
 
-    // Update access time for LRU.
-    _meta[url] = _ImageEntry(
-      fileKey: entry.fileKey,
-      atime:   DateTime.now().millisecondsSinceEpoch,
-      size:    entry.size,
-    );
-    _saveMeta().ignore();
+    // Update access time for LRU, but write the metadata file rarely.
+    final now = DateTime.now().millisecondsSinceEpoch;
+    if (now - entry.atime > 10 * 60 * 1000) {
+      _meta[url] = _ImageEntry(fileKey: entry.fileKey, atime: now, size: entry.size);
+      _saveMetaLater();
+    }
     return bytes;
   }
 
@@ -162,6 +194,7 @@ class OfflineImageCache {
         size:    bytes.length,
       );
       await ImageCacheBackend.write(old.fileKey, bytes);
+      _memPut(url, bytes);
       await _saveMeta();
       return;
     }
@@ -181,6 +214,7 @@ class OfflineImageCache {
     );
     _totalBytes += bytes.length;
     await ImageCacheBackend.write(key, bytes);
+    _memPut(url, bytes);
     await _saveMeta();
   }
 
@@ -201,6 +235,8 @@ class OfflineImageCache {
       freed      += kv.value.size;
       _totalBytes -= kv.value.size;
       _meta.remove(kv.key);
+      final m = _mem.remove(kv.key);
+      if (m != null) _memBytes -= m.length;
     }
     await _saveMeta();
   }
@@ -217,6 +253,8 @@ class OfflineImageCache {
   // ── Clear ─────────────────────────────────────────────────────────────────
 
   static Future<void> clear() async {
+    _mem.clear();
+    _memBytes = 0;
     _meta.clear();
     _totalBytes = 0;
     _nextId     = 0;
@@ -248,6 +286,26 @@ class OfflineImageCache {
   }) {
     final ph = placeholder ?? M3ImagePlaceholder(width: width, height: height);
     if (url.isEmpty) return placeholder ?? const SizedBox.shrink();
+
+    // Fast path: already in memory → show it in the same frame, no
+    // placeholder flash and no disk read.
+    final hot = _mem[url];
+    if (hot != null && _meta.containsKey(url)) {
+      return Builder(builder: (context) {
+        final dpr = MediaQuery.of(context).devicePixelRatio;
+        return Image.memory(
+          hot,
+          width: width,
+          height: height,
+          fit: fit,
+          cacheWidth:  width  != null ? (width * dpr).round()  : null,
+          cacheHeight: height != null ? (height * dpr).round() : null,
+          gaplessPlayback: true,
+          errorBuilder: (_, _, _) =>
+              errorWidget ?? placeholder ?? const SizedBox.shrink(),
+        );
+      });
+    }
 
     // Cache checked FIRST (offline or online) — network is only a fallback.
     return FutureBuilder<Uint8List?>(

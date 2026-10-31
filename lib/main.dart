@@ -452,9 +452,9 @@ class LastStatsApp extends StatelessWidget {
                                     return ValueListenableBuilder<int>(
                                       valueListenable: nightStartHourNotifier,
                                       builder: (_, nightStartHour, _) {
-                                        return ValueListenableBuilder<int>(
-                                          valueListenable: minuteTickNotifier,
-                                          builder: (_, _, _) {
+                                        return ListenableBuilder(
+                                          listenable: Listenable.merge([minuteTickNotifier, useNowPlayingColorNotifier]),
+                                          builder: (_, _) {
                     // Resolve which accent feeds the light theme and which
                     // feeds the dark theme. With hour-based switching on,
                     // both themes get the *same* accent (the one matching
@@ -463,10 +463,13 @@ class LastStatsApp extends StatelessWidget {
                     final bool nightNow = useHours
                         ? isNightByHour(dayStartHour, nightStartHour)
                         : false;
-                    final Color lightAccent = !useDayNight
+                    // "Colour from the music" on: the base accent options are
+                    // greyed out, so they must not be used (day/night included).
+                    final bool np = useNowPlayingColorNotifier.value && !useDynamic;
+                    final Color lightAccent = (!useDayNight || np)
                         ? accent
                         : (useHours ? (nightNow ? accentDark : accent) : accent);
-                    final Color darkAccent = !useDayNight
+                    final Color darkAccent = (!useDayNight || np)
                         ? accent
                         : (useHours ? (nightNow ? accentDark : accent) : accentDark);
                     return ValueListenableBuilder<ThemeMode>(
