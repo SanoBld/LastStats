@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-31T16:56:41Z",
+  "updated": "2026-10-31T20:46:40Z",
   "commits": [
+    {
+      "sha": "b6bbcb41dde0c20c95603b9e70cc7490bdc3fa23",
+      "message": "feat: Améliorer la gestion des images en cache avec une copie en mémoire pour éviter les flashes de placeholder",
+      "date": "2026-10-31T20:44:09Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/b6bbcb41dde0c20c95603b9e70cc7490bdc3fa23",
+      "tags": []
+    },
     {
       "sha": "e46b31ebb6b953cc91bb9f45131f99033cc7a625",
       "message": "feat: Améliorer la gestion des couleurs des widgets et des sauvegardes, incluant des options de restauration et de synchronisation",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/c8162dacc830f49738017c7b23dfd90f8e85904c",
-      "tags": []
-    },
-    {
-      "sha": "b95c420079786d8b59468382ba901ebba035822f",
-      "message": "feat: ajouter des animations de transition et de pression pour améliorer l'interaction utilisateur",
-      "date": "2026-09-11T08:20:52Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/b95c420079786d8b59468382ba901ebba035822f",
       "tags": []
     }
   ]
