@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-31T14:29:08Z",
+  "updated": "2026-10-31T14:51:54Z",
   "commits": [
+    {
+      "sha": "88f0338d2099a563b5f4b62e81c66b314a86bf3b",
+      "message": "feat: Ajouter une option de fond de widget avec plusieurs thèmes et mise à jour instantanée des changements de thème",
+      "date": "2026-10-31T14:41:02Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/88f0338d2099a563b5f4b62e81c66b314a86bf3b",
+      "tags": []
+    },
     {
       "sha": "c3191c4d6ed66741f2c6bdc4c67383c444594466",
       "message": "feat: Update changelog and enhance share card layout for better image sharing",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/1601fcebb1cad6b0e0b64ef1ae84274c3477c3f3",
-      "tags": []
-    },
-    {
-      "sha": "522dae4ca8086d6740b223b43c781d132bc33620",
-      "message": "feat: améliorer la gestion des années de scrobble en ajoutant un indicateur de succès pour le téléchargement",
-      "date": "2026-09-08T19:51:17Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/522dae4ca8086d6740b223b43c781d132bc33620",
       "tags": []
     }
   ]
