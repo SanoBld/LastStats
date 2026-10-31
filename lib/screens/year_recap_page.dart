@@ -1213,6 +1213,11 @@ class _YearRecapPageState extends State<YearRecapPage> {
               style: TextStyle(color: s.onPrimaryContainer, fontSize: 28, fontWeight: FontWeight.w900, height: 1.1)),
           const SizedBox(height: 28),
         ],
+        // "This year, you listened to: 884 scrobbles"
+        Text(tx('yr_total_intro'),
+            textAlign: TextAlign.center,
+            style: TextStyle(color: _yrSoft(s), fontSize: 17, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 14),
         _YrCountUp(value: d.total, fmt: _fmt, delayMs: 350, durationMs: 1600,
             style: TextStyle(color: s.primary, fontSize: 72, fontWeight: FontWeight.w900, height: 1)),
         const SizedBox(height: 6),
@@ -2140,7 +2145,8 @@ class _YrShareCard extends StatelessWidget {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(name, style: TextStyle(color: c1, fontSize: 12, fontWeight: FontWeight.w700)),
       const SizedBox(height: 4),
-      full ? SizedBox(height: 26, child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: t)) : t,
+      // one line, scaled down when the translation is long (the single-slide cards used to cut it)
+      SizedBox(height: 26, child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: t)),
     ]);
   }
 }

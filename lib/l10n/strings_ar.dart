@@ -1357,6 +1357,7 @@ const Map<String, String> kTxAr = {
   'yr_empty': 'لا توجد سكروبلات لعام {year}.',
   'yr_intro_h': 'عامك {year} في الموسيقى',
   'yr_scrobbles': 'سكروبل',
+  'yr_total_intro': 'هذا العام استمعت إلى:',
   'yr_hours': 'أي ما يقارب {h} ساعة من الموسيقى (تقدير).',
   'yr_top_artist': 'فنانك الأول',
   'yr_top_artists': 'أفضل الفنانين',

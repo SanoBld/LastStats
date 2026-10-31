@@ -1383,6 +1383,7 @@ const Map<String, String> kTxZh = {
   'yr_empty': '未找到 {year} 年的 scrobble。',
   'yr_intro_h': '你的 {year} 音乐年',
   'yr_scrobbles': '次 scrobble',
+  'yr_total_intro': '今年你听了：',
   'yr_hours': '大约相当于 {h} 小时的音乐（估算）。',
   'yr_top_artist': '你的年度艺人',
   'yr_top_artists': '热门艺人',

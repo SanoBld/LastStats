@@ -1357,6 +1357,7 @@ const Map<String, String> kTxIt = {
   'yr_empty': 'Nessuno scrobble trovato per il {year}.',
   'yr_intro_h': 'Il tuo {year} in musica',
   'yr_scrobbles': 'scrobble',
+  'yr_total_intro': 'Quest’anno hai ascoltato:',
   'yr_hours': 'Sono circa {h} ore di musica (stima).',
   'yr_top_artist': 'Il tuo artista n. 1',
   'yr_top_artists': 'Top artisti',

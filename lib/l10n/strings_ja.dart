@@ -1356,6 +1356,7 @@ const Map<String, String> kTxJa = {
   'yr_empty': '{year}年のスクロブルは見つかりませんでした。',
   'yr_intro_h': 'あなたの{year}年の音楽',
   'yr_scrobbles': 'スクロブル',
+  'yr_total_intro': '今年あなたが聴いたのは：',
   'yr_hours': 'およそ{h}時間分の音楽です（推定）。',
   'yr_top_artist': 'いちばん聴いたアーティスト',
   'yr_top_artists': 'トップアーティスト',

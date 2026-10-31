@@ -1357,6 +1357,7 @@ const Map<String, String> kTxRu = {
   'yr_empty': 'Скробблов за {year} не найдено.',
   'yr_intro_h': 'Ваш {year} год в музыке',
   'yr_scrobbles': 'скробблов',
+  'yr_total_intro': 'В этом году вы прослушали:',
   'yr_hours': 'Это примерно {h} часов музыки (оценка).',
   'yr_top_artist': 'Ваш артист №1',
   'yr_top_artists': 'Топ исполнителей',

@@ -1386,6 +1386,7 @@ const Map<String, String> kTxFr = {
   'yr_empty': 'Aucun scrobble trouvé pour {year}.',
   'yr_intro_h': 'Votre année {year} en musique',
   'yr_scrobbles': 'scrobbles',
+  'yr_total_intro': 'Cette année, vous avez écouté :',
   'yr_hours': 'Cela représente environ {h} heures de musique (estimation).',
   'yr_top_artist': 'Votre artiste n°1',
   'yr_top_artists': 'Top artistes',
