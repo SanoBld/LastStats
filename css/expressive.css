@@ -202,7 +202,6 @@ a, button { touch-action: manipulation; }
 .project-actions a.is-pressed, .project-actions button.is-pressed {
   border-radius: var(--r-press);
   transform: scale(.95);
-  box-shadow: none;
   transition-duration: .2s, .2s, .2s, .2s;
 }
 /* keep the ripple inside the rounded shape while the radius is animating */
@@ -212,11 +211,11 @@ a, button { touch-action: manipulation; }
    rest = small inner corners, hover = big tile corners, press = soft square */
 .project-actions #download-trigger { border-radius: var(--r-inner); }
 @media (hover: hover) {
-  .project-actions #download-trigger:hover { border-radius: var(--r-tile); transform: translateY(-2px); box-shadow: 0 6px 16px -4px rgba(var(--md-shadow), .4); }
+  .project-actions #download-trigger:hover { border-radius: var(--r-tile); transform: translateY(-2px); }
 }
 .project-actions #download-trigger:active,
 .project-actions #download-trigger.is-pressed {
-  border-radius: var(--r-press); transform: scale(.96); box-shadow: none; transition-duration: .2s, .2s, .2s, .2s;
+  border-radius: var(--r-press); transform: scale(.96); transition-duration: .2s, .2s, .2s, .2s;
 }
 /* version tile is a link now */
 a.gh-stat { text-decoration: none; cursor: pointer; }
@@ -471,4 +470,156 @@ button.cm-tr-btn, .rel-rail button.cm-tr-btn, .rel-toolbar button.cm-tr-btn {
 }
 @media (max-width: 640px) {
   .project-actions > :active, .project-actions > .is-pressed { border-radius: var(--r-press); }
+}
+
+
+/* ==========================================================
+   HARMONY — one set of rules for every button / chip / card on the site.
+   Loaded last on purpose: it replaces the per-page differences (sizes,
+   corner radii, hover lift, hover colors, pressed shape, shadows).
+
+   Button families
+     text buttons : hero actions, contact, footer, back, CTA, filters,
+                    release / commit buttons, language, random colour...
+     icon buttons : theme, logo, translate, carousel arrows, close
+   Same behaviour inside a family:
+     rest    -> own colour, NO shadow
+     hover   -> softer corners (--r-hover) + 2px lift (icons: no lift)
+                + a colour "state layer" (same recipe everywhere), NO shadow
+     pressed -> 14px square + scale .95
+     focus   -> same outline everywhere
+   ========================================================== */
+:root {
+  --btn-h: 44px;       /* standard button */
+  --btn-h-lg: 48px;    /* big action groups (hero, contact, footer, files) */
+  --r-btn: 22px;       /* half of 44px */
+}
+
+/* 1) NO shadow on any button, at rest or on hover */
+.project-actions a, .project-actions button, .contact-links a,
+.footer .footer-links.footer-buttons a, .back-link, .about-cta, .help-external-link,
+.lang-toggle, .theme-toggle, .nav-logo, .cm-tr-btn, .rel-filter-btn, .rel-gh, .rel-more,
+.rel-toggle, .rel-asset, .rel-plat-sum, .cm-btn, .cm-sha, .color-random, .color-modes button,
+.m3-carousel-btn, .lightbox-close, .dl-modal-close, .dl-option, .dl-back,
+.feature-chips span, .project-tags span,
+.project-actions a:hover, .project-actions button:hover, .contact-links a:hover,
+.theme-toggle:hover, .lang-toggle:hover, .nav-logo:hover, .m3-carousel-btn:hover {
+  box-shadow: none !important;
+}
+
+/* 2) same sizes */
+.project-actions a, .project-actions button, .contact-links a,
+.footer .footer-links.footer-buttons a, .rel-asset, .rel-plat-sum { min-height: var(--btn-h-lg); }
+.back-link, .about-cta, .help-external-link, .lang-toggle, .rel-filter-btn:not(.cm-tr-btn),
+.rel-gh, .rel-more, .cm-btn, .color-random, .web-warn-actions a, .web-warn-actions button { min-height: var(--btn-h); }
+.about-cta, .back-link, .help-external-link, .lang-toggle, .rel-gh, .rel-more { border-radius: var(--r-btn); }
+.rel-toggle { border-radius: var(--r-chip); }
+.rel-filter-btn:not(.cm-tr-btn):first-child { border-radius: var(--r-btn) var(--r-inner) var(--r-inner) var(--r-btn); }
+.rel-filter-btn:not(.cm-tr-btn):last-child  { border-radius: var(--r-inner) var(--r-btn) var(--r-btn) var(--r-inner); }
+.cm-btn:first-child { border-radius: var(--r-btn) var(--r-inner) var(--r-inner) var(--r-btn); }
+.cm-btn:last-child  { border-radius: var(--r-inner) var(--r-btn) var(--r-btn) var(--r-inner); }
+.cm-btn:only-child  { border-radius: var(--r-btn); }
+.web-warn-actions a, .web-warn-actions button { border-radius: var(--r-btn); }
+/* same text style */
+.project-actions a, .project-actions button, .contact-links a,
+.footer .footer-links.footer-buttons a, .back-link, .about-cta, .help-external-link,
+.rel-filter-btn, .rel-gh, .rel-more, .rel-asset, .rel-plat-sum, .cm-btn, .color-random {
+  font-weight: 500; letter-spacing: 0;
+}
+.project-actions a, .project-actions button, .contact-links a, .footer .footer-links.footer-buttons a { font-size: .95rem; }
+.back-link, .about-cta, .help-external-link, .rel-filter-btn, .rel-gh, .rel-more, .rel-asset, .rel-plat-sum, .cm-btn, .color-random { font-size: .9rem; }
+
+/* 3) same colours: first button of a group = filled, the others = tonal
+      (the contact links used to be primary / secondary / tertiary) */
+.contact-links a:nth-child(n+2) { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+.contact-links a:first-child { background: var(--md-primary); color: var(--md-on-primary); }
+/* translate button: same tonal round button as theme / logo, filled when on */
+.cm-tr-btn { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+.cm-tr-btn.is-active { background: var(--md-primary); color: var(--md-on-primary); }
+/* chips: same look and same (colour-less) hover everywhere */
+.project-tags span, .project-tags span:hover { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+
+/* 4) same motion */
+.project-actions a, .project-actions button, .contact-links a,
+.footer .footer-links.footer-buttons a, .about-cta, .help-external-link, .lang-toggle,
+.theme-toggle, .nav-logo, .cm-tr-btn, .rel-filter-btn, .rel-gh, .rel-more, .rel-toggle,
+.rel-asset, .rel-plat-sum, .cm-btn, .cm-sha, .color-random, .color-modes button,
+.m3-carousel-btn, .lightbox-close, .dl-modal-close, .dl-option, .dl-back,
+.feature-chips span, .project-tags span {
+  transition: border-radius .5s var(--spring-default), transform .35s var(--spring-fast),
+              background-color .2s var(--effects), color .2s var(--effects), opacity .2s var(--effects);
+}
+
+/* 5) same hover: shape + lift, colour state layer (mouse only) */
+@media (hover: hover) {
+  .project-actions a:hover, .project-actions button:hover, .project-actions #download-trigger:hover,
+  .contact-links a:hover, .footer .footer-links.footer-buttons a:hover,
+  .about-cta:hover, .help-external-link:hover, .lang-toggle:hover,
+  .rel-filter-btn:not(.cm-tr-btn):hover, .rel-gh:hover, .rel-more:hover, .rel-toggle:hover,
+  .rel-asset:hover, .rel-plat-sum:hover, .cm-btn:hover, .color-random:hover {
+    border-radius: var(--r-hover) !important; transform: translateY(-2px);
+  }
+  .back-link.reveal.in-view:hover, .back-link:hover { border-radius: var(--r-hover); transform: translateY(-2px); }
+  /* icon buttons: shape only */
+  .theme-toggle:hover, .nav-logo:hover, .cm-tr-btn:hover, .m3-carousel-btn:hover:not(:disabled),
+  .lightbox-close:hover, .dl-modal-close:hover { border-radius: var(--r-hover) !important; transform: none; }
+  /* chips */
+  .feature-chips span:hover, .project-tags span:hover { border-radius: var(--r-chip); transform: translateY(-2px); }
+
+  /* colour state layer: one recipe for tonal buttons, one for filled ones */
+  .project-actions a.tonal:hover, .project-actions button.tonal:hover,
+  .contact-links a:nth-child(n+2):hover, .footer .footer-links.footer-buttons a:hover,
+  .back-link:hover, .about-cta:hover, .help-external-link:hover, .lang-toggle:hover,
+  .theme-toggle:hover, .nav-logo:hover, .cm-tr-btn:not(.is-active):hover,
+  .rel-filter-btn:not(.is-active):not(.cm-tr-btn):hover, .rel-gh:hover, .rel-more:hover,
+  .rel-asset:hover, .rel-plat-sum:hover, .cm-btn:not(.is-zip):hover,
+  .m3-carousel-btn:hover:not(:disabled), .color-random:not(.is-active):hover {
+    background-color: color-mix(in srgb, var(--md-secondary-container) 86%, var(--md-on-secondary-container));
+    color: var(--md-on-secondary-container);
+  }
+  .project-actions a:not(.tonal):hover, .project-actions button:not(.tonal):hover,
+  .contact-links a:first-child:hover, .rel-filter-btn.is-active:hover, .cm-tr-btn.is-active:hover,
+  .cm-btn.is-zip:hover, .color-modes button.is-active:hover, .color-random.is-active:hover,
+  .rel-card.is-latest .rel-asset:hover, .rel-card.is-latest .rel-plat-sum:hover,
+  .web-warn-open:hover {
+    background-color: color-mix(in srgb, var(--md-primary) 86%, var(--md-on-primary));
+    color: var(--md-on-primary);
+  }
+  .rel-toggle:hover { background-color: var(--md-surface-container-highest); }
+  /* cards / screenshots: same small lift, no shadow, no scale */
+  .project-card:hover, .showcase-media:hover { transform: translateY(-4px); }
+  .showcase-media:hover { border-radius: var(--r-tile); }
+}
+/* latest-version card: buttons are already filled, so hover keeps the same filled layer */
+.rel-card.is-latest .cm-btn.is-zip { background: var(--md-on-primary-container); color: var(--md-primary-container); }
+
+/* 6) same pressed shape (mouse, touch and the JS-held .is-pressed) */
+.project-actions a:active, .project-actions button:active, .project-actions #download-trigger:active,
+.contact-links a:active, .footer .footer-links.footer-buttons a:active,
+.back-link:active, .about-cta:active, .help-external-link:active, .lang-toggle:active,
+.theme-toggle:active, .nav-logo:active, .cm-tr-btn:active, .m3-carousel-btn:active:not(:disabled),
+.rel-filter-btn:not(.cm-tr-btn):active, .rel-gh:active, .rel-more:active, .rel-toggle:active,
+.rel-asset:active, .rel-plat-sum:active, .cm-btn:active, .cm-sha:active, .color-random:active, .color-modes button:active,
+.lightbox-close:active, .dl-modal-close:active, .dl-option:active, .dl-back:active,
+.project-actions a.is-pressed, .project-actions button.is-pressed, .contact-links a.is-pressed,
+.footer .footer-links.footer-buttons a.is-pressed, .back-link.is-pressed, .about-cta.is-pressed,
+.help-external-link.is-pressed, .lang-toggle.is-pressed, .theme-toggle.is-pressed, .nav-logo.is-pressed,
+.cm-tr-btn.is-pressed, .m3-carousel-btn.is-pressed, .rel-filter-btn.is-pressed, .rel-gh.is-pressed,
+.rel-more.is-pressed, .rel-toggle.is-pressed, .rel-asset.is-pressed, .rel-plat-sum.is-pressed,
+.cm-btn.is-pressed, .cm-sha.is-pressed, .color-random.is-pressed, .dl-option.is-pressed, .dl-back.is-pressed,
+.rel-filter-btn:not(.cm-tr-btn).is-pressed, .project-actions #download-trigger.is-pressed {
+  border-radius: var(--r-press) !important; transform: scale(.95) !important;
+  transition-duration: .2s, .2s, .2s, .2s, .2s;
+}
+.project-card:active, .showcase-media:active { transform: scale(.98); }
+
+/* 7) same keyboard focus ring */
+.project-actions a:focus-visible, .project-actions button:focus-visible, .contact-links a:focus-visible,
+.footer .footer-links.footer-buttons a:focus-visible, .back-link:focus-visible, .about-cta:focus-visible,
+.help-external-link:focus-visible, .lang-toggle:focus-visible, .theme-toggle:focus-visible,
+.nav-logo:focus-visible, .cm-tr-btn:focus-visible, .m3-carousel-btn:focus-visible,
+.rel-filter-btn:focus-visible, .rel-gh:focus-visible, .rel-more:focus-visible, .rel-toggle:focus-visible,
+.rel-asset:focus-visible, .rel-plat-sum:focus-visible, .cm-btn:focus-visible, .color-random:focus-visible,
+.dl-option:focus-visible, .dl-back:focus-visible {
+  outline: 2px solid var(--md-primary); outline-offset: 2px;
 }

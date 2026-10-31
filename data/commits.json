@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-31T21:42:32Z",
+  "updated": "2026-10-31T22:08:07Z",
   "commits": [
+    {
+      "sha": "05698c706f191a3c2031965f2372b50d30c74401",
+      "message": "feat: Améliorer l'interface utilisateur en ajustant les espacements et les transitions des boutons",
+      "date": "2026-10-31T21:56:30Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/05698c706f191a3c2031965f2372b50d30c74401",
+      "tags": []
+    },
     {
       "sha": "ae1d799106842013e64c2d4504dbd48e5c1ed2b6",
       "message": "Match Wikipedia music pages to artist and title\n\nRequire exact title matches for albums and tracks, and reject pages that don't mention the artist. Add music-related hints in more languages to improve page filtering.",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/fb056b8fadd4f9df87e2c1af3a1aae438d6400ee",
-      "tags": []
-    },
-    {
-      "sha": "49c5bcb3bb1341e42fc9b7727ce233a8e4c7d069",
-      "message": "feat: simplifier l'animation de pression en supprimant le paramètre downScale",
-      "date": "2026-09-11T10:19:31Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/49c5bcb3bb1341e42fc9b7727ce233a8e4c7d069",
       "tags": []
     }
   ]
