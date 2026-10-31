@@ -1,6 +1,24 @@
 {
-  "updated": "2026-10-31T13:48:07Z",
+  "updated": "2026-10-31T14:19:16Z",
   "commits": [
+    {
+      "sha": "c3191c4d6ed66741f2c6bdc4c67383c444594466",
+      "message": "feat: Update changelog and enhance share card layout for better image sharing",
+      "date": "2026-10-31T14:16:58Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/c3191c4d6ed66741f2c6bdc4c67383c444594466",
+      "tags": []
+    },
+    {
+      "sha": "4d35f981333ca402f99b50256cb91d9fb47f3d73",
+      "message": "feat: add heatmap widget for daily listening calendar\n\n- Implemented HeatmapWidgetProvider to display a calendar-like heatmap of daily listening counts.\n- Added functionality to refresh heatmap data based on daily scrobble counts.\n- Updated WidgetRefresher to include logic for today's data.\n- Created layout for heatmap widget with appropriate dimensions and styling.\n- Introduced new strings for heatmap widget description and name.\n- Modified existing dashboard and notification services to accommodate heatmap data handling.\n- Cleaned up unused UI elements in various widget layouts for a more streamlined appearance.",
+      "date": "2026-10-31T14:06:42Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/4d35f981333ca402f99b50256cb91d9fb47f3d73",
+      "tags": []
+    },
     {
       "sha": "fe75d076e97518ecb948a1cb83018177cd5f8404",
       "message": "Add adaptive icons and custom font for widgets\n\n- Created adaptive icons for various themes (black, white, blue, red, and nothing) in mipmap-anydpi-v26.\n- Added a custom font family for widgets in widget_font.xml.\n- Defined widget styles in values and values-v26 for consistent text appearance.\n- Introduced color resources for icon backgrounds in ic_launcher_colors.xml.",
@@ -2695,24 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/522dae4ca8086d6740b223b43c781d132bc33620",
-      "tags": []
-    },
-    {
-      "sha": "252bbbaf526e6588771876632977591dd7a4730b",
-      "message": "feat: refactor l'affichage des données de chaleur pour une meilleure lisibilité par année",
-      "date": "2026-09-08T19:25:30Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/252bbbaf526e6588771876632977591dd7a4730b",
-      "tags": []
-    },
-    {
-      "sha": "a580015bbe7db4a918e6e0914f18f3bc3d0f74f3",
-      "message": "feat: ajouter la synchronisation en arrière-plan pour garantir l'historique complet lors des exports",
-      "date": "2026-09-08T19:04:21Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/a580015bbe7db4a918e6e0914f18f3bc3d0f74f3",
       "tags": []
     }
   ]
