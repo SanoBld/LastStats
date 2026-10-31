@@ -1,6 +1,15 @@
 {
-  "updated": "2026-10-31T10:45:44Z",
+  "updated": "2026-10-31T10:59:06Z",
   "commits": [
+    {
+      "sha": "54b0a8a5d31a3ff8e7ec8ffae88f9c9bd6040a4d",
+      "message": "feat: Enhance widget functionality and app icon management\n\n- Redesigned Android widgets to support Material You dynamic colors, light/dark mode, and accent color options.\n- Fixed issues with small widgets displaying clipped numbers and empty spaces in the recap widget.\n- Improved app icon management by allowing users to pin app icons to the home screen.\n- Updated widget layouts to include new color filters and icon adjustments based on user preferences.\n- Added support for dynamic color usage in widgets and improved text visibility across different themes.\n- Enhanced localization strings for better user guidance on app icon changes and shortcuts.",
+      "date": "2026-10-31T10:56:37Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/54b0a8a5d31a3ff8e7ec8ffae88f9c9bd6040a4d",
+      "tags": []
+    },
     {
       "sha": "f323e047172534aadcc83c38c1b0f793f8afbf1b",
       "message": "feat: Update widget layouts and strings for improved user experience\n\n- Replaced launcher icon with custom widget glyph in various widget layouts.\n- Added default text values for scrobble counts and labels in multiple widget layouts.\n- Updated widget descriptions in Arabic, German, Spanish, French, Italian, Japanese, Portuguese, Russian, and Chinese for better localization.\n- Modified widget info XML files to include new descriptions for scrobble, now playing, loved, weekly, and recap widgets.\n- Enhanced settings page to conditionally display options based on platform (mobile vs web).\n- Introduced new drawable resources for widget backgrounds and icons.\n- Added dimension resources for consistent widget styling across different screen sizes.",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/507d316a7b0f6097b7b8b6fa85bc64a13ca8ceb8",
-      "tags": []
-    },
-    {
-      "sha": "090c8904f2d59c2405335235ac1c4795c9eea578",
-      "message": "feat: ajouter la mise en cache des données de récapitulation pour améliorer les performances",
-      "date": "2026-09-08T12:46:18Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/090c8904f2d59c2405335235ac1c4795c9eea578",
       "tags": []
     }
   ]
