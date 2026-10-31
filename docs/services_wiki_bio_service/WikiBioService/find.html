@@ -92,7 +92,8 @@
   ];
   WikiBio? out;
   for (final h in hosts) {
-    out = await _search(h, query, name, strictMusic: h == &#39;en&#39;);
+    out = await _search(h, query, name,
+        artist: type == &#39;artists&#39; ? &#39;&#39; : artist);
     if (out != null) break;
   }
   _cache[key] = out;
