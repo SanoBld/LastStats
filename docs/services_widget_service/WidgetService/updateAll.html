@@ -112,6 +112,10 @@
           : t[&#39;artist&#39;]?.toString() ?? &#39;&#39;;
       trackArt = _pickImage(t[&#39;image&#39;]);
       isPlaying = t[&#39;@attr&#39;]?[&#39;nowplaying&#39;] == &#39;true&#39;;
+      &#47;&#47; Last.fm often has no cover: use the same sources as the app.
+      if (trackArt.isEmpty &amp;&amp; trackName.isNotEmpty) {
+        trackArt = await ImageService.resolveTrack(trackName, artistName);
+      }
     }
 
     &#47;&#47; Loved tracks count
@@ -189,7 +193,7 @@
 <footer>
   <span class="no-break">
     laststats_mobile
-      4.3.0-beta+30
+      4.2.1+29
   </span>
   
 </footer>

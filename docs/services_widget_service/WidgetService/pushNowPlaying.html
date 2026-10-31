@@ -85,6 +85,9 @@ every poll tick (every 10–30s) and keeps the widget genuinely live.</p>
           : np[&#39;artist&#39;]?.toString() ?? &#39;&#39;;
       trackArt = _pickImage(np[&#39;image&#39;]);
       isPlaying = np[&#39;@attr&#39;]?[&#39;nowplaying&#39;] == &#39;true&#39;;
+      if (trackArt.isEmpty &amp;&amp; trackName.isNotEmpty) {
+        trackArt = await ImageService.resolveTrack(trackName, artistName);
+      }
     }
     await HomeWidget.saveWidgetData&lt;String&gt;(&#39;track_name&#39;, trackName);
     await HomeWidget.saveWidgetData&lt;String&gt;(&#39;artist_name&#39;, artistName);
@@ -127,7 +130,7 @@ every poll tick (every 10–30s) and keeps the widget genuinely live.</p>
 <footer>
   <span class="no-break">
     laststats_mobile
-      4.3.0-beta+30
+      4.2.1+29
   </span>
   
 </footer>
