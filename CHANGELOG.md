@@ -33,6 +33,7 @@
 ## v4.3.0
 
 **Settings and backups**
+- Lyrics: LRCLIB search is now used when the exact match fails, titles with "feat." / "Remastered" are retried in a clean form, and synced-only lyrics are shown as plain text
 - Fixed: with "colour from the music", the greyed-out base accent (and the day/night accent) is never used any more
 - Fixed: cached images no longer flash a placeholder when a list redraws (they are now kept in memory, and the cache index is written less often)
 - Artist page: the Popular / Recent switch now uses the Material You segmented button
