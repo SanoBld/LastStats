@@ -79,6 +79,12 @@
 - Artist page: the top tracks ranking has a sliding tab selector, bars that fill in, and a cleaner switch between "popular" and "recent"
 - Charts: tapping a legend row or bar gives a small vibration and a soft press animation
 
+**Notifications**
+- Notifications now show the LastStats logo (status-bar glyph and large icon) instead of a plain circle, and every message notification starts with its emoji (a default one per type when none is set)
+- New "Mark as read" and "Mark all as read" buttons on notifications (also clears the download-complete one); "Download" button on the update notification
+- When a download finishes while you are outside the app, the notification offers to install (button and tap); the downloaded installer is deleted automatically once the update is installed, and after saving a file to Downloads
+- After a download from the version history, the sheet has a button that opens your Downloads folder, and the notification opens it too
+
 **Interface and animations**
 - Every tappable area (lists, cards, settings rows, chips, sheets, login page, profile bubble) has the same small press bounce and a pressed fill that follows its own rounded shape, also on tiles with their own background; round buttons such as the back arrow stay round
 - The top bar no longer turns grey when scrolling and pressed buttons no longer show a round Android ripple

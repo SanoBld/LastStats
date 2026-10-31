@@ -8,6 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/notification_detail_page.dart';
 import '../l10n/extra_strings.dart' show tx;
 import '../l10n/l10n.dart';
+import '../widgets/update_install_sheet.dart' show openUpdateUrl;
+import 'update_installer.dart';
 
 const _kLastFmRed = Color(0xFFD51007);
 
@@ -18,6 +20,7 @@ final navigatorKey = GlobalKey<NavigatorState>();
 
 class NotificationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
+  static const _kLargeIcon = DrawableResourceAndroidBitmap('ic_notif_large');
 
   // ── Channel IDs ──────────────────────────────────────────────────────────
   static const _chMilestoneId   = 'ls_milestone';
@@ -55,7 +58,7 @@ class NotificationService {
   // ── Init ─────────────────────────────────────────────────────────────────
 
   static Future<void> init() async {
-    const android = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const android = AndroidInitializationSettings('ic_stat_laststats');
     const ios = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
@@ -73,8 +76,13 @@ class NotificationService {
       // Opens the in-app detail page so the user sees the full notification
       // (title + body, larger) and can follow a link if there is one.
       onDidReceiveNotificationResponse: (details) async {
+        if (details.notificationResponseType == NotificationResponseType.selectedNotificationAction) {
+          await handleAction(details);
+          return;
+        }
         await _handleTap(details.payload);
       },
+      onDidReceiveBackgroundNotificationResponse: notificationBackgroundHandler,
     );
 
     final androidImpl = _plugin.resolvePlatformSpecificImplementation<
@@ -150,6 +158,83 @@ class NotificationService {
     return await android?.areNotificationsEnabled() ?? true;
   }
 
+  // ── Actions (long-press / expand buttons) ───────────────────────────────
+
+  static List<AndroidNotificationAction> _readActions({bool read = true}) => [
+        if (read)
+          AndroidNotificationAction('mark_read', tx('ntf_act_read'), cancelNotification: true),
+        AndroidNotificationAction('mark_all', tx('ntf_act_read_all'), cancelNotification: true),
+      ];
+
+  static List<AndroidNotificationAction> _updateActions() => [
+        AndroidNotificationAction('download_update', L.settingsDownload,
+            showsUserInterface: true, cancelNotification: true),
+        ..._readActions(read: false),
+      ];
+
+  static String simplePayload(String type, String path) =>
+      jsonEncode({'type': type, 'path': path, 'title': '', 'body': ''});
+
+  /// Runs when the user taps an action button on a notification (also from the
+  /// background isolate, see [notificationBackgroundHandler]).
+  static Future<void> handleAction(NotificationResponse r) async {
+    switch (r.actionId) {
+      case 'mark_read':
+        await _markSeen(decodePayload(r.payload));
+        break;
+      case 'mark_all':
+        await _markAllRead();
+        break;
+      case 'install':
+        await _handleTap(r.payload);
+        break;
+      case 'download_update':
+        final url = decodePayload(r.payload)?['url']?.toString();
+        final ctx = navigatorKey.currentContext;
+        if (url != null && url.isNotEmpty && ctx != null) {
+          await openUpdateUrl(ctx, url);
+        } else {
+          await _handleTap(r.payload);
+        }
+        break;
+    }
+  }
+
+  static Future<void> _markSeen(Map<String, dynamic>? data) async {
+    final id = data?['id']?.toString() ?? '';
+    if (id.isEmpty || id.startsWith('update_v')) return;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
+    final seen = (prefs.getStringList('ls_news_seen') ?? <String>[]).toList();
+    if (!seen.contains(id)) {
+      seen.add(id);
+      await prefs.setStringList('ls_news_seen', seen);
+    }
+  }
+
+  /// Marks every shown message as read and clears LastStats notifications
+  /// (a download still in progress and sync progress are kept).
+  static Future<void> _markAllRead() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
+    final seen = (prefs.getStringList('ls_news_seen') ?? <String>[]).toList();
+    try {
+      final android = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      final active = await android?.getActiveNotifications() ?? const <ActiveNotification>[];
+      for (final n in active) {
+        final nid = n.id;
+        if (nid == null) continue;
+        if (n.channelId == _chSyncId) continue;
+        if (n.channelId == _chDlId && RegExp(r'^\d+ %$').hasMatch(n.body ?? '')) continue;
+        final mid = decodePayload(n.payload)?['id']?.toString() ?? '';
+        if (mid.isNotEmpty && !mid.startsWith('update_v') && !seen.contains(mid)) seen.add(mid);
+        await _plugin.cancel(nid);
+      }
+    } catch (_) {}
+    await prefs.setStringList('ls_news_seen', seen);
+  }
+
   // ── Tap handling ─────────────────────────────────────────────────────────
 
   // Pushes the detail page using the global navigatorKey. Safe to call even
@@ -158,6 +243,10 @@ class NotificationService {
   static Future<void> _handleTap(String? payload) async {
     final data = decodePayload(payload);
     if (data == null) return;
+    switch (data['type']) {
+      case 'install':   await installApkAt((data['path'] ?? '').toString()); return;
+      case 'downloads': await openDownloadsFolder((data['path'] ?? '').toString()); return;
+    }
     final nav = navigatorKey.currentState;
     if (nav == null) return;
     nav.push(MaterialPageRoute(
@@ -205,6 +294,7 @@ class NotificationService {
     String? date,
     String? newsType,
     String? emoji,
+    String? id,
   }) =>
       jsonEncode({
         'type':  type,
@@ -213,6 +303,8 @@ class NotificationService {
         if (url      != null && url.isNotEmpty)      'url':      url,
         if (date     != null && date.isNotEmpty)     'date':     date,
         if (newsType != null && newsType.isNotEmpty) 'newsType': newsType,
+        if (emoji    != null && emoji.isNotEmpty)    'emoji':    emoji,
+        if (id       != null && id.isNotEmpty)       'id':       id,
         if (emoji    != null && emoji.isNotEmpty)    'emoji':    emoji,
       });
 
@@ -228,7 +320,9 @@ class NotificationService {
       NotificationDetails(
         android: AndroidNotificationDetails(
           _chMilestoneId, _chMilestoneName,
-          icon:    '@mipmap/ic_launcher',
+          actions: _readActions(read: false),
+          icon:    'ic_stat_laststats',
+          largeIcon: _kLargeIcon,
           color:   _kLastFmRed,
           subText: 'LastStats',
           styleInformation: BigTextStyleInformation(
@@ -252,7 +346,9 @@ class NotificationService {
       NotificationDetails(
         android: AndroidNotificationDetails(
           _chRecapId, _chRecapName,
-          icon:    '@mipmap/ic_launcher',
+          actions: _readActions(read: false),
+          icon:    'ic_stat_laststats',
+          largeIcon: _kLargeIcon,
           color:   _kLastFmRed,
           subText: 'LastStats',
           styleInformation: BigTextStyleInformation(
@@ -276,7 +372,9 @@ class NotificationService {
       NotificationDetails(
         android: AndroidNotificationDetails(
           _chGrandId, _chGrandName,
-          icon:       '@mipmap/ic_launcher',
+          actions: _readActions(read: false),
+          icon:       'ic_stat_laststats',
+          largeIcon: _kLargeIcon,
           color:      _kLastFmRed,
           subText:    'LastStats',
           importance: Importance.high,
@@ -306,7 +404,9 @@ class NotificationService {
       NotificationDetails(
         android: AndroidNotificationDetails(
           _chRecapId, _chRecapName,
-          icon:    '@mipmap/ic_launcher',
+          actions: _readActions(read: false),
+          icon:    'ic_stat_laststats',
+          largeIcon: _kLargeIcon,
           color:   _kLastFmRed,
           subText: 'LastStats',
           styleInformation: InboxStyleInformation(
@@ -334,7 +434,9 @@ class NotificationService {
       NotificationDetails(
         android: AndroidNotificationDetails(
           _chRecapId, _chRecapName,
-          icon:    '@mipmap/ic_launcher',
+          actions: _readActions(read: false),
+          icon:    'ic_stat_laststats',
+          largeIcon: _kLargeIcon,
           color:   _kLastFmRed,
           subText: 'LastStats',
           styleInformation: InboxStyleInformation(
@@ -364,7 +466,9 @@ class NotificationService {
       NotificationDetails(
         android: AndroidNotificationDetails(
           _chUpdateId, _chUpdateName,
-          icon:       '@mipmap/ic_launcher',
+          actions: _updateActions(),
+          icon:       'ic_stat_laststats',
+          largeIcon: _kLargeIcon,
           color:      _kLastFmRed,
           subText:    'LastStats',
           importance: Importance.high,
@@ -378,6 +482,7 @@ class NotificationService {
       ),
       payload: _payload(
         type: 'update', title: title, body: body, url: downloadUrl,
+        id: 'update_v$version',
       ),
     );
   }
@@ -394,7 +499,8 @@ class NotificationService {
     String date  = '',
   }) {
     final color    = _newsColor(type);
-    final fullTitle = emoji.isNotEmpty ? '$emoji $title' : title;
+    final em        = emoji.isNotEmpty ? emoji : _newsEmoji(type);
+    final fullTitle = '$em $title';
     return _plugin.show(
       _idNews(id),
       fullTitle,
@@ -402,7 +508,9 @@ class NotificationService {
       NotificationDetails(
         android: AndroidNotificationDetails(
           _chNewsId, _chNewsName,
-          icon:    '@mipmap/ic_launcher',
+          actions: _readActions(read: true),
+          icon:    'ic_stat_laststats',
+          largeIcon: _kLargeIcon,
           color:   color,
           subText: 'LastStats',
           styleInformation: BigTextStyleInformation(
@@ -414,10 +522,18 @@ class NotificationService {
       ),
       payload: _payload(
         type: 'news', title: title, body: body,
-        date: date, newsType: type, emoji: emoji,
+        date: date, newsType: type, emoji: em, id: id,
       ),
     );
   }
+
+  static String _newsEmoji(String type) => switch (type) {
+    'feature' => '✨',
+    'fix'     => '🛠️',
+    'update'  => '⬆️',
+    'alert'   => '⚠️',
+    _         => 'ℹ️',
+  };
 
   static Color _newsColor(String type) => switch (type) {
     'feature' => const Color(0xFF7C3AED),
@@ -448,7 +564,8 @@ class NotificationService {
       NotificationDetails(
         android: AndroidNotificationDetails(
           _chSyncId, _chSyncName,
-          icon:           '@mipmap/ic_launcher',
+          icon:           'ic_stat_laststats',
+          largeIcon: _kLargeIcon,
           color:          _kLastFmRed,
           subText:        'LastStats',
           importance:     Importance.low,
@@ -484,7 +601,8 @@ class NotificationService {
       NotificationDetails(
         android: AndroidNotificationDetails(
           _chSyncId, _chSyncName,
-          icon:    '@mipmap/ic_launcher',
+          icon:    'ic_stat_laststats',
+          largeIcon: _kLargeIcon,
           color:   _kLastFmRed,
           subText: 'LastStats',
           autoCancel: true,
@@ -503,10 +621,11 @@ class NotificationService {
     return p.getBool('ls_notif_download_enabled') ?? true;
   }
 
-  static AndroidNotificationDetails _dlDetails({double? progress, bool done = false}) =>
+  static AndroidNotificationDetails _dlDetails({double? progress, bool done = false, List<AndroidNotificationAction>? actions}) =>
       AndroidNotificationDetails(
         _chDlId, _chDlName,
-        icon:          '@mipmap/ic_launcher',
+        icon:          'ic_stat_laststats',
+          largeIcon: _kLargeIcon,
         color:         _kLastFmRed,
         subText:       'LastStats',
         importance:    Importance.low,
@@ -518,6 +637,7 @@ class NotificationService {
         maxProgress:   100,
         progress:      ((progress ?? 0) * 100).round(),
         indeterminate: !done && progress == null,
+        actions:       actions,
       );
 
   static Future<void> showDownloadProgress(String title, double? progress) async {
@@ -556,12 +676,20 @@ class NotificationService {
     } catch (_) {}
   }
 
-  static Future<void> showDownloadDone(String title, String body) async {
+  static Future<void> showDownloadDone(String title, String body,
+      {String? payload, bool install = false}) async {
     try {
       await _stopDownloadService();
       if (!await _dlEnabled()) { await _plugin.cancel(_idDownload); return; }
+      final actions = [
+        if (install)
+          AndroidNotificationAction('install', tx('ntf_act_install'),
+              showsUserInterface: true, cancelNotification: true),
+        AndroidNotificationAction('mark_all', tx('ntf_act_read_all'), cancelNotification: true),
+      ];
       await _plugin.show(_idDownload, title, body,
-          NotificationDetails(android: _dlDetails(done: true)));
+          NotificationDetails(android: _dlDetails(done: true, actions: actions)),
+          payload: payload);
     } catch (_) {}
   }
 
@@ -577,7 +705,9 @@ class NotificationService {
         NotificationDetails(
           android: AndroidNotificationDetails(
             _chMilestoneId, _chMilestoneName,
-            icon:    '@mipmap/ic_launcher',
+          actions: _readActions(read: false),
+            icon:    'ic_stat_laststats',
+          largeIcon: _kLargeIcon,
             color:   _kLastFmRed,
             subText: 'LastStats',
           ),
@@ -627,3 +757,7 @@ class NotificationService {
     }
   }
 }
+
+@pragma('vm:entry-point')
+Future<void> notificationBackgroundHandler(NotificationResponse r) =>
+    NotificationService.handleAction(r);

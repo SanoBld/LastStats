@@ -1472,4 +1472,9 @@ const Map<String, String> kTxRu = {
   'ntf_dl_sub': 'Индикатор прогресса при загрузках, в том числе в фоне',
   'ntf_dl_ready': 'Загрузка завершена',
   'ntf_dl_failed': 'Не удалось загрузить',
+  'ntf_act_read': 'Отметить прочитанным',
+  'ntf_act_read_all': 'Отметить всё прочитанным',
+  'ntf_act_install': 'Установить',
+  'ntf_dl_install_hint': 'Нажми, чтобы установить обновление',
+  'up_open_downloads': 'Открыть «Загрузки»',
 };

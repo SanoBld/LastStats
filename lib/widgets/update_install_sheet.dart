@@ -107,7 +107,7 @@ class _UpdateSheetState extends State<_UpdateSheet> {
       void tick(double? p) { if (mounted) setState(() => _p = p); }
       r = widget.save
           ? await saveDownload(widget.url, _fileNameOf(widget.url), tick)
-          : await installUpdate(widget.url, widget.kind, tick);
+          : await installUpdate(widget.url, widget.kind, tick, version: widget.version);
     } catch (_) {}
     if (!mounted) return;
     if (r.startsWith('saved|')) {
@@ -194,9 +194,17 @@ class _UpdateSheetState extends State<_UpdateSheet> {
               M3TonalButton(
                 width: double.infinity,
                 color: scheme.primaryContainer,
+                onTap: () => openDownloadsFolder(_where),
+                child: Text(tx('up_open_downloads'),
+                    style: TextStyle(color: scheme.onPrimaryContainer, fontWeight: FontWeight.w700)),
+              ),
+              const SizedBox(height: 8),
+              M3TonalButton(
+                width: double.infinity,
+                color: scheme.surfaceContainerHighest,
                 onTap: () => Navigator.of(context).pop(),
                 child: Text(tx('up_close'),
-                    style: TextStyle(color: scheme.onPrimaryContainer, fontWeight: FontWeight.w700)),
+                    style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w700)),
               ),
             ],
             if (bad) ...[

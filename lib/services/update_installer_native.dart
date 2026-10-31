@@ -4,7 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import '../l10n/extra_strings.dart';
 import 'notification_service.dart';
-import 'update_service.dart' show DownloadKind;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'update_service.dart';
 
 const _ch = MethodChannel('laststats/installer');
 
@@ -51,7 +52,7 @@ Future<File?> _fetch(String url, String tempName, String title, void Function(do
 /// Downloads the update then launches its installer.
 /// Returns 'ok' (installer launched), 'permission' (Android settings opened,
 /// user must allow installs then tap again) or 'fallback' (open the link instead).
-Future<String> installUpdate(String url, DownloadKind kind, void Function(double?) onProgress) async {
+Future<String> installUpdate(String url, DownloadKind kind, void Function(double?) onProgress, {String? version}) async {
   final android = Platform.isAndroid && kind == DownloadKind.apk;
   final windows = Platform.isWindows && kind == DownloadKind.installer;
   if (!android && !windows) return 'fallback';
@@ -65,7 +66,10 @@ Future<String> installUpdate(String url, DownloadKind kind, void Function(double
   if (file == null) return 'fallback';
 
   if (android) {
-    await NotificationService.showDownloadDone('LastStats', tx('ntf_dl_ready'));
+    final p = await SharedPreferences.getInstance();
+    if (version != null) await p.setString('ls_update_pending_ver', version);
+    await NotificationService.showDownloadDone(tx('ntf_dl_ready'), tx('ntf_dl_install_hint'),
+        payload: NotificationService.simplePayload('install', file.path), install: true);
     return await _ch.invokeMethod<bool>('install', {'path': file.path}) == true ? 'ok' : 'fallback';
   }
   await NotificationService.cancelDownload();
@@ -108,6 +112,50 @@ Future<String> saveDownload(String url, String fileName, void Function(double?) 
     await NotificationService.showDownloadDone(fileName, tx('ntf_dl_failed'));
     return 'fallback';
   }
-  await NotificationService.showDownloadDone(fileName, tx('up_saved'));
+  try { await file.delete(); } catch (_) {}
+  await NotificationService.showDownloadDone(fileName, tx('up_saved'),
+      payload: NotificationService.simplePayload('downloads', saved));
   return 'saved|$saved';
+}
+
+/// Installs an already downloaded APK (used by the notification action).
+Future<void> installApkAt(String path) async {
+  if (!Platform.isAndroid || !await File(path).exists()) return;
+  if (await _ch.invokeMethod<bool>('canInstall') != true) {
+    await _ch.invokeMethod('openSettings');
+    return;
+  }
+  await _ch.invokeMethod('install', {'path': path});
+}
+
+/// Opens the Downloads folder in the system file manager.
+Future<void> openDownloadsFolder(String? where) async {
+  try {
+    if (Platform.isAndroid) {
+      await _ch.invokeMethod('openDownloads');
+    } else if (Platform.isWindows) {
+      final ok = where != null && await File(where).exists();
+      await Process.start('explorer', [ok ? '/select,$where' : (await getDownloadsDirectory())?.path ?? ''],
+          mode: ProcessStartMode.detached);
+    } else if (Platform.isMacOS) {
+      await Process.start('open', where != null ? ['-R', where] : [(await getDownloadsDirectory())?.path ?? ''],
+          mode: ProcessStartMode.detached);
+    } else if (Platform.isLinux) {
+      final dir = where != null ? File(where).parent.path : (await getDownloadsDirectory())?.path ?? '';
+      await Process.start('xdg-open', [dir], mode: ProcessStartMode.detached);
+    }
+  } catch (_) {}
+}
+
+/// Deletes downloaded update files once the update is installed (or never needed).
+Future<void> cleanupUpdateFiles() async {
+  try {
+    final p = await SharedPreferences.getInstance();
+    final pending = p.getString('ls_update_pending_ver');
+    if (UpdateService.currentVersion == '0.0.0') return;
+    if (pending != null && UpdateService.isNewerThanInstalled(pending)) return; // not installed yet
+    final dir = Directory('${(await getTemporaryDirectory()).path}${Platform.pathSeparator}update');
+    if (await dir.exists()) await dir.delete(recursive: true);
+    await p.remove('ls_update_pending_ver');
+  } catch (_) {}
 }

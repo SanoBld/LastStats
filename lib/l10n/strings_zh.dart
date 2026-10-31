@@ -1498,4 +1498,9 @@ const Map<String, String> kTxZh = {
   'ntf_dl_sub': '下载时显示进度条，后台也可用',
   'ntf_dl_ready': '下载完成',
   'ntf_dl_failed': '下载失败',
+  'ntf_act_read': '标为已读',
+  'ntf_act_read_all': '全部标为已读',
+  'ntf_act_install': '安装',
+  'ntf_dl_install_hint': '点按以安装更新',
+  'up_open_downloads': '打开“下载”',
 };

@@ -1471,4 +1471,9 @@ const Map<String, String> kTxJa = {
   'ntf_dl_sub': 'バックグラウンドでもダウンロードの進行バーを表示します',
   'ntf_dl_ready': 'ダウンロード完了',
   'ntf_dl_failed': 'ダウンロードに失敗しました',
+  'ntf_act_read': '既読にする',
+  'ntf_act_read_all': 'すべて既読にする',
+  'ntf_act_install': 'インストール',
+  'ntf_dl_install_hint': 'タップしてアップデートをインストール',
+  'up_open_downloads': 'ダウンロードを開く',
 };

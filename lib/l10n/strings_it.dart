@@ -1472,4 +1472,9 @@ const Map<String, String> kTxIt = {
   'ntf_dl_sub': 'Barra di avanzamento durante i download, anche in background',
   'ntf_dl_ready': 'Download completato',
   'ntf_dl_failed': 'Download non riuscito',
+  'ntf_act_read': 'Segna come letto',
+  'ntf_act_read_all': 'Segna tutto come letto',
+  'ntf_act_install': 'Installa',
+  'ntf_dl_install_hint': 'Tocca per installare l’aggiornamento',
+  'up_open_downloads': 'Apri Download',
 };

@@ -1472,4 +1472,9 @@ const Map<String, String> kTxAr = {
   'ntf_dl_sub': 'شريط تقدم أثناء التنزيل حتى في الخلفية',
   'ntf_dl_ready': 'اكتمل التنزيل',
   'ntf_dl_failed': 'فشل التنزيل',
+  'ntf_act_read': 'وضع علامة مقروء',
+  'ntf_act_read_all': 'وضع علامة مقروء على الكل',
+  'ntf_act_install': 'تثبيت',
+  'ntf_dl_install_hint': 'اضغط لتثبيت التحديث',
+  'up_open_downloads': 'فتح التنزيلات',
 };

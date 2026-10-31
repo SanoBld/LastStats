@@ -1501,4 +1501,9 @@ const Map<String, String> kTxFr = {
   'ntf_dl_sub': 'Barre de progression pendant les téléchargements, même en arrière-plan',
   'ntf_dl_ready': 'Téléchargement terminé',
   'ntf_dl_failed': 'Téléchargement échoué',
+  'ntf_act_read': 'Marquer comme lu',
+  'ntf_act_read_all': 'Tout marquer comme lu',
+  'ntf_act_install': 'Installer',
+  'ntf_dl_install_hint': 'Touche pour installer la mise à jour',
+  'up_open_downloads': 'Ouvrir Téléchargements',
 };

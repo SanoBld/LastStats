@@ -1,5 +1,6 @@
 package com.example.laststats_mobile
 
+import android.app.DownloadManager
 import android.content.ContentValues
 import android.content.Intent
 import android.net.Uri
@@ -36,6 +37,11 @@ class MainActivity : FlutterActivity() {
                                 .setDataAndType(uri, "application/vnd.android.package-archive")
                                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
                             startActivity(i)
+                            result.success(true)
+                        }
+                        "openDownloads" -> {
+                            startActivity(Intent(DownloadManager.ACTION_VIEW_DOWNLOADS)
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                             result.success(true)
                         }
                         "saveToDownloads" -> {

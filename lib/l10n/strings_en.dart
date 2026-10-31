@@ -1501,4 +1501,9 @@ const Map<String, String> kTxEn = {
   'ntf_dl_sub': 'Progress bar during downloads, even in the background',
   'ntf_dl_ready': 'Download complete',
   'ntf_dl_failed': 'Download failed',
+  'ntf_act_read': 'Mark as read',
+  'ntf_act_read_all': 'Mark all as read',
+  'ntf_act_install': 'Install',
+  'ntf_dl_install_hint': 'Tap to install the update',
+  'up_open_downloads': 'Open Downloads',
 };

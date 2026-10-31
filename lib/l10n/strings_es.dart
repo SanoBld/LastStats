@@ -1501,4 +1501,9 @@ const Map<String, String> kTxEs = {
   'ntf_dl_sub': 'Barra de progreso durante las descargas, incluso en segundo plano',
   'ntf_dl_ready': 'Descarga completada',
   'ntf_dl_failed': 'Descarga fallida',
+  'ntf_act_read': 'Marcar como leído',
+  'ntf_act_read_all': 'Marcar todo como leído',
+  'ntf_act_install': 'Instalar',
+  'ntf_dl_install_hint': 'Toca para instalar la actualización',
+  'up_open_downloads': 'Abrir Descargas',
 };

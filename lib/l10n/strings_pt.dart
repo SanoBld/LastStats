@@ -1501,4 +1501,9 @@ const Map<String, String> kTxPt = {
   'ntf_dl_sub': 'Barra de progresso durante as transferências, mesmo em segundo plano',
   'ntf_dl_ready': 'Transferência concluída',
   'ntf_dl_failed': 'Falha na transferência',
+  'ntf_act_read': 'Marcar como lido',
+  'ntf_act_read_all': 'Marcar tudo como lido',
+  'ntf_act_install': 'Instalar',
+  'ntf_dl_install_hint': 'Toca para instalar a atualização',
+  'up_open_downloads': 'Abrir Transferências',
 };

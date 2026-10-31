@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'update_service.dart';
+import 'update_installer.dart';
 
 /// Checks for an update at startup.
 /// No dialog — the news bell badge on the dashboard handles visibility.
@@ -10,6 +11,7 @@ class UpdateStartupChecker {
   static Future<void> run(GlobalKey<NavigatorState> navigatorKey) async {
     if (kIsWeb) return; // web always serves the latest build
     await Future.delayed(const Duration(milliseconds: 800));
+    await cleanupUpdateFiles();   // remove the downloaded installer once installed
     final prefs     = await SharedPreferences.getInstance();
     final wantsBeta = prefs.getBool('ls_beta_channel') ?? false;
     final channel   = wantsBeta ? UpdateChannel.beta : UpdateChannel.stable;

@@ -1472,4 +1472,9 @@ const Map<String, String> kTxDe = {
   'ntf_dl_sub': 'Fortschrittsbalken bei Downloads, auch im Hintergrund',
   'ntf_dl_ready': 'Download abgeschlossen',
   'ntf_dl_failed': 'Download fehlgeschlagen',
+  'ntf_act_read': 'Als gelesen markieren',
+  'ntf_act_read_all': 'Alle als gelesen markieren',
+  'ntf_act_install': 'Installieren',
+  'ntf_dl_install_hint': 'Tippen, um das Update zu installieren',
+  'up_open_downloads': 'Downloads öffnen',
 };
