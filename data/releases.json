@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-01T21:47:08Z",
+  "updated": "2026-11-02T04:52:05Z",
   "stars": 3,
   "releases": [
     {
@@ -43,13 +43,13 @@
         {
           "name": "LastStats-ios.ipa",
           "size": 25609504,
-          "download_count": 8,
+          "download_count": 10,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0/LastStats-ios.ipa"
         },
         {
           "name": "LastStats-linux-arm64.AppImage",
           "size": 17943048,
-          "download_count": 1,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0/LastStats-linux-arm64.AppImage"
         },
         {
@@ -73,7 +73,7 @@
         {
           "name": "LastStats-linux-x64.AppImage",
           "size": 18389496,
-          "download_count": 1,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0/LastStats-linux-x64.AppImage"
         },
         {
@@ -351,7 +351,7 @@
         {
           "name": "LastStats-ios.ipa",
           "size": 25473603,
-          "download_count": 100,
+          "download_count": 101,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/LastStats-ios.ipa"
         },
         {
