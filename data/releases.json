@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-06T13:51:49Z",
+  "updated": "2026-11-06T22:48:21Z",
   "stars": 3,
   "releases": [
     {
@@ -13,7 +13,7 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 48610214,
-          "download_count": 15,
+          "download_count": 17,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0/app-arm64-v8a-release.apk"
         },
         {
@@ -43,7 +43,7 @@
         {
           "name": "LastStats-ios.ipa",
           "size": 25609504,
-          "download_count": 32,
+          "download_count": 34,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0/LastStats-ios.ipa"
         },
         {
