@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-07T23:16:48Z",
+  "updated": "2026-11-07T23:19:31Z",
   "commits": [
+    {
+      "sha": "6bf4d57a6e526f475435ce060a5b85e8a150ba38",
+      "message": "feat(ai): ajouter des messages d'état pour l'IA et mettre à jour les dépendances",
+      "date": "2026-11-07T23:19:07Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/6bf4d57a6e526f475435ce060a5b85e8a150ba38",
+      "tags": []
+    },
     {
       "sha": "7f5bd61b7bce163a6649e6562754a5b18f7a5d04",
       "message": "feat(ai): ajouter des messages d'instructions et des fonctionnalités de test pour l'IA locale",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/c9a38a01b93a8e3643d62ae395dbe40c7da12af8",
-      "tags": []
-    },
-    {
-      "sha": "8afe10a2486650a07bdd6b7ace84a18a556ddc21",
-      "message": "feat: Enhance folder management and backup features\n\n- Added support for including folders in backup options with UI updates.\n- Introduced a custom emoji input dialog for folder creation and editing.\n- Implemented manual sorting for favorite folders, allowing users to reorder tracks.\n- Refactored track display into a reusable TrackRowTile widget for consistency across screens.\n- Updated localization files for new strings related to folders and emojis in multiple languages.",
-      "date": "2026-09-12T09:23:26Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/8afe10a2486650a07bdd6b7ace84a18a556ddc21",
       "tags": []
     }
   ]
