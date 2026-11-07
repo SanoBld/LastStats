@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-07T21:32:12Z",
+  "updated": "2026-11-07T22:42:31Z",
   "commits": [
+    {
+      "sha": "9d4954cbdfe3d9982291c26c08bfd43012744768",
+      "message": "feat(ai): implement local AI functionality with model management and summaries",
+      "date": "2026-11-07T22:42:10Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/9d4954cbdfe3d9982291c26c08bfd43012744768",
+      "tags": []
+    },
     {
       "sha": "00c19e23d62709cef47f7b33386a615a050eaae3",
       "message": "chore: bump version to 4.3.0 [skip ci]",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/afd0ae67340a3ea03eed804c8690e12e90f3f39b",
-      "tags": []
-    },
-    {
-      "sha": "72f3fa7570558396684272fa176490efec32debe",
-      "message": "feat: ajouter un champ de description optionnel pour les dossiers favoris et mettre à jour les pages associées",
-      "date": "2026-09-11T21:37:33Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/72f3fa7570558396684272fa176490efec32debe",
       "tags": []
     }
   ]
