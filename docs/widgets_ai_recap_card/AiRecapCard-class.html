@@ -85,7 +85,7 @@
     <h2>Constructors</h2>
     <dl class="constructor-summary-list">
         <dt id="AiRecapCard.new" class="callable">
-          <span class="name"><a href="../widgets_ai_recap_card/AiRecapCard/AiRecapCard.html">AiRecapCard</a></span><span class="signature">({<span class="parameter" id="param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span> <span class="parameter-name">key</span>, </span><span class="parameter" id="param-facts"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">facts</span>, </span><span class="parameter" id="param-auto"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">auto</span> = <span class="default-value">true</span>, </span><span class="parameter" id="param-title"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">title</span> = <span class="default-value">&#39;&#39;</span>, </span><span class="parameter" id="param-instruction"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">instruction</span> = <span class="default-value">&quot;You write a friendly 2-sentence summary of a person&#39;s music listening. &quot; &#39;Use only the given facts. No lists, no emojis.&#39;</span></span>})</span>
+          <span class="name"><a href="../widgets_ai_recap_card/AiRecapCard/AiRecapCard.html">AiRecapCard</a></span><span class="signature">({<span class="parameter" id="param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span> <span class="parameter-name">key</span>, </span><span class="parameter" id="param-facts"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">facts</span>, </span><span class="parameter" id="param-goals"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../widgets_ai_recap_card/AiGoal-class.html">AiGoal</a></span>&gt;</span></span> <span class="parameter-name">goals</span>, </span><span class="parameter" id="param-auto"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">auto</span> = <span class="default-value">true</span>, </span><span class="parameter" id="param-margin"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/painting/EdgeInsetsGeometry-class.html">EdgeInsetsGeometry</a></span> <span class="parameter-name">margin</span> = <span class="default-value">const EdgeInsets.only(bottom: 16)</span></span>})</span>
         </dt>
         <dd>
           
@@ -106,7 +106,7 @@
 
 </dt>
 <dd>
-  true = génère tout seul (dashboard) ; false = après un tap sur le bouton.
+  
   <div class="features"><span class="feature">final</span></div>
 
 </dd>
@@ -114,6 +114,18 @@
         <dt id="facts" class="property">
   <span class="name"><a href="../widgets_ai_recap_card/AiRecapCard/facts.html">facts</a></span>
   <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="goals" class="property">
+  <span class="name"><a href="../widgets_ai_recap_card/AiRecapCard/goals.html">goals</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../widgets_ai_recap_card/AiGoal-class.html">AiGoal</a></span>&gt;</span></span>
   
 
 </dt>
@@ -135,18 +147,6 @@
 
 </dd>
 
-        <dt id="instruction" class="property">
-  <span class="name"><a href="../widgets_ai_recap_card/AiRecapCard/instruction.html">instruction</a></span>
-  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
-  
-
-</dt>
-<dd>
-  
-  <div class="features"><span class="feature">final</span></div>
-
-</dd>
-
         <dt id="key" class="property inherited">
   <span class="name"><a href="https://api.flutter.dev/flutter/widgets/Widget/key.html">key</a></span>
   <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span>
@@ -159,6 +159,18 @@
 
 </dd>
 
+        <dt id="margin" class="property">
+  <span class="name"><a href="../widgets_ai_recap_card/AiRecapCard/margin.html">margin</a></span>
+  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/painting/EdgeInsetsGeometry-class.html">EdgeInsetsGeometry</a></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
         <dt id="runtimeType" class="property inherited">
   <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/runtimeType.html">runtimeType</a></span>
   <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Type-class.html">Type</a></span>
@@ -168,18 +180,6 @@
 <dd class="inherited">
   A representation of the runtime type of the object.
   <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
-
-</dd>
-
-        <dt id="title" class="property">
-  <span class="name"><a href="../widgets_ai_recap_card/AiRecapCard/title.html">title</a></span>
-  <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>
-  
-
-</dt>
-<dd>
-  
-  <div class="features"><span class="feature">final</span></div>
 
 </dd>
 

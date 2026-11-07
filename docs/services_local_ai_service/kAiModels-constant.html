@@ -66,22 +66,40 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">const kAiModels = &lt;AiModel&gt;[
   AiModel(
-    id: &#39;smollm2_360m&#39;, name: &#39;SmolLM2 (360M)&#39;, sizeMb: 270,
+    id: &#39;smollm2_360m&#39;, name: &#39;SmolLM2 360M&#39;, sizeMb: 270,
     file: &#39;SmolLM2-360M-Instruct-Q4_K_M.gguf&#39;,
     url: &#39;https:&#47;&#47;huggingface.co&#47;bartowski&#47;SmolLM2-360M-Instruct-GGUF&#47;resolve&#47;main&#47;SmolLM2-360M-Instruct-Q4_K_M.gguf&#39;,
     descKey: &#39;ai_m_smol&#39;,
   ),
   AiModel(
-    id: &#39;qwen25_05b&#39;, name: &#39;Qwen 2.5 (0.5B)&#39;, sizeMb: 400,
+    id: &#39;qwen25_05b&#39;, name: &#39;Qwen 2.5 0.5B&#39;, sizeMb: 400,
     file: &#39;qwen2.5-0.5b-instruct-q4_k_m.gguf&#39;,
     url: &#39;https:&#47;&#47;huggingface.co&#47;Qwen&#47;Qwen2.5-0.5B-Instruct-GGUF&#47;resolve&#47;main&#47;qwen2.5-0.5b-instruct-q4_k_m.gguf&#39;,
     descKey: &#39;ai_m_qwen&#39;,
   ),
   AiModel(
-    id: &#39;llama32_1b&#39;, name: &#39;Llama 3.2 (1B)&#39;, sizeMb: 810, template: &#39;llama3&#39;,
+    id: &#39;llama32_1b&#39;, name: &#39;Llama 3.2 1B&#39;, sizeMb: 810,
     file: &#39;Llama-3.2-1B-Instruct-Q4_K_M.gguf&#39;,
     url: &#39;https:&#47;&#47;huggingface.co&#47;bartowski&#47;Llama-3.2-1B-Instruct-GGUF&#47;resolve&#47;main&#47;Llama-3.2-1B-Instruct-Q4_K_M.gguf&#39;,
     descKey: &#39;ai_m_llama&#39;,
+  ),
+  AiModel(
+    id: &#39;gemma3_1b&#39;, name: &#39;Gemma 3 1B&#39;, sizeMb: 810,
+    file: &#39;gemma-3-1b-it-Q4_K_M.gguf&#39;,
+    url: &#39;https:&#47;&#47;huggingface.co&#47;unsloth&#47;gemma-3-1b-it-GGUF&#47;resolve&#47;main&#47;gemma-3-1b-it-Q4_K_M.gguf&#39;,
+    descKey: &#39;ai_m_gemma&#39;,
+  ),
+  AiModel(
+    id: &#39;qwen25_15b&#39;, name: &#39;Qwen 2.5 1.5B&#39;, sizeMb: 1120,
+    file: &#39;qwen2.5-1.5b-instruct-q4_k_m.gguf&#39;,
+    url: &#39;https:&#47;&#47;huggingface.co&#47;Qwen&#47;Qwen2.5-1.5B-Instruct-GGUF&#47;resolve&#47;main&#47;qwen2.5-1.5b-instruct-q4_k_m.gguf&#39;,
+    descKey: &#39;ai_m_qwen15&#39;,
+  ),
+  AiModel(
+    id: &#39;llama32_3b&#39;, name: &#39;Llama 3.2 3B&#39;, sizeMb: 2020,
+    file: &#39;Llama-3.2-3B-Instruct-Q4_K_M.gguf&#39;,
+    url: &#39;https:&#47;&#47;huggingface.co&#47;bartowski&#47;Llama-3.2-3B-Instruct-GGUF&#47;resolve&#47;main&#47;Llama-3.2-3B-Instruct-Q4_K_M.gguf&#39;,
+    descKey: &#39;ai_m_llama3b&#39;,
   ),
 ];</code></pre>
 </section>

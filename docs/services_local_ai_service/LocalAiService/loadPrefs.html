@@ -70,6 +70,14 @@
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; loadPrefs(SharedPreferences p) async {
   aiEnabledNotifier.value = p.getBool(&#39;ls_ai_enabled&#39;) ?? false;
   aiModelNotifier.value   = p.getString(&#39;ls_ai_model&#39;) ?? &#39;&#39;;
+  try {
+    final raw = p.getString(&#39;ls_ai_custom&#39;);
+    if (raw != null) {
+      aiCustomModels.value = (jsonDecode(raw) as List)
+          .map((e) =&gt; AiModel.fromJson(Map&lt;String, dynamic&gt;.from(e)))
+          .toList();
+    }
+  } catch (_) {}
 }</code></pre>
 </section>
 

@@ -62,10 +62,6 @@
 
     </section>
     
-<section class="desc markdown">
-  <p>Télécharge depuis Hugging Face (reprise possible via fichier .part).
-Retourne true si installé.</p>
-</section>
 
 
     
@@ -74,6 +70,7 @@ Retourne true si installé.</p>
   <pre class="language-dart"><code class="language-dart">static Future&lt;bool&gt; download(AiModel m) async {
   if (aiDownloadingNotifier.value.isNotEmpty) return false;
   _cancel = false;
+  lastError = &#39;&#39;;
   aiDownloadingNotifier.value = m.id;
   aiProgressNotifier.value = 0;
   final client = http.Client();
@@ -87,7 +84,7 @@ Retourne true si installé.</p>
     if (res.statusCode != 200 &amp;&amp; res.statusCode != 206) {
       throw HttpException(&#39;HTTP ${res.statusCode}&#39;);
     }
-    if (res.statusCode == 200) have = 0; &#47;&#47; serveur ignore Range
+    if (res.statusCode == 200) have = 0;
     final total = have + (res.contentLength ?? 0);
     final sink = part.openWrite(
         mode: have &gt; 0 ? FileMode.append : FileMode.write);
@@ -104,7 +101,8 @@ Retourne true si installé.</p>
     aiInstalledTick.value++;
     if (aiModelNotifier.value.isEmpty) await selectModel(m.id);
     return true;
-  } catch (_) {
+  } catch (e) {
+    lastError = e.toString();
     return false;
   } finally {
     client.close();

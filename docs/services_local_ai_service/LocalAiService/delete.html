@@ -72,6 +72,11 @@
   if (await f.exists()) await f.delete();
   final part = File(&#39;${f.path}.part&#39;);
   if (await part.exists()) await part.delete();
+  if (m.custom) {
+    aiCustomModels.value =
+        aiCustomModels.value.where((x) =&gt; x.id != m.id).toList();
+    await _saveCustom();
+  }
   if (aiModelNotifier.value == m.id) await selectModel(&#39;&#39;);
   aiInstalledTick.value++;
 }</code></pre>

@@ -57,7 +57,7 @@
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span>&gt;</span></span>
 <span class="name ">generate</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="generate-param-system"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">system</span>, </span></li>
 <li><span class="parameter" id="generate-param-user"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">user</span>, {</span></li>
-<li><span class="parameter" id="generate-param-maxTokens"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">maxTokens</span> = <span class="default-value">110</span>, </span></li>
+<li><span class="parameter" id="generate-param-maxTokens"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">maxTokens</span> = <span class="default-value">140</span>, </span></li>
 </ol>})
 
       
@@ -65,7 +65,7 @@
     </section>
     
 <section class="desc markdown">
-  <p>Génère un texte court. Retourne null en cas d'échec.</p>
+  <p><code>system</code> = but précis + règles ; <code>user</code> = toutes les infos disponibles.</p>
 </section>
 
 
@@ -73,14 +73,12 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;String?&gt; generate(String system, String user,
-    {int maxTokens = 110}) async {
+    {int maxTokens = 140}) async {
   final m = await activeModel();
   if (m == null) return null;
   final path = (await _file(m)).path;
-  final prompt = _prompt(m, system, user);
   try {
-    final out = await Isolate.run(
-        () =&gt; _generateInIsolate(path, prompt, maxTokens));
+    final out = await _run(path, system, user, maxTokens);
     final t = out.trim();
     lastError = t.isEmpty ? &#39;empty output&#39; : &#39;&#39;;
     return t.isEmpty ? null : t;
