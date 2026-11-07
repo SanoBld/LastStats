@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-07T22:53:32Z",
+  "updated": "2026-11-07T23:16:48Z",
   "commits": [
+    {
+      "sha": "7f5bd61b7bce163a6649e6562754a5b18f7a5d04",
+      "message": "feat(ai): ajouter des messages d'instructions et des fonctionnalités de test pour l'IA locale",
+      "date": "2026-11-07T23:05:19Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/7f5bd61b7bce163a6649e6562754a5b18f7a5d04",
+      "tags": []
+    },
     {
       "sha": "9d4954cbdfe3d9982291c26c08bfd43012744768",
       "message": "feat(ai): implement local AI functionality with model management and summaries",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/8afe10a2486650a07bdd6b7ace84a18a556ddc21",
-      "tags": []
-    },
-    {
-      "sha": "afd0ae67340a3ea03eed804c8690e12e90f3f39b",
-      "message": "feat: ajouter un champ pour les pistes récemment écoutées dans les dossiers favoris et mettre à jour l'interface utilisateur",
-      "date": "2026-09-12T08:55:26Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/afd0ae67340a3ea03eed804c8690e12e90f3f39b",
       "tags": []
     }
   ]
