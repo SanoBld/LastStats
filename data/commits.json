@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-07T23:29:40Z",
+  "updated": "2026-11-07T23:47:41Z",
   "commits": [
+    {
+      "sha": "aa52024c801d376510636f3dbfc92a23a0117a8c",
+      "message": "Add multilingual AI model descriptions and enhance AI recap functionality\n\n- Updated Japanese, Portuguese, Russian, and Chinese localization files with new AI model descriptions and search hints.\n- Enhanced the dashboard and detail sheet to provide more comprehensive AI-generated summaries, including user-specific insights and trends.\n- Introduced a new AI goal system to guide the AI in generating tailored responses based on user interactions.\n- Implemented a search feature for Hugging Face models, allowing users to add custom AI models directly from the app.\n- Improved the local AI service to handle custom models and search results more effectively.",
+      "date": "2026-11-07T23:36:44Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/aa52024c801d376510636f3dbfc92a23a0117a8c",
+      "tags": []
+    },
     {
       "sha": "6bf4d57a6e526f475435ce060a5b85e8a150ba38",
       "message": "feat(ai): ajouter des messages d'état pour l'IA et mettre à jour les dépendances",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/71a9610ddbea12686e65c8faf360788c9a02ef5c",
-      "tags": []
-    },
-    {
-      "sha": "c9a38a01b93a8e3643d62ae395dbe40c7da12af8",
-      "message": "feat: Améliorer la gestion des emojis personnalisés dans les dossiers et ajuster le style des boutons d'action",
-      "date": "2026-09-12T09:38:22Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/c9a38a01b93a8e3643d62ae395dbe40c7da12af8",
       "tags": []
     }
   ]
