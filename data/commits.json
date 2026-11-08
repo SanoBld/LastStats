@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-08T04:54:45Z",
+  "updated": "2026-11-08T09:29:32Z",
   "commits": [
+    {
+      "sha": "27777ce1d2177b75746d4c6b78690b0078d8af74",
+      "message": "feat(ai): activer l'auto-génération pour AiRecapCard et améliorer la gestion des requêtes",
+      "date": "2026-11-08T09:29:09Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/27777ce1d2177b75746d4c6b78690b0078d8af74",
+      "tags": []
+    },
     {
       "sha": "aa52024c801d376510636f3dbfc92a23a0117a8c",
       "message": "Add multilingual AI model descriptions and enhance AI recap functionality\n\n- Updated Japanese, Portuguese, Russian, and Chinese localization files with new AI model descriptions and search hints.\n- Enhanced the dashboard and detail sheet to provide more comprehensive AI-generated summaries, including user-specific insights and trends.\n- Introduced a new AI goal system to guide the AI in generating tailored responses based on user interactions.\n- Implemented a search feature for Hugging Face models, allowing users to add custom AI models directly from the app.\n- Improved the local AI service to handle custom models and search results more effectively.",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/2c8ad926a62bb4f5f06aa9cea7467411aafa962c",
-      "tags": []
-    },
-    {
-      "sha": "71a9610ddbea12686e65c8faf360788c9a02ef5c",
-      "message": "feat: Ajouter la prise en charge de l'historique des écoutes dans les sauvegardes, avec options de restauration et gestion des erreurs",
-      "date": "2026-09-12T11:56:20Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/71a9610ddbea12686e65c8faf360788c9a02ef5c",
       "tags": []
     }
   ]
