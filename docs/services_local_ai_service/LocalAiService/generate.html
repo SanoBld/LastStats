@@ -78,7 +78,7 @@
   if (m == null) return null;
   final path = (await _file(m)).path;
   try {
-    final out = await _run(path, system, user, maxTokens);
+    final out = await _enqueue(() =&gt; _run(path, system, user, maxTokens));
     final t = out.trim();
     lastError = t.isEmpty ? &#39;empty output&#39; : &#39;&#39;;
     return t.isEmpty ? null : t;
