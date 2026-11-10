@@ -1,6 +1,14 @@
 {
   "items": [
     {
+      "id": "news_1794346324",
+      "title": "a short, refreshing break",
+      "body": "I'm taking a short break from adding to LastStats due to studies on the one hand, and also to take a short break x)",
+      "type": "info",
+      "emoji": "💤",
+      "date": "10/11"
+    },
+    {
       "id": "news_1793400156",
       "title": "Clear the image cache",
       "body": "We fixed wrong and missing covers and photos. To fetch everything again with the new rules, clear the image cache after updating 4.3.0 (BETA) : Settings > Cache.",
