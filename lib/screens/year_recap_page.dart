@@ -1209,8 +1209,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
         if (_yrInstant)
           const SizedBox(height: 0)
         else ...[
-          Text(tx('yr_intro_h', {'year': '$_year'}),
-              textAlign: TextAlign.center,
+          _YrBlurTitle(tx('yr_intro_h', {'year': '$_year'}),
               style: TextStyle(color: s.onPrimaryContainer, fontSize: 28, fontWeight: FontWeight.w900, height: 1.1)),
           const SizedBox(height: 28),
         ],
@@ -1321,8 +1320,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
       children: [
         _label(s, tx('yr_when_h')),
         const SizedBox(height: 14),
-        Text(tx('yr_p_$persona'),
-            textAlign: TextAlign.center,
+        _YrBlurTitle(tx('yr_p_$persona'), delayMs: 150,
             style: TextStyle(color: s.primary, fontSize: 28, fontWeight: FontWeight.w900)),
         const SizedBox(height: 22),
         SizedBox(
@@ -1447,9 +1445,8 @@ class _YearRecapPageState extends State<YearRecapPage> {
         children: [
           _label(s, tx('yr_friends_h')),
           const SizedBox(height: 10),
-          _YrReveal(delayMs: 250, pop: true, child: Text(rankLine,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: s.primary, fontSize: 28, fontWeight: FontWeight.w900))),
+          _YrBlurTitle(rankLine, delayMs: 250,
+              style: TextStyle(color: s.primary, fontSize: 28, fontWeight: FontWeight.w900)),
           const SizedBox(height: 20),
           for (var i = 0; i < shown.length; i++)
             _YrReveal(
@@ -1805,11 +1802,65 @@ class _YrRevealState extends State<_YrReveal> with SingleTickerProviderStateMixi
         .animate(CurvedAnimation(parent: _c, curve: widget.pop ? Curves.easeOutBack : Curves.easeOutCubic));
     final slide = Tween<Offset>(begin: const Offset(0, 0.25), end: Offset.zero)
         .animate(CurvedAnimation(parent: _c, curve: Curves.easeOutCubic));
-    return FadeTransition(
+    final body = FadeTransition(
       opacity: fade,
       child: SlideTransition(position: slide, child: ScaleTransition(scale: scale, child: widget.child)),
     );
+    if (!M3Motion.blurOn) return body;
+    // Soft blur that sharpens as the block arrives (setting + eco aware).
+    return AnimatedBuilder(
+      animation: _c,
+      child: body,
+      builder: (_, c) {
+        final sg = _c.value >= 1 ? 0.0 : 8.0 * (1 - _c.value);
+        return ImageFiltered(
+          enabled: sg > 0.3,
+          imageFilter: ImageFilter.blur(sigmaX: sg, sigmaY: sg, tileMode: TileMode.decal),
+          child: c,
+        );
+      },
+    );
   }
+}
+
+// Headline that appears letter by letter, each letter sharpening from a blur.
+class _YrBlurTitle extends StatefulWidget {
+  final String text;
+  final TextStyle style;
+  final int delayMs;
+  const _YrBlurTitle(this.text, {required this.style, this.delayMs = 0});
+
+  @override
+  State<_YrBlurTitle> createState() => _YrBlurTitleState();
+}
+
+class _YrBlurTitleState extends State<_YrBlurTitle> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+      vsync: this, duration: Duration(milliseconds: 500 + widget.text.length.clamp(1, 40) * 28));
+  Timer? _t;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_yrInstant) {
+      _c.value = 1;
+      return;
+    }
+    _t = Timer(Duration(milliseconds: widget.delayMs), () {
+      if (mounted) _c.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _t?.cancel();
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      M3BlurText(widget.text, t: _c, style: widget.style);
 }
 
 // Number that counts up from 0 after a delay.
@@ -1881,10 +1932,17 @@ class _YrSlide extends StatelessWidget {
       tween: Tween(begin: 0, end: 1),
       duration: _yrInstant ? Duration.zero : const Duration(milliseconds: 450),
       curve: Curves.easeOutCubic,
-      builder: (_, v, child) => Opacity(
-        opacity: v,
-        child: Transform.translate(offset: Offset(0, 24 * (1 - v)), child: child),
-      ),
+      builder: (_, v, child) {
+        final sg = M3Motion.blurOn ? 6.0 * (1 - v) : 0.0;
+        return Opacity(
+          opacity: v,
+          child: ImageFiltered(
+            enabled: sg > 0.3,
+            imageFilter: ImageFilter.blur(sigmaX: sg, sigmaY: sg, tileMode: TileMode.decal),
+            child: Transform.translate(offset: Offset(0, 24 * (1 - v)), child: child),
+          ),
+        );
+      },
       child: LayoutBuilder(
         builder: (context, c) => SingleChildScrollView(
           physics: const ClampingScrollPhysics(),

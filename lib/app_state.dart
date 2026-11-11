@@ -91,6 +91,9 @@ final pcModeNotifier = ValueNotifier<String>('auto');
 // Saved as 'ls_haptic_feedback' in SharedPreferences.
 final hapticFeedbackNotifier = ValueNotifier<bool>(true);
 
+// Soft blur during transitions and reveals. Saved as 'ls_motion_blur'.
+final motionBlurNotifier = ValueNotifier<bool>(true);
+
 // Show labels under nav bar icons. Saved as 'ls_nav_labels'.
 final navLabelNotifier = ValueNotifier<bool>(true);
 

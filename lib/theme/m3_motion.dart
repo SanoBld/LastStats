@@ -84,7 +84,12 @@ class M3Motion {
 
   /// True when the user turned on "reduce animations".
   static bool reduced(BuildContext context) =>
-      MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+      (MediaQuery.maybeDisableAnimationsOf(context) ?? false) ||
+      ecoModeActiveNotifier.value; // eco mode = no fancy motion
+
+  /// Blur allowed? (user setting on, eco mode off)
+  static bool get blurOn =>
+      motionBlurNotifier.value && !ecoModeActiveNotifier.value;
 
   /// Position of a widget, in the coordinates of the app overlay.
   /// Used as the start of a container transform. Returns null if unknown.
@@ -131,14 +136,20 @@ Widget m3SlideTransition(BuildContext context, Animation<double> a,
     ),
     builder: (_, c) {
       final v = outC.value;
-      final sigma = ecoModeActiveNotifier.value ? 0.0 : 5.0 * v;
-      return ImageFiltered(
-        enabled: sigma > 0.3,
-        imageFilter: ImageFilter.blur(
-            sigmaX: sigma, sigmaY: sigma, tileMode: TileMode.decal),
-        child: FractionalTranslation(
-          translation: Offset(-0.22 * v, 0),
-          child: Transform.scale(scale: 1 - 0.05 * v, child: c),
+      final sigma = M3Motion.blurOn ? 4.0 * v : 0.0;
+      // Solid surface under the moving page and no scale: no dark gap or
+      // dark edge can show. clamp (not decal) so the blur never fades the
+      // edges to black.
+      return ColoredBox(
+        color: surface,
+        child: ImageFiltered(
+          enabled: sigma > 0.3,
+          imageFilter: ImageFilter.blur(
+              sigmaX: sigma, sigmaY: sigma, tileMode: TileMode.clamp),
+          child: FractionalTranslation(
+            translation: Offset(-0.15 * v, 0),
+            child: c,
+          ),
         ),
       );
     },
@@ -155,7 +166,7 @@ Widget m3Reveal(BuildContext context, Animation<double> t, Widget child) {
     child: child,
     builder: (_, c) {
       final v = t.value.clamp(0.0, 1.0);
-      final sigma = (ecoModeActiveNotifier.value || v >= 1) ? 0.0 : 8.0 * (1 - v);
+      final sigma = (!M3Motion.blurOn || v >= 1) ? 0.0 : 8.0 * (1 - v);
       return Opacity(
         opacity: Curves.easeOut.transform((v * 2).clamp(0.0, 1.0)),
         child: ImageFiltered(
@@ -312,7 +323,8 @@ class M3ContainerRoute<T> extends PageRoute<T> {
             Positioned.fill(
               child: IgnorePointer(
                 child: ColoredBox(
-                  color: Colors.black.withValues(alpha: 0.32 * raw),
+                  color: Theme.of(context).colorScheme.surface
+                      .withValues(alpha: 0.55 * raw),
                 ),
               ),
             ),
@@ -415,7 +427,7 @@ class _M3FadeThroughStackState extends State<M3FadeThroughStack>
           child: ImageFiltered(
             enabled: sigma > 0.3,
             imageFilter: ImageFilter.blur(
-                sigmaX: sigma, sigmaY: sigma, tileMode: TileMode.decal),
+                sigmaX: sigma, sigmaY: sigma, tileMode: TileMode.clamp),
             child: Transform.translate(
               offset: Offset(dx, 0),
               child: Transform.scale(scale: scale, child: widget.children[i]),
@@ -429,7 +441,7 @@ class _M3FadeThroughStackState extends State<M3FadeThroughStack>
   @override
   Widget build(BuildContext context) {
     final reduce = M3Motion.reduced(context);
-    final blur = !reduce && !ecoModeActiveNotifier.value;
+    final blur = !reduce && M3Motion.blurOn;
     return AnimatedBuilder(
       animation: _c,
       builder: (context, _) => Stack(
@@ -513,4 +525,70 @@ class M3FadeThroughRoute<T> extends PageRouteBuilder<T> {
 // fades out and shrinks a little. Going back is the reverse, but faster.
 class M3SharedAxisRoute<T> extends M3SlideRoute<T> {
   M3SharedAxisRoute({required super.builder});
+}
+
+
+// ── Letter-by-letter blur reveal (titles, recap text) ──────────────────────
+// Each letter sharpens from a blur and rises, one after the other.
+// [t] runs 0 -> 1. Without blur (setting off / eco mode) it is a plain
+// letter fade, and in reduced motion the text is shown immediately.
+class M3BlurText extends StatelessWidget {
+  const M3BlurText(this.text,
+      {super.key, required this.t, this.style, this.align = TextAlign.center});
+  final String text;
+  final Animation<double> t;
+  final TextStyle? style;
+  final TextAlign align;
+
+  @override
+  Widget build(BuildContext context) {
+    if (M3Motion.reduced(context)) {
+      return Text(text, style: style, textAlign: align);
+    }
+    final words = text.split(' ');
+    final total = text.length.clamp(1, 80);
+    final blur = M3Motion.blurOn;
+    final wrapAlign = align == TextAlign.center
+        ? WrapAlignment.center
+        : (align == TextAlign.end || align == TextAlign.right)
+            ? WrapAlignment.end
+            : WrapAlignment.start;
+    return AnimatedBuilder(
+      animation: t,
+      builder: (_, _) {
+        var n = 0;
+        return Wrap(
+          alignment: wrapAlign,
+          children: [
+            for (final w in words)
+              Padding(
+                padding: const EdgeInsets.only(right: 6),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  for (final r in w.runes)
+                    () {
+                      final i = n++;
+                      final a = (i / total) * 0.55;
+                      final k = ((t.value - a) / 0.45).clamp(0.0, 1.0);
+                      final e = Curves.easeOutCubic.transform(k);
+                      final sg = blur ? 8.0 * (1 - e) : 0.0;
+                      return Opacity(
+                        opacity: e,
+                        child: ImageFiltered(
+                          enabled: sg > 0.3,
+                          imageFilter: ImageFilter.blur(
+                              sigmaX: sg, sigmaY: sg, tileMode: TileMode.decal),
+                          child: Transform.translate(
+                            offset: Offset(0, 14 * (1 - e)),
+                            child: Text(String.fromCharCode(r), style: style),
+                          ),
+                        ),
+                      );
+                    }(),
+                ]),
+              ),
+          ],
+        );
+      },
+    );
+  }
 }

@@ -173,6 +173,7 @@ Future<void> _mainImpl() async {
   pcModeNotifier.value   = prefs.getString('ls_pc_mode') ?? 'auto';
   navLabelNotifier.value     = prefs.getBool('ls_nav_labels')      ?? true;
   hapticFeedbackNotifier.value = prefs.getBool('ls_haptic_feedback') ?? true;
+  motionBlurNotifier.value = prefs.getBool('ls_motion_blur') ?? true;
   livingArtworkNotifier.value = prefs.getBool('ls_living_artwork') ?? true;
   motionArtworkNotifier.value = prefs.getBool('ls_motion_artwork') ?? true;
   dashMotionNotifier.value = prefs.getBool('ls_dash_motion') ?? true;
@@ -414,7 +415,7 @@ class LastStatsApp extends StatelessWidget {
                                 darkTheme: nDarkWithNav,
                                 themeMode: mode,
                                 builder: (context, child) =>
-                                    AppTextScale(child: DesktopTitleBarShell(child: child!)),
+                                    AppTextScale(child: DesktopTitleBarShell(child: ColoredBox(color: Theme.of(context).colorScheme.surface, child: child!))),
                                 home: (username.isNotEmpty && apiKey.isNotEmpty)
                                     ? HomeScreen(username: username, apiKey: apiKey,
                                         startupTab: startupTab)
@@ -536,7 +537,7 @@ class LastStatsApp extends StatelessWidget {
                                       darkTheme: dTheme,
                                       themeMode: mode,
                                       builder: (context, child) =>
-                                          AppTextScale(child: DesktopTitleBarShell(child: child!)),
+                                          AppTextScale(child: DesktopTitleBarShell(child: ColoredBox(color: Theme.of(context).colorScheme.surface, child: child!))),
                                       home: (username.isNotEmpty && apiKey.isNotEmpty)
                                           ? HomeScreen(username: username, apiKey: apiKey,
                                               startupTab: startupTab)

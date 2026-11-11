@@ -12,12 +12,14 @@
 import 'dart:async';
 import 'dart:io' show Platform;
 import 'dart:math' as math;
+import 'dart:ui' show ImageFilter, TileMode;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import '../app_state.dart';
 import '../services/achievements.dart';
+import '../theme/m3_motion.dart';
 
 bool get _isDesktop =>
     !kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS);
@@ -30,14 +32,18 @@ class Tilt3DCard extends StatefulWidget {
   // Achievement border: bronze → iridescent, based on play count.
   // CardTier.none = no border (default, unaffected layout).
   final CardTier tier;
+  // Small tier pill (medal + name) on the front. Off where the front already
+  // spells the tier out (badge viewer).
+  final bool showTierChip;
   const Tilt3DCard({
     super.key,
     required this.front,
     required this.back,
     required this.width,
     required this.height,
-    this.radius = 22,
+    this.radius = 28,
     this.tier = CardTier.none,
+    this.showTierChip = true,
   });
 
   @override
@@ -48,6 +54,9 @@ class _Tilt3DCardState extends State<Tilt3DCard>
     with TickerProviderStateMixin {
   late final AnimationController _flip =
       AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
+  // One-shot entrance: the card rises, grows and sharpens into place.
+  late final AnimationController _intro = AnimationController(
+      vsync: this, duration: const Duration(milliseconds: 650))..forward();
   late final Ticker _smoother;
   StreamSubscription<AccelerometerEvent>? _sub;
 
@@ -125,6 +134,7 @@ class _Tilt3DCardState extends State<Tilt3DCard>
   @override
   void dispose() {
     _flip.dispose();
+    _intro.dispose();
     _smoother.dispose();
     _sub?.cancel();
     super.dispose();
@@ -165,6 +175,30 @@ class _Tilt3DCardState extends State<Tilt3DCard>
 
   @override
   Widget build(BuildContext context) {
+    final card = _buildCard(context);
+    if (M3Motion.reduced(context)) return card;
+    return AnimatedBuilder(
+      animation: _intro,
+      child: card,
+      builder: (_, c) {
+        final k = M3Motion.spatialDefault.transform(_intro.value.clamp(0.0, 1.0));
+        final sg = M3Motion.blurOn ? 10.0 * (1 - _intro.value) : 0.0;
+        return Opacity(
+          opacity: Curves.easeOut.transform((_intro.value * 2).clamp(0.0, 1.0)),
+          child: ImageFiltered(
+            enabled: sg > 0.3,
+            imageFilter: ImageFilter.blur(sigmaX: sg, sigmaY: sg, tileMode: TileMode.decal),
+            child: Transform.translate(
+              offset: Offset(0, 48 * (1 - k)),
+              child: Transform.scale(scale: 0.86 + 0.14 * k, child: c),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCard(BuildContext context) {
     return ValueListenableBuilder<bool>(
       valueListenable: livingArtworkNotifier,
       builder: (context, enabled, _) {
@@ -221,26 +255,36 @@ class _Tilt3DCardState extends State<Tilt3DCard>
                     alignment: Alignment.center,
                     transform: m,
                     child: Container(
-                      decoration: effTier == CardTier.none ? null : BoxDecoration(
+                      decoration: BoxDecoration(
                         borderRadius: radius,
-                        gradient: LinearGradient(
+                        gradient: effTier == CardTier.none ? null : LinearGradient(
                           colors: tierGradient(effTier)!,
                           stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
                           begin: Alignment(-1 - effRy * 0.7, -1 - effRx * 0.7),
                           end: Alignment(1 - effRy * 0.7, 1 - effRx * 0.7),
                         ),
+                        // Depth: the shadow slides opposite to the tilt, and a
+                        // tier card also glows in its own tonal colour.
                         boxShadow: [
                           BoxShadow(
-                            color: tierGradient(effTier)![1].withValues(alpha: 0.28),
-                            blurRadius: 14, spreadRadius: -4,
+                            color: Colors.black.withValues(alpha: 0.30),
+                            blurRadius: 32, spreadRadius: -6,
+                            offset: Offset(-effRy * 14, 16 + effRx * 10),
                           ),
+                          if (effTier != CardTier.none)
+                            BoxShadow(
+                              color: tierGradient(effTier)![1].withValues(alpha: 0.42),
+                              blurRadius: 40, spreadRadius: -2,
+                            ),
                         ],
                       ),
                       // Thicker rim so the tier border reads as a real edge.
                       padding: effTier == CardTier.none
-                          ? EdgeInsets.zero : const EdgeInsets.all(4.5),
+                          ? EdgeInsets.zero : const EdgeInsets.all(5),
                       child: ClipRRect(
-                        borderRadius: radius,
+                        borderRadius: effTier == CardTier.none
+                            ? radius
+                            : BorderRadius.circular(math.max(4.0, widget.radius - 5)),
                         child: Stack(
                           fit: StackFit.expand,
                           children: [
@@ -250,6 +294,40 @@ class _Tilt3DCardState extends State<Tilt3DCard>
                                 child: _GlassReflection(
                                   rx: effRx, ry: effRy,
                                   width: widget.width, height: widget.height,
+                                ),
+                              ),
+                            // Hairline inner edge, like a Material outlined card.
+                            if (showFront)
+                              IgnorePointer(
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(
+                                        math.max(4.0, widget.radius - 5)),
+                                    border: Border.all(
+                                        color: Colors.white.withValues(alpha: 0.16)),
+                                  ),
+                                ),
+                              ),
+                            if (showFront && effTier != CardTier.none && widget.showTierChip)
+                              Positioned(
+                                top: 12, left: 12,
+                                child: Container(
+                                  padding: const EdgeInsets.fromLTRB(8, 5, 12, 5),
+                                  decoration: ShapeDecoration(
+                                    shape: const StadiumBorder(),
+                                    color: tierGradient(effTier)![1],
+                                    shadows: [BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.18),
+                                        blurRadius: 8, offset: const Offset(0, 2))],
+                                  ),
+                                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                                    Icon(Icons.workspace_premium_rounded, size: 16,
+                                        color: tierOnColor(effTier)),
+                                    const SizedBox(width: 4),
+                                    Text(tierLabel(effTier), style: TextStyle(
+                                        fontSize: 12, fontWeight: FontWeight.w800,
+                                        color: tierOnColor(effTier))),
+                                  ]),
                                 ),
                               ),
                           ],

@@ -97,7 +97,9 @@ void _pushFullscreen(BuildContext ctx, String url,
      bool motionIsArtist = false}) {
   Navigator.of(ctx).push(PageRouteBuilder(
     opaque: false,
-    barrierColor: Colors.black,
+    // Transparent: the viewer paints its own themed backdrop, so no black
+    // frame shows around it while it fades in or out.
+    barrierColor: Colors.transparent,
     barrierDismissible: true,
     pageBuilder: (_, _, _) => _FullscreenImageViewer(
         url: url, title: title, subtitle: subtitle, source: source,
@@ -2616,7 +2618,9 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
     final cardW  = math.min(size.width * 0.8, 340.0);
     final cardH  = math.min(size.height * 0.62, cardW * 1.35);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final edge   = isDark ? Colors.black : Colors.white;
+    final cs     = Theme.of(context).colorScheme;
+    // Themed edge colour (tinted surface) instead of pure black / white.
+    final edge   = isDark ? Color.lerp(cs.surface, Colors.black, 0.6)! : cs.surface;
 
     return Scaffold(
       backgroundColor: edge,
@@ -4071,37 +4075,62 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     final plays  = int.tryParse((a['playcount'] ?? '0').toString()) ?? 0;
     final imgUrl = _extractImage(a['image']);
 
-    return M3InkWell(
-      onTap: () {
-        showDetailSheet(ctx, a, 'artists', widget.service);
-      },
+    final top = _topArtists.isEmpty ? 1 : (int.tryParse(
+        ((_topArtists.first as Map)['playcount'] ?? '1').toString()) ?? 1);
+    final frac = top <= 0 ? 0.0 : plays / top;
+    final text = Theme.of(context).textTheme;
+
+    return _FadeSlideIn(
+      delay: Duration(milliseconds: idx * 45),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
-        child: Row(children: [
-          SizedBox(
-            width: 24,
-            child: Text('${idx + 1}',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: scheme.onSurfaceVariant, fontWeight: FontWeight.w700)),
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+        child: Material(
+          color: scheme.surface.withValues(alpha: 0.55),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          clipBehavior: Clip.antiAlias,
+          child: M3InkWell(
+            onTap: () => showDetailSheet(ctx, a, 'artists', widget.service),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 8, 12, 8),
+              child: Row(children: [
+                SizedBox(
+                  width: 22,
+                  child: Text('${idx + 1}', textAlign: TextAlign.center,
+                      style: text.labelLarge?.copyWith(
+                          color: scheme.primary, fontWeight: FontWeight.w800)),
+                ),
+                const SizedBox(width: 8),
+                _SmartImage(
+                  size: 48, borderRadius: 14, initialUrl: imgUrl,
+                  resolver: () => ImageService.resolveArtist(name,
+                      lastfmUrl: imgUrl.isNotEmpty ? imgUrl : null),
+                ),
+                const SizedBox(width: 12),
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                      style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 5),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(3),
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0, end: frac.clamp(0.0, 1.0)),
+                      duration: Duration(milliseconds: 700 + idx * 70),
+                      curve: Curves.easeOutCubic,
+                      builder: (_, v, _) => LinearProgressIndicator(
+                        value: v, minHeight: 4,
+                        color: scheme.primary,
+                        backgroundColor: scheme.primary.withValues(alpha: 0.15),
+                      ),
+                    ),
+                  ),
+                ])),
+                const SizedBox(width: 10),
+                Text('${_fmt(plays)}', style: text.labelMedium?.copyWith(
+                    color: scheme.primary, fontWeight: FontWeight.w800)),
+              ]),
+            ),
           ),
-          const SizedBox(width: 10),
-          _SmartImage(
-            size: 44, borderRadius: 22, initialUrl: imgUrl,
-            resolver: () => ImageService.resolveArtist(name,
-                lastfmUrl: imgUrl.isNotEmpty ? imgUrl : null),
-          ),
-          const SizedBox(width: 12),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(name, maxLines: 1, overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodyMedium
-                  ?.copyWith(fontWeight: FontWeight.w600)),
-            Text('${_fmt(plays)} ${L.commonPlays}',
-              style: Theme.of(context).textTheme.bodySmall
-                  ?.copyWith(color: scheme.onSurfaceVariant)),
-          ])),
-          Icon(Icons.chevron_right_rounded, size: 18, color: scheme.outlineVariant),
-        ]),
+        ),
       ),
     );
   }
@@ -4132,11 +4161,11 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
         gridDelegate: desktop
             ? const SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: 150, mainAxisSpacing: 14,
-                crossAxisSpacing: 14, childAspectRatio: 0.78,
+                crossAxisSpacing: 14, childAspectRatio: 0.72,
               )
             : const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3, mainAxisSpacing: 10,
-                crossAxisSpacing: 10, childAspectRatio: 0.78,
+                crossAxisSpacing: 10, childAspectRatio: 0.72,
               ),
         itemCount: albums.length,
         itemBuilder: (_, i) {
@@ -4146,30 +4175,38 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           final imgUrl  = _extractImage(al['image']);
           final artName = (al['artist']?['name'] ?? '').toString();
 
-          return GestureDetector(
-            onTap: () {
-              showDetailSheet(ctx, al, 'albums', widget.service);
-            },
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: _SmartImage(
-                    size: 100, borderRadius: 10, initialUrl: imgUrl,
-                    resolver: () => ImageService.resolveAlbum(name, artName,
-                        lastfmUrl: imgUrl.isNotEmpty ? imgUrl : null),
-                  ),
+          return _FadeSlideIn(
+            delay: Duration(milliseconds: i * 45),
+            child: Material(
+              color: scheme.surface.withValues(alpha: 0.55),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              clipBehavior: Clip.antiAlias,
+              child: M3InkWell(
+                onTap: () => showDetailSheet(ctx, al, 'albums', widget.service),
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Expanded(
+                      child: AspectRatio(
+                        aspectRatio: 1,
+                        child: _SmartImage(
+                          size: 100, borderRadius: 14, initialUrl: imgUrl,
+                          resolver: () => ImageService.resolveAlbum(name, artName,
+                              lastfmUrl: imgUrl.isNotEmpty ? imgUrl : null),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.labelMedium
+                          ?.copyWith(fontWeight: FontWeight.w700)),
+                    Text('${_fmt(plays)} ${L.commonPlays}',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: scheme.primary, fontWeight: FontWeight.w800)),
+                  ]),
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(name, maxLines: 2, overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.labelSmall
-                    ?.copyWith(fontWeight: FontWeight.w700, fontSize: 11)),
-              Text('${_fmt(plays)} ${L.commonPlays}',
-                style: Theme.of(context).textTheme.labelSmall
-                    ?.copyWith(color: scheme.onSurfaceVariant, fontSize: 9)),
-            ]),
+            ),
           );
         },
       ),
@@ -4184,51 +4221,66 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     final rawUrl = _extractImage(t['image']);
     final hasImg = rawUrl.isNotEmpty && !rawUrl.contains(_ph);
 
-    return GestureDetector(
-      onTap: () {
-        final item = Map<String, dynamic>.from(t);
-        item['artist'] = {'name': artist};
-        showDetailSheet(context, item, 'tracks', widget.service);
-      },
+    return _FadeSlideIn(
+      delay: const Duration(milliseconds: 40),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-        child: Row(children: [
-          Stack(children: [
-            SizedBox(
-              width: 44, height: 44,
-              child: hasImg
-                  ? M3NetImage(url: rawUrl, size: 44, fallback: _artBox(44, scheme))
-                  : M3ShapedBox(size: 44, seed: rawUrl, child: _artBox(44, scheme)),
-            ),
-            if (isNp)
-              Positioned(right: 0, bottom: 0,
-                child: Container(
-                  width: 10, height: 10,
-                  decoration: BoxDecoration(
-                    color:  Colors.greenAccent.shade400,
-                    shape:  BoxShape.circle,
-                    border: Border.all(color: scheme.surface, width: 1.5),
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+        child: Material(
+          color: scheme.surface.withValues(alpha: 0.55),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          clipBehavior: Clip.antiAlias,
+          child: M3InkWell(
+            onTap: () {
+              final item = Map<String, dynamic>.from(t);
+              item['artist'] = {'name': artist};
+              showDetailSheet(context, item, 'tracks', widget.service);
+            },
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 8, 12, 8),
+              child: Row(children: [
+                Stack(children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: SizedBox(
+                      width: 48, height: 48,
+                      child: hasImg
+                          ? M3NetImage(url: rawUrl, size: 48, fallback: _artBox(48, scheme))
+                          : _artBox(48, scheme),
+                    ),
                   ),
-                )),
-          ]),
-          const SizedBox(width: 12),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(track, maxLines: 1, overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodySmall
-                  ?.copyWith(fontWeight: FontWeight.w600)),
-            Text(artist, maxLines: 1, overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.labelSmall
-                  ?.copyWith(color: scheme.onSurfaceVariant)),
-          ])),
-          isNp
-              ? Text(L.commonNowPlayingBadge,
-                  style: TextStyle(
-                      color: Colors.greenAccent.shade700,
-                      fontSize: 10, fontWeight: FontWeight.w800))
-              : Text(_timeAgo(t),
-                  style: Theme.of(context).textTheme.labelSmall
-                      ?.copyWith(color: scheme.onSurfaceVariant, fontSize: 10)),
-        ]),
+                  if (isNp)
+                    Positioned(right: 0, bottom: 0,
+                      child: Container(
+                        width: 12, height: 12,
+                        decoration: BoxDecoration(
+                          color: Colors.greenAccent.shade400,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: scheme.surface, width: 2),
+                        ),
+                      )),
+                ]),
+                const SizedBox(width: 12),
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(track, maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyMedium
+                        ?.copyWith(fontWeight: FontWeight.w700)),
+                  Text(artist, maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodySmall
+                        ?.copyWith(color: scheme.onSurfaceVariant)),
+                ])),
+                const SizedBox(width: 10),
+                isNp
+                    ? Text(L.commonNowPlayingBadge,
+                        style: TextStyle(
+                            color: Colors.greenAccent.shade700,
+                            fontSize: 11, fontWeight: FontWeight.w800))
+                    : Text(_timeAgo(t),
+                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            color: scheme.primary, fontWeight: FontWeight.w800)),
+              ]),
+            ),
+          ),
+        ),
       ),
     );
   }

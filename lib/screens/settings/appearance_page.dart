@@ -1593,6 +1593,20 @@ class _HapticSectionState extends State<_HapticSection> {
             if (v) HapticFeedback.mediumImpact(); // confirm it works
           },
         ),
+        ValueListenableBuilder<bool>(
+          valueListenable: motionBlurNotifier,
+          builder: (_, on, _) => SwitchListTile(
+            secondary: Icon(Icons.blur_on_rounded, color: scheme.primary),
+            title: const Text('Motion blur'),
+            subtitle: const Text('Soft blur during page transitions and reveals'),
+            value: on,
+            onChanged: (v) async {
+              final p = await SharedPreferences.getInstance();
+              await p.setBool('ls_motion_blur', v);
+              motionBlurNotifier.value = v;
+            },
+          ),
+        ),
       ],
     );
   }

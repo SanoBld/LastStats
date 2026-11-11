@@ -355,7 +355,7 @@ class _AchvMilestoneTile extends StatelessWidget {
 void _openAchvCard(BuildContext context, AchievementProgress a, IconData icon) {
   Navigator.of(context).push(PageRouteBuilder(
     opaque: false,
-    barrierColor: Colors.black87,
+    barrierColor: Colors.transparent,
     barrierDismissible: true,
     pageBuilder: (_, _, _) => _AchvCardViewer(a: a, icon: icon),
     transitionsBuilder: (_, anim, _, child) => FadeTransition(opacity: anim, child: child),
@@ -410,7 +410,8 @@ class _AchvCardViewerState extends State<_AchvCardViewer> {
     final topPad = MediaQuery.of(context).padding.top;
 
     return Scaffold(
-      backgroundColor: Colors.black87,
+      // Tonal scrim from the theme instead of flat black.
+      backgroundColor: Theme.of(context).colorScheme.scrim.withValues(alpha: 0.82),
       body: Stack(children: [
         GestureDetector(
           onTap: () => Navigator.pop(context),
@@ -420,6 +421,7 @@ class _AchvCardViewerState extends State<_AchvCardViewer> {
               onTap: () {},
               child: Tilt3DCard(
                 width: cardW, height: cardH,
+                showTierChip: false,
                 tier: a.unlocked ? a.def.tier : CardTier.none,
                 front: _AchvTierSurface(
                   tier: a.def.tier,

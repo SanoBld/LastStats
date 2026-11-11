@@ -243,8 +243,23 @@ class _HistoryPageState extends State<_HistoryPage>
                   begin: Offset(dir == 0 ? 0.0 : dir < 0 ? -0.22 : 0.22, 0),
                   end:   Offset.zero,
                 ).animate(CurvedAnimation(parent: anim, curve: M3Motion.emphasizedDecelerate));
-                return SlideTransition(position: slideIn,
-                    child: FadeTransition(opacity: anim, child: child));
+                // Soft blur while the tab content swaps (setting + eco aware).
+                final moving = M3Motion.blurOn
+                    ? AnimatedBuilder(
+                        animation: anim,
+                        child: FadeTransition(opacity: anim, child: child),
+                        builder: (_, c) {
+                          final sg = 6.0 * (1 - anim.value);
+                          return ImageFiltered(
+                            enabled: sg > 0.3,
+                            imageFilter: ImageFilter.blur(
+                                sigmaX: sg, sigmaY: sg, tileMode: TileMode.clamp),
+                            child: c,
+                          );
+                        })
+                    : FadeTransition(opacity: anim, child: child);
+                if (M3Motion.reduced(context)) return FadeTransition(opacity: anim, child: child);
+                return SlideTransition(position: slideIn, child: moving);
               },
               child: _loading
                 ? const Center(key: ValueKey('hist_load'), child: M3LoadingIndicator())
@@ -513,14 +528,17 @@ class _HistStatsView extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       children: [
-        _HistStatSection(title: L.historyTopArtists, icon: Icons.mic_rounded,
-            data: artists, scheme: scheme, text: text),
+        _FadeSlideIn(delay: const Duration(milliseconds: 0), child: _HistStatSection(
+            title: L.historyTopArtists, icon: Icons.mic_rounded,
+            data: artists, scheme: scheme, text: text)),
         const SizedBox(height: 20),
-        _HistStatSection(title: L.historyTopAlbums, icon: Icons.album_rounded,
-            data: albums, scheme: scheme, text: text),
+        _FadeSlideIn(delay: const Duration(milliseconds: 90), child: _HistStatSection(
+            title: L.historyTopAlbums, icon: Icons.album_rounded,
+            data: albums, scheme: scheme, text: text)),
         const SizedBox(height: 20),
-        _HistStatSection(title: L.historyTopTracks, icon: Icons.music_note_rounded,
-            data: tTracks, scheme: scheme, text: text),
+        _FadeSlideIn(delay: const Duration(milliseconds: 180), child: _HistStatSection(
+            title: L.historyTopTracks, icon: Icons.music_note_rounded,
+            data: tTracks, scheme: scheme, text: text)),
       ],
     );
   }

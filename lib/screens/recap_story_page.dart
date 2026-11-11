@@ -476,6 +476,19 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
                     : AnimatedSwitcher(
                         duration: const Duration(milliseconds: 260),
                         switchInCurve: M3Motion.emphasizedDecelerate,
+                        transitionBuilder: (child, anim) => AnimatedBuilder(
+                          animation: anim,
+                          child: FadeTransition(opacity: anim, child: child),
+                          builder: (_, c) {
+                            final sg = M3Motion.blurOn ? 6.0 * (1 - anim.value) : 0.0;
+                            return ImageFiltered(
+                              enabled: sg > 0.3,
+                              imageFilter: ui.ImageFilter.blur(
+                                  sigmaX: sg, sigmaY: sg, tileMode: TileMode.clamp),
+                              child: c,
+                            );
+                          },
+                        ),
                         child: _body(context, scheme, d, category, categoryItems,
                             key: ValueKey('$_period-$category')),
                       ),
@@ -906,16 +919,25 @@ class _FadeInUpState extends State<_FadeInUp> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedOpacity(
-      opacity: _show ? 1 : 0,
-      duration: const Duration(milliseconds: 350),
+    if (M3Motion.reduced(context)) return widget.child;
+    // Fade + rise + soft blur that sharpens (setting + eco aware).
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: _show ? 1.0 : 0.0),
+      duration: const Duration(milliseconds: 450),
       curve: M3Motion.emphasizedDecelerate,
-      child: AnimatedSlide(
-        offset: _show ? Offset.zero : const Offset(0, 0.15),
-        duration: const Duration(milliseconds: 350),
-        curve: M3Motion.emphasizedDecelerate,
-        child: widget.child,
-      ),
+      child: widget.child,
+      builder: (_, v, c) {
+        final sg = M3Motion.blurOn ? 8.0 * (1 - v) : 0.0;
+        return Opacity(
+          opacity: v.clamp(0.0, 1.0),
+          child: ImageFiltered(
+            enabled: sg > 0.3,
+            imageFilter: ui.ImageFilter.blur(
+                sigmaX: sg, sigmaY: sg, tileMode: TileMode.decal),
+            child: Transform.translate(offset: Offset(0, 22 * (1 - v)), child: c),
+          ),
+        );
+      },
     );
   }
 }

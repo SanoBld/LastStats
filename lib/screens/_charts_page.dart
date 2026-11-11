@@ -1551,8 +1551,17 @@ Color _cardBg(ColorScheme s, [Color? tint]) => (_chartExportMode && _exportBgCol
 BoxDecoration _chartCardDecoration(ColorScheme s, [Color? tint]) => _chartExportMode
     ? const BoxDecoration()
     : BoxDecoration(
-  color: _cardBg(s, tint),
-  borderRadius: BorderRadius.circular(28),
+  // Material You tonal card: a soft diagonal wash from the accent container
+  // into the base surface, plus a hairline edge, instead of one flat fill.
+  gradient: LinearGradient(
+    begin: Alignment.topLeft, end: Alignment.bottomRight,
+    colors: [
+      Color.alphaBlend(s.primaryContainer.withValues(alpha: 0.38), _cardBg(s, tint)),
+      _cardBg(s, tint),
+    ],
+  ),
+  borderRadius: BorderRadius.circular(32),
+  border: Border.all(color: s.outlineVariant.withValues(alpha: 0.35)),
 );
 
 /// Gradient bar fill: lighter at base, full color at top.
