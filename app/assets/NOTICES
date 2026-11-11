@@ -2094,6 +2094,7 @@ shared_preferences
 shared_preferences_android
 shared_preferences_foundation
 shared_preferences_platform_interface
+url_launcher
 url_launcher_android
 url_launcher_ios
 url_launcher_linux
@@ -2101,6 +2102,7 @@ url_launcher_macos
 url_launcher_web
 url_launcher_windows
 vector_graphics
+vector_graphics_codec
 vector_graphics_compiler
 vector_math
 video_player
@@ -2561,7 +2563,6 @@ Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 --------------------------------------------------------------------------------
 dbus
-gtk
 
 Mozilla Public License Version 2.0
 ==================================
@@ -6418,9 +6419,7 @@ plugin_platform_interface
 shared_preferences_linux
 shared_preferences_web
 shared_preferences_windows
-url_launcher
 url_launcher_platform_interface
-vector_graphics_codec
 video_player_web
 xdg_directories
 
