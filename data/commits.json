@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-11T20:16:31Z",
+  "updated": "2026-11-11T21:02:22Z",
   "commits": [
+    {
+      "sha": "b8b16eff9ed8e1b4273cd354cd0556ea604007d3",
+      "message": "feat: activer la désactivation de proguardAndroidTxt dans les propriétés Gradle",
+      "date": "2026-11-11T20:38:22Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/b8b16eff9ed8e1b4273cd354cd0556ea604007d3",
+      "tags": []
+    },
     {
       "sha": "ea2d12bcabd456236c3186a72706ed7a7fe06178",
       "message": "feat: supprimer les dépendances Kotlin inutilisées dans les fichiers Gradle",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/7e5ff13261be232a4f70427aa725934bdc735d42",
-      "tags": []
-    },
-    {
-      "sha": "e06caa4ead71641468bddd3a820392646a67e3a4",
-      "message": "feat: Ajouter des chaînes pour le graphique du dashboard et mettre à jour les paramètres associés",
-      "date": "2026-09-13T08:57:57Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/e06caa4ead71641468bddd3a820392646a67e3a4",
       "tags": []
     }
   ]
