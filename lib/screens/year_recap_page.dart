@@ -1982,8 +1982,6 @@ class _YrShareCard extends StatelessWidget {
   final Uint8List? photo; // profile picture bytes shown as background (null = theme gradient)
   const _YrShareCard({required this.scheme, required this.year, required this.username, required this.data, required this.hours, required this.fmt, this.rankLine, this.photo, this.photoDark = false, this.slide});
 
-  Widget _stat(String label, String value) => Expanded(child: ShareTile(label: label, value: value));
-
   Widget _list(String title, List<_YrRanked> items, String type) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       ShareLabel(title),

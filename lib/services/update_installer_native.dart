@@ -80,7 +80,7 @@ Future<String> installUpdate(String url, DownloadKind kind, void Function(double
 }
 
 /// Downloads a release file and puts it in the default Downloads folder
-/// (no browser, no install). Returns 'saved|<where>' or 'fallback'.
+/// (no browser, no install). Returns 'saved|where' or 'fallback'.
 Future<String> saveDownload(String url, String fileName, void Function(double?) onProgress) async {
   if (Platform.isIOS) return 'fallback';
   final file = await _fetch(url, fileName, fileName, onProgress);

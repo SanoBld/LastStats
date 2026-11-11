@@ -94,7 +94,9 @@ class WikiBioService {
         // For albums and tracks the page must name the artist, otherwise
         // "Dangerous Woman" by someone else gets Ariana Grande's text.
         if (_norm(mainArtist).isNotEmpty &&
-            !_norm('$title $extract').contains(_norm(mainArtist))) continue;
+            !_norm('$title $extract').contains(_norm(mainArtist))) {
+          continue;
+        }
         return WikiBio(extract, (p['fullurl'] ?? 'https://$host.wikipedia.org').toString());
       }
     } catch (_) {}
