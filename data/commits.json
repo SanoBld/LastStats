@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-11T18:35:33Z",
+  "updated": "2026-11-11T19:18:31Z",
   "commits": [
+    {
+      "sha": "6a521975283a482fb2cfd5e5b0f03ee675a9f992",
+      "message": "feat: améliorer les transitions de page avec un nouveau système de mouvement et ajouter des informations de grade sous les cartes",
+      "date": "2026-11-11T19:00:58Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/6a521975283a482fb2cfd5e5b0f03ee675a9f992",
+      "tags": []
+    },
     {
       "sha": "5164c58e4f2e9d296f923e38e06a37e74c8ffff4",
       "message": "feat: add motion blur feature and enhance UI transitions\n\n- Introduced motion blur functionality with a new ValueNotifier for user preference.\n- Updated app state to persist motion blur setting in SharedPreferences.\n- Enhanced UI transitions with soft blur effects during page transitions and reveals.\n- Modified various screens to utilize motion blur settings, improving visual aesthetics.\n- Adjusted card and background decorations for a more dynamic appearance.\n- Implemented letter-by-letter blur reveal for titles in recap pages.",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/c691f5e1c1b970289f9e05e9fac7d93fcf0db0d6",
-      "tags": []
-    },
-    {
-      "sha": "28db81eeaa031e1f8975debaec95c4a841151de4",
-      "message": "feat: Ajouter la fonctionnalité de sauvegarde automatique avec options de configuration",
-      "date": "2026-09-12T12:35:29Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/28db81eeaa031e1f8975debaec95c4a841151de4",
       "tags": []
     }
   ]
