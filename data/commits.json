@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-11T20:12:41Z",
+  "updated": "2026-11-11T20:16:31Z",
   "commits": [
+    {
+      "sha": "ea2d12bcabd456236c3186a72706ed7a7fe06178",
+      "message": "feat: supprimer les dépendances Kotlin inutilisées dans les fichiers Gradle",
+      "date": "2026-11-11T20:16:03Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/ea2d12bcabd456236c3186a72706ed7a7fe06178",
+      "tags": []
+    },
     {
       "sha": "8c6a212e88d0189c56c10c371698d5eb7ed9eb61",
       "message": "feat: mettre à jour la version de Gradle et des plugins Android",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/e06caa4ead71641468bddd3a820392646a67e3a4",
-      "tags": []
-    },
-    {
-      "sha": "2d36e3d449fd853a6d603b72250a16ea8de36250",
-      "message": "feat: Remplacer le bloc des artistes/albums/pistes par un graphique de dashboard configurable",
-      "date": "2026-09-13T08:43:17Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/2d36e3d449fd853a6d603b72250a16ea8de36250",
       "tags": []
     }
   ]
