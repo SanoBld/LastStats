@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-11T17:04:46Z",
+  "updated": "2026-11-11T18:35:33Z",
   "commits": [
+    {
+      "sha": "5164c58e4f2e9d296f923e38e06a37e74c8ffff4",
+      "message": "feat: add motion blur feature and enhance UI transitions\n\n- Introduced motion blur functionality with a new ValueNotifier for user preference.\n- Updated app state to persist motion blur setting in SharedPreferences.\n- Enhanced UI transitions with soft blur effects during page transitions and reveals.\n- Modified various screens to utilize motion blur settings, improving visual aesthetics.\n- Adjusted card and background decorations for a more dynamic appearance.\n- Implemented letter-by-letter blur reveal for titles in recap pages.",
+      "date": "2026-11-11T18:24:24Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/5164c58e4f2e9d296f923e38e06a37e74c8ffff4",
+      "tags": []
+    },
     {
       "sha": "0eaf963147408894796c045432f2c90a553bb217",
       "message": "feat: Remplacer les animations de transition par des effets de glissement et de révélation",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/28db81eeaa031e1f8975debaec95c4a841151de4",
-      "tags": []
-    },
-    {
-      "sha": "2c8ad926a62bb4f5f06aa9cea7467411aafa962c",
-      "message": "feat: Ajouter la prise en charge de l'exportation des thèmes dans les sauvegardes, avec avertissement sur la lenteur potentielle",
-      "date": "2026-09-12T12:15:05Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/2c8ad926a62bb4f5f06aa9cea7467411aafa962c",
       "tags": []
     }
   ]
