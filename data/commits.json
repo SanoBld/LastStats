@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-11T13:48:13Z",
+  "updated": "2026-11-11T14:36:39Z",
   "commits": [
+    {
+      "sha": "0eaf963147408894796c045432f2c90a553bb217",
+      "message": "feat: Remplacer les animations de transition par des effets de glissement et de révélation",
+      "date": "2026-11-11T14:34:32Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/0eaf963147408894796c045432f2c90a553bb217",
+      "tags": []
+    },
     {
       "sha": "e4912192261b0b1d1c36b24e231473a728611aa8",
       "message": "feat: Ajouter des animations de feuille pour les pages de récapitulatif et de classement",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/2c8ad926a62bb4f5f06aa9cea7467411aafa962c",
-      "tags": []
-    },
-    {
-      "sha": "71a9610ddbea12686e65c8faf360788c9a02ef5c",
-      "message": "feat: Ajouter la prise en charge de l'historique des écoutes dans les sauvegardes, avec options de restauration et gestion des erreurs",
-      "date": "2026-09-12T11:56:20Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/71a9610ddbea12686e65c8faf360788c9a02ef5c",
       "tags": []
     }
   ]
