@@ -105,6 +105,84 @@ class M3Motion {
   }
 }
 
+
+// ── Slide + parallax (all page navigation) ─────────────────────────────────
+// New page slides in from the right edge; the page below drifts left,
+// shrinks a little and softens (blur). Back is the exact reverse.
+// No fade: the motion itself carries the change. Reduced motion → fade.
+Widget m3SlideTransition(BuildContext context, Animation<double> a,
+    Animation<double> s, Widget child) {
+  if (M3Motion.reduced(context)) {
+    return FadeTransition(opacity: a, child: child);
+  }
+  final inC = CurvedAnimation(
+    parent: a,
+    curve: M3Motion.emphasized,
+    reverseCurve: M3Motion.emphasizedAccelerate,
+  );
+  final outC = CurvedAnimation(parent: s, curve: M3Motion.emphasized);
+  final surface = Theme.of(context).colorScheme.surface;
+  return AnimatedBuilder(
+    animation: outC,
+    child: SlideTransition(
+      position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero)
+          .animate(inC),
+      child: ColoredBox(color: surface, child: child),
+    ),
+    builder: (_, c) {
+      final v = outC.value;
+      final sigma = ecoModeActiveNotifier.value ? 0.0 : 5.0 * v;
+      return ImageFiltered(
+        enabled: sigma > 0.3,
+        imageFilter: ImageFilter.blur(
+            sigmaX: sigma, sigmaY: sigma, tileMode: TileMode.decal),
+        child: FractionalTranslation(
+          translation: Offset(-0.22 * v, 0),
+          child: Transform.scale(scale: 1 - 0.05 * v, child: c),
+        ),
+      );
+    },
+  );
+}
+
+/// Content arriving (cards, charts, loaded data): rises, grows from a
+/// slightly smaller size and sharpens from a blur. [t] runs 0 → 1.
+Widget m3Reveal(BuildContext context, Animation<double> t, Widget child) {
+  if (M3Motion.reduced(context)) return child;
+  final k = CurvedAnimation(parent: t, curve: M3Motion.spatialDefault);
+  return AnimatedBuilder(
+    animation: k,
+    child: child,
+    builder: (_, c) {
+      final v = t.value.clamp(0.0, 1.0);
+      final sigma = (ecoModeActiveNotifier.value || v >= 1) ? 0.0 : 8.0 * (1 - v);
+      return Opacity(
+        opacity: Curves.easeOut.transform((v * 2).clamp(0.0, 1.0)),
+        child: ImageFiltered(
+          enabled: sigma > 0.3,
+          imageFilter: ImageFilter.blur(
+              sigmaX: sigma, sigmaY: sigma, tileMode: TileMode.decal),
+          child: Transform.translate(
+            offset: Offset(0, 36 * (1 - k.value)),
+            child: Transform.scale(scale: 0.92 + 0.08 * k.value, child: c),
+          ),
+        ),
+      );
+    },
+  );
+}
+
+class M3SlideRoute<T> extends PageRouteBuilder<T> {
+  M3SlideRoute({required WidgetBuilder builder})
+      : super(
+          transitionDuration: const Duration(milliseconds: 450),
+          reverseTransitionDuration: const Duration(milliseconds: 350),
+          pageBuilder: (context, _, _) => builder(context),
+          transitionsBuilder: (context, a, s, child) =>
+              m3SlideTransition(context, a, s, child),
+        );
+}
+
 // ── Forward / backward (normal navigation) ─────────────────────────────────
 // Rise + fade with a spatial spring. The old page stays solid underneath.
 class M3PageTransitionsBuilder extends PageTransitionsBuilder {
@@ -114,7 +192,7 @@ class M3PageTransitionsBuilder extends PageTransitionsBuilder {
   Duration get transitionDuration => M3Motion.spatialDefaultDuration;
 
   @override
-  Duration get reverseTransitionDuration => const Duration(milliseconds: 300);
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 350);
 
   // The page underneath stays still and solid (no fade), so nothing
   // behind it (for example the home screen) shows through while animating.
@@ -129,43 +207,7 @@ class M3PageTransitionsBuilder extends PageTransitionsBuilder {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    // Reduced motion → only a subtle fade.
-    if (M3Motion.reduced(context)) {
-      return FadeTransition(opacity: animation, child: child);
-    }
-    final move = CurvedAnimation(
-      parent: animation,
-      curve: M3Motion.spatialDefault,
-      reverseCurve: M3Motion.emphasizedAccelerate,
-    );
-    final fade = CurvedAnimation(
-      parent: animation,
-      curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
-      reverseCurve: const Interval(0.3, 1.0, curve: Curves.easeIn),
-    );
-    return FadeTransition(
-      opacity: fade,
-      child: AnimatedBuilder(
-        animation: animation,
-        builder: (_, c) {
-          final s = animation.status == AnimationStatus.forward
-              ? 6.0 * (1 - Curves.easeOut.transform(animation.value)) : 0.0;
-          return ImageFiltered(
-            enabled: s > 0.3 && !ecoModeActiveNotifier.value,
-            imageFilter: ImageFilter.blur(sigmaX: s, sigmaY: s, tileMode: TileMode.decal),
-            child: c);
-        },
-        child: SlideTransition(
-        position: Tween<Offset>(begin: const Offset(0.0, 0.06), end: Offset.zero)
-            .animate(move),
-        // Solid background so the page is never see-through.
-        child: ColoredBox(
-          color: Theme.of(context).colorScheme.surface,
-          child: child,
-        ),
-      ),
-      ),
-    );
+    return m3SlideTransition(context, animation, secondaryAnimation, child);
   }
 }
 
@@ -406,24 +448,27 @@ class _M3FadeThroughStackState extends State<M3FadeThroughStack>
 class M3Switcher extends StatelessWidget {
   const M3Switcher({
     super.key,
-    this.duration = const Duration(milliseconds: 300),
+    this.duration = const Duration(milliseconds: 450),
     this.child,
   });
 
   final Duration duration;
   final Widget?  child;
 
+  // Loading → content: old content sinks and softens, new content rises
+  // and sharpens (see m3Reveal). Not a plain cross-fade.
   static Widget _fade(Widget child, Animation<double> animation) {
     return AnimatedBuilder(
       animation: animation,
       child: child,
       builder: (context, child) {
         final leaving = animation.status == AnimationStatus.reverse;
+        if (!leaving) return m3Reveal(context, animation, child!);
         final v = animation.value;
-        final opacity = leaving
-            ? const Interval(0.65, 1.0).transform(v)
-            : const Interval(0.35, 1.0, curve: M3Motion.effectsDefault).transform(v);
-        return Opacity(opacity: opacity, child: child);
+        return Opacity(
+          opacity: const Interval(0.5, 1.0).transform(v),
+          child: Transform.scale(scale: 0.97 + 0.03 * v, child: child),
+        );
       },
     );
   }
@@ -466,48 +511,6 @@ class M3FadeThroughRoute<T> extends PageRouteBuilder<T> {
 // For child pages of the same flow (for example account level -> level
 // history). New page rises and fades in with a spatial spring, the old one
 // fades out and shrinks a little. Going back is the reverse, but faster.
-class M3SharedAxisRoute<T> extends PageRouteBuilder<T> {
-  M3SharedAxisRoute({required WidgetBuilder builder})
-      : super(
-          transitionDuration: M3Motion.spatialDefaultDuration,
-          reverseTransitionDuration: const Duration(milliseconds: 300),
-          pageBuilder: (context, _, _) => builder(context),
-          transitionsBuilder: (context, animation, secondary, child) {
-            final reduce = M3Motion.reduced(context);
-            if (reduce) return FadeTransition(opacity: animation, child: child);
-            final rise = CurvedAnimation(
-              parent: animation,
-              curve: M3Motion.spatialDefault,
-              reverseCurve: M3Motion.emphasizedAccelerate,
-            );
-            final fadeIn = CurvedAnimation(
-              parent: animation,
-              curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
-              reverseCurve: const Interval(0.4, 1.0, curve: Curves.easeIn),
-            );
-            final behind = CurvedAnimation(
-              parent: secondary,
-              curve: M3Motion.emphasizedDecelerate,
-            );
-            return FadeTransition(
-              opacity: ReverseAnimation(
-                  behind.drive(CurveTween(curve: const Interval(0.0, 0.5)))),
-              child: ScaleTransition(
-                scale: Tween<double>(begin: 1.0, end: 0.94).animate(behind),
-                child: FadeTransition(
-                  opacity: fadeIn,
-                  child: SlideTransition(
-                    position: Tween<Offset>(
-                            begin: const Offset(0, 0.08), end: Offset.zero)
-                        .animate(rise),
-                    child: ScaleTransition(
-                      scale: Tween<double>(begin: 0.96, end: 1.0).animate(rise),
-                      child: child,
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        );
+class M3SharedAxisRoute<T> extends M3SlideRoute<T> {
+  M3SharedAxisRoute({required super.builder});
 }

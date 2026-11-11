@@ -1498,7 +1498,7 @@ class _FadeInSection extends StatefulWidget {
 
 class _FadeInSectionState extends State<_FadeInSection> with SingleTickerProviderStateMixin {
   late final AnimationController _c = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 480));
+      vsync: this, duration: const Duration(milliseconds: 650));
   late final Animation<double> _fade = CurvedAnimation(parent: _c, curve: M3Motion.emphasizedDecelerate);
   late final Animation<Offset> _slide = Tween<Offset>(
     begin: const Offset(0, 0.06),
@@ -1531,10 +1531,8 @@ class _FadeInSectionState extends State<_FadeInSection> with SingleTickerProvide
   }
 
   @override
-  Widget build(BuildContext context) => FadeTransition(
-    opacity: _fade,
-    child: SlideTransition(position: _slide, child: widget.child),
-  );
+  Widget build(BuildContext context) =>
+      m3Reveal(context, _c, widget.child);
 }
 
 

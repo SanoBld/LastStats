@@ -24,7 +24,7 @@ class _FadeSlideIn extends StatefulWidget {
     required this.child,
     this.delay         = Duration.zero,
     this.skipAnimation = false,
-  }) : duration = const Duration(milliseconds: 350);
+  }) : duration = const Duration(milliseconds: 550);
 
   @override
   State<_FadeSlideIn> createState() => _FadeSlideInState();
@@ -59,10 +59,8 @@ class _FadeSlideInState extends State<_FadeSlideIn>
   void dispose() { _ctrl.dispose(); super.dispose(); }
 
   @override
-  Widget build(BuildContext context) => FadeTransition(
-    opacity: _fade,
-    child:   SlideTransition(position: _slide, child: widget.child),
-  );
+  Widget build(BuildContext context) =>
+      m3Reveal(context, _ctrl, widget.child);
 }
 
 // ── Reusable press animation: small scale-down bounce on tap ─────────────────

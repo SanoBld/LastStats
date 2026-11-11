@@ -356,11 +356,7 @@ Route<void> _detailRoute(BuildContext context, WidgetBuilder builder) {
       context.widget is _FullProfileSheet ||
       context.findAncestorWidgetOfExactType<_ItemDetailSheet>() != null ||
       context.findAncestorWidgetOfExactType<_FullProfileSheet>() != null;
-  if (nested) return MaterialPageRoute<void>(builder: builder);
-  return M3ContainerRoute<void>(
-    builder: builder,
-    origin: M3Motion.originOf(context),
-  );
+  return M3SlideRoute<void>(builder: builder);
 }
 
 
