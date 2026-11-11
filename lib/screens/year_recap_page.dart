@@ -147,6 +147,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
   void _openStyle() {
     showModalBottomSheet<void>(
       context: context,
+      sheetAnimationStyle: kM3SheetAnimation,
       isScrollControlled: true,
       useSafeArea: true,
       showDragHandle: true,

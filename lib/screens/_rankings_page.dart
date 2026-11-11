@@ -52,6 +52,7 @@ class _RankingsPageState extends State<_RankingsPage>
     _haptic(_HapticImpact.selection);
     await showModalBottomSheet<void>(
       context: context,
+      sheetAnimationStyle: kM3SheetAnimation,
       showDragHandle: true,
       isScrollControlled: true,
       builder: (sh) => StatefulBuilder(builder: (sh, setSheet) {

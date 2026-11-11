@@ -12,7 +12,7 @@
 //  here becomes a simple fade (no sliding, no scaling).
 // ══════════════════════════════════════════════════════════════════════════
 
-import 'dart:ui' show lerpDouble;
+import 'dart:ui' show lerpDouble, ImageFilter, TileMode;
 import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
@@ -145,7 +145,17 @@ class M3PageTransitionsBuilder extends PageTransitionsBuilder {
     );
     return FadeTransition(
       opacity: fade,
-      child: SlideTransition(
+      child: AnimatedBuilder(
+        animation: animation,
+        builder: (_, c) {
+          final s = animation.status == AnimationStatus.forward
+              ? 6.0 * (1 - Curves.easeOut.transform(animation.value)) : 0.0;
+          return ImageFiltered(
+            enabled: s > 0.3 && !ecoModeActiveNotifier.value,
+            imageFilter: ImageFilter.blur(sigmaX: s, sigmaY: s, tileMode: TileMode.decal),
+            child: c);
+        },
+        child: SlideTransition(
         position: Tween<Offset>(begin: const Offset(0.0, 0.06), end: Offset.zero)
             .animate(move),
         // Solid background so the page is never see-through.
@@ -153,6 +163,7 @@ class M3PageTransitionsBuilder extends PageTransitionsBuilder {
           color: Theme.of(context).colorScheme.surface,
           child: child,
         ),
+      ),
       ),
     );
   }
@@ -308,7 +319,7 @@ class _M3FadeThroughStackState extends State<M3FadeThroughStack>
     with SingleTickerProviderStateMixin {
   late final AnimationController _c = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 300),
+    duration: const Duration(milliseconds: 380),
     value: 1.0,
   );
   late int _current = widget.index;
@@ -330,17 +341,28 @@ class _M3FadeThroughStackState extends State<M3FadeThroughStack>
     super.dispose();
   }
 
-  Widget _item(int i, double t, bool reduce) {
-    double opacity = 0;
-    double scale   = 1;
+  // Direction-aware fade-through: the old tab slides + softly blurs out
+  // toward the side it came from, the new one slides in and sharpens.
+  // Blur only runs while animating (sigma 0 at rest) and is skipped in
+  // reduced motion / eco mode. Widget tree stays identical -> state kept.
+  Widget _item(int i, double t, bool reduce, bool blur) {
+    double opacity = 0, scale = 1, dx = 0, sigma = 0;
+    final dir = _current >= _previous ? 1.0 : -1.0;
     if (i == _current) {
-      final k = const Interval(0.35, 1.0, curve: M3Motion.emphasizedDecelerate)
-          .transform(t);
+      final k = const Interval(0.3, 1.0, curve: M3Motion.emphasizedDecelerate).transform(t);
       opacity = k;
-      scale   = reduce ? 1.0 : 0.96 + 0.04 * k;
+      if (!reduce) {
+        scale = 0.97 + 0.03 * k;
+        dx = dir * 28 * (1 - k);
+        sigma = blur ? 6 * (1 - k) : 0;
+      }
     } else if (i == _previous && t < 1.0) {
-      opacity =
-          1.0 - const Interval(0.0, 0.35, curve: Curves.easeIn).transform(t);
+      final k = const Interval(0.0, 0.35, curve: Curves.easeIn).transform(t);
+      opacity = 1.0 - k;
+      if (!reduce) {
+        dx = -dir * 20 * k;
+        sigma = blur ? 5 * k : 0;
+      }
     }
     return Offstage(
       offstage: opacity <= 0.0,
@@ -348,7 +370,15 @@ class _M3FadeThroughStackState extends State<M3FadeThroughStack>
         ignoring: i != _current,
         child: Opacity(
           opacity: opacity.clamp(0.0, 1.0),
-          child: Transform.scale(scale: scale, child: widget.children[i]),
+          child: ImageFiltered(
+            enabled: sigma > 0.3,
+            imageFilter: ImageFilter.blur(
+                sigmaX: sigma, sigmaY: sigma, tileMode: TileMode.decal),
+            child: Transform.translate(
+              offset: Offset(dx, 0),
+              child: Transform.scale(scale: scale, child: widget.children[i]),
+            ),
+          ),
         ),
       ),
     );
@@ -357,12 +387,13 @@ class _M3FadeThroughStackState extends State<M3FadeThroughStack>
   @override
   Widget build(BuildContext context) {
     final reduce = M3Motion.reduced(context);
+    final blur = !reduce && !ecoModeActiveNotifier.value;
     return AnimatedBuilder(
       animation: _c,
       builder: (context, _) => Stack(
         children: [
           for (int i = 0; i < widget.children.length; i++)
-            _item(i, reduce ? 1.0 : _c.value, reduce),
+            _item(i, reduce ? 1.0 : _c.value, reduce, blur),
         ],
       ),
     );
