@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-11T13:45:29Z",
+  "updated": "2026-11-11T13:48:13Z",
   "commits": [
+    {
+      "sha": "e4912192261b0b1d1c36b24e231473a728611aa8",
+      "message": "feat: Ajouter des animations de feuille pour les pages de récapitulatif et de classement",
+      "date": "2026-11-11T13:47:55Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/e4912192261b0b1d1c36b24e231473a728611aa8",
+      "tags": []
+    },
     {
       "sha": "f69c5cba3164918aaade9f05edf04110eb4195a1",
       "message": "Refactor: Remove chat settings and memory pages, along with related services\n\n- Deleted `chat_settings_page.dart` and `memory_page.dart` to streamline settings management.\n- Removed `backup.dart`, `chat_service.dart`, `core_prompt.dart`, `hf_service.dart`, `reset.dart`, and associated methods to simplify the codebase.\n- Cleaned up unused imports and methods across various services.\n- Adjusted `year_recap_page.dart` to remove an unused widget.\n- Updated `update_installer_native.dart` documentation for clarity.\n- Fixed a conditional check in `wiki_bio_service.dart` for better accuracy in artist name matching.",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/71a9610ddbea12686e65c8faf360788c9a02ef5c",
-      "tags": []
-    },
-    {
-      "sha": "c9a38a01b93a8e3643d62ae395dbe40c7da12af8",
-      "message": "feat: Améliorer la gestion des emojis personnalisés dans les dossiers et ajuster le style des boutons d'action",
-      "date": "2026-09-12T09:38:22Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/c9a38a01b93a8e3643d62ae395dbe40c7da12af8",
       "tags": []
     }
   ]
