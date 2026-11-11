@@ -35,6 +35,10 @@ class Tilt3DCard extends StatefulWidget {
   // Small tier pill (medal + name) on the front. Off where the front already
   // spells the tier out (badge viewer).
   final bool showTierChip;
+  // Material You frame: a tonal rounded card around the artwork (like an M3
+  // filled card). [frameColor] defaults to surfaceContainerHigh.
+  final bool framed;
+  final Color? frameColor;
   const Tilt3DCard({
     super.key,
     required this.front,
@@ -44,6 +48,8 @@ class Tilt3DCard extends StatefulWidget {
     this.radius = 28,
     this.tier = CardTier.none,
     this.showTierChip = true,
+    this.framed = false,
+    this.frameColor,
   });
 
   @override
@@ -203,7 +209,10 @@ class _Tilt3DCardState extends State<Tilt3DCard>
       valueListenable: livingArtworkNotifier,
       builder: (context, enabled, _) {
         final radius = BorderRadius.circular(widget.radius);
-        final effTier = achievementsEnabledNotifier.value ? widget.tier : CardTier.none;
+        final cs = Theme.of(context).colorScheme;
+        final frameC = widget.frameColor ?? cs.surfaceContainerHigh;
+        final pad = widget.framed ? 9.0 : 0.0;
+        final inner = BorderRadius.circular(math.max(8.0, widget.radius - pad));
         return MouseRegion(
           onHover: enabled ? (e) => _tiltFromLocal(e.localPosition) : null,
           onExit: enabled ? (_) => _resetTilt() : null,
@@ -255,36 +264,27 @@ class _Tilt3DCardState extends State<Tilt3DCard>
                     alignment: Alignment.center,
                     transform: m,
                     child: Container(
+                      padding: EdgeInsets.all(pad),
                       decoration: BoxDecoration(
+                        color: widget.framed ? frameC : null,
                         borderRadius: radius,
-                        gradient: effTier == CardTier.none ? null : LinearGradient(
-                          colors: tierGradient(effTier)!,
-                          stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
-                          begin: Alignment(-1 - effRy * 0.7, -1 - effRx * 0.7),
-                          end: Alignment(1 - effRy * 0.7, 1 - effRx * 0.7),
-                        ),
-                        // Depth: the shadow slides opposite to the tilt, and a
-                        // tier card also glows in its own tonal colour.
+                        // Depth: shadow slides opposite to the tilt, plus a
+                        // soft tonal glow so the card sits in the theme.
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.30),
-                            blurRadius: 32, spreadRadius: -6,
-                            offset: Offset(-effRy * 14, 16 + effRx * 10),
+                            color: Colors.black.withValues(alpha: 0.28),
+                            blurRadius: 38, spreadRadius: -8,
+                            offset: Offset(-effRy * 12, 18 + effRx * 8),
                           ),
-                          if (effTier != CardTier.none)
+                          if (widget.framed)
                             BoxShadow(
-                              color: tierGradient(effTier)![1].withValues(alpha: 0.42),
-                              blurRadius: 40, spreadRadius: -2,
+                              color: frameC.withValues(alpha: 0.35),
+                              blurRadius: 44, spreadRadius: -4,
                             ),
                         ],
                       ),
-                      // Thicker rim so the tier border reads as a real edge.
-                      padding: effTier == CardTier.none
-                          ? EdgeInsets.zero : const EdgeInsets.all(5),
                       child: ClipRRect(
-                        borderRadius: effTier == CardTier.none
-                            ? radius
-                            : BorderRadius.circular(math.max(4.0, widget.radius - 5)),
+                        borderRadius: inner,
                         child: Stack(
                           fit: StackFit.expand,
                           children: [
@@ -296,38 +296,15 @@ class _Tilt3DCardState extends State<Tilt3DCard>
                                   width: widget.width, height: widget.height,
                                 ),
                               ),
-                            // Hairline inner edge, like a Material outlined card.
-                            if (showFront)
+                            if (showFront && !widget.framed)
                               IgnorePointer(
                                 child: DecoratedBox(
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(
-                                        math.max(4.0, widget.radius - 5)),
+                                    borderRadius: inner,
                                     border: Border.all(
-                                        color: Colors.white.withValues(alpha: 0.16)),
+                                        color: Colors.white.withValues(alpha: 0.18),
+                                        width: 1.5),
                                   ),
-                                ),
-                              ),
-                            if (showFront && effTier != CardTier.none && widget.showTierChip)
-                              Positioned(
-                                top: 12, left: 12,
-                                child: Container(
-                                  padding: const EdgeInsets.fromLTRB(8, 5, 12, 5),
-                                  decoration: ShapeDecoration(
-                                    shape: const StadiumBorder(),
-                                    color: tierGradient(effTier)![1],
-                                    shadows: [BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.18),
-                                        blurRadius: 8, offset: const Offset(0, 2))],
-                                  ),
-                                  child: Row(mainAxisSize: MainAxisSize.min, children: [
-                                    Icon(Icons.workspace_premium_rounded, size: 16,
-                                        color: tierOnColor(effTier)),
-                                    const SizedBox(width: 4),
-                                    Text(tierLabel(effTier), style: TextStyle(
-                                        fontSize: 12, fontWeight: FontWeight.w800,
-                                        color: tierOnColor(effTier))),
-                                  ]),
                                 ),
                               ),
                           ],
@@ -370,10 +347,99 @@ class _GlassReflection extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: RadialGradient(
             colors: [
-              Colors.white.withValues(alpha: 0.22 + strength * 0.16),
+              Colors.white.withValues(alpha: 0.12 + strength * 0.10),
               Colors.white.withValues(alpha: 0),
             ],
             stops: const [0.0, 1.0],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+// ── Grade info, shown OUTSIDE (under) the card ──────────────────────────────
+// Arch-shaped tonal card in the tier's Material You colour (big top corners,
+// small bottom ones, like the widget cards): dark round medal, grade name,
+// plays, and a progress bar towards the next grade.
+class TierInfoCard extends StatelessWidget {
+  final CardTier tier;
+  final String title, subtitle;
+  final double? progress; // 0..1, null = hide the bar
+  final double? width;
+  final VoidCallback? onTap;
+  const TierInfoCard({
+    super.key,
+    required this.tier,
+    required this.title,
+    required this.subtitle,
+    this.progress,
+    this.width,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final g = tierGradient(tier);
+    if (g == null) return const SizedBox.shrink();
+    final base = g[1];
+    final on = tierOnColor(tier);
+    return SizedBox(
+      width: width,
+      child: Material(
+        color: base,
+        clipBehavior: Clip.antiAlias,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(30), topRight: Radius.circular(30),
+            bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20),
+          ),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 10, 16, 10),
+            child: Row(children: [
+              Container(
+                width: 48, height: 48,
+                decoration: BoxDecoration(color: on, shape: BoxShape.circle),
+                child: Icon(Icons.workspace_premium_rounded, size: 26, color: base),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, maxLines: 1, overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 17, height: 1.1,
+                            fontWeight: FontWeight.w800, color: on)),
+                    const SizedBox(height: 2),
+                    Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
+                            color: on.withValues(alpha: 0.72))),
+                    if (progress != null) ...[
+                      const SizedBox(height: 8),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: progress, minHeight: 5,
+                          backgroundColor: on.withValues(alpha: 0.16),
+                          valueColor: AlwaysStoppedAnimation(on),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              if (onTap != null) ...[
+                const SizedBox(width: 10),
+                Icon(Icons.info_outline_rounded, size: 20,
+                    color: on.withValues(alpha: 0.7)),
+              ],
+            ]),
           ),
         ),
       ),

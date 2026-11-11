@@ -351,15 +351,10 @@ void showDetailSheet(
   ));
 }
 
-// From a list: the item grows into the page (container transform).
-// From inside another detail page (deep navigation): normal forward/back.
-Route<void> _detailRoute(BuildContext context, WidgetBuilder builder) {
-  final nested = context.widget is _ItemDetailSheet ||
-      context.widget is _FullProfileSheet ||
-      context.findAncestorWidgetOfExactType<_ItemDetailSheet>() != null ||
-      context.findAncestorWidgetOfExactType<_FullProfileSheet>() != null;
-  return M3SlideRoute<void>(builder: builder);
-}
+// Detail pages rise in (growing from the tapped item when known) and settle
+// back the same way (see m3RiseTransition).
+Route<void> _detailRoute(BuildContext context, WidgetBuilder builder) =>
+    M3RiseRoute<void>(builder: builder, origin: M3Motion.originOf(context));
 
 
 class _ItemDetailSheet extends StatefulWidget {
@@ -2616,7 +2611,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
     final topPad = MediaQuery.of(context).padding.top;
     final size   = MediaQuery.of(context).size;
     final cardW  = math.min(size.width * 0.8, 340.0);
-    final cardH  = math.min(size.height * 0.62, cardW * 1.35);
+    final cardH  = math.min(size.height * 0.54, cardW * 1.35);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cs     = Theme.of(context).colorScheme;
     // Themed edge colour (tinted surface) instead of pure black / white.
@@ -2683,7 +2678,11 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
                 // dismiss-on-tap background behind it.
                 GestureDetector(
                   onTap: () {},
-                  child: Tilt3DCard(
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Tilt3DCard(
+                    framed: true,
+                    frameColor: _cardScheme(Theme.of(context).colorScheme).surfaceContainerHigh,
+                    radius: 40,
                     width: cardW,
                     height: cardH,
                     tier: widget.tier,
@@ -2715,6 +2714,26 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
                       qrData: widget.qrData,
                     ),
                   ),
+                  // Grade info lives OUTSIDE the card, right under it.
+                  if (achievementsEnabledNotifier.value &&
+                      widget.tier != CardTier.none) ...[
+                    const SizedBox(height: 18),
+                    Builder(builder: (_) {
+                      final next = nextPlayThreshold(widget.myPlaycount);
+                      return TierInfoCard(
+                        width: cardW,
+                        tier: widget.tier,
+                        title: tierLabel(widget.tier),
+                        subtitle: '${widget.myPlaycount} ${L.dashScrobbles}'
+                            '${next != null ? '  ·  $next' : ''}',
+                        progress: next == null
+                            ? 1.0
+                            : (widget.myPlaycount / next).clamp(0.0, 1.0),
+                        onTap: _showTierInfo,
+                      );
+                    }),
+                  ],
+                  ]),
                 ),
               ]),
             ),
@@ -3601,16 +3620,16 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                         _buildAchievementsPreview(ctx, scheme),
                       if (_isNowPlaying) _buildNowPlayingCard(scheme),
                       if (_topArtists.isNotEmpty) ...[
-                        _sectionHeader(L.commonTopArtists, scheme),
+                        _sectionHeader(L.commonTopArtists, scheme, icon: Icons.mic_external_on_rounded, count: _topArtists.length),
                         ..._topArtists.asMap().entries.map(
                             (e) => _buildArtistRow(ctx, e.value, e.key, scheme)),
                       ],
                       if (_topAlbums.isNotEmpty) ...[
-                        _sectionHeader(L.commonAlbums, scheme),
+                        _sectionHeader(L.commonAlbums, scheme, icon: Icons.album_rounded, count: _topAlbums.take(6).length),
                         _buildAlbumsGrid(ctx, scheme),
                       ],
                       if (_recent.isNotEmpty) ...[
-                        _sectionHeader(L.commonRecentTracks, scheme),
+                        _sectionHeader(L.commonRecentTracks, scheme, icon: Icons.history_rounded, count: _recent.length),
                         ..._recent.map((r) => _buildRecentRow(r, scheme)),
                       ],
                       const SizedBox(height: 48),
@@ -4055,15 +4074,46 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
     );
   }
 
-  Widget _sectionHeader(String title, ColorScheme scheme) {
+  // Section title: arch-shaped tonal icon (big top corners, small bottom
+  // ones, like the Material You widget cards), a bold title and a count pill.
+  Widget _sectionHeader(String title, ColorScheme scheme,
+      {IconData? icon, int? count}) {
+    final text = Theme.of(context).textTheme;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+      padding: const EdgeInsets.fromLTRB(20, 28, 20, 12),
       child: Row(children: [
-        Text(title,
-          style: Theme.of(context).textTheme.titleSmall
-              ?.copyWith(fontWeight: FontWeight.w800)),
-        const SizedBox(width: 10),
-        Expanded(child: Divider(color: scheme.outlineVariant, height: 1)),
+        if (icon != null) ...[
+          Container(
+            width: 46, height: 46,
+            decoration: BoxDecoration(
+              color: scheme.primaryContainer,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(23), topRight: Radius.circular(23),
+                bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10),
+              ),
+            ),
+            child: Icon(icon, size: 24, color: scheme.onPrimaryContainer),
+          ),
+          const SizedBox(width: 14),
+        ],
+        Expanded(
+          child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: text.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w800, letterSpacing: -0.4,
+                  color: scheme.onSurface)),
+        ),
+        if (count != null)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+            decoration: ShapeDecoration(
+              shape: const StadiumBorder(),
+              color: scheme.secondaryContainer,
+            ),
+            child: Text('$count',
+                style: text.labelLarge?.copyWith(
+                    color: scheme.onSecondaryContainer,
+                    fontWeight: FontWeight.w800)),
+          ),
       ]),
     );
   }

@@ -111,49 +111,170 @@ class M3Motion {
 }
 
 
-// ── Slide + parallax (all page navigation) ─────────────────────────────────
-// New page slides in from the right edge; the page below drifts left,
-// shrinks a little and softens (blur). Back is the exact reverse.
-// No fade: the motion itself carries the change. Reduced motion → fade.
+// ── Page motion (rebuilt from scratch) ─────────────────────────────────────
+// Why the old version "popped":
+//  • a CurvedAnimation was rebuilt on every frame and the curve flipped
+//    depending on the live status, so a quick back swipe jumped;
+//  • the page content was repainted every frame under Opacity / blur;
+//  • the page below could show a dark strip while moving.
+// What this does instead:
+//  • one State owns the curves (created once, direction-safe);
+//  • the page content sits in a RepaintBoundary, so each frame only moves
+//    a cached texture (no re-raster, no jank on the way back);
+//  • the widget tree never changes shape while animating;
+//  • the page below only drifts a little and is dimmed by a scrim, on a
+//    solid surface colour, so no empty strip can show.
+// Two styles, same engine:  slide (page → page)  and  rise (open a card).
+// Reduced motion / eco mode → plain fade.
+class _M3Page extends StatefulWidget {
+  const _M3Page({
+    required this.a,
+    required this.s,
+    required this.rise,
+    required this.child,
+    this.origin,
+  });
+  final Animation<double> a, s;
+  final bool rise;
+  final Widget child;
+  final Rect? origin; // where the tapped item was (rise only)
+
+  @override
+  State<_M3Page> createState() => _M3PageState();
+}
+
+class _M3PageState extends State<_M3Page> {
+  late CurvedAnimation _in, _out;
+  late Widget _body; // cached, so a frame never rebuilds the page itself
+
+  @override
+  void initState() {
+    super.initState();
+    _bind();
+    _body = RepaintBoundary(child: widget.child);
+  }
+
+  void _bind() {
+    _in = CurvedAnimation(
+        parent: widget.a,
+        curve: M3Motion.emphasized,
+        reverseCurve: Curves.easeInOutCubic);
+    _out = CurvedAnimation(
+        parent: widget.s,
+        curve: M3Motion.emphasized,
+        reverseCurve: Curves.easeInOutCubic);
+  }
+
+  @override
+  void didUpdateWidget(_M3Page old) {
+    super.didUpdateWidget(old);
+    if (old.a != widget.a || old.s != widget.s) {
+      _in.dispose();
+      _out.dispose();
+      _bind();
+    }
+    if (!identical(old.child, widget.child)) {
+      _body = RepaintBoundary(child: widget.child);
+    }
+  }
+
+  @override
+  void dispose() {
+    _in.dispose();
+    _out.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final surface = Theme.of(context).colorScheme.surface;
+    final blur = M3Motion.blurOn;
+    final rise = widget.rise;
+
+    // Where a "rise" grows from: the tapped item when we know it.
+    var align = Alignment.center;
+    var startScale = 0.93;
+    final o = widget.origin;
+    if (rise && o != null && !o.isEmpty) {
+      final sz = MediaQuery.sizeOf(context);
+      if (o.width * o.height < sz.width * sz.height * 0.6) {
+        align = Alignment(
+          ((o.center.dx / sz.width) * 2 - 1).clamp(-1.0, 1.0),
+          ((o.center.dy / sz.height) * 2 - 1).clamp(-1.0, 1.0),
+        );
+        startScale = 0.84;
+      }
+    }
+
+    return AnimatedBuilder(
+      animation: Listenable.merge([_in, _out, widget.a]),
+      child: ColoredBox(color: surface, child: _body),
+      builder: (_, c) {
+        final t = _in.value.clamp(0.0, 1.0); // this page, in
+        final u = _out.value.clamp(0.0, 1.0); // covered by the next page
+        final fade = const Interval(0.0, 0.4, curve: Curves.easeOut)
+            .transform(widget.a.value.clamp(0.0, 1.0));
+        final sigma = blur ? (rise ? 8.0 : 6.0) * (1 - t) : 0.0;
+
+        Widget w = Stack(fit: StackFit.passthrough, children: [
+          c!,
+          Positioned.fill(
+            child: IgnorePointer(
+              child: ColoredBox(
+                  color: Colors.black
+                      .withValues(alpha: (rise ? 0.26 : 0.16) * u)),
+            ),
+          ),
+        ]);
+
+        w = ImageFiltered(
+          enabled: sigma > 0.25,
+          imageFilter: ImageFilter.blur(
+              sigmaX: sigma, sigmaY: sigma, tileMode: TileMode.clamp),
+          child: w,
+        );
+
+        if (rise) {
+          final r = (40.0 * (1 - t)) > (28.0 * u) ? 40.0 * (1 - t) : 28.0 * u;
+          w = ClipRRect(
+            borderRadius: BorderRadius.circular(r),
+            clipBehavior: r > 0.5 ? Clip.antiAlias : Clip.none,
+            child: w,
+          );
+          w = Transform.scale(
+            scale: (startScale + (1 - startScale) * t) * (1 - 0.06 * u),
+            alignment: align,
+            child: FractionalTranslation(
+                translation: Offset(0, 0.08 * (1 - t)), child: w),
+          );
+        } else {
+          w = FractionalTranslation(
+              translation: Offset(0.28 * (1 - t) - 0.12 * u, 0), child: w);
+        }
+        return Opacity(opacity: fade, child: w);
+      },
+    );
+  }
+}
+
 Widget m3SlideTransition(BuildContext context, Animation<double> a,
     Animation<double> s, Widget child) {
   if (M3Motion.reduced(context)) {
     return FadeTransition(opacity: a, child: child);
   }
-  final inC = CurvedAnimation(
-    parent: a,
-    curve: M3Motion.emphasized,
-    reverseCurve: M3Motion.emphasizedAccelerate,
-  );
-  final outC = CurvedAnimation(parent: s, curve: M3Motion.emphasized);
-  final surface = Theme.of(context).colorScheme.surface;
-  return AnimatedBuilder(
-    animation: outC,
-    child: SlideTransition(
-      position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero)
-          .animate(inC),
-      child: ColoredBox(color: surface, child: child),
-    ),
-    builder: (_, c) {
-      final v = outC.value;
-      final sigma = M3Motion.blurOn ? 4.0 * v : 0.0;
-      // Solid surface under the moving page and no scale: no dark gap or
-      // dark edge can show. clamp (not decal) so the blur never fades the
-      // edges to black.
-      return ColoredBox(
-        color: surface,
-        child: ImageFiltered(
-          enabled: sigma > 0.3,
-          imageFilter: ImageFilter.blur(
-              sigmaX: sigma, sigmaY: sigma, tileMode: TileMode.clamp),
-          child: FractionalTranslation(
-            translation: Offset(-0.15 * v, 0),
-            child: c,
-          ),
-        ),
-      );
-    },
-  );
+  return _M3Page(a: a, s: s, rise: false, child: child);
+}
+
+/// Open a detail page (artist / album / track / friend) and come back.
+/// The page rises (grows from the tapped item when known), corners flatten,
+/// sharpens from a soft blur; the page behind shrinks a bit and dims.
+Widget m3RiseTransition(BuildContext context, Animation<double> a,
+    Animation<double> s, Widget child,
+    {Rect? origin}) {
+  if (M3Motion.reduced(context)) {
+    return FadeTransition(opacity: a, child: child);
+  }
+  return _M3Page(a: a, s: s, rise: true, origin: origin, child: child);
 }
 
 /// Content arriving (cards, charts, loaded data): rises, grows from a
@@ -181,6 +302,17 @@ Widget m3Reveal(BuildContext context, Animation<double> t, Widget child) {
       );
     },
   );
+}
+
+class M3RiseRoute<T> extends PageRouteBuilder<T> {
+  M3RiseRoute({required WidgetBuilder builder, Rect? origin})
+      : super(
+          transitionDuration: const Duration(milliseconds: 480),
+          reverseTransitionDuration: const Duration(milliseconds: 380),
+          pageBuilder: (context, _, _) => builder(context),
+          transitionsBuilder: (context, a, s, child) =>
+              m3RiseTransition(context, a, s, child, origin: origin),
+        );
 }
 
 class M3SlideRoute<T> extends PageRouteBuilder<T> {
@@ -373,7 +505,7 @@ class _M3FadeThroughStackState extends State<M3FadeThroughStack>
     with SingleTickerProviderStateMixin {
   late final AnimationController _c = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 380),
+    duration: const Duration(milliseconds: 340),
     value: 1.0,
   );
   late int _current = widget.index;
@@ -385,7 +517,8 @@ class _M3FadeThroughStackState extends State<M3FadeThroughStack>
     if (old.index != widget.index) {
       _previous = old.index;
       _current  = widget.index;
-      _c.forward(from: 0);
+      _c.value = 0; // set BEFORE this frame builds: no one-frame flash
+      _c.forward();
     }
   }
 
@@ -395,42 +528,51 @@ class _M3FadeThroughStackState extends State<M3FadeThroughStack>
     super.dispose();
   }
 
-  // Direction-aware fade-through: the old tab slides + softly blurs out
-  // toward the side it came from, the new one slides in and sharpens.
-  // Blur only runs while animating (sigma 0 at rest) and is skipped in
-  // reduced motion / eco mode. Widget tree stays identical -> state kept.
+  // Tabs cross-fade with a small directional slide and a soft blur.
+// Rules that keep it pop-free:
+//  • every tab keeps the SAME wrapper chain whether shown or hidden, so
+//    nothing is mounted / unmounted while animating (state is kept);
+//  • the incoming tab is on screen from the very first frame (never
+//    Offstage while it fades in), so it is never laid out "late";
+//  • the old tab fades out while the new one fades in (no empty gap);
+//  • each tab sits in a RepaintBoundary: frames only move cached layers.
   Widget _item(int i, double t, bool reduce, bool blur) {
-    double opacity = 0, scale = 1, dx = 0, sigma = 0;
+    final isCur = i == _current;
+    final isPrev = i == _previous && t < 1.0;
     final dir = _current >= _previous ? 1.0 : -1.0;
-    if (i == _current) {
-      final k = const Interval(0.3, 1.0, curve: M3Motion.emphasizedDecelerate).transform(t);
-      opacity = k;
+    double opacity = 0, scale = 1, dx = 0, sigma = 0;
+    if (isCur) {
+      final k = M3Motion.emphasizedDecelerate.transform(t);
+      opacity = const Interval(0.1, 0.8, curve: Curves.easeOut).transform(t);
       if (!reduce) {
-        scale = 0.97 + 0.03 * k;
-        dx = dir * 28 * (1 - k);
-        sigma = blur ? 6 * (1 - k) : 0;
+        scale = 0.98 + 0.02 * k;
+        dx = dir * 24 * (1 - k);
+        sigma = blur ? 5 * (1 - k) : 0;
       }
-    } else if (i == _previous && t < 1.0) {
-      final k = const Interval(0.0, 0.35, curve: Curves.easeIn).transform(t);
+    } else if (isPrev) {
+      final k = const Interval(0.0, 0.45, curve: Curves.easeIn).transform(t);
       opacity = 1.0 - k;
       if (!reduce) {
-        dx = -dir * 20 * k;
-        sigma = blur ? 5 * k : 0;
+        dx = -dir * 16 * k;
+        sigma = blur ? 4 * k : 0;
       }
     }
     return Offstage(
-      offstage: opacity <= 0.0,
+      offstage: !isCur && !isPrev,
       child: IgnorePointer(
-        ignoring: i != _current,
+        ignoring: !isCur,
         child: Opacity(
           opacity: opacity.clamp(0.0, 1.0),
           child: ImageFiltered(
-            enabled: sigma > 0.3,
+            enabled: sigma > 0.25,
             imageFilter: ImageFilter.blur(
                 sigmaX: sigma, sigmaY: sigma, tileMode: TileMode.clamp),
             child: Transform.translate(
               offset: Offset(dx, 0),
-              child: Transform.scale(scale: scale, child: widget.children[i]),
+              child: Transform.scale(
+                scale: scale,
+                child: RepaintBoundary(child: widget.children[i]),
+              ),
             ),
           ),
         ),
@@ -445,9 +587,13 @@ class _M3FadeThroughStackState extends State<M3FadeThroughStack>
     return AnimatedBuilder(
       animation: _c,
       builder: (context, _) => Stack(
+        fit: StackFit.expand,
         children: [
           for (int i = 0; i < widget.children.length; i++)
-            _item(i, reduce ? 1.0 : _c.value, reduce, blur),
+            KeyedSubtree(
+              key: ValueKey<int>(i),
+              child: _item(i, reduce ? 1.0 : _c.value, reduce, blur),
+            ),
         ],
       ),
     );
