@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-11T19:18:31Z",
+  "updated": "2026-11-11T19:24:52Z",
   "commits": [
+    {
+      "sha": "0648631483e31d50d0940ff2e4c7627131d8e68b",
+      "message": "feat: améliorer l'affichage des cartes d'accomplissement et ajuster le style des en-têtes",
+      "date": "2026-11-11T19:24:28Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/0648631483e31d50d0940ff2e4c7627131d8e68b",
+      "tags": []
+    },
     {
       "sha": "6a521975283a482fb2cfd5e5b0f03ee675a9f992",
       "message": "feat: améliorer les transitions de page avec un nouveau système de mouvement et ajouter des informations de grade sous les cartes",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/88fc31b1b15a42b68c5af2982227525c56f1d92e",
-      "tags": []
-    },
-    {
-      "sha": "c691f5e1c1b970289f9e05e9fac7d93fcf0db0d6",
-      "message": "feat: Ajouter la prise en charge du shoutbox Last.fm avec options de lecture",
-      "date": "2026-09-12T19:57:50Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/c691f5e1c1b970289f9e05e9fac7d93fcf0db0d6",
       "tags": []
     }
   ]
