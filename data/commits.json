@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-11T22:09:39Z",
+  "updated": "2026-11-11T22:14:19Z",
   "commits": [
+    {
+      "sha": "ef518af06c13d42aeb19cd8685a47df9444025fe",
+      "message": "feat: mettre à jour la version de compileSdk à 36 pour les sous-projets",
+      "date": "2026-11-11T22:13:51Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/ef518af06c13d42aeb19cd8685a47df9444025fe",
+      "tags": []
+    },
     {
       "sha": "b8b16eff9ed8e1b4273cd354cd0556ea604007d3",
       "message": "feat: activer la désactivation de proguardAndroidTxt dans les propriétés Gradle",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/2fdf6d991b59bc2289d9b06a16813145352ecd25",
-      "tags": []
-    },
-    {
-      "sha": "7e5ff13261be232a4f70427aa725934bdc735d42",
-      "message": "feat: Améliorer le chargement du graphique du dashboard avec mise en cache et récupération parallèle des données",
-      "date": "2026-09-13T09:14:59Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/7e5ff13261be232a4f70427aa725934bdc735d42",
       "tags": []
     }
   ]
