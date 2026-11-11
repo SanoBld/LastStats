@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-11T20:08:18Z",
+  "updated": "2026-11-11T20:12:41Z",
   "commits": [
+    {
+      "sha": "8c6a212e88d0189c56c10c371698d5eb7ed9eb61",
+      "message": "feat: mettre à jour la version de Gradle et des plugins Android",
+      "date": "2026-11-11T20:09:43Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/8c6a212e88d0189c56c10c371698d5eb7ed9eb61",
+      "tags": []
+    },
     {
       "sha": "ec6e636e8da285893af9e743225fd583381b4fb7",
       "message": "feat: mettre à jour la version de Gradle et des plugins Android",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/2d36e3d449fd853a6d603b72250a16ea8de36250",
-      "tags": []
-    },
-    {
-      "sha": "1f4dedbac6f9df0e631bd005748f601344e89500",
-      "message": "feat: Supprimer la prise en charge de l'envoi de messages sur le mur d'un ami et nettoyer le code associé",
-      "date": "2026-09-12T20:43:20Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/1f4dedbac6f9df0e631bd005748f601344e89500",
       "tags": []
     }
   ]
