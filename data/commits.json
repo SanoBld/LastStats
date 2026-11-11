@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-11T19:31:02Z",
+  "updated": "2026-11-11T19:41:48Z",
   "commits": [
+    {
+      "sha": "ec6e636e8da285893af9e743225fd583381b4fb7",
+      "message": "feat: mettre à jour la version de Gradle et des plugins Android",
+      "date": "2026-11-11T19:39:03Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/ec6e636e8da285893af9e743225fd583381b4fb7",
+      "tags": []
+    },
     {
       "sha": "0648631483e31d50d0940ff2e4c7627131d8e68b",
       "message": "feat: améliorer l'affichage des cartes d'accomplissement et ajuster le style des en-têtes",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/1f4dedbac6f9df0e631bd005748f601344e89500",
-      "tags": []
-    },
-    {
-      "sha": "88fc31b1b15a42b68c5af2982227525c56f1d92e",
-      "message": "feat: Ajouter la fonctionnalité de publication de messages sur le mur d'un ami",
-      "date": "2026-09-12T20:01:02Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/88fc31b1b15a42b68c5af2982227525c56f1d92e",
       "tags": []
     }
   ]
