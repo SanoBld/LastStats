@@ -422,19 +422,19 @@ class _AchvCardViewerState extends State<_AchvCardViewer> {
               child: Tilt3DCard(
                 width: cardW, height: cardH,
                 showTierChip: false,
-                tier: a.unlocked ? a.def.tier : CardTier.none,
-                front: _AchvTierSurface(
-                  tier: a.def.tier,
-                  child: Center(
+                tier: CardTier.none, // same plain card as the artwork viewer
+                front: _badgeFace(
+                  context, a.def.tier,
+                  (fg) => Center(
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(icon, size: 60, color: tierOnColor(a.def.tier)),
+                      Icon(icon, size: 60, color: fg),
                       const SizedBox(height: 14),
                       Text(_achvCategoryLabel(a.def.category), textAlign: TextAlign.center, style: TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.w800, color: tierOnColor(a.def.tier))),
+                          fontSize: 18, fontWeight: FontWeight.w800, color: fg)),
                       const SizedBox(height: 2),
                       Text(tierLabel(a.def.tier), style: TextStyle(
                           fontSize: 14, fontWeight: FontWeight.w600,
-                          color: tierOnColor(a.def.tier).withValues(alpha: 0.7))),
+                          color: fg.withValues(alpha: 0.7))),
                     ]),
                   ),
                 ),
@@ -791,4 +791,20 @@ class _AchvTierBadgeState extends State<_AchvTierBadge> {
             ),
     );
   }
+}
+
+
+// Flat face for the badge viewer: the trophy colour as background, darkened
+// in the dark theme and lightened in the light theme. Text/icon colour is
+// picked from the result so it always reads.
+Widget _badgeFace(BuildContext context, CardTier tier, Widget Function(Color fg) child) {
+  final base = tierGradient(tier)?[1] ?? Theme.of(context).colorScheme.surfaceContainerHighest;
+  final dark = Theme.of(context).brightness == Brightness.dark;
+  final hsl = HSLColor.fromColor(base);
+  final bg = hsl
+      .withLightness(dark ? (hsl.lightness * 0.42).clamp(0.12, 0.30) : (hsl.lightness + (1 - hsl.lightness) * 0.55))
+      .withSaturation((hsl.saturation * (dark ? 0.9 : 0.8)).clamp(0.0, 1.0))
+      .toColor();
+  final fg = dark ? const Color(0xFFF3EEE9) : const Color(0xFF2B2118);
+  return ColoredBox(color: bg, child: child(fg));
 }

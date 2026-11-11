@@ -3225,7 +3225,8 @@ class _ChartHead extends StatelessWidget {
       ),
       const SizedBox(width: 12),
       Expanded(child: Text(title,
-          style: t.titleLarge?.copyWith(fontWeight: FontWeight.w800))),
+          style: t.titleLarge?.copyWith(
+              fontWeight: FontWeight.w800, color: s.primary))),
     ]);
   }
 }
