@@ -115,6 +115,7 @@ window.I18N.it = {
   "releases.error": "Impossibile caricare le versioni. Riprova più tardi.",
   "releases.all_on_github": "Vedi su GitHub",
   "releases.show_more": "Mostra altro",
+  "releases.show_less": "Mostra meno",
   "releases.filter_all": "Tutte",
   "releases.filter_stable": "Stabili",
   "releases.downloads": "download",

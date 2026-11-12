@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-12T00:09:40Z",
+  "updated": "2026-11-12T11:50:56Z",
   "commits": [
+    {
+      "sha": "55094b4c0946415a32c674f13acee710f19961a0",
+      "message": "Refactor code structure for improved readability and maintainability",
+      "date": "2026-11-12T11:50:29Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/55094b4c0946415a32c674f13acee710f19961a0",
+      "tags": []
+    },
     {
       "sha": "ef518af06c13d42aeb19cd8685a47df9444025fe",
       "message": "feat: mettre à jour la version de compileSdk à 36 pour les sous-projets",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/992ca8c2971139248e8b9f8f6a3babde7b99dd80",
-      "tags": []
-    },
-    {
-      "sha": "2fdf6d991b59bc2289d9b06a16813145352ecd25",
-      "message": "feat: Optimiser l'initialisation des services et améliorer la gestion des notifications sur Windows",
-      "date": "2026-09-13T14:14:05Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/2fdf6d991b59bc2289d9b06a16813145352ecd25",
       "tags": []
     }
   ]

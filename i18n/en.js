@@ -235,6 +235,7 @@ window.I18N.en = {
   "releases.error": "Could not load versions. Please try again later.",
   "releases.all_on_github": "View on GitHub",
   "releases.show_more": "Show more",
+  "releases.show_less": "Show less",
   "releases.filter_all": "All",
   "releases.filter_stable": "Stable",
   "releases.downloads": "downloads",

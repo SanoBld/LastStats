@@ -235,6 +235,7 @@ window.I18N.fr = {
   "releases.error": "Impossible de charger les versions. Réessayez plus tard.",
   "releases.all_on_github": "Voir sur GitHub",
   "releases.show_more": "Afficher plus",
+  "releases.show_less": "Afficher moins",
   "releases.filter_all": "Toutes",
   "releases.filter_stable": "Stables",
   "releases.downloads": "téléchargements",

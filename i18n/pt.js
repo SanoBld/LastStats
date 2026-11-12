@@ -115,6 +115,7 @@ window.I18N.pt = {
   "releases.error": "Não foi possível carregar as versões. Tenta novamente mais tarde.",
   "releases.all_on_github": "Ver no GitHub",
   "releases.show_more": "Mostrar mais",
+  "releases.show_less": "Mostrar menos",
   "releases.filter_all": "Todas",
   "releases.filter_stable": "Estáveis",
   "releases.downloads": "transferências",

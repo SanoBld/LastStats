@@ -115,6 +115,7 @@ window.I18N.de = {
   "releases.error": "Versionen konnten nicht geladen werden. Bitte versuche es später erneut.",
   "releases.all_on_github": "Auf GitHub ansehen",
   "releases.show_more": "Mehr anzeigen",
+  "releases.show_less": "Weniger anzeigen",
   "releases.filter_all": "Alle",
   "releases.filter_stable": "Stabil",
   "releases.downloads": "Downloads",

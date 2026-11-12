@@ -115,6 +115,7 @@ window.I18N.ar = {
   "releases.error": "تعذّر تحميل الإصدارات. يُرجى المحاولة لاحقًا.",
   "releases.all_on_github": "عرض على GitHub",
   "releases.show_more": "عرض المزيد",
+  "releases.show_less": "عرض أقل",
   "releases.filter_all": "الكل",
   "releases.filter_stable": "مستقرة",
   "releases.downloads": "تنزيل",
