@@ -22,7 +22,7 @@
 
 // Hero grid vibration: tiny buzz while the pointer moves over the header, a thump on press.
 (function () {
-  var grid = document.querySelector('.project-hero-grid.beat');
+  var grid = document.querySelector('.project-hero-grid');
   var head = grid && grid.parentElement;
   if (!head || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   var idle;

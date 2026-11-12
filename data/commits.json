@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-12T20:18:06Z",
+  "updated": "2026-11-12T20:19:20Z",
   "commits": [
+    {
+      "sha": "ad0483046ee3d594c1f2e7bad71c25fd90e1c10e",
+      "message": "feat: ajuster l'effet de vibration de la grille héro pour une meilleure réactivité et animation",
+      "date": "2026-11-12T20:18:57Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/ad0483046ee3d594c1f2e7bad71c25fd90e1c10e",
+      "tags": []
+    },
     {
       "sha": "2594c18a79b86c2eb04fbef4d644dd5d2e8571f9",
       "message": "feat: ajouter un effet de vibration local sur la grille héro lors du mouvement de la souris et de la pression",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/44f00ff24280b78d2b8f961a5e3a9edc34634f58",
-      "tags": []
-    },
-    {
-      "sha": "4e4dac70e3b4acc944b7b96619a5b31ffee801d3",
-      "message": "feat: Ajouter des sections de transparence sur les bibliothèques open source et la licence, ainsi qu'une note sur l'IA dans le développement",
-      "date": "2026-09-13T20:00:37Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/4e4dac70e3b4acc944b7b96619a5b31ffee801d3",
       "tags": []
     }
   ]
