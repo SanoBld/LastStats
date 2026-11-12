@@ -26,14 +26,20 @@
   var head = grid && grid.parentElement;
   if (!head || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   var idle;
-  head.addEventListener('pointermove', function () {
+  head.addEventListener('pointermove', function (e) {
+    var r = grid.getBoundingClientRect();
+    grid.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+    grid.style.setProperty('--my', (e.clientY - r.top) + 'px');
     if (grid.classList.contains('is-press')) return;
     grid.classList.add('is-hover');
     clearTimeout(idle);
     idle = setTimeout(function () { grid.classList.remove('is-hover'); }, 180);
   });
   head.addEventListener('pointerleave', function () { clearTimeout(idle); grid.classList.remove('is-hover'); });
-  head.addEventListener('pointerdown', function () {
+  head.addEventListener('pointerdown', function (e) {
+    var r = grid.getBoundingClientRect();
+    grid.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+    grid.style.setProperty('--my', (e.clientY - r.top) + 'px');
     grid.classList.remove('is-hover', 'is-press');
     void grid.offsetWidth;
     grid.classList.add('is-press');
