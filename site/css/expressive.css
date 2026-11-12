@@ -406,7 +406,7 @@ button.cm-tr-btn, .rel-rail button.cm-tr-btn, .rel-toolbar button.cm-tr-btn {
 }
 
 /* ---------- Hero: everything visible right at page load, on any screen ---------- */
-.project-page-header .reveal:not(.back-link) { opacity: 1 !important; transform: none !important; transition: none; }
+html:not(.gsap-on) .project-page-header .reveal:not(.back-link) { opacity: 1 !important; transform: none !important; transition: none; }
 .project-page-header .gh-stats .gh-stat { animation: none; }
 .project-page-header .gh-stats { min-height: 0; }
 @media (max-height: 820px) {

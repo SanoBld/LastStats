@@ -115,6 +115,7 @@ window.I18N.zh = {
   "releases.error": "无法加载版本。请稍后再试。",
   "releases.all_on_github": "在 GitHub 上查看",
   "releases.show_more": "显示更多",
+  "releases.show_less": "收起",
   "releases.filter_all": "全部",
   "releases.filter_stable": "稳定版",
   "releases.downloads": "次下载",

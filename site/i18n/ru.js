@@ -115,6 +115,7 @@ window.I18N.ru = {
   "releases.error": "Не удалось загрузить версии. Повторите попытку позже.",
   "releases.all_on_github": "Смотреть на GitHub",
   "releases.show_more": "Показать ещё",
+  "releases.show_less": "Свернуть",
   "releases.filter_all": "Все",
   "releases.filter_stable": "Стабильные",
   "releases.downloads": "загрузок",

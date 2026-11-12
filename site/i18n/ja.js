@@ -115,6 +115,7 @@ window.I18N.ja = {
   "releases.error": "バージョンを読み込めませんでした。後でもう一度お試しください。",
   "releases.all_on_github": "GitHubで見る",
   "releases.show_more": "もっと見る",
+  "releases.show_less": "折りたたむ",
   "releases.filter_all": "すべて",
   "releases.filter_stable": "安定版",
   "releases.downloads": "ダウンロード",

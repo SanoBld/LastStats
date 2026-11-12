@@ -4,6 +4,18 @@
   const tag = document.currentScript;
   const repo = (tag && tag.getAttribute('data-repo')) || 'SanoBld/LastStats-App';
   const PAGE = 8; // cards shown at once
+  const G = () => (window.gsap && !matchMedia('(prefers-reduced-motion: reduce)').matches ? window.gsap : null);
+  // entrance for cards (initial load, filter change, infinite scroll) + download counter count-up
+  function enter(nodes) {
+    const g = G(); nodes = Array.from(nodes);
+    if (!g || !nodes.length) return;
+    g.from(nodes, { opacity: 0, y: 18, duration: .5, ease: 'power3.out', stagger: .06, clearProps: 'transform,opacity' });
+    nodes.forEach((n, i) => {
+      const c = n.querySelector('.rel-dl-n'); if (!c) return;
+      const end = +c.dataset.n || 0, o = { v: 0 };
+      g.to(o, { v: end, duration: .9, delay: .15 + i * .06, ease: 'power2.out', onUpdate: () => { c.textContent = Math.round(o.v).toLocaleString(lang()); } });
+    });
+  }
 
   const list = document.getElementById('rel-list');
   const statusEl = document.getElementById('rel-status');
@@ -192,7 +204,7 @@
     link.className = 'rel-asset md-ripple';
     link.href = a.browser_download_url;
     link.innerHTML = `<span class="rel-asset-name">${esc(a.name)}</span>
-      <span class="rel-asset-meta">${size(a.size)} · ${a.download_count.toLocaleString(lang())}</span>`;
+      <span class="rel-asset-meta">${size(a.size)} · <span class="rel-asset-dl"><span class="ms" aria-hidden="true">download</span>${a.download_count.toLocaleString(lang())}</span></span>`;
     link.title = `${a.download_count} ${t('releases.downloads')}`;
     return link;
   }
@@ -227,9 +239,10 @@
     const body = (rel.body || '').trim();
     const assets = (rel.assets || []).filter((a) => !/\.(sha256|sig|blockmap)$/i.test(a.name));
 
+    const total = assets.reduce((n, a) => n + (a.download_count || 0), 0);
     el.innerHTML = `
       <div class="rel-head"><h2 class="rel-tag">${esc(rel.tag_name || rel.name)}</h2>${badges}</div>
-      <p class="rel-date">${esc(date)}</p>
+      <p class="rel-date">${esc(date)}<span class="rel-dl" title="${esc(t('releases.downloads'))}"><span class="ms" aria-hidden="true">download</span><b class="rel-dl-n" data-n="${total}">${total.toLocaleString(lang())}</b> ${esc(t('releases.downloads'))}</span></p>
       <h3 class="rel-files-title">${esc(t('releases.notes'))}</h3>
       <div class="rel-notes">${body ? md(body) : '<p>' + esc(t('releases.no_notes')) + '</p>'}</div>
       <h3 class="rel-files-title">${esc(t('releases.files'))}</h3>
@@ -244,8 +257,12 @@
       btn.className = 'rel-toggle md-ripple';
       btn.textContent = t('releases.show_more');
       btn.addEventListener('click', () => {
+        const g = G(), from = notes.offsetHeight;
         const collapsed = notes.classList.toggle('is-collapsed');
-        btn.textContent = collapsed ? t('releases.show_more') : '−';
+        btn.textContent = collapsed ? t('releases.show_more') : t('releases.show_less');
+        if (!g) return;
+        const to = collapsed ? notes.offsetHeight : notes.scrollHeight;
+        g.fromTo(notes, { height: from }, { height: to, duration: .45, ease: 'power3.inOut', clearProps: 'height' });
       });
       notes.after(btn);
     }
@@ -290,12 +307,14 @@
     buildRail();
     updateRail();
     checkSentinel();
+    enter(list.children);
   }
 
   // infinite scroll: add the next cards (only the new ones) when the bottom comes near
   function appendUpTo(count) {
     shown = Math.max(shown, count);
-    visible.slice(list.children.length, shown).forEach((r) => list.appendChild(mk(r, r.tag_name === latestTag)));
+    const fresh = visible.slice(list.children.length, shown).map((r) => list.appendChild(mk(r, r.tag_name === latestTag)));
+    enter(fresh);
     checkSentinel();
     updateRail();
   }
@@ -397,7 +416,11 @@
     filter = b.getAttribute('data-filter');
     shown = PAGE;
     filterBtns.forEach((x) => x.classList.toggle('is-active', x === b));
-    render();
+    const g = G(), old = Array.from(list.children);
+    if (g && old.length) {
+      g.killTweensOf(old);
+      g.to(old, { opacity: 0, y: -10, duration: .18, stagger: .02, ease: 'power2.in', onComplete: render });
+    } else render();
   }));
 
   // data comes from js/gh-data.js (static copy first, GitHub API only as a fallback)

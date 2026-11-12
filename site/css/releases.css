@@ -240,3 +240,11 @@
 /* original tight gaps everywhere, only a bigger gap where a dropdown meets a single file */
 .rel-assets, .rel-plat, .rel-plat-files { gap: 2px; }
 .rel-plat + .rel-plat-single, .rel-plat-single + .rel-plat { margin-top: 1rem; }
+
+/* download counter chip */
+.rel-dl { display: inline-flex; align-items: center; gap: .3rem; margin-inline-start: .7rem; padding: .15rem .65rem .15rem .45rem; border-radius: 999px; background: var(--md-surface-container-high); color: var(--md-on-surface); font-size: .8rem; opacity: 1; vertical-align: middle; }
+.rel-dl .ms { font-size: 16px; }
+.rel-dl b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.rel-card.is-latest .rel-dl { background: var(--md-primary); color: var(--md-on-primary); }
+.rel-asset-dl { display: inline-flex; align-items: center; gap: .2rem; vertical-align: middle; }
+.rel-asset-dl .ms { font-size: 15px; }

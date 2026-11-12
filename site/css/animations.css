@@ -1,0 +1,29 @@
+/* Pre-hide hero until GSAP starts (no "pop then animate"); removed by animations.js */
+html.pre-anim .nav,
+html.pre-anim .project-logo,
+html.pre-anim .back-link,
+html.pre-anim .project-page-desc,
+html.pre-anim .project-page-header h1,
+html.pre-anim .feature-chips span,
+html.pre-anim .project-tags span,
+html.pre-anim .project-actions > *,
+html.pre-anim .gh-stats { visibility: hidden; }
+
+/* First-visit loader: Material You surface + morphing primary shape */
+html.show-loader::before, html.show-loader::after { content: ""; position: fixed; z-index: 99999; opacity: 1; transition: opacity .45s ease; pointer-events: none; }
+html.show-loader::before { inset: 0; background: var(--md-background, #fff); pointer-events: auto; }
+html.show-loader::after {
+  top: 50%; left: 50%; width: 76px; height: 76px; margin: -38px 0 0 -38px;
+  background: var(--md-primary, #10617D);
+  border-radius: 50%;
+  animation: ls-morph 1.6s cubic-bezier(.2, 0, 0, 1) infinite;
+}
+html.show-loader.loader-out::before, html.show-loader.loader-out::after { opacity: 0; }
+@keyframes ls-morph {
+  0%   { border-radius: 50%; transform: rotate(0) scale(.9); }
+  25%  { border-radius: 32% 68% 55% 45% / 45% 40% 60% 55%; transform: rotate(90deg) scale(1.05); }
+  50%  { border-radius: 24%; transform: rotate(180deg) scale(.95); }
+  75%  { border-radius: 60% 40% 38% 62% / 55% 60% 40% 45%; transform: rotate(270deg) scale(1.05); }
+  100% { border-radius: 50%; transform: rotate(360deg) scale(.9); }
+}
+@media (prefers-reduced-motion: reduce) { html.show-loader::after { animation: none; } }
