@@ -43,10 +43,10 @@
 .project-hero-grid {
   position: absolute;
   inset: 0 0 -3rem 0;
-  background-image: linear-gradient(var(--md-outline-variant) 1px, transparent 1px), linear-gradient(90deg, var(--md-outline-variant) 1px, transparent 1px);
+  background-image: linear-gradient(color-mix(in srgb, var(--md-primary) 60%, var(--md-outline-variant)) 1.5px, transparent 1.5px), linear-gradient(90deg, color-mix(in srgb, var(--md-primary) 60%, var(--md-outline-variant)) 1.5px, transparent 1.5px);
   background-size: 64px 64px;
-  mask-image: radial-gradient(ellipse 80% 55% at 50% 15%, #000 20%, transparent 75%);
-  opacity: .2;
+  mask-image: radial-gradient(ellipse 90% 65% at 50% 15%, #000 30%, transparent 85%);
+  opacity: .5;
   z-index: -1;
 }
 

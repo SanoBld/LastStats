@@ -1,6 +1,24 @@
 {
-  "updated": "2026-11-12T19:16:57Z",
+  "updated": "2026-11-12T20:18:06Z",
   "commits": [
+    {
+      "sha": "2594c18a79b86c2eb04fbef4d644dd5d2e8571f9",
+      "message": "feat: ajouter un effet de vibration local sur la grille héro lors du mouvement de la souris et de la pression",
+      "date": "2026-11-12T20:17:17Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/2594c18a79b86c2eb04fbef4d644dd5d2e8571f9",
+      "tags": []
+    },
+    {
+      "sha": "e72757952d9535e2eadf53f44d64603e0bc373e9",
+      "message": "feat: améliorer les animations et les effets de fond dans les styles de projet",
+      "date": "2026-11-12T20:15:29Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/e72757952d9535e2eadf53f44d64603e0bc373e9",
+      "tags": []
+    },
     {
       "sha": "5683f75994a1487b5e9ba84e8bf179464f08a3be",
       "message": "feat: enhance UI and functionality with new styles and animations\n\n- Added new styles for header buttons and project actions in expressive.css to improve visual appeal and interaction.\n- Updated project.css to refine layout and background effects for project detail pages.\n- Enhanced Arabic, German, English, Spanish, French, Italian, Japanese, Portuguese, Russian, and Chinese translations for better clarity and engagement.\n- Modified index.html to incorporate new features and improve user experience.\n- Implemented a new animation effect for the project hero grid in expressive.js to create a more dynamic interface.\n- Updated GitHub stats functionality in github-stats.js to include live download tracking, enhancing real-time data presentation.",
@@ -2697,24 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/4e4dac70e3b4acc944b7b96619a5b31ffee801d3",
-      "tags": []
-    },
-    {
-      "sha": "bec977556d9e232c818a8e3bf1c261ce9d530364",
-      "message": "feat: Mettre à jour le changelog en supprimant les sections obsolètes et en améliorant la lisibilité",
-      "date": "2026-09-13T19:49:52Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/bec977556d9e232c818a8e3bf1c261ce9d530364",
-      "tags": []
-    },
-    {
-      "sha": "ee6802101b29ea60db1f799f7cd622a775c62fa2",
-      "message": "feat: Refactor search fields for consistency and improve sharing functionality across platforms",
-      "date": "2026-09-13T19:14:32Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/ee6802101b29ea60db1f799f7cd622a775c62fa2",
       "tags": []
     }
   ]
