@@ -647,6 +647,6 @@ html:not(.gsap-on) .project-page-header .reveal:not(.back-link) { opacity: 1 !im
 .project-hero-grid.beat { transform-origin: 50% 20%; }
 .project-hero-grid.beat.is-hover { animation: grid-buzz .16s linear infinite; }
 .project-hero-grid.beat.is-press { animation: grid-thump .35s ease-out; }
-@keyframes grid-buzz { 0%,100% { transform: translate(0,0); opacity: .26; } 25% { transform: translate(1.2px,-.8px); } 50% { transform: translate(-1px,.8px); opacity: .3; } 75% { transform: translate(.8px,1px); } }
-@keyframes grid-thump { 0% { transform: scale(1); opacity: .2; } 20% { transform: scale(1.02) translate(2px,-1px); opacity: .4; } 40% { transform: scale(.995) translate(-2px,1px); } 60% { transform: scale(1.01) translate(1px,1px); } 100% { transform: scale(1); opacity: .2; } }
+@keyframes grid-buzz { 0%,100% { transform: translate(0,0); opacity: .6; } 25% { transform: translate(1.2px,-.8px); } 50% { transform: translate(-1px,.8px); opacity: .7; } 75% { transform: translate(.8px,1px); } }
+@keyframes grid-thump { 0% { transform: scale(1); opacity: .5; } 20% { transform: scale(1.02) translate(2px,-1px); opacity: .85; } 40% { transform: scale(.995) translate(-2px,1px); } 60% { transform: scale(1.01) translate(1px,1px); } 100% { transform: scale(1); opacity: .5; } }
 @media (prefers-reduced-motion: reduce) { .project-hero-grid.beat { animation: none !important; } }
