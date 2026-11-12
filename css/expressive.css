@@ -632,15 +632,17 @@ html:not(.gsap-on) .project-page-header .reveal:not(.back-link) { opacity: 1 !im
   background: var(--md-tertiary-container) !important; color: var(--md-on-tertiary-container) !important;
 }
 
-/* ---------- Header buttons: same connected shapes as the stat tiles ---------- */
-@media (min-width: 641px) {
-  .project-actions > a:not(:active):not(.is-pressed), .project-actions > button:not(:active):not(.is-pressed) { border-radius: var(--r-inner); }
-  .project-actions > a:first-child:not(:active):not(.is-pressed), .project-actions > button:first-child:not(:active):not(.is-pressed),
-  .project-actions > #download-trigger:first-child:not(:active):not(.is-pressed) { border-radius: var(--r-outer) var(--r-inner) var(--r-inner) var(--r-outer); }
-  .project-actions > a:last-child:not(:active):not(.is-pressed), .project-actions > button:last-child:not(:active):not(.is-pressed) { border-radius: var(--r-inner) var(--r-outer) var(--r-outer) var(--r-inner); }
-}
-@media (max-width: 640px) {
-  .project-actions #download-trigger:not(:active):not(.is-pressed) { border-radius: var(--r-pill); }
+/* ---------- Header buttons: connected shapes like the stat tiles, on every screen size ----------
+   Row (desktop + wide phones): big corners on the outer sides. Column (small phones): big corners top and bottom. */
+.project-actions > :is(a, button):not(:active):not(.is-pressed),
+.project-actions > #download-trigger:not(:active):not(.is-pressed) { border-radius: var(--r-inner); }
+.project-actions > :is(a, button):first-child:not(:active):not(.is-pressed),
+.project-actions > #download-trigger:first-child:not(:active):not(.is-pressed) { border-radius: var(--r-outer) var(--r-inner) var(--r-inner) var(--r-outer); }
+.project-actions > :is(a, button):last-child:not(:active):not(.is-pressed) { border-radius: var(--r-inner) var(--r-outer) var(--r-outer) var(--r-inner); }
+@media (max-width: 520px) {
+  .project-actions > :is(a, button):first-child:not(:active):not(.is-pressed),
+  .project-actions > #download-trigger:first-child:not(:active):not(.is-pressed) { border-radius: var(--r-outer) var(--r-outer) var(--r-inner) var(--r-inner); }
+  .project-actions > :is(a, button):last-child:not(:active):not(.is-pressed) { border-radius: var(--r-inner) var(--r-inner) var(--r-outer) var(--r-outer); }
 }
 
 /* ---------- Hero grid: local vibration around the pointer (index only, set by js/expressive.js) ---------- */
@@ -656,3 +658,24 @@ html:not(.gsap-on) .project-page-header .reveal:not(.back-link) { opacity: 1 !im
 @keyframes grid-buzz { 0%,100% { transform: translate(0,0); } 25% { transform: translate(2.5px,-2px); } 50% { transform: translate(-2.5px,2px); } 75% { transform: translate(2px,2.5px); } }
 @keyframes grid-thump { 0% { transform: translate(0,0); } 20% { transform: translate(3px,-2px); } 40% { transform: translate(-3px,2px); } 60% { transform: translate(2px,2px); } 80% { transform: translate(-1px,-1px); } 100% { transform: translate(0,0); } }
 @media (prefers-reduced-motion: reduce) { .project-hero-grid::after { animation: none !important; } }
+
+/* ---------- Softer press animation everywhere: lighter squeeze, slower and smoother ---------- */
+.project-actions a:active, .project-actions button:active, .project-actions #download-trigger:active,
+.contact-links a:active, .footer .footer-links.footer-buttons a:active,
+.back-link:active, .about-cta:active, .help-external-link:active, .lang-toggle:active,
+.theme-toggle:active, .nav-logo:active, .cm-tr-btn:active, .m3-carousel-btn:active:not(:disabled),
+.rel-filter-btn:not(.cm-tr-btn):active, .rel-gh:active, .rel-more:active, .rel-toggle:active,
+.rel-asset:active, .rel-plat-sum:active, .cm-btn:active, .cm-sha:active, .color-random:active, .color-modes button:active,
+.lightbox-close:active, .dl-modal-close:active, .dl-option:active, .dl-back:active,
+.project-actions a.is-pressed, .project-actions button.is-pressed, .contact-links a.is-pressed,
+.footer .footer-links.footer-buttons a.is-pressed, .back-link.is-pressed, .about-cta.is-pressed,
+.help-external-link.is-pressed, .lang-toggle.is-pressed, .theme-toggle.is-pressed, .nav-logo.is-pressed,
+.cm-tr-btn.is-pressed, .m3-carousel-btn.is-pressed, .rel-filter-btn.is-pressed, .rel-gh.is-pressed,
+.rel-more.is-pressed, .rel-toggle.is-pressed, .rel-asset.is-pressed, .rel-plat-sum.is-pressed,
+.cm-btn.is-pressed, .cm-sha.is-pressed, .color-random.is-pressed, .dl-option.is-pressed, .dl-back.is-pressed,
+.rel-filter-btn:not(.cm-tr-btn).is-pressed, .project-actions #download-trigger.is-pressed {
+  transform: scale(.97) !important;
+  transition-duration: .35s !important;
+  transition-timing-function: cubic-bezier(.2, .8, .2, 1) !important;
+}
+.project-actions a, .project-actions button, .contact-links a { transition-timing-function: cubic-bezier(.2, .8, .2, 1); }

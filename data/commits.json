@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-12T20:19:20Z",
+  "updated": "2026-11-12T21:41:41Z",
   "commits": [
+    {
+      "sha": "06e004e16fa453b964747a8914b169e78d3b6889",
+      "message": "feat: améliorer l'animation des boutons avec des coins connectés et une pression plus douce",
+      "date": "2026-11-12T21:39:13Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/06e004e16fa453b964747a8914b169e78d3b6889",
+      "tags": []
+    },
     {
       "sha": "ad0483046ee3d594c1f2e7bad71c25fd90e1c10e",
       "message": "feat: ajuster l'effet de vibration de la grille héro pour une meilleure réactivité et animation",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/2291e4e0edf8b40cff4fc0ddc9fcb377ccafb72a",
-      "tags": []
-    },
-    {
-      "sha": "44f00ff24280b78d2b8f961a5e3a9edc34634f58",
-      "message": "feat: Mise à jour du changelog, nettoyage du code et réécriture du README pour refléter les fonctionnalités actuelles",
-      "date": "2026-09-13T20:13:56Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/44f00ff24280b78d2b8f961a5e3a9edc34634f58",
       "tags": []
     }
   ]
