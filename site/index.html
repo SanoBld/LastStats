@@ -34,7 +34,7 @@
 
   <section class="project-page-header">
     <div class="project-hero-bg" aria-hidden="true"></div>
-    <div class="project-hero-grid" aria-hidden="true"></div>
+    <div class="project-hero-grid beat" aria-hidden="true"></div>
 
 
 
@@ -50,14 +50,13 @@
 
     <h1 class="project-page-title reveal">LastStats</h1>
     <p class="project-page-desc reveal" data-i18n="index.your_listening_habits_deserve_better">
-      Vos habitudes d'écoute méritent mieux qu'une page Last.fm figée. LastStats les transforme
-      en un dashboard vivant, pensé Material You, disponible sur mobile comme sur desktop.
+      Vos écoutes Last.fm méritent mieux qu'une simple page. LastStats les transforme en un tableau de bord vivant et coloré, sur mobile comme sur ordinateur.
     </p>
 
     <div class="feature-chips reveal">
-      <span>Flutter</span>
-      <span>Material You</span>
-      <span>Last.fm API</span>
+      <span data-i18n="index.chip_mobile_desktop">Mobile et ordinateur</span>
+      <span data-i18n="index.chip_phone_colors">Couleurs de votre téléphone</span>
+      <span data-i18n="index.chip_lastfm">Compatible Last.fm</span>
       <span data-i18n="index.dark_light_amoled">Dark / Light / AMOLED</span>
       <span data-i18n="index.android_widgets">Widgets Android</span>
       <span data-i18n="index.multi_language">Multi-langue</span>
@@ -67,18 +66,18 @@
     <div class="gh-stats reveal" id="gh-stats" aria-hidden="true"></div>
 
     <div class="project-actions reveal">
-      <a href="https://github.com/SanoBld/LastStats" target="_blank" rel="noopener" class="md-ripple">
+      <button type="button" id="download-trigger" class="md-ripple" data-repo="SanoBld/LastStats">
+        <span class="ms" style="font-size:18px" aria-hidden="true">download</span>
+        <span data-i18n="common.download">Télécharger</span>
+      </button>
+      <a href="https://github.com/SanoBld/LastStats" target="_blank" rel="noopener" class="md-ripple tonal">
         <!-- github mark -->
         <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
         <span data-i18n="index.view_on_github">Voir sur GitHub</span>
         <span class="ms arrow-icon" style="font-size:14px" aria-hidden="true">arrow_forward</span>
       </a>
-      <button type="button" id="download-trigger" class="md-ripple tonal" data-repo="SanoBld/LastStats">
-        <span class="ms" style="font-size:18px" aria-hidden="true">download</span>
-        <span data-i18n="common.download">Télécharger</span>
-      </button>
       <!-- web build of the app (Flutter Web), opens a preview notice first -->
-      <button type="button" id="web-trigger" class="md-ripple tonal" data-web-url="https://sanobld.github.io/LastStats/app/">
+      <button type="button" id="web-trigger" class="md-ripple tonal tert" data-web-url="https://sanobld.github.io/LastStats/app/">
         <span data-i18n="webBtn">Version web</span>
         <span class="web-beta-chip" data-i18n="webBetaChip">Aperçu</span>
       </button>
@@ -89,14 +88,10 @@
   <section>
     <div class="about-app reveal">
       <p data-i18n="index.connect_your_last_fm_account">
-        Connectez votre compte Last.fm, et LastStats prend le relais : vos artistes, vos albums,
-        vos titres du moment, réunis dans un dashboard pensé pour être aussi beau qu'utile.
-        Vos données restent les vôtres, tout simplement mises en valeur.
+        Connectez votre compte Last.fm et LastStats s'occupe du reste : vos artistes, vos albums et vos titres du moment, réunis au même endroit, clairs et agréables à regarder. Vos données restent à vous.
       </p>
       <p data-i18n="index.on_the_design_side_the">
-        Côté design, l'app suit Material You à la lettre : les couleurs s'accordent à votre
-        téléphone, vous choisissez entre clair, sombre ou AMOLED, et l'accent coloré de toute
-        l'app s'adapte même à la pochette de l'album que vous écoutez.
+        L'app prend les couleurs de votre téléphone. Vous choisissez un thème clair, sombre ou noir total, et les couleurs changent même selon la pochette de l'album que vous écoutez.
       </p>
     </div>
 

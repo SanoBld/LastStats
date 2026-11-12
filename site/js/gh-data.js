@@ -87,5 +87,5 @@
     });
   }
 
-  window.ghData = { get() { return promise || (promise = load()); } };
+  window.ghData = { repo: repo, get() { return promise || (promise = load()); } };
 })();

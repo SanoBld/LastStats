@@ -623,3 +623,30 @@ html:not(.gsap-on) .project-page-header .reveal:not(.back-link) { opacity: 1 !im
 .dl-option:focus-visible, .dl-back:focus-visible {
   outline: 2px solid var(--md-primary); outline-offset: 2px;
 }
+
+
+/* ---------- Header buttons: download = accent, GitHub = secondary, web = tertiary ---------- */
+.project-actions #download-trigger { font-weight: 600; box-shadow: 0 6px 20px -8px var(--md-primary); }
+.project-actions a.tonal { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+.project-actions button.tert, .project-actions button.tert:hover, .project-actions button.tert:active {
+  background: var(--md-tertiary-container) !important; color: var(--md-on-tertiary-container) !important;
+}
+
+/* ---------- Header buttons: same connected shapes as the stat tiles ---------- */
+@media (min-width: 641px) {
+  .project-actions > a:not(:active):not(.is-pressed), .project-actions > button:not(:active):not(.is-pressed) { border-radius: var(--r-inner); }
+  .project-actions > a:first-child:not(:active):not(.is-pressed), .project-actions > button:first-child:not(:active):not(.is-pressed),
+  .project-actions > #download-trigger:first-child:not(:active):not(.is-pressed) { border-radius: var(--r-outer) var(--r-inner) var(--r-inner) var(--r-outer); }
+  .project-actions > a:last-child:not(:active):not(.is-pressed), .project-actions > button:last-child:not(:active):not(.is-pressed) { border-radius: var(--r-inner) var(--r-outer) var(--r-outer) var(--r-inner); }
+}
+@media (max-width: 640px) {
+  .project-actions #download-trigger:not(:active):not(.is-pressed) { border-radius: var(--r-pill); }
+}
+
+/* ---------- Hero grid: small vibration on mouse move and on press (index only, set by js/expressive.js) ---------- */
+.project-hero-grid.beat { transform-origin: 50% 20%; }
+.project-hero-grid.beat.is-hover { animation: grid-buzz .16s linear infinite; }
+.project-hero-grid.beat.is-press { animation: grid-thump .35s ease-out; }
+@keyframes grid-buzz { 0%,100% { transform: translate(0,0); opacity: .26; } 25% { transform: translate(1.2px,-.8px); } 50% { transform: translate(-1px,.8px); opacity: .3; } 75% { transform: translate(.8px,1px); } }
+@keyframes grid-thump { 0% { transform: scale(1); opacity: .2; } 20% { transform: scale(1.02) translate(2px,-1px); opacity: .4; } 40% { transform: scale(.995) translate(-2px,1px); } 60% { transform: scale(1.01) translate(1px,1px); } 100% { transform: scale(1); opacity: .2; } }
+@media (prefers-reduced-motion: reduce) { .project-hero-grid.beat { animation: none !important; } }
