@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-12T14:46:34Z",
+  "updated": "2026-11-12T19:16:57Z",
   "commits": [
+    {
+      "sha": "5683f75994a1487b5e9ba84e8bf179464f08a3be",
+      "message": "feat: enhance UI and functionality with new styles and animations\n\n- Added new styles for header buttons and project actions in expressive.css to improve visual appeal and interaction.\n- Updated project.css to refine layout and background effects for project detail pages.\n- Enhanced Arabic, German, English, Spanish, French, Italian, Japanese, Portuguese, Russian, and Chinese translations for better clarity and engagement.\n- Modified index.html to incorporate new features and improve user experience.\n- Implemented a new animation effect for the project hero grid in expressive.js to create a more dynamic interface.\n- Updated GitHub stats functionality in github-stats.js to include live download tracking, enhancing real-time data presentation.",
+      "date": "2026-11-12T19:13:42Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/5683f75994a1487b5e9ba84e8bf179464f08a3be",
+      "tags": []
+    },
     {
       "sha": "55094b4c0946415a32c674f13acee710f19961a0",
       "message": "Refactor code structure for improved readability and maintainability",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/ee6802101b29ea60db1f799f7cd622a775c62fa2",
-      "tags": []
-    },
-    {
-      "sha": "992ca8c2971139248e8b9f8f6a3babde7b99dd80",
-      "message": "feat: Ajouter un nom d'affichage personnalisé et améliorer le partage de fichiers sur toutes les plateformes",
-      "date": "2026-09-13T14:38:12Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/992ca8c2971139248e8b9f8f6a3babde7b99dd80",
       "tags": []
     }
   ]

@@ -75,5 +75,44 @@
     update(typeof d.stars === 'number' ? d.stars : null, tag, downloads);
   }).catch(() => {});
 
+
+  // Live downloads: quietly re-check every 8 s while the tab is visible.
+  // Uses ETag, so "nothing changed" answers (304) cost nothing against GitHub's limit.
+  // Stops by itself if GitHub says the limit is reached.
+  (function live() {
+    const apiRepo = (window.ghData && ghData.repo) || repo;
+    const url = 'https://api.github.com/repos/' + apiRepo + '/releases?per_page=100';
+    let etag = null, timer = null, shown = null;
+    function tween(from, to) {
+      const t0 = performance.now(), dur = 600;
+      (function step(now) {
+        const k = Math.min(1, (now - t0) / dur);
+        tiles[2].raw = Math.round(from + (to - from) * k);
+        paint();
+        if (k < 1) requestAnimationFrame(step);
+      })(t0);
+    }
+    function tick() {
+      if (document.hidden) return schedule();
+      const headers = etag ? { 'If-None-Match': etag } : {};
+      fetch(url, { headers }).then((r) => {
+        if (r.status === 304) return null;
+        if (r.status === 403 || r.status === 429) throw new Error('limit');
+        if (!r.ok) return null;
+        etag = r.headers.get('ETag');
+        return r.json();
+      }).then((rels) => {
+        if (Array.isArray(rels)) {
+          const total = rels.reduce((s, rel) => s + (rel.assets || []).reduce((n, a) => n + (a.download_count || 0), 0), 0);
+          const cur = typeof tiles[2].raw === 'number' ? tiles[2].raw : total;
+          if (total !== cur) { update(null, null, total); tween(cur, total); }
+        }
+        schedule();
+      }).catch((e) => { if (!e || e.message !== 'limit') schedule(); });
+    }
+    function schedule() { timer = setTimeout(tick, 8000); }
+    schedule();
+  })();
+
   if (window.i18n) i18n.onChange(paint);
 })();

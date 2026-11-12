@@ -12,7 +12,8 @@
   padding-bottom: 5rem;
   text-align: center;
   position: relative;
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
 }
 /* keep the actual text content readable and centered like a normal section
    again (skip the two full-bleed background layers, they need the real width) */
@@ -27,7 +28,7 @@
    cutting off in a hard line like it did before */
 .project-hero-bg {
   position: absolute;
-  inset: 0;
+  inset: 0 0 -9rem 0;
   background:
     radial-gradient(circle at 20% 10%, var(--md-primary-container), transparent 55%),
     radial-gradient(circle at 85% 15%, var(--md-tertiary-container), transparent 45%),
@@ -36,15 +37,15 @@
   z-index: -2;
   animation: drift 22s ease-in-out infinite alternate;
   will-change: transform;
-  -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 25%, rgba(0,0,0,.55) 60%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 25%, rgba(0,0,0,.55) 60%, transparent 100%);
 }
 .project-hero-grid {
   position: absolute;
-  inset: 0;
+  inset: 0 0 -3rem 0;
   background-image: linear-gradient(var(--md-outline-variant) 1px, transparent 1px), linear-gradient(90deg, var(--md-outline-variant) 1px, transparent 1px);
   background-size: 64px 64px;
-  mask-image: radial-gradient(ellipse 80% 60% at 50% 20%, #000 30%, transparent 80%);
+  mask-image: radial-gradient(ellipse 80% 55% at 50% 15%, #000 20%, transparent 75%);
   opacity: .2;
   z-index: -1;
 }

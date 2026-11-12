@@ -19,3 +19,24 @@
   });
 })();
 
+
+// Hero grid vibration: tiny buzz while the pointer moves over the header, a thump on press.
+(function () {
+  var grid = document.querySelector('.project-hero-grid.beat');
+  var head = grid && grid.parentElement;
+  if (!head || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var idle;
+  head.addEventListener('pointermove', function () {
+    if (grid.classList.contains('is-press')) return;
+    grid.classList.add('is-hover');
+    clearTimeout(idle);
+    idle = setTimeout(function () { grid.classList.remove('is-hover'); }, 180);
+  });
+  head.addEventListener('pointerleave', function () { clearTimeout(idle); grid.classList.remove('is-hover'); });
+  head.addEventListener('pointerdown', function () {
+    grid.classList.remove('is-hover', 'is-press');
+    void grid.offsetWidth;
+    grid.classList.add('is-press');
+  });
+  grid.addEventListener('animationend', function (e) { if (e.animationName === 'grid-thump') grid.classList.remove('is-press'); });
+})();
