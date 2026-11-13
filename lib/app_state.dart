@@ -52,13 +52,9 @@ bool isNightByHour(int dayStartHour, int nightStartHour) {
       : (h >= nightStartHour && h < dayStartHour);
 }
 
-// Visual style preset: 'default' | 'nothing'
+// Visual style preset (only 'default' now)
 // Saved as 'ls_theme_style' in SharedPreferences.
 final themeStyleNotifier = ValueNotifier<String>('default');
-
-// Nothing OS accent variant: 'classic' (red only) | 'mixed' (red + yellow touches)
-// Saved as 'ls_nothing_accent' in SharedPreferences.
-final nothingAccentNotifier = ValueNotifier<String>('classic');
 
 // Color used when music-color mode is on but nothing is playing.
 // Saved as 'ls_nowplaying_fallback_color' in SharedPreferences.

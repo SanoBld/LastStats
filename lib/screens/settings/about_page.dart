@@ -15,12 +15,10 @@ import '../../theme/m3_motion.dart';
 import 'readme_page.dart';
 
 /// Picks the self-contained logo SVG (own background baked in): the plain
-/// mono logo by default, the red-dot "Nothing" variant only when that theme
-/// is active — matching brightness either way.
+/// mono logo, matching brightness.
 String _logoAsset(BuildContext context) {
   final dark = Theme.of(context).brightness == Brightness.dark;
-  final family = themeStyleNotifier.value == 'nothing' ? 'app_logo_nothing' : 'app_logo';
-  return 'assets/icons/${family}_${dark ? 'black_bg' : 'white_bg'}.svg';
+  return 'assets/icons/app_logo_${dark ? 'black_bg' : 'white_bg'}.svg';
 }
 
 class AboutPage extends StatelessWidget {

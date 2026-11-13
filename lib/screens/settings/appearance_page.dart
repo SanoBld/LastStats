@@ -9,7 +9,6 @@ import '../../theme/m3_shapes.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../app_state.dart';
-import '../../nothing_theme.dart';
 import '../../l10n/l10n.dart';
 import '../../services/motion_artwork_service.dart';
 import '../../services/spotify_canvas_service.dart';
@@ -35,10 +34,7 @@ class AppearancePage extends StatefulWidget {
 }
 
 class _AppearancePageState extends State<AppearancePage> {
-  String _themeStyle           = 'default';
   String _harmony              = 'mono';
-  String _nothingAccent        = 'classic';
-  static const bool _showNothing = false;
   String _theme                = 'system';
   String _accent               = 'purple';
   bool   _useDynamicColor      = false;
@@ -75,13 +71,10 @@ class _AppearancePageState extends State<AppearancePage> {
     if (!mounted) return;
     setState(() {
       _harmony              = p.getString('ls_color_harmony')           ?? 'mono';
-      _themeStyle           = p.getString('ls_theme_style')             ?? 'default';
-      if (!_showNothing && _themeStyle == 'nothing') {
-        _themeStyle = 'default';
-        p.setString('ls_theme_style', 'default');
+      if (p.getString('ls_theme_style') != 'default') {
+        p.setString('ls_theme_style', 'default'); // old Nothing style → default
         themeStyleNotifier.value = 'default';
       }
-      _nothingAccent        = p.getString('ls_nothing_accent')          ?? 'classic';
       _theme                = p.getString('ls_theme')                   ?? 'system';
       _accent               = p.getString('ls_accent')                  ?? 'purple';
       _useDynamicColor      = p.getBool('ls_use_dynamic_color')         ?? false;
@@ -107,30 +100,6 @@ class _AppearancePageState extends State<AppearancePage> {
     if (v is bool)   await p.setBool(key, v);
     if (v is String) await p.setString(key, v);
     if (v is int)    await p.setInt(key, v);
-  }
-
-  // Switch visual style.
-  // When activating Nothing: explicitly disable dynamic and music color
-  // so they don't silently stay on in the background.
-  Future<void> _setStyle(String v) async {
-    final p = await SharedPreferences.getInstance();
-    await p.setString('ls_theme_style', v);
-
-    if (v == 'nothing') {
-      await p.setBool('ls_use_dynamic_color',    false);
-      await p.setBool('ls_use_nowplaying_color', false);
-      setState(() {
-        _themeStyle         = v;
-        _useDynamicColor    = false;
-        _useNowPlayingColor = false;
-      });
-      useDynamicColorNotifier.value    = false;
-      useNowPlayingColorNotifier.value = false;
-      accentNotifier.value = accentFromString(_accent);
-    } else {
-      setState(() => _themeStyle = v);
-    }
-    themeStyleNotifier.value = v;
   }
 
   Future<void> _setHarmony(String v) async {
@@ -160,12 +129,6 @@ class _AppearancePageState extends State<AppearancePage> {
       trailing: sel ? Icon(Icons.check_circle_rounded, color: scheme.primary) : null,
       onTap: () => _setHarmony(key),
     );
-  }
-
-  Future<void> _setNothingAccent(String v) async {
-    await _set('ls_nothing_accent', v);
-    setState(() => _nothingAccent = v);
-    nothingAccentNotifier.value = v;
   }
 
   Future<void> _setTheme(String v) async {
@@ -251,18 +214,6 @@ class _AppearancePageState extends State<AppearancePage> {
       _accent.startsWith('#') ||
       !kSettingsAccentOptions.any((o) => o.$2 == _accent);
 
-  bool get _isNothing => _themeStyle == 'nothing';
-
-  // What's grayed out when Nothing is active:
-  //   OLED          → yes (Nothing dark is inherently OLED black — redundant)
-  //   Accent color  → yes (Nothing uses its own color system)
-  //   Dynamic color → yes (conflicts with Nothing style)
-  //   Music color   → yes (conflicts with Nothing style)
-  // What stays active:
-  //   Theme (light/dark/system) → NO — user can pick light or dark Nothing
-  //   Artwork color theme       → NO — affects detail sheets independently
-  //   PC/layout mode            → NO — unrelated to visual style
-
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
@@ -272,173 +223,6 @@ class _AppearancePageState extends State<AppearancePage> {
       appBar: M3AppBar(title: L.settingsAppearance),
       body: ListView(padding: const EdgeInsets.all(20), children: [
 
-        // ══════════════════════════════════════════════════════════════════
-        //  Style selector
-        // ══════════════════════════════════════════════════════════════════
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-          child: Text(
-            L.apVisualStyle,
-            style: text.titleSmall?.copyWith(
-                color: scheme.primary, fontWeight: FontWeight.w800,
-                letterSpacing: 0.4),
-          ),
-        ),
-
-        Row(children: [
-          Expanded(child: _StyleCard(
-            selected:  !_isNothing,
-            onTap:     () => _setStyle('default'),
-            showDark:  false, // uses scheme surfaceContainerHighest
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(children: [
-                  _dot(scheme.primary),
-                  const SizedBox(width: 4),
-                  _dot(scheme.secondary),
-                  const SizedBox(width: 4),
-                  _dot(scheme.tertiary),
-                ]),
-                const Spacer(),
-                Text('Material You',
-                    style: text.labelSmall?.copyWith(
-                        color: scheme.onSurfaceVariant)),
-                const SizedBox(height: 2),
-                Text(L.apStyleDefault,
-                    style: text.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w700)),
-              ],
-            ),
-          )),
-          if (_showNothing) const SizedBox(width: 12),
-          if (_showNothing) Expanded(child: _StyleCard(
-            selected:    _isNothing,
-            onTap:       () { _apHaptic(); _setStyle('nothing'); },
-            showDark:    _theme != 'light', // light preview when light mode chosen
-            accentColor: kNothingRed,
-            child: Builder(builder: (ctx) {
-              final cardDark  = _theme != 'light';
-              final textCol   = cardDark ? kNothingWhite      : kNothingDarkText;
-              final metaCol   = cardDark ? kNothingGrey       : const Color(0xFF6B6560);
-              final dotFaded  = cardDark
-                  ? kNothingWhite.withValues(alpha: 0.15)
-                  : kNothingDarkText.withValues(alpha: 0.12);
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(children: [
-                    _dot(kNothingRed),
-                    const SizedBox(width: 4),
-                    if (_nothingAccent == 'mixed') ...[
-                      _dot(kNothingYellow),
-                      const SizedBox(width: 4),
-                    ],
-                    _dot(dotFaded),
-                  ]),
-                  const Spacer(),
-                  Text('nothing.',
-                      style: TextStyle(fontFamily: 'NType82', fontSize: 10,
-                          color: metaCol, letterSpacing: 0.3)),
-                  const SizedBox(height: 2),
-                  Text('Nothing OS',
-                      style: TextStyle(fontFamily: 'NType82', fontSize: 14,
-                          fontWeight: FontWeight.w700, color: textCol)),
-                ],
-              );
-            }),
-          )),
-          // Nothing OS is hidden for now (see _showNothing). Instead of
-          // removing it, show a greyed-out card that says it is being improved.
-          if (!_showNothing) ...[
-            const SizedBox(width: 12),
-            Expanded(child: _StyleCard(
-              selected: false,
-              showDark: true,
-              onTap: () {
-                _apHaptic();
-                showAppSnackBar(context, SnackBar(
-                  content: Text(tx('nothing_wip_msg')),
-                  behavior: SnackBarBehavior.floating,
-                ));
-              },
-              child: Opacity(
-                opacity: 0.55,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(children: [
-                      _dot(kNothingRed),
-                      const SizedBox(width: 4),
-                      _dot(kNothingWhite.withValues(alpha: 0.15)),
-                      const Spacer(),
-                      const Icon(Icons.construction_rounded,
-                          size: 15, color: kNothingYellow),
-                    ]),
-                    const Spacer(),
-                    Text(tx('nothing_wip_badge'),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontFamily: 'NType82', fontSize: 10,
-                            color: kNothingYellow, letterSpacing: 0.3)),
-                    const SizedBox(height: 2),
-                    const Text('Nothing OS',
-                        style: TextStyle(fontFamily: 'NType82', fontSize: 14,
-                            fontWeight: FontWeight.w700, color: kNothingWhite)),
-                  ],
-                ),
-              ),
-            )),
-          ],
-        ]),
-
-        // ── Nothing sub-options (shown only when Nothing is active) ───────
-        if (_isNothing && _showNothing) ...[
-          const SizedBox(height: 12),
-
-          // Accent variant picker
-          _NothingPanel(
-            isDark: _theme != 'light',
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _NothingLabel(L.apNothingAccentLabel),
-                const SizedBox(height: 10),
-                Row(children: [
-                  Expanded(child: _NothingAccentTile(
-                    color:    kNothingRed,
-                    label:    L.apNothingClassic,
-                    sublabel: tx('ui_nothing_red_sub'),
-                    desc:     L.apRedOnlyDesc,
-                    selected: _nothingAccent == 'classic',
-                    isDark:   _theme != 'light',
-                    onTap:    () { _apHaptic(); _setNothingAccent('classic'); },
-                  )),
-                  const SizedBox(width: 10),
-                  Expanded(child: _NothingAccentTile(
-                    color:    kNothingRed,
-                    color2:   kNothingYellow,
-                    label:    L.apNothingMixed,
-                    sublabel: tx('ui_nothing_yellow_sub'),
-                    desc:     L.apRedYellowDesc,
-                    selected: _nothingAccent == 'mixed',
-                    isDark:   _theme != 'light',
-                    onTap:    () { _apHaptic(); _setNothingAccent('mixed'); },
-                  )),
-                ]),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          // Active banner
-          _NothingInfoBanner(
-            L.apNothingActiveBanner,
-          ),
-        ],
-
-        const SizedBox(height: 20),
 
         // ══════════════════════════════════════════════════════════════════
         SettingsSection(label: tx('txt_sec'), children: [
@@ -535,7 +319,7 @@ class _AppearancePageState extends State<AppearancePage> {
 
         const AppIconSection(),
 
-        //  Theme — ALWAYS active (Nothing supports light + dark)
+        //  Theme — always active
         // ══════════════════════════════════════════════════════════════════
         SettingsSection(label: L.settingsTheme, children: [
           SettingChoiceRow(
@@ -547,24 +331,21 @@ class _AppearancePageState extends State<AppearancePage> {
               ('dark',   L.settingsThemeDark,  Icons.dark_mode_rounded),
             ],
             value: _theme,
-            description: _isNothing ? L.apNothingOledInherent : null,
             onChanged: (v) => _setTheme(v),
           ),
 
-          // OLED toggle — grayed out when Nothing is active (redundant)
+          // OLED toggle — disabled in the light theme
           const Divider(height: 1, indent: 16, endIndent: 16),
           Opacity(
-            opacity: _isNothing ? 0.3 : (_theme == 'light' ? 0.4 : 1.0),
+            opacity: _theme == 'light' ? 0.4 : 1.0,
             child: IgnorePointer(
-              ignoring: _isNothing || _theme == 'light',
+              ignoring: _theme == 'light',
               child: SettingSwitchRow(
                 icon: Icons.phone_android_rounded,
                 title: L.apOledTitle,
-                subtitle: _isNothing
-                    ? L.apOledBuiltIntoNothing
-                    : L.apOledPureBlack,
-                value: _isNothing ? false : _oledMode,
-                onChanged: _isNothing || _theme == 'light'
+                subtitle: L.apOledPureBlack,
+                value: _oledMode,
+                onChanged: _theme == 'light'
                     ? null
                     : (v) async {
                         await _set('ls_oled_mode', v);
@@ -591,9 +372,9 @@ class _AppearancePageState extends State<AppearancePage> {
         //  Colors
         // ══════════════════════════════════════════════════════════════════
         Opacity(
-          opacity: _isNothing ? 0.3 : 1.0,
+          opacity: 1.0,
           child: IgnorePointer(
-            ignoring: _isNothing,
+            ignoring: false,
             child: SettingsSection(label: L.settingsAccentColor, children: [
               Padding(padding: const EdgeInsets.fromLTRB(16, 14, 16, 14), child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -705,9 +486,9 @@ class _AppearancePageState extends State<AppearancePage> {
         const SizedBox(height: 20),
 
         Opacity(
-          opacity: (_isNothing || _useDynamicColor || _useNowPlayingColor) ? 0.3 : 1.0,
+          opacity: (_useDynamicColor || _useNowPlayingColor) ? 0.3 : 1.0,
           child: IgnorePointer(
-            ignoring: _isNothing || _useDynamicColor || _useNowPlayingColor,
+            ignoring: _useDynamicColor || _useNowPlayingColor,
             child: SettingsSection(label: L.settingsDayNightAccent, children: [
               SwitchListTile(
                 secondary: Icon(Icons.brightness_4_rounded, color: scheme.primary),
@@ -785,9 +566,9 @@ class _AppearancePageState extends State<AppearancePage> {
         const SizedBox(height: 20),
 
         Opacity(
-          opacity: _isNothing ? 0.3 : 1.0,
+          opacity: 1.0,
           child: IgnorePointer(
-            ignoring: _isNothing,
+            ignoring: false,
             child: SettingsSection(label: L.settingsDynamicColor, children: [
               SwitchListTile(
                 secondary: Icon(Icons.colorize_rounded, color: scheme.primary),
@@ -987,215 +768,6 @@ class _AppearancePageState extends State<AppearancePage> {
         const RestartBanner(),
         const SizedBox(height: 20),
       ]),
-    );
-  }
-}
-
-// ── Small helpers ─────────────────────────────────────────────────────────────
-
-Widget _dot(Color c) => Container(
-  width: 10, height: 10,
-  decoration: BoxDecoration(color: c, shape: BoxShape.circle),
-);
-
-// ── Nothing OS panel container ────────────────────────────────────────────────
-
-class _NothingPanel extends StatelessWidget {
-  final Widget child;
-  final bool   isDark;
-  const _NothingPanel({required this.child, this.isDark = true});
-
-  @override
-  Widget build(BuildContext context) {
-    final bg     = isDark ? const Color(0xFF0D0D0D) : const Color(0xFFFFFFFF);
-    final border = isDark ? const Color(0xFF2A2A2A) : const Color(0xFFE0DDD8);
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color:        bg,
-        border:       Border.all(color: border),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: child,
-    );
-  }
-}
-
-class _NothingLabel extends StatelessWidget {
-  final String text;
-  const _NothingLabel(this.text);
-
-  @override
-  Widget build(BuildContext context) => Row(children: [
-    Container(width: 6, height: 6,
-        decoration: const BoxDecoration(
-            color: kNothingRed, shape: BoxShape.circle)),
-    const SizedBox(width: 7),
-    Text(text,
-        style: const TextStyle(
-            fontFamily: 'NType82', fontSize: 11,
-            color: kNothingGrey, letterSpacing: 0.8,
-            fontWeight: FontWeight.w500)),
-  ]);
-}
-
-class _NothingInfoBanner extends StatelessWidget {
-  final String message;
-  const _NothingInfoBanner(this.message);
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-    decoration: BoxDecoration(
-      color:        kNothingRed.withValues(alpha: 0.07),
-      borderRadius: BorderRadius.circular(6),
-      border:       Border.all(color: kNothingRed.withValues(alpha: 0.25)),
-    ),
-    child: Row(children: [
-      const Icon(Icons.info_outline_rounded, size: 13, color: kNothingRed),
-      const SizedBox(width: 8),
-      Expanded(child: Text(message,
-          style: const TextStyle(
-              fontFamily: 'NType82', fontSize: 11,
-              color: kNothingRed, letterSpacing: 0.1))),
-    ]),
-  );
-}
-
-// ── Nothing accent tile ───────────────────────────────────────────────────────
-
-class _NothingAccentTile extends StatelessWidget {
-  final Color   color;
-  final Color?  color2;
-  final String  label;
-  final String  sublabel;
-  final String  desc;
-  final bool    selected;
-  final bool    isDark;   // adapts bg to light/dark Nothing mode
-  final VoidCallback onTap;
-
-  const _NothingAccentTile({
-    required this.color,
-    required this.label,
-    required this.sublabel,
-    required this.desc,
-    required this.selected,
-    required this.onTap,
-    this.color2,
-    this.isDark = true,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bg        = isDark ? const Color(0xFF111111) : const Color(0xFFFFFFFF);
-    final bgSel     = color.withValues(alpha: isDark ? 0.08 : 0.06);
-    final borderOff = isDark ? const Color(0xFF2A2A2A) : const Color(0xFFE0DDD8);
-    final textCol   = isDark ? kNothingWhite : kNothingDarkText;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.all(11),
-        decoration: BoxDecoration(
-          color:        selected ? bgSel : bg,
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(
-              color: selected ? color : borderOff,
-              width: selected ? 1.5 : 1),
-        ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Container(
-              width: 18, height: 18,
-              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-              child: selected
-                  ? const Icon(Icons.check_rounded, size: 11, color: Colors.black)
-                  : null,
-            ),
-            if (color2 != null) ...[
-              const SizedBox(width: 4),
-              Container(width: 10, height: 10,
-                  decoration: BoxDecoration(color: color2, shape: BoxShape.circle)),
-            ],
-          ]),
-          const SizedBox(height: 8),
-          Text(label,
-              style: TextStyle(
-                  fontFamily: 'NType82', fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: selected ? color : textCol)),
-          const SizedBox(height: 2),
-          Text(sublabel,
-              style: TextStyle(
-                  fontFamily: 'NType82Mono', fontSize: 9,
-                  color: kNothingGrey, letterSpacing: 0.5)),
-          const SizedBox(height: 3),
-          Text(desc,
-              style: TextStyle(
-                  fontFamily: 'NType82', fontSize: 10, color: kNothingGrey)),
-        ]),
-      ),
-    );
-  }
-}
-
-// ── Style selector card ───────────────────────────────────────────────────────
-
-class _StyleCard extends StatelessWidget {
-  final bool         selected;
-  final bool         showDark;  // true = dark preview card background
-  final Color?       accentColor;
-  final VoidCallback onTap;
-  final Widget       child;
-
-  const _StyleCard({
-    required this.selected,
-    required this.onTap,
-    required this.child,
-    this.showDark    = true,
-    this.accentColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final ac     = accentColor ?? scheme.primary;
-    // showDark=true → Nothing dark card preview (#0D0D0D)
-    // showDark=false → uses current theme's surface (adapts to light/dark app theme)
-    // For Nothing card in light mode: warm off-white (#F0EDE8)
-    final bg = !showDark
-        ? scheme.surfaceContainerHighest
-        : const Color(0xFF0D0D0D);
-    final border = selected
-        ? ac
-        : scheme.outlineVariant.withValues(alpha: 0.4);
-
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        height: 96,
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color:        bg,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: border, width: selected ? 2 : 1),
-          boxShadow: selected
-              ? [BoxShadow(color: ac.withValues(alpha: 0.18),
-                    blurRadius: 12, spreadRadius: 1)]
-              : null,
-        ),
-        child: Stack(children: [
-          child,
-          if (selected)
-            Positioned(
-              top: 0, right: 0,
-              child: Icon(Icons.check_circle_rounded,
-                  size: 15, color: ac),
-            ),
-        ]),
-      ),
     );
   }
 }

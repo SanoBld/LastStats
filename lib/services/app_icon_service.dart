@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 /// Selectable launcher icon (Android only): one activity-alias per icon.
 class AppIconService {
   static const _ch = MethodChannel('laststats/appicon');
-  static const keys = ['default', 'white', 'nothing_black', 'nothing_white', 'blue', 'red'];
+  static const keys = ['default', 'white', 'blue', 'red'];
 
   static bool get supported => !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
 

@@ -12,7 +12,6 @@ import 'package:workmanager/workmanager.dart';
 import 'package:window_manager/window_manager.dart';
 import 'app_state.dart';
 import 'widgets/app_text_scale.dart';
-import 'nothing_theme.dart';
 import 'screens/setup_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/notification_detail_page.dart';
@@ -108,7 +107,6 @@ Future<void> _mainImpl() async {
 
   // ── Appearance ──────────────────────────────────────────────────────────
   themeStyleNotifier.value             = prefs.getString('ls_theme_style')           ?? 'default';
-  nothingAccentNotifier.value          = prefs.getString('ls_nothing_accent')        ?? 'classic';
   themeModeNotifier.value              = themeFromString(prefs.getString('ls_theme'));
   accentNotifier.value                 = accentFromString(prefs.getString('ls_accent'));
   useDayNightAccentNotifier.value      = prefs.getBool('ls_use_daynight_accent')     ?? false;
@@ -248,7 +246,7 @@ Future<void> _mainImpl() async {
       for (final n in <Listenable>[
         themeModeNotifier, accentNotifier, accentDarkNotifier, themeStyleNotifier,
         useDynamicColorNotifier, colorHarmonyNotifier, oledModeNotifier,
-        useDayNightAccentNotifier, nothingAccentNotifier,
+        useDayNightAccentNotifier,
       ]) { n.addListener(onTheme); }
     }
   }
@@ -368,68 +366,6 @@ class LastStatsApp extends StatelessWidget {
           valueListenable: themeStyleNotifier,
           builder: (_, style, _) {
 
-            // ── Nothing OS style ─────────────────────────────────────────
-            if (style == 'nothing') {
-              return ValueListenableBuilder<String>(
-                valueListenable: nothingAccentNotifier,
-                builder: (_, nAccent, _) {
-                  return ValueListenableBuilder<ThemeMode>(
-                    valueListenable: themeModeNotifier,
-                    builder: (_, mode, _) {
-                      return ValueListenableBuilder<String>(
-                        valueListenable: localeNotifier,
-                        builder: (_, _, _) {
-                          // Build both light and dark variants — Flutter picks
-                          // the right one automatically based on themeMode.
-                          final nLight = NothingTheme.build(
-                            accent:     nAccent,
-                            brightness: Brightness.light,
-                          );
-                          final nDark = NothingTheme.build(
-                            accent:     nAccent,
-                            brightness: Brightness.dark,
-                          );
-                          return ValueListenableBuilder<bool>(
-                            valueListenable: navLabelNotifier,
-                            builder: (_, showLabels, _) {
-                              final navBehavior = showLabels
-                                  ? NavigationDestinationLabelBehavior.alwaysShow
-                                  : NavigationDestinationLabelBehavior.alwaysHide;
-                              // Merge label behavior into Nothing themes
-                              final nLightWithNav = nLight.copyWith(
-                                navigationBarTheme: nLight.navigationBarTheme
-                                    .copyWith(labelBehavior: navBehavior),
-                              pageTransitionsTheme: kM3PageTransitions,
-                              );
-                              final nDarkWithNav = nDark.copyWith(
-                                navigationBarTheme: nDark.navigationBarTheme
-                                    .copyWith(labelBehavior: navBehavior),
-                              pageTransitionsTheme: kM3PageTransitions,
-                              );
-                              return MaterialApp(
-                                navigatorKey:               navigatorKey,
-                                title:                      'LastStats',
-                                debugShowCheckedModeBanner: false,
-                                localizationsDelegates:     GlobalMaterialLocalizations.delegates,
-                                theme:     nLightWithNav,
-                                darkTheme: nDarkWithNav,
-                                themeMode: mode,
-                                builder: (context, child) =>
-                                    AppTextScale(child: DesktopTitleBarShell(child: ColoredBox(color: Theme.of(context).colorScheme.surface, child: child!))),
-                                home: (username.isNotEmpty && apiKey.isNotEmpty)
-                                    ? HomeScreen(username: username, apiKey: apiKey,
-                                        startupTab: startupTab)
-                                    : const SetupScreen(),
-                              );
-                            },
-                          );
-                        },
-                      );
-                    },
-                  );
-                },
-              );
-            }
 
             // ── Default style: Material You + accent + OLED ──────────────
             return ValueListenableBuilder<bool>(

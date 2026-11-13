@@ -369,13 +369,6 @@ class _AppearanceStepState extends State<_AppearanceStep> {
     setState(() {});
   }
 
-  Future<void> _setStyle(String v) async {
-    final p = await SharedPreferences.getInstance();
-    await p.setString('ls_theme_style', v);
-    themeStyleNotifier.value = v;
-    setState(() {});
-  }
-
   Future<void> _setOled(bool v) async {
     final p = await SharedPreferences.getInstance();
     await p.setBool('ls_oled_mode', v);
@@ -415,17 +408,6 @@ class _AppearanceStepState extends State<_AppearanceStep> {
             title: L.onboardAppearanceTitle,
             subtitle: L.onboardAppearanceSub,
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(L.onboardStyle, style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
-              const SizedBox(height: 10),
-              M3SegmentedButton<String>(
-                segments: [
-                  ButtonSegment(value: 'default', icon: const Icon(Icons.auto_awesome_rounded), label: Text(L.onboardStyleMaterialYou)),
-                  ButtonSegment(value: 'nothing', icon: const Icon(Icons.grid_on_rounded), label: Text(L.onboardStyleNothing)),
-                ],
-                selected: {style},
-                onSelectionChanged: (s) => _setStyle(s.first),
-              ),
-              const SizedBox(height: 22),
               Text(L.settingsTheme, style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
               const SizedBox(height: 10),
               M3SegmentedButton<ThemeMode>(
@@ -440,7 +422,7 @@ class _AppearanceStepState extends State<_AppearanceStep> {
                 }),
               ),
               const SizedBox(height: 22),
-              if (style == 'default') ...[
+              ...[
                 _OnbSwitch(
                   title: Text(L.settingsDynamicColor, style: const TextStyle(fontWeight: FontWeight.w700)),
                   subtitle: Text(L.onboardDynamicColorSub,
@@ -489,24 +471,6 @@ class _AppearanceStepState extends State<_AppearanceStep> {
                         labelStyle: TextStyle(color: scheme.onSecondaryContainer, fontWeight: FontWeight.w600),
                         side: BorderSide.none),
                   ]),
-                ),
-              ] else ...[
-                Text(L.onboardAccentTint, style: TextStyle(fontWeight: FontWeight.w700, color: scheme.onSurface)),
-                const SizedBox(height: 10),
-                ValueListenableBuilder<String>(
-                  valueListenable: nothingAccentNotifier,
-                  builder: (_, nAccent, _) => M3SegmentedButton<String>(
-                    segments: [
-                      ButtonSegment(value: 'classic', label: Text(L.onboardNothingRedOnly)),
-                      ButtonSegment(value: 'mixed', label: Text(L.onboardNothingRedYellow)),
-                    ],
-                    selected: {nAccent},
-                    onSelectionChanged: (s) async {
-                      final p = await SharedPreferences.getInstance();
-                      await p.setString('ls_nothing_accent', s.first);
-                      nothingAccentNotifier.value = s.first;
-                    },
-                  ),
                 ),
               ],
               const SizedBox(height: 22),

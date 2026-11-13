@@ -82,7 +82,6 @@ const _kThemeKeys = {
   'ls_use_nowplaying_color',
   'ls_nowplaying_fallback_color',
   'ls_theme_style',
-  'ls_nothing_accent',
   'ls_oled_mode',
   'ls_color_harmony',
   'ls_artwork_color_theme',
@@ -629,8 +628,9 @@ class BackupService {
     useDynamicColorNotifier.value       = p.getBool('ls_use_dynamic_color')    ?? false;
     useNowPlayingColorNotifier.value    = p.getBool('ls_use_nowplaying_color') ?? false;
     localeNotifier.value                = p.getString('ls_locale')             ?? 'fr';
-    themeStyleNotifier.value            = p.getString('ls_theme_style')        ?? 'default';
-    nothingAccentNotifier.value         = p.getString('ls_nothing_accent')     ?? 'classic';
+    // The Nothing OS style is gone: always the default style.
+    await p.setString('ls_theme_style', 'default');
+    themeStyleNotifier.value            = 'default';
     oledModeNotifier.value              = p.getBool('ls_oled_mode')            ?? false;
     colorHarmonyNotifier.value          = p.getString('ls_color_harmony')      ?? 'mono';
     // Day/night accent colors — these were being written to disk on

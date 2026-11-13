@@ -2880,11 +2880,14 @@ class _HeatmapCard extends StatelessWidget {
   // One year's worth of week columns + month labels, laid out exactly like
   // GitHub's contribution graph: 7 rows (days) × N columns (weeks).
   Widget _yearBlock(BuildContext context, ColorScheme s, TextTheme t,
-      DateTime yearStart, DateTime yearEnd, int maxVal) {
+      DateTime yearStart, DateTime yearEnd, int maxVal, double avail) {
     final startWd    = yearStart.weekday;
     final totalDays  = yearEnd.difference(yearStart).inDays + 1;
     final totalCells = (startWd - 1) + totalDays;
     final weeks      = (totalCells / 7).ceil();
+    // Cells grow to fill the card width (year label = 34 + 8 padding).
+    final cw = ((avail - 42 - _gap * weeks) / weeks).clamp(_cell, 60.0);
+    final ch = cw.clamp(_cell, 20.0);
 
     final weekColumns = List.generate(weeks, (col) {
       return List.generate(7, (row) {
@@ -2939,7 +2942,7 @@ class _HeatmapCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 ...days.map((offset) {
                   if (offset == null) {
-                    return SizedBox(width: _cell, height: _cell + _gap);
+                    return SizedBox(width: cw, height: ch + _gap);
                   }
                   final d   = yearStart.add(Duration(days: offset));
                   final key = '${d.year}-'
@@ -2958,7 +2961,7 @@ class _HeatmapCard extends StatelessWidget {
                       message: count > 0
                           ? '${d.day}/${d.month}/${d.year} — $count scrobbles' : '',
                       child: Container(
-                        width: _cell, height: _cell,
+                        width: cw, height: ch,
                         decoration: BoxDecoration(
                           color: color,
                           borderRadius: BorderRadius.circular(2.5),
@@ -2976,7 +2979,12 @@ class _HeatmapCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => LayoutBuilder(
+        builder: (context, box) => _buildCard(context,
+            (box.maxWidth.isFinite ? box.maxWidth : 340.0) - 28), // minus card padding
+      );
+
+  Widget _buildCard(BuildContext context, double avail) {
     final s      = Theme.of(context).colorScheme;
     final t      = Theme.of(context).textTheme;
     final maxVal = data.values.fold(0, (a, b) => a > b ? a : b);
@@ -2991,7 +2999,7 @@ class _HeatmapCard extends StatelessWidget {
     final yearBlocks = years.map((y) {
       final yearStart = y == startDay.year ? startDay : DateTime(y, 1, 1);
       final yearEnd   = y == endDay.year ? endDay : DateTime(y, 12, 31);
-      return _yearBlock(context, s, t, yearStart, yearEnd, maxVal);
+      return _yearBlock(context, s, t, yearStart, yearEnd, maxVal, avail);
     }).toList();
 
     return Container(

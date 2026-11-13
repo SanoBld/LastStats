@@ -24,12 +24,10 @@ import 'onboarding_flow.dart';
 // ══════════════════════════════════════════════════════════════════════════
 
 /// Picks the self-contained logo SVG (own background baked in) matching the
-/// current theme family (Nothing red-dot vs plain mono) and brightness.
+/// current brightness.
 String _logoAsset(BuildContext context) {
   final dark = Theme.of(context).brightness == Brightness.dark;
-  final nothing = themeStyleNotifier.value == 'nothing';
-  final family = nothing ? 'app_logo_nothing' : 'app_logo';
-  return 'assets/icons/${family}_${dark ? 'black_bg' : 'white_bg'}.svg';
+  return 'assets/icons/app_logo_${dark ? 'black_bg' : 'white_bg'}.svg';
 }
 
 class SetupScreen extends StatefulWidget {

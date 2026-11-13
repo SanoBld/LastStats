@@ -46,7 +46,7 @@ class WidgetService {
       if (username.isEmpty || apiKey.isEmpty) return; // not logged in
 
       // App theme, passed to Android so widgets match it (style + light/dark).
-      final themeStyle = prefs.getString('ls_theme_style') ?? 'default';
+      const themeStyle = 'default';
       final themeMode = prefs.getString('ls_theme') ?? 'system';
       final accentLight = prefs.getString('ls_accent') ?? '';
       final accentDark = prefs.getString('ls_accent_dark') ?? accentLight;

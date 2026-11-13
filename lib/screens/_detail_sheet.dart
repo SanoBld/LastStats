@@ -2884,24 +2884,38 @@ class _ShareCardArtState extends State<_ShareCardArt> {
                           ]),
                         ],
                         const SizedBox(height: 14),
+                        // Brand bottom-left. Without a QR the source goes
+                        // on the right of the same line.
                         Row(children: [
-                          Text(source,
-                              style: TextStyle(color: fg3, fontSize: 11)),
-                          const Spacer(),
                           ShareMark(color: fg2, k: 1.15),
+                          if (!hasQr) ...[
+                            const Spacer(),
+                            Text(source,
+                                style: TextStyle(color: fg3, fontSize: 11)),
+                          ],
                         ]),
                       ],
                     ),
                   ),
                   if (hasQr) ...[
                     const SizedBox(width: 14),
-                    QrImageView(
+                    // Source sits just above its QR code.
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(source,
+                            style: TextStyle(color: fg3, fontSize: 11)),
+                        const SizedBox(height: 6),
+                        QrImageView(
                       data: qrData, version: QrVersions.auto, size: 84, gapless: true,
                       dataModuleStyle: QrDataModuleStyle(
                           color: fg, dataModuleShape: QrDataModuleShape.square),
                       eyeStyle: QrEyeStyle(
                           color: fg, eyeShape: QrEyeShape.square),
                       backgroundColor: Colors.transparent,
+                    ),
+                      ],
                     ),
                   ],
                 ],
@@ -3480,7 +3494,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           final surface = Theme.of(innerContext).scaffoldBackgroundColor;
           return Scaffold(
             body: _loading
-                ? const M3Loader()
+                ? const SkeletonList()
                 : _buildContent(innerContext, scheme, surface),
           );
         }),
