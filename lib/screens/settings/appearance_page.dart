@@ -408,7 +408,7 @@ class _AppearancePageState extends State<AppearancePage> {
                   Expanded(child: _NothingAccentTile(
                     color:    kNothingRed,
                     label:    L.apNothingClassic,
-                    sublabel: 'Red #FF2020',
+                    sublabel: tx('ui_nothing_red_sub'),
                     desc:     L.apRedOnlyDesc,
                     selected: _nothingAccent == 'classic',
                     isDark:   _theme != 'light',
@@ -419,7 +419,7 @@ class _AppearancePageState extends State<AppearancePage> {
                     color:    kNothingRed,
                     color2:   kNothingYellow,
                     label:    L.apNothingMixed,
-                    sublabel: '+ Yellow #FFC700',
+                    sublabel: tx('ui_nothing_yellow_sub'),
                     desc:     L.apRedYellowDesc,
                     selected: _nothingAccent == 'mixed',
                     isDark:   _theme != 'light',
@@ -1596,9 +1596,9 @@ class _HapticSectionState extends State<_HapticSection> {
         ValueListenableBuilder<bool>(
           valueListenable: motionBlurNotifier,
           builder: (_, on, _) => SwitchListTile(
-            secondary: Icon(Icons.blur_on_rounded, color: scheme.primary),
-            title: const Text('Motion blur'),
-            subtitle: const Text('Soft blur during page transitions and reveals'),
+            secondary: Icon(Icons.lens_blur_rounded, color: scheme.primary),
+            title: Text(tx('set_mblur_t')),
+            subtitle: Text(tx('set_mblur_s')),
             value: on,
             onChanged: (v) async {
               final p = await SharedPreferences.getInstance();

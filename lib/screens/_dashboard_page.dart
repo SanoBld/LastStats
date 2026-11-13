@@ -1882,7 +1882,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
 
     return M3Switcher(
       duration: const Duration(milliseconds: 300),
-      child: RefreshIndicator(
+      child: M3Refresh(
       key: const ValueKey('dash_ok'),
       onRefresh: _load,
       child: CustomScrollView(slivers: [
@@ -2652,7 +2652,7 @@ class _DashboardSkeleton extends StatelessWidget {
         Positioned.fill(child: SkeletonPulse(child: _content(context))),
         // Loader always in the middle of the screen
         const Positioned.fill(
-            child: Center(child: M3LoadingIndicator(size: 72))),
+            child: Center(child: M3LoadingIndicator())),
       ]);
 
   Widget _content(BuildContext context) {

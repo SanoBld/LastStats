@@ -315,3 +315,97 @@ class M3ImagePlaceholder extends StatelessWidget {
     });
   }
 }
+
+
+// ── Pull-to-refresh with the app's own loader ──────────────────────────────
+// Replaces Flutter's RefreshIndicator. Same idea: pull down at the top of a
+// scroll view, release, and onRefresh runs while the app loader spins.
+class M3Refresh extends StatefulWidget {
+  const M3Refresh({super.key, required this.onRefresh, required this.child});
+  final Future<void> Function() onRefresh;
+  final Widget child;
+
+  @override
+  State<M3Refresh> createState() => _M3RefreshState();
+}
+
+class _M3RefreshState extends State<M3Refresh> {
+  static const double _trigger = 80;
+  final ValueNotifier<double> _pull = ValueNotifier(0);
+  bool _refreshing = false;
+
+  @override
+  void dispose() {
+    _pull.dispose();
+    super.dispose();
+  }
+
+  bool _onScroll(ScrollNotification n) {
+    // Only the outer scroll view, not nested lists.
+    if (n.depth != 0 || _refreshing) return false;
+    if (n is OverscrollNotification && n.dragDetails != null && n.overscroll < 0) {
+      _pull.value = (_pull.value - n.overscroll).clamp(0.0, _trigger * 1.6);
+    } else if (n is ScrollUpdateNotification) {
+      final px = n.metrics.pixels;
+      if (px < 0 && n.dragDetails != null) {
+        _pull.value = (-px).clamp(0.0, _trigger * 1.6);
+      } else if (px > 0 && _pull.value != 0) {
+        _pull.value = 0;
+      }
+    } else if (n is ScrollEndNotification) {
+      if (_pull.value >= _trigger) {
+        _run();
+      } else {
+        _pull.value = 0;
+      }
+    }
+    return false;
+  }
+
+  Future<void> _run() async {
+    setState(() => _refreshing = true);
+    _pull.value = _trigger;
+    try {
+      await widget.onRefresh();
+    } finally {
+      if (mounted) {
+        setState(() => _refreshing = false);
+        _pull.value = 0;
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final top = MediaQuery.of(context).padding.top;
+    return NotificationListener<ScrollNotification>(
+      onNotification: _onScroll,
+      child: Stack(children: [
+        widget.child,
+        Positioned(
+          top: top + 8,
+          left: 0,
+          right: 0,
+          child: IgnorePointer(
+            child: ValueListenableBuilder<double>(
+              valueListenable: _pull,
+              builder: (_, pull, _) {
+                final t = (pull / _trigger).clamp(0.0, 1.0);
+                return Opacity(
+                  opacity: t,
+                  child: Transform.translate(
+                    offset: Offset(0, (pull * 0.6).clamp(0.0, 60.0) - 20),
+                    child: Transform.scale(
+                      scale: 0.6 + 0.4 * t,
+                      child: Center(child: M3LoadingIndicator(size: 36)),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ]),
+    );
+  }
+}

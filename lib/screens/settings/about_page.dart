@@ -175,7 +175,7 @@ class AboutPage extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.animation_rounded),
               title: const Text('Podium', style: TextStyle(fontWeight: FontWeight.w600)),
-              subtitle: Text('Inspiration: soft blur on arrival / departure transitions', style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              subtitle: Text(tx('about_insp_podium'), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               trailing: const Icon(Icons.open_in_new_rounded, size: 16),
               onTap: () => _open('https://github.com/GHOSTxASR/podium-music-player'),
             ),
@@ -183,7 +183,7 @@ class AboutPage extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.swap_horiz_rounded),
               title: const Text('Metrolist', style: TextStyle(fontWeight: FontWeight.w600)),
-              subtitle: Text('Inspiration: slide + fade between tabs (Material 3)', style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              subtitle: Text(tx('about_insp_metrolist'), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               trailing: const Icon(Icons.open_in_new_rounded, size: 16),
               onTap: () => _open('https://github.com/MetrolistGroup/Metrolist'),
             ),
@@ -191,7 +191,7 @@ class AboutPage extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.auto_awesome_rounded),
               title: const Text('Material 3 skill', style: TextStyle(fontWeight: FontWeight.w600)),
-              subtitle: Text('Motion guidelines: easing, springs, shared axis', style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+              subtitle: Text(tx('about_insp_m3skill'), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               trailing: const Icon(Icons.open_in_new_rounded, size: 16),
               onTap: () => _open('https://github.com/hamen/material-3-skill'),
             ),

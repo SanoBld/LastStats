@@ -1031,7 +1031,7 @@ class _ChangeKeyDialogState extends State<_ChangeKeyDialog> {
           child: _checking
               ? const SizedBox(
                   width: 18, height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2))
+                  child: M3Spinner())
               : Text(tx('key_change_apply')),
         ),
       ],

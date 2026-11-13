@@ -342,7 +342,7 @@ class _HistChronView extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final text   = Theme.of(context).textTheme;
 
-    return RefreshIndicator(
+    return M3Refresh(
       onRefresh: () async {},
       child: ListView.builder(
         padding: const EdgeInsets.only(bottom: 24),

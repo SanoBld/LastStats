@@ -89,6 +89,7 @@ const _kThemeKeys = {
   'ls_keep_last_artwork_color',
   'ls_living_artwork',
   'ls_motion_artwork',
+  'ls_motion_blur',
   'ls_motion_source',
   'ls_motion_order',
   'ls_motion_quality',
@@ -654,6 +655,7 @@ class BackupService {
     livingArtworkNotifier.value         = p.getBool('ls_living_artwork')       ?? true;
     motionArtworkNotifier.value         = p.getBool('ls_motion_artwork')       ?? true;
     dashMotionNotifier.value            = p.getBool('ls_dash_motion')          ?? true;
+    motionBlurNotifier.value            = p.getBool('ls_motion_blur')          ?? true;
     textScaleNotifier.value             = p.getDouble('ls_text_scale')         ?? 1.1;
     appFontNotifier.value               = p.getString('ls_app_font')           ?? 'GoogleSansFlex';
     await CustomFontService.load(p);

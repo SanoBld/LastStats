@@ -670,7 +670,7 @@ class _ChartsPageState extends State<_ChartsPage>
                   color: scheme.tertiaryContainer,
                   borderRadius: AppRadius.xlR,
                 ),
-                child: Text('Beta',
+                child: Text(tx('ui_beta'),
                     style: txt.labelSmall?.copyWith(
                         color: scheme.onTertiaryContainer,
                         fontWeight: FontWeight.w700)),
@@ -1290,7 +1290,7 @@ class _ChartsPageState extends State<_ChartsPage>
                       opacity: _yearDataLoading ? 0.6 : 1.0,
                       duration: const Duration(milliseconds: 200),
                       curve: M3Motion.emphasizedDecelerate,
-                      child: RefreshIndicator(
+                      child: M3Refresh(
                         onRefresh: _load,
                         child: ListView(
                           controller: _mainScroll,

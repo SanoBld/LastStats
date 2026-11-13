@@ -2102,7 +2102,7 @@ class _BlurFadeImageState extends State<_BlurFadeImage>
             child: AnimatedOpacity(
               opacity: _imageLoaded ? 0.0 : 1.0,
               duration: M3Motion.effectsDefaultDuration,
-              child: const M3LoadingIndicator(size: 64),
+              child: const M3LoadingIndicator(),
             ),
           ),
         ),

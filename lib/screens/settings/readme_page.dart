@@ -1,6 +1,7 @@
 // README viewer + live project activity (latest release, downloads, commits,
 // workflow runs). Opened from Settings > About. The README is fetched from
 // GitHub (always current) and falls back to the copy bundled in the app.
+import '../../widgets/skeleton.dart';
 import '../../theme/m3_interaction.dart';
 import '../../l10n/extra_strings.dart';
 import 'dart:convert';
@@ -85,7 +86,7 @@ class _ReadmePageState extends State<ReadmePage> {
             constraints: const BoxConstraints(maxWidth: double.infinity),
             child: Column(children: [
 Expanded(
-                child: RefreshIndicator(
+                child: M3Refresh(
                   onRefresh: () async { setState(_load); },
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
@@ -363,7 +364,7 @@ class _Loading extends StatelessWidget {
   const _Loading();
   @override
   Widget build(BuildContext context) => const Center(
-      child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 3)));
+      child: SizedBox(width: 32, height: 32, child: M3Spinner()));
 }
 
 class _Failed extends StatelessWidget {
