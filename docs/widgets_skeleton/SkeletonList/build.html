@@ -109,39 +109,24 @@ and</li>
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 Widget build(BuildContext context) {
+  final scheme = Theme.of(context).colorScheme;
+  final kind = layout ?? (header ? SkeletonLayout.charts : SkeletonLayout.list);
   final list = SkeletonPulse(
     child: SingleChildScrollView(
       physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Column(
-        children: [
-          if (header) ...[
-            const SkeletonBox(height: 180, radius: 20),
-            const SizedBox(height: 20),
-          ],
-          for (int i = 0; i &lt; rows; i++)
-            const Padding(
-              padding: EdgeInsets.only(bottom: 14),
-              child: Row(children: [
-                SkeletonBox(width: 48, height: 48, radius: 10),
-                SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SkeletonBox(height: 14),
-                      SizedBox(height: 8),
-                      SkeletonBox(width: 120, height: 11),
-                    ],
-                  ),
-                ),
-              ]),
-            ),
-        ],
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 900),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+            child: _SkLayouts.build(kind, scheme, rows),
+          ),
+        ),
       ),
     ),
   );
-  &#47;&#47; Loader always in the middle of the page, on top of the grey boxes.
+  &#47;&#47; Loader always in the middle of the page, on top of the grey shapes.
   return Stack(children: [
     Positioned.fill(child: list),
     const Positioned.fill(child: M3Loader()),

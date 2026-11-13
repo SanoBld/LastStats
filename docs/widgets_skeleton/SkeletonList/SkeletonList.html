@@ -57,6 +57,7 @@
       <span class="name ">SkeletonList</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/foundation/Key-class.html">Key</a>?</span> <span class="parameter-name">key</span>, </span></li>
 <li><span class="parameter" id="param-rows"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">rows</span> = <span class="default-value">8</span>, </span></li>
 <li><span class="parameter" id="param-header"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">header</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="param-layout"><span class="type-annotation"><a href="../../widgets_skeleton/SkeletonLayout.html">SkeletonLayout</a>?</span> <span class="parameter-name">layout</span>, </span></li>
 </ol>})
     </section>
     
@@ -65,7 +66,12 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">const SkeletonList({super.key, this.rows = 8, this.header = false});</code></pre>
+  <pre class="language-dart"><code class="language-dart">const SkeletonList({
+  super.key,
+  this.rows = 8,
+  this.header = false,
+  this.layout,
+});</code></pre>
 </section>
 
 
