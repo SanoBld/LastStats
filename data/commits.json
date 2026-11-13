@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-13T23:02:46Z",
+  "updated": "2026-11-13T23:19:55Z",
   "commits": [
+    {
+      "sha": "bcfe9234c78ce1c09c143d65aa571979ccb1514f",
+      "message": "Update localization strings and enhance skeleton loading components\n\n- Updated Spanish, French, Italian, Japanese, Portuguese, Russian, and Chinese localization strings for onboarding and settings pages to improve clarity and consistency.\n- Introduced new layout options for SkeletonList to better represent different loading states across various screens (charts, rankings, history, search, favorites, detail).\n- Enhanced the _HeatmapCard and _CompactHeatmap components to dynamically adjust the display based on available screen width, improving usability.\n- Refactored loading indicators in multiple screens to utilize the new SkeletonList layout options for a more cohesive user experience during loading states.",
+      "date": "2026-11-13T23:11:29Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/bcfe9234c78ce1c09c143d65aa571979ccb1514f",
+      "tags": []
+    },
     {
       "sha": "b723b4219ea45b1cad0c1aae93b82eb98293431b",
       "message": "Refactor appearance settings and remove Nothing OS style\n\n- Updated the appearance settings to remove references to the Nothing OS style, including the associated accent options.\n- Simplified the logo asset retrieval to use a single logo for both themes.\n- Adjusted the heatmap card layout to dynamically calculate cell sizes based on available width.\n- Replaced loading indicators with SkeletonList in history and detail sheets for improved user experience.\n- Cleaned up backup service to default to the standard theme style and removed unnecessary keys.\n- Updated widget service to use a constant theme style instead of reading from preferences.",
@@ -2705,17 +2714,6 @@
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/a8e363a85b43f92e46e17d4d68ca80859c6dab89",
       "tags": []
-    },
-    {
-      "sha": "5e01e76374bb1a5f1ad72983bcceacad091d4538",
-      "message": "feat: Implémenter un cache LRU pour les URL d'images afin de réduire l'utilisation de la mémoire",
-      "date": "2026-09-15T18:49:03Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/5e01e76374bb1a5f1ad72983bcceacad091d4538",
-      "tags": [
-        "v3.5.0"
-      ]
     }
   ]
 }
