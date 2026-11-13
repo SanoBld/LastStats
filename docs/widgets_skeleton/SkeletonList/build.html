@@ -144,7 +144,7 @@ Widget build(BuildContext context) {
   &#47;&#47; Loader always in the middle of the page, on top of the grey boxes.
   return Stack(children: [
     Positioned.fill(child: list),
-    const Positioned.fill(child: Center(child: M3LoadingIndicator(size: 72))),
+    const Positioned.fill(child: M3Loader()),
   ]);
 }</code></pre>
 </section>

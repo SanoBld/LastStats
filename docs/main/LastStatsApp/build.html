@@ -115,68 +115,6 @@ Widget build(BuildContext context) {
         valueListenable: themeStyleNotifier,
         builder: (_, style, _) {
 
-          &#47;&#47; ── Nothing OS style ─────────────────────────────────────────
-          if (style == &#39;nothing&#39;) {
-            return ValueListenableBuilder&lt;String&gt;(
-              valueListenable: nothingAccentNotifier,
-              builder: (_, nAccent, _) {
-                return ValueListenableBuilder&lt;ThemeMode&gt;(
-                  valueListenable: themeModeNotifier,
-                  builder: (_, mode, _) {
-                    return ValueListenableBuilder&lt;String&gt;(
-                      valueListenable: localeNotifier,
-                      builder: (_, _, _) {
-                        &#47;&#47; Build both light and dark variants — Flutter picks
-                        &#47;&#47; the right one automatically based on themeMode.
-                        final nLight = NothingTheme.build(
-                          accent:     nAccent,
-                          brightness: Brightness.light,
-                        );
-                        final nDark = NothingTheme.build(
-                          accent:     nAccent,
-                          brightness: Brightness.dark,
-                        );
-                        return ValueListenableBuilder&lt;bool&gt;(
-                          valueListenable: navLabelNotifier,
-                          builder: (_, showLabels, _) {
-                            final navBehavior = showLabels
-                                ? NavigationDestinationLabelBehavior.alwaysShow
-                                : NavigationDestinationLabelBehavior.alwaysHide;
-                            &#47;&#47; Merge label behavior into Nothing themes
-                            final nLightWithNav = nLight.copyWith(
-                              navigationBarTheme: nLight.navigationBarTheme
-                                  .copyWith(labelBehavior: navBehavior),
-                            pageTransitionsTheme: kM3PageTransitions,
-                            );
-                            final nDarkWithNav = nDark.copyWith(
-                              navigationBarTheme: nDark.navigationBarTheme
-                                  .copyWith(labelBehavior: navBehavior),
-                            pageTransitionsTheme: kM3PageTransitions,
-                            );
-                            return MaterialApp(
-                              navigatorKey:               navigatorKey,
-                              title:                      &#39;LastStats&#39;,
-                              debugShowCheckedModeBanner: false,
-                              localizationsDelegates:     GlobalMaterialLocalizations.delegates,
-                              theme:     nLightWithNav,
-                              darkTheme: nDarkWithNav,
-                              themeMode: mode,
-                              builder: (context, child) =&gt;
-                                  AppTextScale(child: DesktopTitleBarShell(child: ColoredBox(color: Theme.of(context).colorScheme.surface, child: child!))),
-                              home: (username.isNotEmpty &amp;&amp; apiKey.isNotEmpty)
-                                  ? HomeScreen(username: username, apiKey: apiKey,
-                                      startupTab: startupTab)
-                                  : const SetupScreen(),
-                            );
-                          },
-                        );
-                      },
-                    );
-                  },
-                );
-              },
-            );
-          }
 
           &#47;&#47; ── Default style: Material You + accent + OLED ──────────────
           return ValueListenableBuilder&lt;bool&gt;(
