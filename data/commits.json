@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-13T14:04:22Z",
+  "updated": "2026-11-13T22:12:04Z",
   "commits": [
+    {
+      "sha": "2c1b8424824351f4e8c93898bc1ea4c0de35f023",
+      "message": "feat: ajouter des traductions pour le flou de mouvement et améliorer les éléments de l'interface utilisateur",
+      "date": "2026-11-13T22:00:52Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/2c1b8424824351f4e8c93898bc1ea4c0de35f023",
+      "tags": []
+    },
     {
       "sha": "06e004e16fa453b964747a8914b169e78d3b6889",
       "message": "feat: améliorer l'animation des boutons avec des coins connectés et une pression plus douce",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/722f2fa8f309c997ae9573a1648a617c007c2d9c",
-      "tags": []
-    },
-    {
-      "sha": "2291e4e0edf8b40cff4fc0ddc9fcb377ccafb72a",
-      "message": "feat: Mettre à jour les notes sur l'IA dans les traductions et améliorer la section des bibliothèques open source dans la page À propos",
-      "date": "2026-09-13T20:27:19Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/2291e4e0edf8b40cff4fc0ddc9fcb377ccafb72a",
       "tags": []
     }
   ]
