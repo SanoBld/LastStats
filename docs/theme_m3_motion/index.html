@@ -64,6 +64,14 @@
     <section class="summary offset-anchor" id="classes">
       <h2>Classes</h2>
       <dl>
+          <dt id="M3BlurText">
+  <span class="name "><a href="../theme_m3_motion/M3BlurText-class.html">M3BlurText</a></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
           <dt id="M3ContainerRoute">
   <span class="name "><a href="../theme_m3_motion/M3ContainerRoute-class.html">M3ContainerRoute</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> 
 
@@ -112,8 +120,24 @@
   
 </dd>
 
+          <dt id="M3RiseRoute">
+  <span class="name "><a href="../theme_m3_motion/M3RiseRoute-class.html">M3RiseRoute</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
           <dt id="M3SharedAxisRoute">
   <span class="name "><a href="../theme_m3_motion/M3SharedAxisRoute-class.html">M3SharedAxisRoute</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> 
+
+</dt>
+<dd>
+  
+</dd>
+
+          <dt id="M3SlideRoute">
+  <span class="name "><a href="../theme_m3_motion/M3SlideRoute-class.html">M3SlideRoute</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> 
 
 </dt>
 <dd>
@@ -183,6 +207,48 @@
 
 </dd>
 
+          <dt id="m3Reveal" class="callable">
+  <span class="name"><a href="../theme_m3_motion/m3Reveal.html">m3Reveal</a></span><span class="signature">(<wbr><span class="parameter" id="m3Reveal-param-context"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, </span><span class="parameter" id="m3Reveal-param-t"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/animation/Animation-class.html">Animation</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span>&gt;</span></span> <span class="parameter-name">t</span>, </span><span class="parameter" id="m3Reveal-param-child"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span> <span class="parameter-name">child</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Content arriving (cards, charts, loaded data): rises, grows from a
+slightly smaller size and sharpens from a blur. <code>t</code> runs 0 → 1.
+  
+
+</dd>
+
+          <dt id="m3RiseTransition" class="callable">
+  <span class="name"><a href="../theme_m3_motion/m3RiseTransition.html">m3RiseTransition</a></span><span class="signature">(<wbr><span class="parameter" id="m3RiseTransition-param-context"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, </span><span class="parameter" id="m3RiseTransition-param-a"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/animation/Animation-class.html">Animation</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span>&gt;</span></span> <span class="parameter-name">a</span>, </span><span class="parameter" id="m3RiseTransition-param-s"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/animation/Animation-class.html">Animation</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span>&gt;</span></span> <span class="parameter-name">s</span>, </span><span class="parameter" id="m3RiseTransition-param-child"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span> <span class="parameter-name">child</span>, {</span><span class="parameter" id="m3RiseTransition-param-origin"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Rect-class.html">Rect</a>?</span> <span class="parameter-name">origin</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Open a detail page (artist / album / track / friend) and come back.
+The page rises (grows from the tapped item when known), corners flatten,
+sharpens from a soft blur; the page behind shrinks a bit and dims.
+  
+
+</dd>
+
+          <dt id="m3SlideTransition" class="callable">
+  <span class="name"><a href="../theme_m3_motion/m3SlideTransition.html">m3SlideTransition</a></span><span class="signature">(<wbr><span class="parameter" id="m3SlideTransition-param-context"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, </span><span class="parameter" id="m3SlideTransition-param-a"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/animation/Animation-class.html">Animation</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span>&gt;</span></span> <span class="parameter-name">a</span>, </span><span class="parameter" id="m3SlideTransition-param-s"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/animation/Animation-class.html">Animation</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span>&gt;</span></span> <span class="parameter-name">s</span>, </span><span class="parameter" id="m3SlideTransition-param-child"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span> <span class="parameter-name">child</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/widgets/Widget-class.html">Widget</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
       </dl>
     </section>
 
@@ -237,7 +303,6 @@
       <li><a href="../screens_settings_faq_page/">screens/settings/faq_page</a></li>
       <li><a href="../screens_settings_language_page/">screens/settings/language_page</a></li>
       <li><a href="../screens_settings_lastfm_login_page/">screens/settings/lastfm_login_page</a></li>
-      <li><a href="../screens_settings_local_ai_page/">screens/settings/local_ai_page</a></li>
       <li><a href="../screens_settings_notifications_page/">screens/settings/notifications_page</a></li>
       <li><a href="../screens_settings_pc_mode_section/">screens/settings/pc_mode_section</a></li>
       <li><a href="../screens_settings_readme_page/">screens/settings/readme_page</a></li>
@@ -268,6 +333,7 @@
       <li><a href="../services_eco_mode_controller/">services/eco_mode_controller</a></li>
       <li><a href="../services_favorites_auth/">services/favorites_auth</a></li>
       <li><a href="../services_favorites_folders_service/">services/favorites_folders_service</a></li>
+      <li><a href="../services_file_output/">services/file_output</a></li>
       <li><a href="../services_friends_library_service/">services/friends_library_service</a></li>
       <li><a href="../services_header_image_service/">services/header_image_service</a></li>
       <li><a href="../services_image_cache_backend_native/">services/image_cache_backend_native</a></li>
@@ -278,7 +344,6 @@
       <li><a href="../services_lastfm_service/">services/lastfm_service</a></li>
       <li><a href="../services_library_merge/">services/library_merge</a></li>
       <li><a href="../services_listenbrainz_service/">services/listenbrainz_service</a></li>
-      <li><a href="../services_local_ai_service/">services/local_ai_service</a></li>
       <li><a href="../services_lyrics_service/">services/lyrics_service</a></li>
       <li><a href="../services_motion_artwork_service/">services/motion_artwork_service</a></li>
       <li><a href="../services_movie_easter_egg/">services/movie_easter_egg</a></li>
@@ -318,7 +383,6 @@
       <li><a href="../theme_m3_motion/">theme/m3_motion</a></li>
       <li><a href="../theme_m3_shapes/">theme/m3_shapes</a></li>
       <li><a href="../theme_story_style/">theme/story_style</a></li>
-      <li><a href="../widgets_ai_recap_card/">widgets/ai_recap_card</a></li>
       <li><a href="../widgets_app_text_scale/">widgets/app_text_scale</a></li>
       <li><a href="../widgets_brand_icon/">widgets/brand_icon</a></li>
       <li><a href="../widgets_custom_title_bar/">widgets/custom_title_bar</a></li>

@@ -71,9 +71,8 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">void showAchievementsSheet(BuildContext context, Map&lt;String, dynamic&gt;? userInfo, {bool isSelf = false}) {
   &#47;&#47; The tapped card grows into the page (container transform).
-  Navigator.of(context).push(M3ContainerRoute&lt;void&gt;(
+  Navigator.of(context).push(M3SlideRoute&lt;void&gt;(
     builder: (_) =&gt; _AchievementsSheet(userInfo: userInfo, isSelf: isSelf),
-    origin: M3Motion.originOf(context),
   ));
 }</code></pre>
 </section>

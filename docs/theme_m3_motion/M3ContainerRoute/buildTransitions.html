@@ -237,7 +237,8 @@ Widget buildTransitions(BuildContext context, Animation&lt;double&gt; animation,
           Positioned.fill(
             child: IgnorePointer(
               child: ColoredBox(
-                color: Colors.black.withValues(alpha: 0.32 * raw),
+                color: Theme.of(context).colorScheme.surface
+                    .withValues(alpha: 0.55 * raw),
               ),
             ),
           ),
