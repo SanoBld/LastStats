@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-13T22:29:28Z",
+  "updated": "2026-11-13T22:54:00Z",
   "commits": [
+    {
+      "sha": "b723b4219ea45b1cad0c1aae93b82eb98293431b",
+      "message": "Refactor appearance settings and remove Nothing OS style\n\n- Updated the appearance settings to remove references to the Nothing OS style, including the associated accent options.\n- Simplified the logo asset retrieval to use a single logo for both themes.\n- Adjusted the heatmap card layout to dynamically calculate cell sizes based on available width.\n- Replaced loading indicators with SkeletonList in history and detail sheets for improved user experience.\n- Cleaned up backup service to default to the standard theme style and removed unnecessary keys.\n- Updated widget service to use a constant theme style instead of reading from preferences.",
+      "date": "2026-11-13T22:51:37Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/b723b4219ea45b1cad0c1aae93b82eb98293431b",
+      "tags": []
+    },
     {
       "sha": "0229c3e247ace08fff2828ca08416c56e352b9a2",
       "message": "feat: mise à jour des indicateurs de chargement avec M3LinearProgress et M3Loader pour une cohérence visuelle",
@@ -2707,15 +2716,6 @@
       "tags": [
         "v3.5.0"
       ]
-    },
-    {
-      "sha": "2fe15a28a7cb62317c63f8706aafa66b7653f081",
-      "message": "Update Italian and Portuguese localization strings for improved clarity and consistency\n\n- Changed references from \"tuo\" (your) to \"suo\" (his/her) in Italian localization for a more formal tone.\n- Updated the Portuguese localization string for fallback period label from \"Período do fallback\" to \"Período de reserva\".",
-      "date": "2026-09-14T19:47:03Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/2fe15a28a7cb62317c63f8706aafa66b7653f081",
-      "tags": []
     }
   ]
 }
