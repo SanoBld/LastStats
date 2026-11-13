@@ -2872,36 +2872,39 @@ class _HeatmapCard extends StatelessWidget {
   // If set, draw only these years instead of every year between start/end.
   // Used by _HeatmapPager below to show a few years at a time on screen.
   final List<int>?        onlyYears;
-  // true = on screen: keep cells at a readable size and show only the LATEST
-  // weeks that fit the width (always filled edge to edge). false = shared
-  // image: draw the whole period.
-  final bool              trimLatest;
+  // true = on screen: if a year is shorter than the width, the period is
+  // extended backwards (earlier weeks) so the row is always full, and the
+  // view opens on the latest day. false = shared image: exact period.
+  final bool              live;
   const _HeatmapCard({required this.data, required this.start, required this.end,
-      this.onlyYears, this.trimLatest = false});
+      this.onlyYears, this.live = false});
 
   static const _cell = 10.0;
   static const _gap  = 1.5;
-  static const _minShown = 12.0; // smallest cell kept on screen
 
   // One year's worth of week columns + month labels, laid out exactly like
   // GitHub's contribution graph: 7 rows (days) × N columns (weeks).
   Widget _yearBlock(BuildContext context, ColorScheme s, TextTheme t,
       DateTime yearStart, DateTime yearEnd, int maxVal, double avail) {
+    final labelYear = yearStart.year;
+    // Small fixed cells. If the period does not fill the width, go further
+    // back in time (the extra weeks come from the previous year's data).
+    final fit = ((avail - 42) / (_cell + _gap)).floor();
+    if (live) {
+      final base = (((yearStart.weekday - 1) +
+              yearEnd.difference(yearStart).inDays + 1) / 7).ceil();
+      if (base < fit) yearStart = yearStart.subtract(Duration(days: (fit - base) * 7));
+    }
     final startWd    = yearStart.weekday;
     final totalDays  = yearEnd.difference(yearStart).inDays + 1;
     final totalCells = (startWd - 1) + totalDays;
-    final totalWeeks = (totalCells / 7).ceil();
-    // On screen: as many weeks as fit at a readable size, always the latest.
-    final fit  = ((avail - 42) / (_minShown + _gap)).floor().clamp(4, 400);
-    final skip = trimLatest ? math.max(0, totalWeeks - fit) : 0;
-    final weeks = totalWeeks - skip;
-    // Cells grow to fill the card width (year label = 34 + 8 padding).
-    final cw = ((avail - 42 - _gap * weeks) / weeks).clamp(_cell, 60.0);
-    final ch = cw.clamp(_cell, 20.0);
+    final weeks      = (totalCells / 7).ceil();
+    const cw = _cell;
+    const ch = _cell;
 
     final weekColumns = List.generate(weeks, (col) {
       return List.generate(7, (row) {
-        final offset = (col + skip) * 7 + row - (startWd - 1);
+        final offset = col * 7 + row - (startWd - 1);
         if (offset < 0 || offset >= totalDays) return null;
         return offset;
       });
@@ -2911,12 +2914,8 @@ class _HeatmapCard extends StatelessWidget {
     var cursor = DateTime(yearStart.year, yearStart.month, 1);
     while (!cursor.isAfter(yearEnd)) {
       final off = cursor.difference(yearStart).inDays + (startWd - 1);
-      if (off >= 0 && off ~/ 7 >= skip) monthStarts[off ~/ 7 - skip] = L.months[cursor.month];
+      if (off >= 0) monthStarts[off ~/ 7] = L.months[cursor.month];
       cursor = DateTime(cursor.year, cursor.month + 1, 1);
-    }
-    if (skip > 0 && !monthStarts.containsKey(0) && !monthStarts.containsKey(1)) {
-      final first = yearStart.add(Duration(days: skip * 7 - (startWd - 1)));
-      monthStarts[0] = L.months[first.month];
     }
 
     return Row(
@@ -2927,7 +2926,7 @@ class _HeatmapCard extends StatelessWidget {
           padding: const EdgeInsets.only(right: 8, top: 14),
           child: SizedBox(
             width: 34,
-            child: Text('${yearStart.year}',
+            child: Text('$labelYear',
                 style: t.labelSmall?.copyWith(
                     fontSize: 11, fontWeight: FontWeight.w800, color: s.primary)),
           ),
@@ -3022,9 +3021,8 @@ class _HeatmapCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
+          _EndScrollView(
+            enabled: live,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -3136,7 +3134,7 @@ class _HeatmapPagerState extends State<_HeatmapPager> {
       children: [
         _HeatmapCard(
           data: widget.data, start: blockStart, end: blockEnd,
-          onlyYears: pageYears, trimLatest: true,
+          onlyYears: pageYears, live: true,
         ),
         if (years.length > _yearsPerPage)
           Padding(
@@ -3250,4 +3248,44 @@ class _ChartHead extends StatelessWidget {
               fontWeight: FontWeight.w800, color: s.primary))),
     ]);
   }
+}
+
+
+// Horizontal scroll that opens on the far right (the latest day).
+class _EndScrollView extends StatefulWidget {
+  final Widget child;
+  final bool enabled;
+  const _EndScrollView({required this.child, this.enabled = true});
+  @override
+  State<_EndScrollView> createState() => _EndScrollViewState();
+}
+
+class _EndScrollViewState extends State<_EndScrollView> {
+  final _ctrl = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.enabled) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _ctrl.hasClients) {
+          _ctrl.jumpTo(_ctrl.position.maxScrollExtent);
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => SingleChildScrollView(
+        controller: _ctrl,
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        child: widget.child,
+      );
 }

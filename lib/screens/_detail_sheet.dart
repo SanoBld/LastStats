@@ -2902,9 +2902,9 @@ class _ShareCardArtState extends State<_ShareCardArt> {
                     // Source sits just above its QR code.
                     Column(
                       mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(source,
+                        Text(source, textAlign: TextAlign.center,
                             style: TextStyle(color: fg3, fontSize: 11)),
                         const SizedBox(height: 6),
                         QrImageView(
@@ -3222,17 +3222,28 @@ class _StatChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(icon, size: 15, color: scheme.primary),
-            const SizedBox(width: 5),
-            Text(value, style: text.titleSmall?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: scheme.primary)),
-          ]),
+          // One line, centered: big numbers shrink instead of wrapping.
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(icon, size: 15, color: scheme.primary),
+              const SizedBox(width: 5),
+              Text(value, maxLines: 1, softWrap: false,
+                  style: text.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: scheme.primary)),
+            ]),
+          ),
           const SizedBox(height: 2),
-          Text(label, style: text.labelSmall?.copyWith(
-              color: fg.withValues(alpha: 0.75), fontSize: 10)),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(label, maxLines: 1, softWrap: false,
+                textAlign: TextAlign.center,
+                style: text.labelSmall?.copyWith(
+                    color: fg.withValues(alpha: 0.75), fontSize: 10)),
+          ),
         ],
       ),
     );
@@ -3494,7 +3505,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           final surface = Theme.of(innerContext).scaffoldBackgroundColor;
           return Scaffold(
             body: _loading
-                ? const SkeletonList(layout: SkeletonLayout.detail)
+                ? const SkeletonList()
                 : _buildContent(innerContext, scheme, surface),
           );
         }),
@@ -3611,16 +3622,16 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                         _buildAchievementsPreview(ctx, scheme),
                       if (_isNowPlaying) _buildNowPlayingCard(scheme),
                       if (_topArtists.isNotEmpty) ...[
-                        _sectionHeader(L.commonTopArtists, scheme, icon: Icons.mic_external_on_rounded, count: _topArtists.length),
+                        _sectionHeader(L.commonTopArtists, scheme, icon: Icons.mic_external_on_rounded),
                         ..._topArtists.asMap().entries.map(
                             (e) => _buildArtistRow(ctx, e.value, e.key, scheme)),
                       ],
                       if (_topAlbums.isNotEmpty) ...[
-                        _sectionHeader(L.commonAlbums, scheme, icon: Icons.album_rounded, count: _topAlbums.take(6).length),
+                        _sectionHeader(L.commonAlbums, scheme, icon: Icons.album_rounded),
                         _buildAlbumsGrid(ctx, scheme),
                       ],
                       if (_recent.isNotEmpty) ...[
-                        _sectionHeader(L.commonRecentTracks, scheme, icon: Icons.history_rounded, count: _recent.length),
+                        _sectionHeader(L.commonRecentTracks, scheme, icon: Icons.history_rounded),
                         ..._recent.map((r) => _buildRecentRow(r, scheme)),
                       ],
                       const SizedBox(height: 48),

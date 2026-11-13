@@ -2802,6 +2802,7 @@ class _RollingNumber extends StatefulWidget {
   final String     suffix;
   final Duration   duration;
   final bool       fullFormat;
+  final Alignment  alignment;
 
   const _RollingNumber({
     super.key,
@@ -2811,6 +2812,7 @@ class _RollingNumber extends StatefulWidget {
     this.suffix     = '',
     this.duration   = const Duration(milliseconds: 1100),
     this.fullFormat = false,
+    this.alignment  = Alignment.centerLeft,
   });
 
   @override
@@ -2843,9 +2845,14 @@ class _RollingNumberState extends State<_RollingNumber>
       builder: (_, _) {
         final current   = (_anim.value * widget.target).round();
         final formatted = widget.fullFormat ? _fmtFull(current) : _fmt(current);
-        return Text(
-          '${widget.prefix}$formatted${widget.suffix}',
-          style: widget.style,
+        return FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: widget.alignment,
+          child: Text(
+            '${widget.prefix}$formatted${widget.suffix}',
+            maxLines: 1, softWrap: false,
+            style: widget.style,
+          ),
         );
       },
     );
@@ -2997,13 +3004,17 @@ class _MiniMetric extends StatelessWidget {
           suffix:   suffix,
           duration: const Duration(milliseconds: 1000),
           style:    valueStyle,
+          alignment: Alignment.center,
         )
       else
         Text('—', style: valueStyle),
       const SizedBox(height: 2),
-      Text(label,
-          style: text.labelSmall?.copyWith(
-              color: color.withValues(alpha: 0.6), fontSize: 10)),
+      FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(label, maxLines: 1, softWrap: false,
+            style: text.labelSmall?.copyWith(
+                color: color.withValues(alpha: 0.6), fontSize: 10)),
+      ),
     ]);
 
     if (onTap == null) return content;
@@ -4616,26 +4627,27 @@ class _CompactHeatmap extends StatelessWidget {
     final s = Theme.of(context).colorScheme;
     final t = Theme.of(context).textTheme;
 
-    final startDay = DateTime(start.year, start.month, start.day);
     final endDay   = DateTime(end.year, end.month, end.day);
+    var startDay   = DateTime(start.year, start.month, start.day);
     final maxVal   = data.values.fold(0, (a, b) => a > b ? a : b);
+
+    // Small fixed cells: if the period is shorter than the width, go further
+    // back in time so the card is always full.
+    final fit  = ((avail + _gap) / (_cell + _gap)).floor();
+    final base = (((startDay.weekday - 1) +
+            endDay.difference(startDay).inDays + 1) / 7).ceil();
+    if (base < fit) startDay = startDay.subtract(Duration(days: (fit - base) * 7));
 
     // Same week-grid layout idea as the Charts tab heatmap, minus the
     // per-year split and the year label column.
     final startWd    = startDay.weekday;
     final totalDays  = endDay.difference(startDay).inDays + 1;
     final totalCells = (startWd - 1) + totalDays;
-    final totalWeeks = (totalCells / 7).ceil();
-    // Show the latest weeks that fit, cells grow so the card is always full.
-    final fit   = ((avail + _gap) / (_cell + _gap)).floor().clamp(4, 400);
-    final skip  = math.max(0, totalWeeks - fit);
-    final weeks = totalWeeks - skip;
-    final cell  = ((avail - _gap * weeks) / weeks).clamp(_cell, 40.0);
-    final cellH = cell.clamp(_cell, 20.0);
+    final weeks      = (totalCells / 7).ceil();
 
     final weekColumns = List.generate(weeks, (col) {
       return List.generate(7, (row) {
-        final offset = (col + skip) * 7 + row - (startWd - 1);
+        final offset = col * 7 + row - (startWd - 1);
         if (offset < 0 || offset >= totalDays) return null;
         return offset;
       });
@@ -4646,12 +4658,8 @@ class _CompactHeatmap extends StatelessWidget {
     var cursor = DateTime(startDay.year, startDay.month, 1);
     while (!cursor.isAfter(endDay)) {
       final off = cursor.difference(startDay).inDays + (startWd - 1);
-      if (off >= 0 && off ~/ 7 >= skip) monthStarts[off ~/ 7 - skip] = L.months[cursor.month];
+      if (off >= 0) monthStarts[off ~/ 7] = L.months[cursor.month];
       cursor = DateTime(cursor.year, cursor.month + 1, 1);
-    }
-    if (skip > 0 && !monthStarts.containsKey(0) && !monthStarts.containsKey(1)) {
-      final first = startDay.add(Duration(days: skip * 7 - (startWd - 1)));
-      monthStarts[0] = L.months[first.month];
     }
 
     return Container(
@@ -4660,9 +4668,7 @@ class _CompactHeatmap extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
+          _EndScrollView(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: weekColumns.asMap().entries.map((entry) {
@@ -4689,7 +4695,7 @@ class _CompactHeatmap extends StatelessWidget {
                       const SizedBox(height: 2),
                       ...days.map((offset) {
                         if (offset == null) {
-                          return SizedBox(width: cell, height: cellH + _gap);
+                          return const SizedBox(width: _cell, height: _cell + _gap);
                         }
                         final d   = startDay.add(Duration(days: offset));
                         final key = '${d.year}-'
@@ -4708,7 +4714,7 @@ class _CompactHeatmap extends StatelessWidget {
                             message: count > 0
                                 ? '${d.day}/${d.month}/${d.year} — $count scrobbles' : '',
                             child: Container(
-                              width: cell, height: cellH,
+                              width: _cell, height: _cell,
                               decoration: BoxDecoration(
                                 color: color,
                                 borderRadius: BorderRadius.circular(3),
