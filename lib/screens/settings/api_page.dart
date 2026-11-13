@@ -338,7 +338,7 @@ class _ApiPageState extends State<ApiPage> {
                 const SizedBox(height: 6),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
-                  child: LinearProgressIndicator(
+                  child: M3LinearProgress(
                     value: frac,
                     minHeight: 5,
                     color: frac >= 0.8 ? scheme.tertiary : scheme.primary,

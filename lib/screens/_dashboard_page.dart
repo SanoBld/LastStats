@@ -1001,7 +1001,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                               Expanded(
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(3),
-                                  child: LinearProgressIndicator(value: ratio, minHeight: 5, backgroundColor: sc.primary.withValues(alpha: 0.15)),
+                                  child: M3LinearProgress(value: ratio, minHeight: 5, backgroundColor: sc.primary.withValues(alpha: 0.15)),
                                 ),
                               ),
                             ]),
@@ -1536,7 +1536,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
             borderRadius: BorderRadius.circular(3),
             child: SizedBox(
               width: 70, height: 4,
-              child: LinearProgressIndicator(
+              child: M3LinearProgress(
                 value: ratio.clamp(0.0, 1.0),
                 backgroundColor: Colors.white.withValues(alpha: 0.25),
                 valueColor: AlwaysStoppedAnimation(Colors.white.withValues(alpha: 0.9)),
@@ -2652,7 +2652,7 @@ class _DashboardSkeleton extends StatelessWidget {
         Positioned.fill(child: SkeletonPulse(child: _content(context))),
         // Loader always in the middle of the screen
         const Positioned.fill(
-            child: Center(child: M3LoadingIndicator())),
+            child: M3Loader()),
       ]);
 
   Widget _content(BuildContext context) {

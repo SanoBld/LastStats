@@ -262,7 +262,7 @@ class _HistoryPageState extends State<_HistoryPage>
                 return SlideTransition(position: slideIn, child: moving);
               },
               child: _loading
-                ? const Center(key: ValueKey('hist_load'), child: M3LoadingIndicator())
+                ? const M3Loader(key: ValueKey('hist_load'))
                 : _error != null
                   ? _ErrorView(message: _error!, onRetry: _load)
                   : _tracks.isEmpty

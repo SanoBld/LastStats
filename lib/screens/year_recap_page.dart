@@ -1682,7 +1682,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
             curve: Curves.easeOutCubic,
             builder: (_, v, _) => ClipRRect(
               borderRadius: BorderRadius.circular(6),
-              child: LinearProgressIndicator(
+              child: M3LinearProgress(
                 value: v.clamp(0.02, 1.0),
                 minHeight: 10,
                 backgroundColor: s.primary.withValues(alpha: 0.12),

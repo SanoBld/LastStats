@@ -128,7 +128,7 @@ Expanded(
                               const SizedBox(height: 10),
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
-                                child: LinearProgressIndicator(
+                                child: M3LinearProgress(
                                   value: lvlRatio.clamp(0.0, 1.0),
                                   minHeight: 8,
                                   color: scheme.primary,
@@ -327,7 +327,7 @@ class _AchvMilestoneTile extends StatelessWidget {
                 const SizedBox(height: 8),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: LinearProgressIndicator(
+                  child: M3LinearProgress(
                     value: ratio, minHeight: 8,
                     color: scheme.primary,
                     backgroundColor: a.unlocked

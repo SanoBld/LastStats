@@ -82,7 +82,7 @@ class SkeletonBlock extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           SkeletonPulse(child: SkeletonBox(height: height, radius: radius)),
-          const M3LoadingIndicator(size: 44),
+          const M3Loader(size: 44),
         ],
       );
 }
@@ -130,7 +130,7 @@ class SkeletonList extends StatelessWidget {
     // Loader always in the middle of the page, on top of the grey boxes.
     return Stack(children: [
       Positioned.fill(child: list),
-      const Positioned.fill(child: Center(child: M3LoadingIndicator(size: 72))),
+      const Positioned.fill(child: M3Loader()),
     ]);
   }
 }
@@ -138,7 +138,8 @@ class SkeletonList extends StatelessWidget {
 // ── Loading indicator (wavy shape that spins and morphs) ───────────────────
 // Material 3 Expressive style: a soft wavy shape inside a round container.
 class M3LoadingIndicator extends StatefulWidget {
-  const M3LoadingIndicator({super.key, this.size = 48, this.color});
+  const M3LoadingIndicator({super.key, this.size = 48, this.color, this.progress});
+  final Animation<double>? progress; // set = this drives the spin (pull to refresh)
   final double size;
   final Color? color;   // set = only the bumpy shape, in this color (for buttons)
 
@@ -157,6 +158,7 @@ class _M3LoadingIndicatorState extends State<M3LoadingIndicator>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    if (widget.progress != null) return; // driven from outside
     // Reduced motion → still shape, no spin.
     if (M3Motion.reduced(context)) {
       _c.stop();
@@ -182,7 +184,7 @@ class _M3LoadingIndicatorState extends State<M3LoadingIndicator>
         child: CustomPaint(
           size: Size.square(widget.size),
           painter: _LoaderPainter(
-            progress: _c,
+            progress: widget.progress ?? _c,
             container: widget.color == null ? scheme.primaryContainer : null,
             shape: widget.color ?? scheme.primary,
           ),
@@ -317,9 +319,77 @@ class M3ImagePlaceholder extends StatelessWidget {
 }
 
 
-// ── Pull-to-refresh with the app's own loader ──────────────────────────────
-// Replaces Flutter's RefreshIndicator. Same idea: pull down at the top of a
-// scroll view, release, and onRefresh runs while the app loader spins.
+// ── One loader for the whole app ───────────────────────────────────────────
+// Same shape, same size, same fade + scale entrance on every page and chart.
+class M3Loader extends StatelessWidget {
+  const M3Loader({super.key, this.size = 48, this.label, this.color, this.shrink = false});
+  final bool shrink; // true = only as big as its content (inside a card / dialog)
+  final double size;
+  final Widget? label;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) => TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0, end: 1),
+        duration: const Duration(milliseconds: 260),
+        curve: M3Motion.emphasizedDecelerate,
+        builder: (_, v, child) => Opacity(
+          opacity: v.clamp(0.0, 1.0),
+          child: Transform.scale(scale: 0.8 + 0.2 * v, child: child),
+        ),
+        child: _wrap(
+          Column(mainAxisSize: MainAxisSize.min, children: [
+            M3LoadingIndicator(size: size, color: color),
+            if (label != null) ...[const SizedBox(height: 16), label!],
+          ]),
+        ),
+      );
+
+  Widget _wrap(Widget c) => shrink ? c : Center(child: c);
+}
+
+// ── One progress bar for the whole app ──────────────────────────────────────
+// Rounded pill, two sizes (6 slim / 8 normal), value changes are animated.
+class M3LinearProgress extends StatelessWidget {
+  const M3LinearProgress({
+    super.key,
+    this.value,
+    this.minHeight = 6,
+    this.color,
+    this.backgroundColor,
+    this.valueColor,
+  });
+  final double? value; // null = unknown duration
+  final double minHeight;
+  final Color? color;
+  final Color? backgroundColor;
+  final Animation<Color?>? valueColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final h = minHeight >= 8 ? 8.0 : 6.0;
+    final fg = color ?? valueColor?.value ?? scheme.primary;
+    final bg = backgroundColor ?? scheme.primary.withValues(alpha: 0.15);
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(h / 2),
+      child: value == null
+          ? LinearProgressIndicator(minHeight: h, color: fg, backgroundColor: bg)
+          : TweenAnimationBuilder<double>(
+              tween: Tween(end: value!.clamp(0.0, 1.0)),
+              duration: const Duration(milliseconds: 400),
+              curve: M3Motion.emphasizedDecelerate,
+              builder: (_, v, _) => LinearProgressIndicator(
+                  value: v, minHeight: h, color: fg, backgroundColor: bg),
+            ),
+    );
+  }
+}
+
+// ── Pull-to-refresh with the app's own loader ───────────────────────────────
+// Pull down at the top: the loader fades in and turns a little more with
+// every bit you pull. Release past the mark: it spins while onRefresh runs,
+// then fades out.
 class M3Refresh extends StatefulWidget {
   const M3Refresh({super.key, required this.onRefresh, required this.child});
   final Future<void> Function() onRefresh;
@@ -329,34 +399,55 @@ class M3Refresh extends StatefulWidget {
   State<M3Refresh> createState() => _M3RefreshState();
 }
 
-class _M3RefreshState extends State<M3Refresh> {
+class _M3RefreshState extends State<M3Refresh> with TickerProviderStateMixin {
   static const double _trigger = 80;
   final ValueNotifier<double> _pull = ValueNotifier(0);
+  late final AnimationController _spin =
+      AnimationController(vsync: this, duration: const Duration(milliseconds: 3600));
+  late final AnimationController _vis =
+      AnimationController(vsync: this, duration: const Duration(milliseconds: 220));
   bool _refreshing = false;
 
   @override
   void dispose() {
     _pull.dispose();
+    _spin.dispose();
+    _vis.dispose();
     super.dispose();
+  }
+
+  void _setPull(double v) {
+    _pull.value = v;
+    if (v > 6) {
+      if (_vis.status != AnimationStatus.forward && _vis.value < 1) _vis.forward();
+      _spin.value = (v / _trigger * 0.75).clamp(0.0, 1.0); // turns while you pull
+    } else if (_vis.value > 0 && _vis.status != AnimationStatus.reverse) {
+      _vis.reverse();
+    }
+  }
+
+  void _release() {
+    _pull.value = 0;
+    _vis.reverse();
   }
 
   bool _onScroll(ScrollNotification n) {
     // Only the outer scroll view, not nested lists.
     if (n.depth != 0 || _refreshing) return false;
     if (n is OverscrollNotification && n.dragDetails != null && n.overscroll < 0) {
-      _pull.value = (_pull.value - n.overscroll).clamp(0.0, _trigger * 1.6);
+      _setPull((_pull.value - n.overscroll).clamp(0.0, _trigger * 1.6));
     } else if (n is ScrollUpdateNotification) {
       final px = n.metrics.pixels;
       if (px < 0 && n.dragDetails != null) {
-        _pull.value = (-px).clamp(0.0, _trigger * 1.6);
+        _setPull((-px).clamp(0.0, _trigger * 1.6));
       } else if (px > 0 && _pull.value != 0) {
-        _pull.value = 0;
+        _release();
       }
     } else if (n is ScrollEndNotification) {
       if (_pull.value >= _trigger) {
         _run();
-      } else {
-        _pull.value = 0;
+      } else if (_pull.value != 0) {
+        _release();
       }
     }
     return false;
@@ -365,12 +456,15 @@ class _M3RefreshState extends State<M3Refresh> {
   Future<void> _run() async {
     setState(() => _refreshing = true);
     _pull.value = _trigger;
+    if (!M3Motion.reduced(context)) _spin.repeat();
     try {
       await widget.onRefresh();
     } finally {
       if (mounted) {
-        setState(() => _refreshing = false);
+        await _vis.reverse();
+        _spin.stop();
         _pull.value = 0;
+        setState(() => _refreshing = false);
       }
     }
   }
@@ -387,17 +481,19 @@ class _M3RefreshState extends State<M3Refresh> {
           left: 0,
           right: 0,
           child: IgnorePointer(
-            child: ValueListenableBuilder<double>(
-              valueListenable: _pull,
-              builder: (_, pull, _) {
-                final t = (pull / _trigger).clamp(0.0, 1.0);
+            child: AnimatedBuilder(
+              animation: Listenable.merge([_pull, _vis]),
+              builder: (_, _) {
+                final v = Curves.easeOut.transform(_vis.value);
+                if (v == 0) return const SizedBox.shrink();
+                final dy = _refreshing ? 28.0 : (_pull.value * 0.6).clamp(0.0, 56.0);
                 return Opacity(
-                  opacity: t,
+                  opacity: v,
                   child: Transform.translate(
-                    offset: Offset(0, (pull * 0.6).clamp(0.0, 60.0) - 20),
+                    offset: Offset(0, dy - 20),
                     child: Transform.scale(
-                      scale: 0.6 + 0.4 * t,
-                      child: Center(child: M3LoadingIndicator(size: 36)),
+                      scale: 0.5 + 0.5 * v,
+                      child: Center(child: M3LoadingIndicator(size: 36, progress: _spin)),
                     ),
                   ),
                 );

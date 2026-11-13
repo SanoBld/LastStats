@@ -130,7 +130,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 tween: Tween(begin: 0, end: (_page + 1) / _pages),
                 duration: const Duration(milliseconds: 320),
                 curve: M3Motion.emphasizedDecelerate,
-                builder: (_, v, _) => LinearProgressIndicator(
+                builder: (_, v, _) => M3LinearProgress(
                   value: v, minHeight: 5,
                   backgroundColor: scheme.surfaceContainerHighest,
                   valueColor: AlwaysStoppedAnimation(scheme.primary),

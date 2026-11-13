@@ -1596,7 +1596,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                           tween: Tween(begin: 0, end: frac.clamp(0.0, 1.0)),
                           duration: Duration(milliseconds: 700 + i * 70),
                           curve: Curves.easeOutCubic,
-                          builder: (_, v, _) => LinearProgressIndicator(
+                          builder: (_, v, _) => M3LinearProgress(
                             value: v, minHeight: 4,
                             color: scheme.primary,
                             backgroundColor: scheme.primary.withValues(alpha: 0.15),
@@ -2478,7 +2478,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
               const SizedBox(height: 16),
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
+                child: M3LinearProgress(
                   value: (widget.myPlaycount / next).clamp(0.0, 1.0), minHeight: 6,
                   backgroundColor: Theme.of(ctx).colorScheme.surfaceContainerHighest,
                 ),
@@ -3480,7 +3480,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           final surface = Theme.of(innerContext).scaffoldBackgroundColor;
           return Scaffold(
             body: _loading
-                ? const Center(child: M3LoadingIndicator())
+                ? const M3Loader()
                 : _buildContent(innerContext, scheme, surface),
           );
         }),
@@ -4135,7 +4135,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                       tween: Tween(begin: 0, end: frac.clamp(0.0, 1.0)),
                       duration: Duration(milliseconds: 700 + idx * 70),
                       curve: Curves.easeOutCubic,
-                      builder: (_, v, _) => LinearProgressIndicator(
+                      builder: (_, v, _) => M3LinearProgress(
                         value: v, minHeight: 4,
                         color: scheme.primary,
                         backgroundColor: scheme.primary.withValues(alpha: 0.15),

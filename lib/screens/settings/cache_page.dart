@@ -229,7 +229,7 @@ Expanded(
                   if (_clearing)
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16),
-                      child: Center(child: M3LoadingIndicator()),
+                      child: M3Loader(),
                     )
                   else ...[
                     SettingActionRow(
@@ -392,7 +392,7 @@ class _Bar extends StatelessWidget {
       const SizedBox(height: 4),
       ClipRRect(
         borderRadius: BorderRadius.circular(2),
-        child: LinearProgressIndicator(
+        child: M3LinearProgress(
           value:           frac,
           minHeight:       4,
           color:           color,

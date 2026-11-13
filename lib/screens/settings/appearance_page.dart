@@ -1595,10 +1595,10 @@ class _HapticSectionState extends State<_HapticSection> {
         ),
         ValueListenableBuilder<bool>(
           valueListenable: motionBlurNotifier,
-          builder: (_, on, _) => SwitchListTile(
-            secondary: Icon(Icons.lens_blur_rounded, color: scheme.primary),
-            title: Text(tx('set_mblur_t')),
-            subtitle: Text(tx('set_mblur_s')),
+          builder: (_, on, _) => SettingSwitchRow(
+            icon: Icons.lens_blur_rounded,
+            title: tx('set_mblur_t'),
+            subtitle: tx('set_mblur_s'),
             value: on,
             onChanged: (v) async {
               final p = await SharedPreferences.getInstance();

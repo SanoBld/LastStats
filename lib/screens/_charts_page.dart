@@ -958,14 +958,13 @@ class _ChartsPageState extends State<_ChartsPage>
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                const M3LoadingIndicator(),
-                const SizedBox(height: 16),
-                ValueListenableBuilder<String>(
+              child: M3Loader(
+                shrink: true,
+                label: ValueListenableBuilder<String>(
                   valueListenable: statusText,
                   builder: (_, text, _) => Text(text, textAlign: TextAlign.center),
                 ),
-              ]),
+              ),
             ),
           ),
         ),

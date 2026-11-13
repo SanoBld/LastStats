@@ -710,9 +710,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
 
   Widget _buildLoading(ColorScheme scheme) => SizedBox(
     height: 280,
-    child: Center(
-      child: M3LoadingIndicator(),
-    ),
+    child: M3Loader(),
   );
 
   Widget _buildContent(ColorScheme scheme, TextTheme text) {
@@ -1309,7 +1307,7 @@ class _CompareBar extends StatelessWidget {
             tween:    Tween(begin: 0, end: ratio),
             duration: const Duration(milliseconds: 700),
             curve:    M3Motion.emphasizedDecelerate,
-            builder: (context, value, _) => LinearProgressIndicator(
+            builder: (context, value, _) => M3LinearProgress(
               value:           value,
               minHeight:       10,
               backgroundColor: scheme.surfaceContainerHighest,
@@ -1590,7 +1588,7 @@ class _BreakdownCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8),
-                      child: LinearProgressIndicator(
+                      child: M3LinearProgress(
                         value: v,
                         minHeight: 8,
                         color: rows[i].$4,

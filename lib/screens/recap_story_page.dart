@@ -471,7 +471,7 @@ class _RecapStoryPageState extends State<RecapStoryPage> {
               ),
               Expanded(
                 child: d.loading && !d.loaded
-                    ? Center(child: M3LoadingIndicator())
+                    ? M3Loader()
                     // Cross-fade whenever the period or category changes.
                     : AnimatedSwitcher(
                         duration: const Duration(milliseconds: 260),

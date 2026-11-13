@@ -30,7 +30,11 @@
 -->
 
 
-## v4.3.0
+## v4.4.0
+
+**Animations**
+- New: "Motion blur" option in Appearance, saved and restored with your themes
+- Better animations: pull-to-refresh now uses the app loader (it turns as you pull and fades in / out), one loader style everywhere (pages and charts), and one progress bar style with smooth value changes
 
 **Settings and backups**
 - Fixed: the Wikipedia description of an album or track must now mention its artist, so a same-name work by someone else no longer shows the wrong text
