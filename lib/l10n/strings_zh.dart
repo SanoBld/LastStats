@@ -284,7 +284,7 @@ class AppStringsZh implements AppStrings {
   @override String get onboardFinish           => '完成';
   @override String get onboardBack             => '返回';
   @override String get onboardAppearanceTitle  => '自定义您的风格';
-  @override String get onboardAppearanceSub    => '选择浅色或深色主题、强调色以及应用的视觉风格。';
+  @override String get onboardAppearanceSub    => '选择浅色或深色主题、强调色以及显示选项。';
   @override String get onboardNotifTitle       => '及时获知动态';
   @override String get onboardNotifSub         => '选择要接收的通知,以及手机是否需要振动。';
   @override String get onboardFavTitle         => '您的收藏用户';
@@ -313,17 +313,11 @@ class AppStringsZh implements AppStrings {
   @override String get settingsShowAllPlatformLinksSub => '忽略过滤，显示所有链接（Last.fm、Spotify、YT Music、网页）';
   @override String get onboardUpdatesTitle     => '更新';
   @override String get onboardUpdatesSub       => '应用会自动检查是否有新版本可用。';
-  @override String get onboardStyle              => '风格';
-  @override String get onboardStyleMaterialYou    => 'Material You';
-  @override String get onboardStyleNothing        => 'Nothing OS';
   @override String get onboardPreview             => '预览';
   @override String get onboardPreviewButton       => '按钮';
   @override String get onboardPreviewOutline      => '主按钮';
   @override String get onboardPreviewText         => '示例文字';
   @override String get onboardPreviewBubble       => '气泡';
-  @override String get onboardAccentTint          => '强调色调';
-  @override String get onboardNothingRedOnly      => '仅红色';
-  @override String get onboardNothingRedYellow    => '红+黄';
   @override String get onboardDisplay             => '显示';
   @override String get onboardOledTitle           => 'OLED 纯黑';
   @override String get onboardOledSub             => '在深色模式下背景变为纯黑色,可以在 OLED 屏幕上节省电量。';
@@ -969,8 +963,8 @@ const Map<String, String> kTxZh = {
   'bio_src_wiki_orig': '原文 · 维基百科',
   'dash_motion_t': '仪表盘动态封面',
   'dash_motion_s': '在播放卡片和顶部栏中播放当前曲目的视频。需要开启视频封面。',
-  'onb_cov_t': '封面和图片',
-  'onb_cov_s': '选择图片的形状以及封面的显示方式。',
+  'onb_cov_t': '封面、图片和动画',
+  'onb_cov_s': '选择图片的形状、封面的显示方式以及动画样式。',
   'onb_sync_t': '同步与电池',
   'onb_sync_s': '让统计数据保持最新,同时不过多消耗手机电量。',
   'onb_autosync_t': '自动同步',

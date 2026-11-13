@@ -471,7 +471,7 @@ class _SettingsPageState extends State<_SettingsPage> {
   List<_SettingsCardData> _buildCards() => [
     // 0 — Appearance
     _SettingsCardData(
-      keywords: ['couleur', 'accent', 'color', 'thème', 'theme', 'sombre', 'dark', 'clair', 'light', 'oled', 'nothing', 'police', 'font', 'widget', 'farbe', 'colore', 'cor', 'цвет', 'ウィジェット', '小组件', 'لون'],
+      keywords: ['couleur', 'accent', 'color', 'thème', 'theme', 'sombre', 'dark', 'clair', 'light', 'oled', 'police', 'font', 'widget', 'farbe', 'colore', 'cor', 'цвет', 'ウィジェット', '小组件', 'لون'],
       icon: Icons.palette_rounded,
       iconBgColor: (s) => s.primaryContainer,
       iconFgColor: (s) => s.onPrimaryContainer,

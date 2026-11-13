@@ -87,51 +87,195 @@ class SkeletonBlock extends StatelessWidget {
       );
 }
 
-/// A full page list of loading rows (square picture + 2 lines).
+/// Which page the grey background imitates.
+enum SkeletonLayout { list, charts, ranking, history, search, favorites, detail }
+
+/// Full-page loading background: grey shapes laid out like the page that is
+/// loading (same look and pulse as the dashboard), loader in the middle.
 class SkeletonList extends StatelessWidget {
-  const SkeletonList({super.key, this.rows = 8, this.header = false});
+  const SkeletonList({
+    super.key,
+    this.rows = 8,
+    this.header = false,
+    this.layout,
+  });
   final int rows;
-  final bool header; // big card on top (for chart pages)
+  final bool header; // old flag: same as SkeletonLayout.charts
+  final SkeletonLayout? layout;
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final kind = layout ?? (header ? SkeletonLayout.charts : SkeletonLayout.list);
     final list = SkeletonPulse(
       child: SingleChildScrollView(
         physics: const NeverScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-        child: Column(
-          children: [
-            if (header) ...[
-              const SkeletonBox(height: 180, radius: 20),
-              const SizedBox(height: 20),
-            ],
-            for (int i = 0; i < rows; i++)
-              const Padding(
-                padding: EdgeInsets.only(bottom: 14),
-                child: Row(children: [
-                  SkeletonBox(width: 48, height: 48, radius: 10),
-                  SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SkeletonBox(height: 14),
-                        SizedBox(height: 8),
-                        SkeletonBox(width: 120, height: 11),
-                      ],
-                    ),
-                  ),
-                ]),
-              ),
-          ],
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 900),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+              child: _SkLayouts.build(kind, scheme, rows),
+            ),
+          ),
         ),
       ),
     );
-    // Loader always in the middle of the page, on top of the grey boxes.
+    // Loader always in the middle of the page, on top of the grey shapes.
     return Stack(children: [
       Positioned.fill(child: list),
       const Positioned.fill(child: M3Loader()),
     ]);
+  }
+}
+
+class _SkLayouts {
+  static Widget bone(ColorScheme s,
+          {double w = double.infinity, double h = 14, double r = 10}) =>
+      Container(
+        width: w,
+        height: h,
+        decoration: BoxDecoration(
+          color: s.onSurface.withValues(alpha: 0.13),
+          borderRadius: BorderRadius.circular(r),
+        ),
+      );
+
+  static Widget card(ColorScheme s, double h, {Color? color, double r = 16}) =>
+      Container(
+        height: h,
+        decoration: BoxDecoration(
+          color: color ?? s.surfaceContainerHighest.withValues(alpha: 0.7),
+          borderRadius: BorderRadius.circular(r),
+          border: Border.all(color: s.outlineVariant.withValues(alpha: 0.3)),
+        ),
+      );
+
+  static Widget title(ColorScheme s, double w) => Row(children: [
+        bone(s, w: 20, h: 20, r: 10),
+        const SizedBox(width: 8),
+        bone(s, w: w, h: 14, r: 7),
+      ]);
+
+  static Widget chips(ColorScheme s, int n) => Row(children: [
+        for (int i = 0; i < n; i++) ...[
+          if (i > 0) const SizedBox(width: 8),
+          bone(s, w: 64 + (i % 2) * 14, h: 32, r: 16),
+        ],
+      ]);
+
+  static Widget row(ColorScheme s,
+          {double img = 48, bool rank = false, bool trailing = false, bool round = false}) =>
+      Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Row(children: [
+          if (rank) ...[bone(s, w: 22, h: 14, r: 7), const SizedBox(width: 10)],
+          bone(s, w: img, h: img, r: round ? img / 2 : 10),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              bone(s, w: 150, h: 13, r: 6),
+              const SizedBox(height: 6),
+              bone(s, w: 90, h: 10, r: 5),
+            ]),
+          ),
+          if (trailing) bone(s, w: 36, h: 12, r: 6),
+        ]),
+      );
+
+  static Widget pair(ColorScheme s, double h) => Row(children: [
+        Expanded(child: card(s, h)),
+        const SizedBox(width: 10),
+        Expanded(child: card(s, h)),
+      ]);
+
+  static Widget build(SkeletonLayout kind, ColorScheme s, int rows) {
+    const gap = SizedBox(height: 12);
+    switch (kind) {
+      case SkeletonLayout.charts:
+        return Column(children: [
+          chips(s, 4),
+          const SizedBox(height: 16),
+          card(s, 200, color: s.primaryContainer.withValues(alpha: 0.35)),
+          const SizedBox(height: 10),
+          pair(s, 90),
+          const SizedBox(height: 10),
+          pair(s, 90),
+          const SizedBox(height: 20),
+          Align(alignment: Alignment.centerLeft, child: title(s, 110)),
+          gap,
+          card(s, 160),
+          gap,
+          card(s, 160, color: s.secondaryContainer.withValues(alpha: 0.4)),
+        ]);
+      case SkeletonLayout.ranking:
+        return Column(children: [
+          Align(alignment: Alignment.centerLeft, child: chips(s, 3)),
+          const SizedBox(height: 16),
+          for (int i = 0; i < rows + 2; i++)
+            row(s, img: 52, rank: true, trailing: true),
+        ]);
+      case SkeletonLayout.history:
+        return Column(children: [
+          card(s, 56, color: s.secondaryContainer.withValues(alpha: 0.4)),
+          const SizedBox(height: 18),
+          Align(alignment: Alignment.centerLeft, child: bone(s, w: 110, h: 12, r: 6)),
+          gap,
+          for (int i = 0; i < 4; i++) row(s, img: 46, trailing: true),
+          const SizedBox(height: 8),
+          Align(alignment: Alignment.centerLeft, child: bone(s, w: 90, h: 12, r: 6)),
+          gap,
+          for (int i = 0; i < rows; i++) row(s, img: 46, trailing: true),
+        ]);
+      case SkeletonLayout.search:
+        return Column(children: [
+          card(s, 56, r: 28),
+          const SizedBox(height: 14),
+          Align(alignment: Alignment.centerLeft, child: chips(s, 3)),
+          const SizedBox(height: 20),
+          Align(alignment: Alignment.centerLeft, child: title(s, 100)),
+          gap,
+          for (int i = 0; i < rows; i++) row(s, img: 48, round: i % 3 == 0),
+        ]);
+      case SkeletonLayout.favorites:
+        return Column(children: [
+          card(s, 52, r: 26),
+          const SizedBox(height: 16),
+          for (int r = 0; r < 3; r++) ...[
+            Row(children: [
+              Expanded(child: AspectRatio(aspectRatio: 1.25, child: card(s, double.infinity))),
+              const SizedBox(width: 10),
+              Expanded(child: AspectRatio(aspectRatio: 1.25, child: card(s, double.infinity))),
+            ]),
+            const SizedBox(height: 10),
+          ],
+        ]);
+      case SkeletonLayout.detail:
+        return Column(children: [
+          card(s, 230, color: s.primaryContainer.withValues(alpha: 0.35), r: 24),
+          const SizedBox(height: 16),
+          Align(alignment: Alignment.centerLeft, child: bone(s, w: 200, h: 20, r: 8)),
+          const SizedBox(height: 8),
+          Align(alignment: Alignment.centerLeft, child: bone(s, w: 120, h: 12, r: 6)),
+          const SizedBox(height: 18),
+          Row(children: [
+            Expanded(child: card(s, 70)),
+            const SizedBox(width: 10),
+            Expanded(child: card(s, 70)),
+            const SizedBox(width: 10),
+            Expanded(child: card(s, 70)),
+          ]),
+          const SizedBox(height: 20),
+          Align(alignment: Alignment.centerLeft, child: title(s, 100)),
+          gap,
+          for (int i = 0; i < 4; i++) row(s, img: 44),
+        ]);
+      case SkeletonLayout.list:
+        return Column(children: [
+          for (int i = 0; i < rows; i++) row(s, img: 48),
+        ]);
+    }
   }
 }
 

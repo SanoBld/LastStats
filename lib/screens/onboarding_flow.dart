@@ -879,6 +879,8 @@ class _CoversStepState extends State<_CoversStep> {
             tx('set_motion_t'), tx('set_motion_s')),
         sw('ls_nav_labels', Icons.label_outline_rounded, navLabelNotifier,
             L.apShowTabLabels, L.apShowTabLabelsSub),
+        sw('ls_motion_blur', Icons.lens_blur_rounded, motionBlurNotifier,
+            tx('set_mblur_t'), tx('set_mblur_s')),
       ]),
     );
   }

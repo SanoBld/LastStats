@@ -262,7 +262,7 @@ class _HistoryPageState extends State<_HistoryPage>
                 return SlideTransition(position: slideIn, child: moving);
               },
               child: _loading
-                ? const SkeletonList(key: ValueKey('hist_load'))
+                ? const SkeletonList(key: ValueKey('hist_load'), layout: SkeletonLayout.history)
                 : _error != null
                   ? _ErrorView(message: _error!, onRetry: _load)
                   : _tracks.isEmpty

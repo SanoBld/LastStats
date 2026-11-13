@@ -254,7 +254,7 @@ class AppStringsJa implements AppStrings {
   @override String get onboardFinish => '完了';
   @override String get onboardBack => '戻る';
   @override String get onboardAppearanceTitle => 'スタイルをカスタマイズ';
-  @override String get onboardAppearanceSub => 'ライトテーマまたはダークテーマ、アクセントカラー、アプリの見た目のスタイルを選択してください。';
+  @override String get onboardAppearanceSub => 'ライトテーマまたはダークテーマ、アクセントカラー、表示オプションを選択してください。';
   @override String get onboardNotifTitle => '最新情報をチェック';
   @override String get onboardNotifSub => '受け取る通知の種類と、端末を振動させるかどうかを選択してください。';
   @override String get onboardFavTitle => 'お気に入りのプロフィール';
@@ -283,17 +283,11 @@ class AppStringsJa implements AppStrings {
   @override String get settingsShowAllPlatformLinksSub => 'フィルターを無視してすべてのリンクを表示（Last.fm、Spotify、YT Music、Web）';
   @override String get onboardUpdatesTitle => 'アップデート';
   @override String get onboardUpdatesSub => '新しいバージョンが公開されているかどうかを自動で確認します。';
-  @override String get onboardStyle => 'スタイル';
-  @override String get onboardStyleMaterialYou => 'Material You';
-  @override String get onboardStyleNothing => 'Nothing OS';
   @override String get onboardPreview => 'プレビュー';
   @override String get onboardPreviewButton => 'ボタン';
   @override String get onboardPreviewOutline => 'メインボタン';
   @override String get onboardPreviewText => 'サンプルテキスト';
   @override String get onboardPreviewBubble => '吹き出し';
-  @override String get onboardAccentTint => 'アクセントの色合い';
-  @override String get onboardNothingRedOnly => 'レッドのみ';
-  @override String get onboardNothingRedYellow => 'レッド＋イエロー';
   @override String get onboardDisplay => '表示';
   @override String get onboardOledTitle => 'OLED純黒';
   @override String get onboardOledSub => 'ダークモードで背景が完全な黒になり、OLED 画面ではバッテリーの節約になります。';
@@ -942,8 +936,8 @@ const Map<String, String> kTxJa = {
   'bio_src_wiki_orig': '原文・Wikipedia',
   'dash_motion_t': 'ダッシュボードのアニメーションカバー',
   'dash_motion_s': '再生中の曲の動画を再生カードとヘッダーで再生します。動画カバーが必要です。',
-  'onb_cov_t': 'カバーと画像',
-  'onb_cov_s': '画像の形と、ジャケットの表示方法を選択してください。',
+  'onb_cov_t': 'カバー、画像、アニメーション',
+  'onb_cov_s': '画像の形、ジャケットの表示方法、アニメーションのスタイルを選択してください。',
   'onb_sync_t': '同期とバッテリー',
   'onb_sync_s': 'スマートフォンのバッテリーを使いすぎずに、統計を最新の状態に保ちます。',
   'onb_autosync_t': '自動同期',

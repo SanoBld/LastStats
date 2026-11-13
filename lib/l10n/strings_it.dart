@@ -254,7 +254,7 @@ class AppStringsIt implements AppStrings {
   @override String get onboardFinish => 'Fine';
   @override String get onboardBack => 'Indietro';
   @override String get onboardAppearanceTitle => 'Personalizzi il suo stile';
-  @override String get onboardAppearanceSub => 'Scelga il tema chiaro o scuro, il colore di accento e lo stile visivo dell\'app.';
+  @override String get onboardAppearanceSub => 'Scelga il tema chiaro o scuro, il colore di accento e le opzioni di visualizzazione.';
   @override String get onboardNotifTitle => 'Resta aggiornato';
   @override String get onboardNotifSub => 'Scelga quali notifiche ricevere e se il telefono deve vibrare.';
   @override String get onboardFavTitle => 'I suoi profili preferiti';
@@ -283,17 +283,11 @@ class AppStringsIt implements AppStrings {
   @override String get settingsShowAllPlatformLinksSub => 'Ignora il filtro e mostra ogni link (Last.fm, Spotify, YT Music, Web)';
   @override String get onboardUpdatesTitle => 'Aggiornamenti';
   @override String get onboardUpdatesSub => 'L\'app controlla automaticamente se è disponibile una nuova versione.';
-  @override String get onboardStyle => 'Stile';
-  @override String get onboardStyleMaterialYou => 'Material You';
-  @override String get onboardStyleNothing => 'Nothing OS';
   @override String get onboardPreview => 'Anteprima';
   @override String get onboardPreviewButton => 'Pulsante';
   @override String get onboardPreviewOutline => 'Pulsante principale';
   @override String get onboardPreviewText => 'Testo di esempio';
   @override String get onboardPreviewBubble => 'Fumetto';
-  @override String get onboardAccentTint => 'Tonalità accento';
-  @override String get onboardNothingRedOnly => 'Solo rosso';
-  @override String get onboardNothingRedYellow => 'Rosso + giallo';
   @override String get onboardDisplay => 'Schermo';
   @override String get onboardOledTitle => 'Nero puro OLED';
   @override String get onboardOledSub => 'Lo sfondo diventa completamente nero nella modalità scura, risparmiando batteria sugli schermi OLED.';
@@ -943,8 +937,8 @@ const Map<String, String> kTxIt = {
   'bio_src_wiki_orig': 'Testo originale · Wikipedia',
   'dash_motion_t': 'Copertina animata nella dashboard',
   'dash_motion_s': 'Riproduce il video del brano in ascolto sulla scheda di riproduzione e nell\'intestazione. Richiede le copertine video.',
-  'onb_cov_t': 'Copertine e immagini',
-  'onb_cov_s': 'Scelga la forma delle immagini e il modo in cui vengono mostrate le copertine.',
+  'onb_cov_t': 'Copertine, immagini e animazioni',
+  'onb_cov_s': 'Scelga la forma delle immagini, come vengono mostrate le copertine e lo stile delle animazioni.',
   'onb_sync_t': 'Sincronizzazione e batteria',
   'onb_sync_s': 'Mantenga aggiornate le sue statistiche senza consumare troppa batteria del telefono.',
   'onb_autosync_t': 'Sincronizzazione automatica',

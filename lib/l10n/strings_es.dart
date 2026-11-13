@@ -287,7 +287,7 @@ class AppStringsEs implements AppStrings {
   @override String get onboardFinish           => 'Finalizar';
   @override String get onboardBack             => 'Atrás';
   @override String get onboardAppearanceTitle  => 'Personalice su estilo';
-  @override String get onboardAppearanceSub    => 'Elija el tema claro u oscuro, el color de acento y el estilo visual de la aplicación.';
+  @override String get onboardAppearanceSub    => 'Elija el tema claro u oscuro, el color de acento y las opciones de visualización.';
   @override String get onboardNotifTitle       => 'Mantente informado';
   @override String get onboardNotifSub         => 'Elija qué notificaciones desea recibir y si el teléfono debe vibrar.';
   @override String get onboardFavTitle         => 'Sus perfiles favoritos';
@@ -316,17 +316,11 @@ class AppStringsEs implements AppStrings {
   @override String get settingsShowAllPlatformLinksSub => 'Ignora el filtro y muestra todos los enlaces (Last.fm, Spotify, YT Music, Web)';
   @override String get onboardUpdatesTitle     => 'Actualizaciones';
   @override String get onboardUpdatesSub       => 'La aplicación comprueba automáticamente si hay una versión nueva disponible.';
-  @override String get onboardStyle              => 'Estilo';
-  @override String get onboardStyleMaterialYou    => 'Material You';
-  @override String get onboardStyleNothing        => 'Nothing OS';
   @override String get onboardPreview             => 'Vista previa';
   @override String get onboardPreviewButton       => 'Botón';
   @override String get onboardPreviewOutline      => 'Botón principal';
   @override String get onboardPreviewText         => 'Texto de ejemplo';
   @override String get onboardPreviewBubble       => 'Burbuja';
-  @override String get onboardAccentTint          => 'Tono de acento';
-  @override String get onboardNothingRedOnly      => 'Solo rojo';
-  @override String get onboardNothingRedYellow    => 'Rojo + amarillo';
   @override String get onboardDisplay             => 'Pantalla';
   @override String get onboardOledTitle           => 'Negro OLED';
   @override String get onboardOledSub             => 'El fondo se vuelve completamente negro en el modo oscuro, lo que ahorra batería en las pantallas OLED.';
@@ -972,8 +966,8 @@ const Map<String, String> kTxEs = {
   'bio_src_wiki_orig': 'Texto original · Wikipedia',
   'dash_motion_t': 'Portada animada en el panel',
   'dash_motion_s': 'Reproduce el vídeo de la canción actual en la tarjeta de reproducción y en la cabecera. Requiere las portadas de vídeo.',
-  'onb_cov_t': 'Portadas e imágenes',
-  'onb_cov_s': 'Elija la forma de las imágenes y cómo se muestran las portadas.',
+  'onb_cov_t': 'Portadas, imágenes y animaciones',
+  'onb_cov_s': 'Elija la forma de las imágenes, cómo se muestran las portadas y el estilo de las animaciones.',
   'onb_sync_t': 'Sincronización y batería',
   'onb_sync_s': 'Mantenga sus estadísticas al día sin consumir demasiada batería del teléfono.',
   'onb_autosync_t': 'Sincronización automática',

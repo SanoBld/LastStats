@@ -35,10 +35,11 @@
 **Animations**
 - New: "Motion blur" option in Appearance, saved and restored with your themes
 - Better animations: pull-to-refresh now uses the app loader (it turns as you pull and fades in / out), one loader style everywhere (pages and charts), and one progress bar style with smooth value changes
-- Loading screens on charts and tabs now show the same soft placeholder shapes with the loader on top
+- Loading screens: every tab (charts, ranking, history, search, favorites, track details) now shows soft placeholder shapes laid out like its own content, with the same pulse and loader as the dashboard
 
 **Interface**
 - Removed: the Nothing OS style (app, onboarding and settings); the app now always uses Material You
-- Fixed: the music calendar now uses the full width of the screen
+- Music calendar: always fills the full width and shows the latest weeks that fit your screen; in Charts it now opens on today instead of the start of the year
+- Updated the first-launch introduction: new animation blur option, texts that match the current settings, no more mention of the removed style
 - Profile share image: "LastStats" is now at the bottom left and the source (Last.fm) sits just above the QR code
 

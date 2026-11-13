@@ -254,7 +254,7 @@ class AppStringsRu implements AppStrings {
   @override String get onboardFinish => 'Готово';
   @override String get onboardBack => 'Назад';
   @override String get onboardAppearanceTitle => 'Настройте свой стиль';
-  @override String get onboardAppearanceSub => 'Выберите светлую или тёмную тему, акцентный цвет и внешний стиль приложения.';
+  @override String get onboardAppearanceSub => 'Выберите светлую или тёмную тему, акцентный цвет и параметры отображения.';
   @override String get onboardNotifTitle => 'Будьте в курсе';
   @override String get onboardNotifSub => 'Выберите, какие уведомления вы хотите получать и должен ли телефон вибрировать.';
   @override String get onboardFavTitle => 'Ваши избранные профили';
@@ -283,17 +283,11 @@ class AppStringsRu implements AppStrings {
   @override String get settingsShowAllPlatformLinksSub => 'Игнорировать фильтр и показывать все ссылки (Last.fm, Spotify, YT Music, Web)';
   @override String get onboardUpdatesTitle => 'Обновления';
   @override String get onboardUpdatesSub => 'Приложение автоматически проверяет, доступна ли новая версия.';
-  @override String get onboardStyle => 'Стиль';
-  @override String get onboardStyleMaterialYou => 'Material You';
-  @override String get onboardStyleNothing => 'Nothing OS';
   @override String get onboardPreview => 'Предпросмотр';
   @override String get onboardPreviewButton => 'Кнопка';
   @override String get onboardPreviewOutline => 'Основная кнопка';
   @override String get onboardPreviewText => 'Пример текста';
   @override String get onboardPreviewBubble => 'Пузырь';
-  @override String get onboardAccentTint => 'Оттенок акцента';
-  @override String get onboardNothingRedOnly => 'Только красный';
-  @override String get onboardNothingRedYellow => 'Красный + жёлтый';
   @override String get onboardDisplay => 'Экран';
   @override String get onboardOledTitle => 'Настоящий чёрный OLED';
   @override String get onboardOledSub => 'В тёмном режиме фон становится полностью чёрным, что экономит заряд на экранах OLED.';
@@ -943,8 +937,8 @@ const Map<String, String> kTxRu = {
   'bio_src_wiki_orig': 'Оригинальный текст · Википедия',
   'dash_motion_t': 'Анимированная обложка на главной',
   'dash_motion_s': 'Воспроизводит видео текущего трека на карточке воспроизведения и в шапке. Требуются видеообложки.',
-  'onb_cov_t': 'Обложки и изображения',
-  'onb_cov_s': 'Выберите форму изображений и способ отображения обложек.',
+  'onb_cov_t': 'Обложки, изображения и анимации',
+  'onb_cov_s': 'Выберите форму изображений, способ отображения обложек и стиль анимаций.',
   'onb_sync_t': 'Синхронизация и батарея',
   'onb_sync_s': 'Поддерживайте статистику в актуальном состоянии, не расходуя слишком много заряда телефона.',
   'onb_autosync_t': 'Автоматическая синхронизация',

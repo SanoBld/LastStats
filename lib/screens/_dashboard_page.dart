@@ -4607,7 +4607,12 @@ class _CompactHeatmap extends StatelessWidget {
   static const _gap  = 2.0;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => LayoutBuilder(
+        builder: (context, box) => _card(context,
+            (box.maxWidth.isFinite ? box.maxWidth : 340.0) - 28), // minus padding
+      );
+
+  Widget _card(BuildContext context, double avail) {
     final s = Theme.of(context).colorScheme;
     final t = Theme.of(context).textTheme;
 
@@ -4620,11 +4625,17 @@ class _CompactHeatmap extends StatelessWidget {
     final startWd    = startDay.weekday;
     final totalDays  = endDay.difference(startDay).inDays + 1;
     final totalCells = (startWd - 1) + totalDays;
-    final weeks      = (totalCells / 7).ceil();
+    final totalWeeks = (totalCells / 7).ceil();
+    // Show the latest weeks that fit, cells grow so the card is always full.
+    final fit   = ((avail + _gap) / (_cell + _gap)).floor().clamp(4, 400);
+    final skip  = math.max(0, totalWeeks - fit);
+    final weeks = totalWeeks - skip;
+    final cell  = ((avail - _gap * weeks) / weeks).clamp(_cell, 40.0);
+    final cellH = cell.clamp(_cell, 20.0);
 
     final weekColumns = List.generate(weeks, (col) {
       return List.generate(7, (row) {
-        final offset = col * 7 + row - (startWd - 1);
+        final offset = (col + skip) * 7 + row - (startWd - 1);
         if (offset < 0 || offset >= totalDays) return null;
         return offset;
       });
@@ -4635,8 +4646,12 @@ class _CompactHeatmap extends StatelessWidget {
     var cursor = DateTime(startDay.year, startDay.month, 1);
     while (!cursor.isAfter(endDay)) {
       final off = cursor.difference(startDay).inDays + (startWd - 1);
-      if (off >= 0) monthStarts[off ~/ 7] = L.months[cursor.month];
+      if (off >= 0 && off ~/ 7 >= skip) monthStarts[off ~/ 7 - skip] = L.months[cursor.month];
       cursor = DateTime(cursor.year, cursor.month + 1, 1);
+    }
+    if (skip > 0 && !monthStarts.containsKey(0) && !monthStarts.containsKey(1)) {
+      final first = startDay.add(Duration(days: skip * 7 - (startWd - 1)));
+      monthStarts[0] = L.months[first.month];
     }
 
     return Container(
@@ -4674,7 +4689,7 @@ class _CompactHeatmap extends StatelessWidget {
                       const SizedBox(height: 2),
                       ...days.map((offset) {
                         if (offset == null) {
-                          return const SizedBox(width: _cell, height: _cell + _gap);
+                          return SizedBox(width: cell, height: cellH + _gap);
                         }
                         final d   = startDay.add(Duration(days: offset));
                         final key = '${d.year}-'
@@ -4693,7 +4708,7 @@ class _CompactHeatmap extends StatelessWidget {
                             message: count > 0
                                 ? '${d.day}/${d.month}/${d.year} — $count scrobbles' : '',
                             child: Container(
-                              width: _cell, height: _cell,
+                              width: cell, height: cellH,
                               decoration: BoxDecoration(
                                 color: color,
                                 borderRadius: BorderRadius.circular(3),

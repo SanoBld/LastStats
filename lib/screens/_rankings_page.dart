@@ -343,7 +343,7 @@ class _TopListBodyState extends State<_TopListBody>
       return M3Switcher(
         duration: const Duration(milliseconds: 300),
         child: _loading
-          ? const SkeletonList(key: ValueKey('rank_load'))
+          ? const SkeletonList(key: ValueKey('rank_load'), layout: SkeletonLayout.ranking)
           : _error != null
             ? _ErrorView(message: _error!, onRetry: () => _load(reset: true))
             : Center(key: const ValueKey('rank_empty'), child: Text(L.commonNoResults,

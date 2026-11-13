@@ -254,7 +254,7 @@ class AppStringsAr implements AppStrings {
   @override String get onboardFinish => 'إنهاء';
   @override String get onboardBack => 'رجوع';
   @override String get onboardAppearanceTitle => 'خصّص أسلوبك';
-  @override String get onboardAppearanceSub => 'اختر السمة الفاتحة أو الداكنة، ولون التمييز، والمظهر العام للتطبيق.';
+  @override String get onboardAppearanceSub => 'اختر السمة الفاتحة أو الداكنة، ولون التمييز، وخيارات العرض.';
   @override String get onboardNotifTitle => 'ابقَ على اطلاع';
   @override String get onboardNotifSub => 'اختر الإشعارات التي تريد استلامها، وهل يجب أن يهتز الهاتف.';
   @override String get onboardFavTitle => 'ملفاتك المفضلة';
@@ -283,17 +283,11 @@ class AppStringsAr implements AppStrings {
   @override String get settingsShowAllPlatformLinksSub => 'تجاهل الفلتر وعرض كل رابط (Last.fm، Spotify، YT Music، الويب)';
   @override String get onboardUpdatesTitle => 'التحديثات';
   @override String get onboardUpdatesSub => 'يتحقق التطبيق تلقائيًا مما إذا كان هناك إصدار جديد متاح.';
-  @override String get onboardStyle => 'الأسلوب';
-  @override String get onboardStyleMaterialYou => 'Material You';
-  @override String get onboardStyleNothing => 'Nothing OS';
   @override String get onboardPreview => 'معاينة';
   @override String get onboardPreviewButton => 'زر';
   @override String get onboardPreviewOutline => 'الزر الرئيسي';
   @override String get onboardPreviewText => 'نص تجريبي';
   @override String get onboardPreviewBubble => 'فقاعة';
-  @override String get onboardAccentTint => 'درجة لون التمييز';
-  @override String get onboardNothingRedOnly => 'أحمر فقط';
-  @override String get onboardNothingRedYellow => 'أحمر + أصفر';
   @override String get onboardDisplay => 'العرض';
   @override String get onboardOledTitle => 'أسود OLED حقيقي';
   @override String get onboardOledSub => 'تصبح الخلفية سوداء تمامًا في الوضع الداكن، مما يوفر البطارية على شاشات OLED.';
@@ -943,8 +937,8 @@ const Map<String, String> kTxAr = {
   'bio_src_wiki_orig': 'النص الأصلي · ويكيبيديا',
   'dash_motion_t': 'غلاف متحرك في لوحة التحكم',
   'dash_motion_s': 'يشغّل فيديو المقطع الحالي على بطاقة التشغيل وفي الترويسة. يتطلب أغلفة الفيديو.',
-  'onb_cov_t': 'الأغلفة والصور',
-  'onb_cov_s': 'اختر شكل الصور وطريقة عرض الأغلفة.',
+  'onb_cov_t': 'الأغلفة والصور والرسوم المتحركة',
+  'onb_cov_s': 'اختر شكل الصور وطريقة عرض الأغلفة ونمط الرسوم المتحركة.',
   'onb_sync_t': 'المزامنة والبطارية',
   'onb_sync_s': 'أبقِ إحصاءاتك محدّثة دون استهلاك الكثير من بطارية هاتفك.',
   'onb_autosync_t': 'المزامنة التلقائية',

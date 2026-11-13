@@ -734,7 +734,7 @@ class _SearchPageState extends State<_SearchPage> {
     return M3Switcher(
       duration: const Duration(milliseconds: 280),
       child: _searching
-          ? const SkeletonList(key: ValueKey('search_load'))
+          ? const SkeletonList(key: ValueKey('search_load'), layout: SkeletonLayout.search)
           : _buildResultsContent(context, scheme, text),
     );
   }

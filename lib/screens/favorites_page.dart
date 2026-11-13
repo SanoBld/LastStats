@@ -115,7 +115,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
 Expanded(child: M3Switcher(
         duration: const Duration(milliseconds: 250),
         child: _loading
-          ? const SkeletonList(key: ValueKey('load'))
+          ? const SkeletonList(key: ValueKey('load'), layout: SkeletonLayout.favorites)
           : Column(key: const ValueKey('content'), children: [
               M3SearchField(
                 hint: L.favSearchHint,

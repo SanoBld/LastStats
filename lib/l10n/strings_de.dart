@@ -254,7 +254,7 @@ class AppStringsDe implements AppStrings {
   @override String get onboardFinish => 'Fertig';
   @override String get onboardBack => 'Zurück';
   @override String get onboardAppearanceTitle => 'Personalisieren Sie Ihren Stil';
-  @override String get onboardAppearanceSub => 'Wählen Sie das helle oder dunkle Design, die Akzentfarbe und den visuellen Stil der App.';
+  @override String get onboardAppearanceSub => 'Wählen Sie das helle oder dunkle Design, die Akzentfarbe und die Anzeigeoptionen.';
   @override String get onboardNotifTitle => 'Immer auf dem Laufenden';
   @override String get onboardNotifSub => 'Wählen Sie, welche Benachrichtigungen Sie erhalten möchten und ob das Telefon vibrieren soll.';
   @override String get onboardFavTitle => 'Ihre Lieblingsprofile';
@@ -283,17 +283,11 @@ class AppStringsDe implements AppStrings {
   @override String get settingsShowAllPlatformLinksSub => 'Filter ignorieren und jeden Link anzeigen (Last.fm, Spotify, YT Music, Web)';
   @override String get onboardUpdatesTitle => 'Updates';
   @override String get onboardUpdatesSub => 'Die App prüft automatisch, ob eine neue Version verfügbar ist.';
-  @override String get onboardStyle => 'Stil';
-  @override String get onboardStyleMaterialYou => 'Material You';
-  @override String get onboardStyleNothing => 'Nothing OS';
   @override String get onboardPreview => 'Vorschau';
   @override String get onboardPreviewButton => 'Button';
   @override String get onboardPreviewOutline => 'Hauptschaltfläche';
   @override String get onboardPreviewText => 'Beispieltext';
   @override String get onboardPreviewBubble => 'Sprechblase';
-  @override String get onboardAccentTint => 'Akzentton';
-  @override String get onboardNothingRedOnly => 'Nur Rot';
-  @override String get onboardNothingRedYellow => 'Rot + Gelb';
   @override String get onboardDisplay => 'Anzeige';
   @override String get onboardOledTitle => 'OLED-Echtschwarz';
   @override String get onboardOledSub => 'Im dunklen Modus wird der Hintergrund komplett schwarz, was bei OLED-Bildschirmen Akku spart.';
@@ -943,8 +937,8 @@ const Map<String, String> kTxDe = {
   'bio_src_wiki_orig': 'Originaltext · Wikipedia',
   'dash_motion_t': 'Animiertes Cover im Dashboard',
   'dash_motion_s': 'Spielt das Video des aktuellen Titels auf der Wiedergabekarte und im Kopfbereich ab. Erfordert Video-Cover.',
-  'onb_cov_t': 'Cover und Bilder',
-  'onb_cov_s': 'Wählen Sie die Form der Bilder und die Darstellung der Cover.',
+  'onb_cov_t': 'Cover, Bilder und Animationen',
+  'onb_cov_s': 'Wählen Sie die Form der Bilder, die Darstellung der Cover und den Animationsstil.',
   'onb_sync_t': 'Synchronisierung und Akku',
   'onb_sync_s': 'Halten Sie Ihre Statistiken aktuell, ohne den Akku Ihres Telefons stark zu belasten.',
   'onb_autosync_t': 'Automatische Synchronisierung',

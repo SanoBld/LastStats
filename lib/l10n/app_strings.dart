@@ -327,17 +327,11 @@ abstract class AppStrings {
   String get settingsShowAllPlatformLinksSub;
   String get onboardUpdatesTitle;
   String get onboardUpdatesSub;
-  String get onboardStyle;
-  String get onboardStyleMaterialYou;
-  String get onboardStyleNothing;
   String get onboardPreview;
   String get onboardPreviewButton;
   String get onboardPreviewOutline;
   String get onboardPreviewText;
   String get onboardPreviewBubble;
-  String get onboardAccentTint;
-  String get onboardNothingRedOnly;
-  String get onboardNothingRedYellow;
   String get onboardDisplay;
   String get onboardOledTitle;
   String get onboardOledSub;

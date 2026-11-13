@@ -287,7 +287,7 @@ class AppStringsEn implements AppStrings {
   @override String get onboardFinish           => 'Finish';
   @override String get onboardBack             => 'Back';
   @override String get onboardAppearanceTitle  => 'Personalize your style';
-  @override String get onboardAppearanceSub    => 'Choose the light or dark theme, the accent color and the visual style of the app.';
+  @override String get onboardAppearanceSub    => 'Choose the light or dark theme, the accent color and the display options.';
   @override String get onboardNotifTitle       => 'Stay in the loop';
   @override String get onboardNotifSub         => 'Choose which notifications you want to receive and whether the phone should vibrate.';
   @override String get onboardFavTitle         => 'Your favorite profiles';
@@ -316,17 +316,11 @@ class AppStringsEn implements AppStrings {
   @override String get settingsShowAllPlatformLinksSub => 'Ignore the filter and show every link (Last.fm, Spotify, YT Music, Web)';
   @override String get onboardUpdatesTitle     => 'Updates';
   @override String get onboardUpdatesSub       => 'The app automatically checks whether a new version is available.';
-  @override String get onboardStyle              => 'Style';
-  @override String get onboardStyleMaterialYou    => 'Material You';
-  @override String get onboardStyleNothing        => 'Nothing OS';
   @override String get onboardPreview             => 'Preview';
   @override String get onboardPreviewButton       => 'Button';
   @override String get onboardPreviewOutline      => 'Main button';
   @override String get onboardPreviewText         => 'Sample text';
   @override String get onboardPreviewBubble       => 'Bubble';
-  @override String get onboardAccentTint          => 'Accent tint';
-  @override String get onboardNothingRedOnly      => 'Red only';
-  @override String get onboardNothingRedYellow    => 'Red + yellow';
   @override String get onboardDisplay             => 'Display';
   @override String get onboardOledTitle           => 'OLED true black';
   @override String get onboardOledSub             => 'The background becomes fully black in dark mode, which saves battery on OLED screens.';
@@ -972,8 +966,8 @@ const Map<String, String> kTxEn = {
   'bio_src_wiki_orig': 'Original text · Wikipedia',
   'dash_motion_t': 'Animated cover on the dashboard',
   'dash_motion_s': 'Plays the video of the current track on the now-playing card and in the header. Requires video covers.',
-  'onb_cov_t': 'Covers and images',
-  'onb_cov_s': 'Choose the shape of the images and how the cover art is displayed.',
+  'onb_cov_t': 'Covers, images and animations',
+  'onb_cov_s': 'Choose the shape of the images, how covers are displayed and the animation style.',
   'onb_sync_t': 'Sync and battery',
   'onb_sync_s': 'Keep your statistics up to date without using too much of your phone\'s battery.',
   'onb_autosync_t': 'Automatic sync',

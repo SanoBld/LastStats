@@ -3494,7 +3494,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           final surface = Theme.of(innerContext).scaffoldBackgroundColor;
           return Scaffold(
             body: _loading
-                ? const SkeletonList()
+                ? const SkeletonList(layout: SkeletonLayout.detail)
                 : _buildContent(innerContext, scheme, surface),
           );
         }),

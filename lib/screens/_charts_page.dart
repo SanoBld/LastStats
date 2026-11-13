@@ -1255,7 +1255,7 @@ class _ChartsPageState extends State<_ChartsPage>
     return M3Switcher(
       duration: const Duration(milliseconds: 300),
       child: _loading
-        ? const SkeletonList(key: ValueKey('c_l'), header: true)
+        ? const SkeletonList(key: ValueKey('c_l'), layout: SkeletonLayout.charts)
         : _error != null
           ? KeyedSubtree(key: const ValueKey('c_e'), child: _ErrorView(message: _error!, onRetry: _load))
           : SafeArea(
@@ -2872,10 +2872,16 @@ class _HeatmapCard extends StatelessWidget {
   // If set, draw only these years instead of every year between start/end.
   // Used by _HeatmapPager below to show a few years at a time on screen.
   final List<int>?        onlyYears;
-  const _HeatmapCard({required this.data, required this.start, required this.end, this.onlyYears});
+  // true = on screen: keep cells at a readable size and show only the LATEST
+  // weeks that fit the width (always filled edge to edge). false = shared
+  // image: draw the whole period.
+  final bool              trimLatest;
+  const _HeatmapCard({required this.data, required this.start, required this.end,
+      this.onlyYears, this.trimLatest = false});
 
   static const _cell = 10.0;
   static const _gap  = 1.5;
+  static const _minShown = 12.0; // smallest cell kept on screen
 
   // One year's worth of week columns + month labels, laid out exactly like
   // GitHub's contribution graph: 7 rows (days) × N columns (weeks).
@@ -2884,14 +2890,18 @@ class _HeatmapCard extends StatelessWidget {
     final startWd    = yearStart.weekday;
     final totalDays  = yearEnd.difference(yearStart).inDays + 1;
     final totalCells = (startWd - 1) + totalDays;
-    final weeks      = (totalCells / 7).ceil();
+    final totalWeeks = (totalCells / 7).ceil();
+    // On screen: as many weeks as fit at a readable size, always the latest.
+    final fit  = ((avail - 42) / (_minShown + _gap)).floor().clamp(4, 400);
+    final skip = trimLatest ? math.max(0, totalWeeks - fit) : 0;
+    final weeks = totalWeeks - skip;
     // Cells grow to fill the card width (year label = 34 + 8 padding).
     final cw = ((avail - 42 - _gap * weeks) / weeks).clamp(_cell, 60.0);
     final ch = cw.clamp(_cell, 20.0);
 
     final weekColumns = List.generate(weeks, (col) {
       return List.generate(7, (row) {
-        final offset = col * 7 + row - (startWd - 1);
+        final offset = (col + skip) * 7 + row - (startWd - 1);
         if (offset < 0 || offset >= totalDays) return null;
         return offset;
       });
@@ -2901,8 +2911,12 @@ class _HeatmapCard extends StatelessWidget {
     var cursor = DateTime(yearStart.year, yearStart.month, 1);
     while (!cursor.isAfter(yearEnd)) {
       final off = cursor.difference(yearStart).inDays + (startWd - 1);
-      if (off >= 0) monthStarts[off ~/ 7] = L.months[cursor.month];
+      if (off >= 0 && off ~/ 7 >= skip) monthStarts[off ~/ 7 - skip] = L.months[cursor.month];
       cursor = DateTime(cursor.year, cursor.month + 1, 1);
+    }
+    if (skip > 0 && !monthStarts.containsKey(0) && !monthStarts.containsKey(1)) {
+      final first = yearStart.add(Duration(days: skip * 7 - (startWd - 1)));
+      monthStarts[0] = L.months[first.month];
     }
 
     return Row(
@@ -3122,7 +3136,7 @@ class _HeatmapPagerState extends State<_HeatmapPager> {
       children: [
         _HeatmapCard(
           data: widget.data, start: blockStart, end: blockEnd,
-          onlyYears: pageYears,
+          onlyYears: pageYears, trimLatest: true,
         ),
         if (years.length > _yearsPerPage)
           Padding(

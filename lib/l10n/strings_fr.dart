@@ -287,7 +287,7 @@ class AppStringsFr implements AppStrings {
   @override String get onboardFinish           => 'Terminer';
   @override String get onboardBack             => 'Retour';
   @override String get onboardAppearanceTitle  => 'Personnalisez votre style';
-  @override String get onboardAppearanceSub    => 'Choisissez le thème clair ou sombre, la couleur d\'accent et le style visuel de l\'application.';
+  @override String get onboardAppearanceSub    => 'Choisissez le thème clair ou sombre, la couleur d\'accent et les options d\'affichage.';
   @override String get onboardNotifTitle       => 'Restez informé';
   @override String get onboardNotifSub         => 'Choisissez les notifications que vous voulez recevoir et si le téléphone doit vibrer.';
   @override String get onboardFavTitle         => 'Vos profils favoris';
@@ -316,17 +316,11 @@ class AppStringsFr implements AppStrings {
   @override String get settingsShowAllPlatformLinksSub => 'Ignore le filtre et montre tous les liens (Last.fm, Spotify, YT Music, Web)';
   @override String get onboardUpdatesTitle     => 'Mises à jour';
   @override String get onboardUpdatesSub       => 'L\'application vérifie automatiquement si une nouvelle version est disponible.';
-  @override String get onboardStyle              => 'Style';
-  @override String get onboardStyleMaterialYou    => 'Material You';
-  @override String get onboardStyleNothing        => 'Nothing OS';
   @override String get onboardPreview             => 'Aperçu';
   @override String get onboardPreviewButton       => 'Bouton';
   @override String get onboardPreviewOutline      => 'Bouton principal';
   @override String get onboardPreviewText         => 'Texte exemple';
   @override String get onboardPreviewBubble       => 'Bulle';
-  @override String get onboardAccentTint          => 'Teinte d\'accent';
-  @override String get onboardNothingRedOnly      => 'Rouge seul';
-  @override String get onboardNothingRedYellow    => 'Rouge + jaune';
   @override String get onboardDisplay             => 'Affichage';
   @override String get onboardOledTitle           => 'Noir OLED';
   @override String get onboardOledSub             => 'Le fond devient complètement noir en mode sombre, ce qui économise la batterie sur les écrans OLED.';
@@ -972,8 +966,8 @@ const Map<String, String> kTxFr = {
   'bio_src_wiki_orig': 'Texte original · Wikipédia',
   'dash_motion_t': 'Pochette animée sur l\'accueil',
   'dash_motion_s': 'Joue la vidéo du titre en cours sur la carte de lecture et dans l\'en-tête. Nécessite les pochettes vidéo.',
-  'onb_cov_t': 'Pochettes et images',
-  'onb_cov_s': 'Choisissez la forme des images et la façon dont les pochettes s\'affichent.',
+  'onb_cov_t': 'Pochettes, images et animations',
+  'onb_cov_s': 'Choisissez la forme des images, l\'affichage des pochettes et le style des animations.',
   'onb_sync_t': 'Synchronisation et batterie',
   'onb_sync_s': 'Gardez vos statistiques à jour sans trop consommer la batterie de votre téléphone.',
   'onb_autosync_t': 'Synchronisation automatique',

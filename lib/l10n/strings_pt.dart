@@ -287,7 +287,7 @@ class AppStringsPt implements AppStrings {
   @override String get onboardFinish           => 'Concluir';
   @override String get onboardBack             => 'Voltar';
   @override String get onboardAppearanceTitle  => 'Personalize seu estilo';
-  @override String get onboardAppearanceSub    => 'Escolha o tema claro ou escuro, a cor de destaque e o estilo visual do aplicativo.';
+  @override String get onboardAppearanceSub    => 'Escolha o tema claro ou escuro, a cor de destaque e as opções de exibição.';
   @override String get onboardNotifTitle       => 'Fique por dentro';
   @override String get onboardNotifSub         => 'Escolha quais notificações deseja receber e se o telefone deve vibrar.';
   @override String get onboardFavTitle         => 'Seus perfis favoritos';
@@ -316,17 +316,11 @@ class AppStringsPt implements AppStrings {
   @override String get settingsShowAllPlatformLinksSub => 'Ignora o filtro e mostra todos os links (Last.fm, Spotify, YT Music, Web)';
   @override String get onboardUpdatesTitle     => 'Atualizações';
   @override String get onboardUpdatesSub       => 'O aplicativo verifica automaticamente se há uma nova versão disponível.';
-  @override String get onboardStyle              => 'Estilo';
-  @override String get onboardStyleMaterialYou    => 'Material You';
-  @override String get onboardStyleNothing        => 'Nothing OS';
   @override String get onboardPreview             => 'Prévia';
   @override String get onboardPreviewButton       => 'Botão';
   @override String get onboardPreviewOutline      => 'Botão principal';
   @override String get onboardPreviewText         => 'Texto de exemplo';
   @override String get onboardPreviewBubble       => 'Bolha';
-  @override String get onboardAccentTint          => 'Tom de destaque';
-  @override String get onboardNothingRedOnly      => 'Só vermelho';
-  @override String get onboardNothingRedYellow    => 'Vermelho + amarelo';
   @override String get onboardDisplay             => 'Tela';
   @override String get onboardOledTitle           => 'Preto OLED';
   @override String get onboardOledSub             => 'O fundo fica totalmente preto no modo escuro, o que economiza bateria em telas OLED.';
@@ -972,8 +966,8 @@ const Map<String, String> kTxPt = {
   'bio_src_wiki_orig': 'Texto original · Wikipédia',
   'dash_motion_t': 'Capa animada no painel',
   'dash_motion_s': 'Reproduz o vídeo da faixa atual no cartão de reprodução e no cabeçalho. Requer as capas de vídeo.',
-  'onb_cov_t': 'Capas e imagens',
-  'onb_cov_s': 'Escolha o formato das imagens e como as capas são exibidas.',
+  'onb_cov_t': 'Capas, imagens e animações',
+  'onb_cov_s': 'Escolha o formato das imagens, como as capas são exibidas e o estilo das animações.',
   'onb_sync_t': 'Sincronização e bateria',
   'onb_sync_s': 'Mantenha suas estatísticas atualizadas sem gastar muita bateria do telefone.',
   'onb_autosync_t': 'Sincronização automática',
