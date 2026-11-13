@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-13T22:12:04Z",
+  "updated": "2026-11-13T22:18:45Z",
   "commits": [
+    {
+      "sha": "0229c3e247ace08fff2828ca08416c56e352b9a2",
+      "message": "feat: mise à jour des indicateurs de chargement avec M3LinearProgress et M3Loader pour une cohérence visuelle",
+      "date": "2026-11-13T22:18:18Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/0229c3e247ace08fff2828ca08416c56e352b9a2",
+      "tags": []
+    },
     {
       "sha": "2c1b8424824351f4e8c93898bc1ea4c0de35f023",
       "message": "feat: ajouter des traductions pour le flou de mouvement et améliorer les éléments de l'interface utilisateur",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/2fe15a28a7cb62317c63f8706aafa66b7653f081",
-      "tags": []
-    },
-    {
-      "sha": "722f2fa8f309c997ae9573a1648a617c007c2d9c",
-      "message": "feat: Mettre à jour les captures d'écran pour refléter les dernières modifications visuelles",
-      "date": "2026-09-13T20:45:35Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/722f2fa8f309c997ae9573a1648a617c007c2d9c",
       "tags": []
     }
   ]
