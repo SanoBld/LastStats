@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-13T23:24:54Z",
+  "updated": "2026-11-13T23:48:46Z",
   "commits": [
+    {
+      "sha": "d741f2f0e7de89b7cdddd879be500c6955f378e1",
+      "message": "feat: améliorer l'affichage des données avec un centrage et une mise à l'échelle des textes",
+      "date": "2026-11-13T23:35:09Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/d741f2f0e7de89b7cdddd879be500c6955f378e1",
+      "tags": []
+    },
     {
       "sha": "bcfe9234c78ce1c09c143d65aa571979ccb1514f",
       "message": "Update localization strings and enhance skeleton loading components\n\n- Updated Spanish, French, Italian, Japanese, Portuguese, Russian, and Chinese localization strings for onboarding and settings pages to improve clarity and consistency.\n- Introduced new layout options for SkeletonList to better represent different loading states across various screens (charts, rankings, history, search, favorites, detail).\n- Enhanced the _HeatmapCard and _CompactHeatmap components to dynamically adjust the display based on available screen width, improving usability.\n- Refactored loading indicators in multiple screens to utilize the new SkeletonList layout options for a more cohesive user experience during loading states.",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/ead33e6bddb0130133f7231d0e030f12cc9b0159",
-      "tags": []
-    },
-    {
-      "sha": "a8e363a85b43f92e46e17d4d68ca80859c6dab89",
-      "message": "feat: add interactive features and enhancements\n\n- Implemented a card stack interaction for screenshots, allowing users to click the top card to send it to the back of the pile.\n- Added a custom cursor glow effect that follows the mouse movement.\n- Created a two-step download modal that fetches the latest GitHub release based on the user's OS and architecture selection.\n- Integrated live GitHub stats display for stars and latest release tag.\n- Developed a lightweight i18n helper for dynamic text translation based on user language preference.\n- Introduced a lightbox feature for viewing screenshots with zoom functionality.\n- Added a simple reveal-on-scroll effect for elements.\n- Implemented an auto-hiding navigation bar that appears on scroll up and hides on scroll down.\n- Created a ripple effect for clickable elements to enhance user interaction.\n- Developed a showcase progress indicator that fills as users scroll through the walkthrough.\n- Added a theme toggle feature with light, dark, and auto modes, persisting user preference.\n- Created a legal notice page detailing site publisher, hosting, intellectual property, and personal data policies.",
-      "date": "2026-09-16T15:13:49Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/a8e363a85b43f92e46e17d4d68ca80859c6dab89",
       "tags": []
     }
   ]
