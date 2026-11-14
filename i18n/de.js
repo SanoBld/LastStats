@@ -340,7 +340,7 @@ window.I18N.de = {
   "hp.src.l.7": "<a href=\"https://web-scrobbler.com\" target=\"_blank\" rel=\"noopener\">Web Scrobbler</a>",
   "hp.src.l.8": "<a href=\"https://listenbrainz.org\" target=\"_blank\" rel=\"noopener\">ListenBrainz</a>",
   "legal.license": "Code-Lizenz",
-  "legal.license.p1": "Der Quellcode von LastStats steht unter der <strong>MIT</strong>-Lizenz (siehe Datei LICENSE im GitHub-Repository). Du kannst ihn nutzen, kopieren, ändern und weitergeben, solange du den Copyright-Hinweis und den Lizenztext beibehältst.",
+  "legal.license.p1": "Der Quellcode von LastStats steht unter der <strong>GNU GPL v3</strong>-Lizenz (siehe Datei LICENSE im GitHub-Repository). Du kannst ihn nutzen, kopieren, ändern und weitergeben, solange du den Copyright-Hinweis behältst, abgeleitete Werke unter derselben Lizenz veröffentlichst und deren Quellcode bereitstellst. Copyright © 2026 Sano Bld.",
   "legal.liability": "Haftungsbeschränkung",
   "legal.liability.p1": "Die Website und die App werden „wie besehen“ bereitgestellt, soweit gesetzlich zulässig ohne Gewähr jeder Art. Die angezeigten Statistiken stammen von Drittdiensten (insbesondere Last.fm): Sie können unvollständig, verspätet oder fehlerhaft sein, und wir können ihre Richtigkeit nicht garantieren.",
   "legal.liability.p2": "Wir haften nicht für die Nichtverfügbarkeit eines Drittdienstes oder für Schäden, die aus der Nutzung der Website oder der App entstehen, soweit das Gesetz dies nicht verbietet.",

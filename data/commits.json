@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-14T14:13:11Z",
+  "updated": "2026-11-14T15:28:11Z",
   "commits": [
+    {
+      "sha": "fd359711876dc6ed55183e8e697fe36214233ce4",
+      "message": "Add new SVG icons and implement M3 widgets for enhanced UI features\n\n- Added SVG icons for GitHub, Instagram, Linux, Telegram, Windows, and YouTube.\n- Introduced M3Confetti widget for a confetti burst effect.\n- Created M3EqualizerBars widget for animated equalizer bars.\n- Implemented M3Marquee widget for scrolling text display.\n- Developed M3PopupMenu widget for a customizable options menu.",
+      "date": "2026-11-14T15:27:46Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/fd359711876dc6ed55183e8e697fe36214233ce4",
+      "tags": []
+    },
     {
       "sha": "e54ae6cd2843a5c5de408c445277c42caef031f7",
       "message": "Update localization strings for year recap feature in multiple languages\n\n- Enhanced Spanish, French, Italian, Japanese, Portuguese, Russian, and Chinese strings for better user engagement and clarity.\n- Improved phrasing in various sections including loading messages, error messages, and user statistics to create a more friendly and relatable tone.\n- Adjusted formatting for consistency in displaying labels based on locale in the year recap page.",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/058aee614b9c19b632f225daef436c4e5f4ad1f8",
-      "tags": []
-    },
-    {
-      "sha": "292e6410b7512cfb9ac41e98a9d92ebefa05a63e",
-      "message": "Refactor UI transitions and loading indicators to align with Material 3 design principles\n\n- Replaced traditional page transitions with M3ContainerRoute for smoother navigation in achievements and detail sheets.\n- Updated loading indicators across various pages to use SkeletonList and SkeletonBlock for a more stable layout during data fetching.\n- Introduced M3Switcher for cleaner animated transitions in charts, dashboard, rankings, and search pages.\n- Implemented M3FadeThroughStack for top-level tab transitions to enhance user experience.\n- Added M3ActionRow for consistent action button styling in detail sheets.\n- Created a new m3_motion.dart file to centralize Material 3 motion definitions and transitions.\n- Introduced skeleton.dart for reusable skeleton loaders to improve loading states across the application.",
-      "date": "2026-09-21T18:23:00Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/292e6410b7512cfb9ac41e98a9d92ebefa05a63e",
       "tags": []
     }
   ]

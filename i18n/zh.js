@@ -340,7 +340,7 @@ window.I18N.zh = {
   "hp.src.l.7": "<a href=\"https://web-scrobbler.com\" target=\"_blank\" rel=\"noopener\">Web Scrobbler</a>",
   "hp.src.l.8": "<a href=\"https://listenbrainz.org\" target=\"_blank\" rel=\"noopener\">ListenBrainz</a>",
   "legal.license": "代码许可证",
-  "legal.license.p1": "LastStats 的源代码以 <strong>MIT</strong> 许可证发布（见 GitHub 仓库中的 LICENSE 文件）。只要保留版权声明和许可证文本，你就可以使用、复制、修改和再分发。",
+  "legal.license.p1": "LastStats 的源代码以 <strong>GNU GPL v3</strong> 许可证发布（见 GitHub 仓库中的 LICENSE 文件）。只要保留版权声明、以相同许可证发布衍生作品并提供其源代码，你就可以使用、复制、修改和再分发。Copyright © 2026 Sano Bld。",
   "legal.liability": "责任限制",
   "legal.liability.p1": "在法律允许的范围内，网站和应用按“现状”提供，不作任何形式的保证。所显示的统计数据来自第三方服务（尤其是 Last.fm）：可能不完整、有延迟或有误，我们无法保证其准确性。",
   "legal.liability.p2": "对于第三方服务不可用，或因使用网站或应用造成的任何损害，我们不承担责任，法律禁止的情形除外。",

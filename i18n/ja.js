@@ -340,7 +340,7 @@ window.I18N.ja = {
   "hp.src.l.7": "<a href=\"https://web-scrobbler.com\" target=\"_blank\" rel=\"noopener\">Web Scrobbler</a>",
   "hp.src.l.8": "<a href=\"https://listenbrainz.org\" target=\"_blank\" rel=\"noopener\">ListenBrainz</a>",
   "legal.license": "コードのライセンス",
-  "legal.license.p1": "LastStats のソースコードは <strong>MIT</strong> ライセンスで公開されています（GitHub リポジトリの LICENSE ファイルをご覧ください）。著作権表示とライセンス文を残す限り、使用、複製、改変、再配布ができます。",
+  "legal.license.p1": "LastStats のソースコードは <strong>GNU GPL v3</strong> ライセンスで公開されています（GitHub リポジトリの LICENSE ファイルをご覧ください）。著作権表示を残し、派生物を同じライセンスで公開し、そのソースコードを提供する限り、使用、複製、改変、再配布ができます。Copyright © 2026 Sano Bld。",
   "legal.liability": "責任の制限",
   "legal.liability.p1": "サイトとアプリは、法律で認められる範囲で、いかなる保証もなく「現状のまま」提供されます。表示される統計は外部サービス（特に Last.fm）から取得しているため、不完全、遅延、または誤りを含む場合があり、私たちはその正確性を保証できません。",
   "legal.liability.p2": "外部サービスが利用できないこと、またはサイトやアプリの利用によって生じた損害について、法律で禁じられている場合を除き、私たちは責任を負いません。",

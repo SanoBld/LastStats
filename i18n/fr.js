@@ -334,7 +334,7 @@ window.I18N.fr = {
   "hp.hub.d.faq": "Les réponses aux questions les plus fréquentes.",
   "hp.hub.d.sources": "Les liens utiles et les sources de ce centre d’aide.",
   "legal.license": "Licence du code",
-  "legal.license.p1": "Le code source de LastStats est publié sous licence <strong>MIT</strong> (voir le fichier LICENSE du dépôt GitHub). Vous pouvez l'utiliser, le copier, le modifier et le redistribuer, à condition de conserver la mention de copyright et le texte de la licence.",
+  "legal.license.p1": "Le code source de LastStats est publié sous licence <strong>GNU GPL v3</strong> (voir le fichier LICENSE du dépôt GitHub). Vous pouvez l'utiliser, le copier, le modifier et le redistribuer, à condition de conserver la mention de copyright, de publier les œuvres dérivées sous la même licence et d'en fournir le code source. Copyright © 2026 Sano Bld.",
   "legal.liability": "Limitation de responsabilité",
   "legal.liability.p1": "Le site et l'application sont fournis « tels quels », sans garantie d'aucune sorte, dans la mesure permise par la loi. Les statistiques affichées proviennent de services tiers (Last.fm notamment) : elles peuvent être incomplètes, en retard ou erronées, et nous ne pouvons pas en garantir l'exactitude.",
   "legal.liability.p2": "Nous ne pouvons pas être tenus responsables de l'indisponibilité d'un service tiers, ni d'un dommage résultant de l'utilisation du site ou de l'application, sauf dans les cas où la loi l'interdit.",
