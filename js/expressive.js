@@ -52,7 +52,7 @@
   var logo = document.querySelector('.project-logo');
   // Public web key (not secret, it is in the page on purpose)
   var URL = 'https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=SanoBld&limit=1&format=json&api_key=d3390e1dcc15a77e5bd2c33bbb488de7';
-  var lastId = '', cover = null;
+  var lastId = '';
   var SS = window.sessionStorage;
   function ss(k, v) { try { if (v === undefined) return SS.getItem(k); if (v === null) SS.removeItem(k); else SS.setItem(k, v); } catch (e) {} return null; }
   lastId = ss('music-id') || '';
@@ -127,41 +127,60 @@
       });
     });
   }
+  var head = grid && grid.parentElement;
+  var playing = false, covers = [], idx = -1, curUrl = '', timer = null, started = false;
+  // Everything here only runs when the option "colors from the music" is ON (no calls, no animation otherwise)
+  function enabled() { try { return localStorage.getItem('accent-music') === '1'; } catch (e) { return false; } }
+  function showCover() { covers.forEach(function (c, i) { if (c) c.classList.toggle('is-on', playing && i === idx && !!curUrl); }); }
   function set(on) {
+    playing = on;
     if (grid) grid.classList.toggle('is-playing', on);
     if (logo) logo.classList.toggle('is-playing', on);
-    if (cover) cover.classList.toggle('is-on', on);
+    showCover();
   }
-  // Very blurred cover behind the cells
-  function setCover(url) {
-    var head = grid && grid.parentElement;
-    if (!head) return;
-    if (!cover) {
-      cover = document.createElement('div');
-      cover.className = 'project-hero-bg project-hero-cover';
-      cover.setAttribute('aria-hidden', 'true');
-      head.insertBefore(cover, grid);
-    }
-    if (url) cover.style.backgroundImage = 'url("' + url + '")';
-    cover.classList.toggle('is-on', grid.classList.contains('is-playing') && !!cover.style.backgroundImage);
+  function mkCover() {
+    var c = document.createElement('div');
+    c.className = 'project-hero-bg project-hero-cover';
+    c.setAttribute('aria-hidden', 'true');
+    head.insertBefore(c, grid);
+    return c;
   }
-  // Coming from another page: show the playing look at once (checked again just below)
-  if (ss('music-on') === '1') { set(true); setCover(ss('music-cover') || ''); }
+  // Very blurred cover behind the cells; a new cover cross-fades with the old one (same speed as the color change)
+  function setCover(url, instant) {
+    if (!head || !grid) return;
+    if (!url) { curUrl = ''; showCover(); return; }
+    if (url === curUrl) { showCover(); return; }
+    curUrl = url;
+    var im = new Image();
+    im.onload = function () {
+      if (curUrl !== url) return;
+      var n = idx === 0 ? 1 : 0;
+      if (!covers[n]) covers[n] = mkCover();
+      var c = covers[n];
+      c.style.backgroundImage = 'url("' + url + '")';
+      if (instant) c.style.transition = 'none';
+      idx = n; showCover();
+      if (instant) { void c.offsetWidth; c.style.transition = ''; }
+    };
+    im.src = url;
+  }
   function check() {
-    if (document.hidden) return;
+    if (document.hidden || !enabled()) return;
     fetch(URL).then(function (r) { return r.json(); }).then(function (d) {
+      if (!started) return;
       var t = d && d.recenttracks && d.recenttracks.track;
       t = Array.isArray(t) ? t[0] : t;
       var on = !!(t && t['@attr'] && t['@attr'].nowplaying === 'true');
       set(on);
       ss('music-on', on ? '1' : '0');
       var am = window.accentMusic;
-      if (!on) { lastId = ''; ss('music-id', null); ss('music-cover', null); if (am) am.clear(); return; }
+      if (!on) { lastId = ''; ss('music-id', null); ss('music-cover', null); setCover(''); if (am) am.clear(); return; }
       var id = (t.artist['#text'] || '') + '|' + t.name;
       var same = (id === lastId);
       var keep = same && window.__musicHue !== undefined;   // same track after navigation: keep the color, no animation
       if (same && ss('music-cover')) { setCover(ss('music-cover')); if (keep) return; }
       findCover(t, function (url) {
+        if (!started) return;
         ss('music-cover', url || null); setCover(url);
         if (!am || keep) return;
         lastId = id; ss('music-id', id);
@@ -169,7 +188,31 @@
       });
     }).catch(function () {});
   }
-  check();
-  setInterval(check, 30000);
-  document.addEventListener('visibilitychange', check);
+  function start() {
+    if (started || !grid) return;
+    started = true;
+    // Coming from another page: show the playing look at once, no fade-in (no pop at load)
+    var root = document.documentElement;
+    if (ss('music-on') === '1') {
+      root.classList.add('ls-init');
+      set(true); setCover(ss('music-cover') || '', true);
+      requestAnimationFrame(function () { requestAnimationFrame(function () { setTimeout(function () { root.classList.remove('ls-init'); }, 60); }); });
+    }
+    check();
+    timer = setInterval(check, 30000);
+    document.addEventListener('visibilitychange', check);
+  }
+  function stop() {
+    if (!started) return;
+    started = false;
+    clearInterval(timer);
+    document.removeEventListener('visibilitychange', check);
+    set(false); setCover('');
+    covers.forEach(function (c) { if (c && c.parentNode) setTimeout(function () { c.parentNode && c.parentNode.removeChild(c); }, 1000); });
+    covers = []; idx = -1; curUrl = ''; lastId = '';
+    ss('music-on', null); ss('music-id', null); ss('music-cover', null);
+    if (window.accentMusic) window.accentMusic.clear();
+  }
+  window.addEventListener('accent-music-change', function (e) { if (e.detail) start(); else stop(); });
+  if (enabled()) start();
 })();

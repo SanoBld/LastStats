@@ -90,7 +90,7 @@
   window.accentMusic = {
     last: null,
     enabled: () => musicOn,
-    setEnabled(v) { musicOn = v; try { localStorage.setItem('accent-music', v ? '1' : '0'); } catch (e) {} tween(v && this.last !== null ? this.last : hue); },
+    setEnabled(v) { musicOn = v; try { localStorage.setItem('accent-music', v ? '1' : '0'); } catch (e) {} window.dispatchEvent(new CustomEvent('accent-music-change', { detail: v })); tween(v && this.last !== null ? this.last : hue); },
     show(h, same) { this.last = h; if (!musicOn) return; try { sessionStorage.setItem(SH, h); } catch (e) {} if (!same) tween(h); },
     clear() { this.last = null; try { sessionStorage.removeItem(SH); } catch (e) {} if (musicOn) tween(hue); },
   };

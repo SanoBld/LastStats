@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-14T22:02:57Z",
+  "updated": "2026-11-14T22:05:00Z",
   "commits": [
+    {
+      "sha": "717f6593b7cd4bbfcfd771ef9568005d067b93f0",
+      "message": "feat: amélioration de la gestion des transitions et ajout d'un événement personnalisé pour le changement de musique",
+      "date": "2026-11-14T22:04:15Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/717f6593b7cd4bbfcfd771ef9568005d067b93f0",
+      "tags": []
+    },
     {
       "sha": "2bfd33cdaa20de3140fbfd9b4fd5d3329f8debd5",
       "message": "feat: ajout de la gestion des clés d'API via des variables d'environnement pour les builds Android et Web",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/419f524c822385a202aa7ecaef4fc3cd233092e0",
-      "tags": []
-    },
-    {
-      "sha": "4c17a1757b398528bff160585681a4fcdb4ab9a4",
-      "message": "feat: ajouter une section \"Découvrir\" au tableau de bord avec des idées musicales à faire défiler et des formes d'images Material You",
-      "date": "2026-09-21T20:56:45Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/4c17a1757b398528bff160585681a4fcdb4ab9a4",
       "tags": []
     }
   ]
