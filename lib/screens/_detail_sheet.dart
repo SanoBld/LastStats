@@ -3504,9 +3504,14 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
           final scheme  = Theme.of(innerContext).colorScheme;
           final surface = Theme.of(innerContext).scaffoldBackgroundColor;
           return Scaffold(
-            body: _loading
-                ? const SkeletonList()
-                : _buildContent(innerContext, scheme, surface),
+            body: M3Switcher(
+              duration: const Duration(milliseconds: 450),
+              child: _loading
+                  ? const M3Loader(key: ValueKey('profile_loading'))
+                  : KeyedSubtree(
+                      key: const ValueKey('profile_loaded'),
+                      child: _buildContent(innerContext, scheme, surface)),
+            ),
           );
         }),
       ),

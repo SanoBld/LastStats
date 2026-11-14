@@ -40,6 +40,9 @@
 **Interface**
 - Removed: the Nothing OS style (app, onboarding and settings); the app now always uses Material You
 - Music calendar: always fills the full width and shows the latest weeks that fit your screen; in Charts it now opens on today instead of the start of the year
+- Charts calendar redesigned in the GitHub contribution style (months on top, Mon/Wed/Fri, rounded cells, Less/More legend, year selector), opening on today
+- Home calendar now loads enough weeks to fill the card with real data
+- Friend profile: simple loader with a smooth transition instead of the grey placeholder
 - Updated the first-launch introduction: new animation blur option, texts that match the current settings, no more mention of the removed style
 - Profile share image: "LastStats" is now at the bottom left and the source (Last.fm) sits just above the QR code
 

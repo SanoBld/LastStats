@@ -386,7 +386,9 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   // How many days back the dashboard chart looks at. Same short window for
   // both the calendar and the monthly bars — this is a quick glance widget,
   // not the full multi-year history from the Charts tab, so it stays fast.
-  static const _kDashChartDays = 60;
+  // Sized from the screen width in _loadDashboardChart so the calendar is
+  // always full of real data (default = a phone-sized 26 weeks).
+  int _dashDays = 182;
 
   // ── Dashboard chart (listening calendar / monthly bars) ─────────────────
   // Loads cached data first (instant, if we have any from the last 30 min),
@@ -396,8 +398,14 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   Future<void> _loadDashboardChart() async {
     if (_dashChartLoading) return;
 
+    // Enough weeks to fill the card: 12 px cells + 2 px gaps.
+    final view = WidgetsBinding.instance.platformDispatcher.views.first;
+    final w = view.physicalSize.width / view.devicePixelRatio;
+    final weeks = (((w - 32 - 28) / 14).ceil() + 1).clamp(20, 53);
+    _dashDays = weeks * 7;
+
     // Instant paint from cache, if any.
-    final cached = DataCache.getSync('dashchart_${_kDashChartDays}d') as Map?;
+    final cached = DataCache.getSync('dashchart_${_dashDays}d') as Map?;
     if (cached != null) {
       setState(() {
         _dashChartCalendar = Map<String, int>.from(cached['calendar'] as Map);
@@ -410,7 +418,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     setState(() => _dashChartLoading = true);
     try {
       final now   = DateTime.now();
-      final since = now.subtract(const Duration(days: _kDashChartDays - 1));
+      final since = now.subtract(Duration(days: _dashDays - 1));
       final calendarData = <String, int>{};
       final monthlyData  = <String, int>{};
 
@@ -466,7 +474,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         _dashChartLoading  = false;
         _dashChartLoaded   = true;
       });
-      await DataCache.set('dashchart_${_kDashChartDays}d',
+      await DataCache.set('dashchart_${_dashDays}d',
           {'calendar': calendarData, 'monthly': monthlyData});
     } catch (_) {
       if (mounted) setState(() => _dashChartLoading = false);
@@ -606,8 +614,8 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   // Builds the header + content for the chosen dashboard chart.
   Widget _buildDashboardChartSection() {
     final now   = DateTime.now();
-    // Calendar only shows the last _kDashChartDays days — no year rows.
-    final calStart = now.subtract(const Duration(days: _kDashChartDays - 1));
+    // Calendar only shows the last _dashDays days — no year rows.
+    final calStart = now.subtract(Duration(days: _dashDays - 1));
     final title = _dashboardChart == 'monthly'
         ? L.dashChartMonthlyLabel
         : L.dashChartCalendarLabel;

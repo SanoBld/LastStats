@@ -1420,7 +1420,7 @@ class _ChartsPageState extends State<_ChartsPage>
                         (calendarForView != null && calendarForView.isNotEmpty)
                             ? RepaintBoundary(
                                 key: _xkeys['calendar'],
-                                child: _HeatmapPager(
+                                child: _GhCalendar(
                                     data: calendarForView, start: heatmapStart, end: heatmapEnd))
                             : _NoDataCard(
                                 year: 0,
@@ -1432,7 +1432,7 @@ class _ChartsPageState extends State<_ChartsPage>
                       else if (calendarForView != null)
                         RepaintBoundary(
                           key: _xkeys['calendar'],
-                          child: _HeatmapPager(
+                          child: _GhCalendar(
                               data: calendarForView, start: heatmapStart, end: heatmapEnd))
                       else if (!hasFullData && _selectedYear != DateTime.now().year)
                         _NoDataCard(year: _selectedYear, onLoad: () => AllScrobblesService.loadAll(widget.service)),
@@ -3287,5 +3287,280 @@ class _EndScrollViewState extends State<_EndScrollView> {
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         child: widget.child,
+      );
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════
+//  _GhCalendar — GitHub contribution-graph look, in the app's colors:
+//  title with the total, month names on top, Mon/Wed/Fri on the left,
+//  rounded cells (Sunday first), "Less … More" legend, and a year selector
+//  (vertical list on wide screens, chips on phones). The newest year shows
+//  the last 12 months ending today. Opens on the latest day.
+// ══════════════════════════════════════════════════════════════════════════
+class _GhCalendar extends StatefulWidget {
+  final Map<String, int> data;
+  final DateTime start, end;
+  const _GhCalendar({required this.data, required this.start, required this.end});
+  @override
+  State<_GhCalendar> createState() => _GhCalendarState();
+}
+
+class _GhCalendarState extends State<_GhCalendar> {
+  int? _year; // null = newest year (rolling last 12 months)
+
+  static const _gap = 3.0;
+  static const _minCell = 10.0;
+  static const _maxCell = 18.0;
+  static const _labelW = 30.0;
+
+  static DateTime _d(DateTime d) => DateTime(d.year, d.month, d.day);
+  static String _key(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  List<int> get _years =>
+      [for (var y = widget.end.year; y >= widget.start.year; y--) y];
+
+  // Visible date range for the selected year.
+  (DateTime, DateTime) _range() {
+    final first = _d(widget.start), last = _d(widget.end);
+    final years = _years;
+    final y = _year ?? years.first;
+    if (years.length == 1) return (first, last);
+    if (y == years.first) {
+      var s = last.subtract(const Duration(days: 364));
+      if (s.isBefore(first)) s = first;
+      return (s, last);
+    }
+    var s = DateTime(y, 1, 1), e = DateTime(y, 12, 31);
+    if (s.isBefore(first)) s = first;
+    if (e.isAfter(last)) e = last;
+    return (s, e);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Theme.of(context).colorScheme;
+    final t = Theme.of(context).textTheme;
+    final (rs, re) = _range();
+    final years = _years;
+    final selected = _year ?? years.first;
+
+    var total = 0, maxVal = 0;
+    for (var d = rs; !d.isAfter(re); d = d.add(const Duration(days: 1))) {
+      final v = widget.data[_key(d)] ?? 0;
+      total += v;
+      if (v > maxVal) maxVal = v;
+    }
+
+    return LayoutBuilder(builder: (context, box) {
+      final wide = box.maxWidth >= 720 && years.length > 1;
+      final selectorW = wide ? 96.0 : 0.0;
+      final inner = box.maxWidth - selectorW - (wide ? 12 : 0) - 28; // card padding
+
+      final title = Text('${_fmtFull(total)} ${L.dashScrobbles}',
+          style: t.titleSmall?.copyWith(fontWeight: FontWeight.w700));
+
+      final chips = [
+        for (final y in years)
+          _YearPill(
+            label: '$y', selected: y == selected, scheme: s, text: t,
+            onTap: () => setState(() => _year = y == years.first ? null : y),
+          ),
+      ];
+
+      final card = Container(
+        decoration: _chartCardDecoration(s),
+        padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _grid(context, s, t, rs, re, maxVal, inner),
+          const SizedBox(height: 10),
+          Row(children: [
+            const Spacer(),
+            Text(tx('ui_less'),
+                style: t.labelSmall?.copyWith(fontSize: 10, color: s.onSurfaceVariant)),
+            const SizedBox(width: 5),
+            for (var i = 0; i < 5; i++)
+              Container(
+                width: 11, height: 11,
+                margin: const EdgeInsets.only(right: 3),
+                decoration: BoxDecoration(
+                  color: _levelColor(s, i),
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+            const SizedBox(width: 2),
+            Text(tx('ui_more'),
+                style: t.labelSmall?.copyWith(fontSize: 10, color: s.onSurfaceVariant)),
+          ]),
+        ]),
+      );
+
+      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(padding: const EdgeInsets.only(bottom: 10, left: 2), child: title),
+        if (years.length > 1 && !wide)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(children: [
+                for (final c in chips) Padding(
+                    padding: const EdgeInsets.only(right: 8), child: c),
+              ]),
+            ),
+          ),
+        if (wide)
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Expanded(child: card),
+            const SizedBox(width: 12),
+            SizedBox(
+              width: selectorW,
+              child: Column(children: [
+                for (final c in chips) Padding(
+                    padding: const EdgeInsets.only(bottom: 6), child: c),
+              ]),
+            ),
+          ])
+        else
+          card,
+      ]);
+    });
+  }
+
+  Color _levelColor(ColorScheme s, int level) => level == 0
+      ? s.surfaceContainerHigh
+      : Color.lerp(s.primaryContainer, s.primary, 0.2 + 0.8 * (level - 1) / 3)!;
+
+  Widget _grid(BuildContext context, ColorScheme s, TextTheme t,
+      DateTime rs, DateTime re, int maxVal, double inner) {
+    // Sunday-first columns, like GitHub.
+    final gridStart = rs.subtract(Duration(days: rs.weekday % 7));
+    final weeks = (re.difference(gridStart).inDays + 1 + 6) ~/ 7;
+    final avail = inner - _labelW;
+    final cell = ((avail - (weeks - 1) * _gap) / weeks).clamp(_minCell, _maxCell);
+    final step = cell + _gap;
+
+    // Month names: the column holding the 1st of a month.
+    final months = <int, String>{};
+    for (var col = 0; col < weeks; col++) {
+      for (var row = 0; row < 7; row++) {
+        final d = gridStart.add(Duration(days: col * 7 + row));
+        if (d.day == 1 && !d.isBefore(rs) && !d.isAfter(re)) {
+          months[col] = L.months[d.month];
+        }
+      }
+    }
+    if (!months.containsKey(0) && !months.containsKey(1) && !months.containsKey(2)) {
+      months[0] = L.months[rs.month];
+    }
+
+    final wd = L.weekdaysShort; // Mon..Sun
+    Widget dayLabel(int row) {
+      final text = row == 1 ? wd[0] : row == 3 ? wd[2] : row == 5 ? wd[4] : '';
+      return SizedBox(
+        height: step,
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(text, maxLines: 1,
+              style: t.labelSmall?.copyWith(fontSize: 11, color: s.onSurfaceVariant)),
+        ),
+      );
+    }
+
+    final grid = SizedBox(
+      width: weeks * step - _gap,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        SizedBox(
+          height: 20,
+          child: Stack(clipBehavior: Clip.none, children: [
+            for (final e in months.entries)
+              Positioned(
+                left: e.key * step, top: 0,
+                child: Text(e.value, maxLines: 1, softWrap: false,
+                    style: t.labelSmall?.copyWith(
+                        fontSize: 11, color: s.onSurfaceVariant)),
+              ),
+          ]),
+        ),
+        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          for (var col = 0; col < weeks; col++)
+            Padding(
+              padding: EdgeInsets.only(right: col == weeks - 1 ? 0 : _gap),
+              child: Column(children: [
+                for (var row = 0; row < 7; row++)
+                  _cellAt(s, gridStart.add(Duration(days: col * 7 + row)),
+                      rs, re, maxVal, cell),
+              ]),
+            ),
+        ]),
+      ]),
+    );
+
+    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      SizedBox(
+        width: _labelW,
+        child: Column(children: [
+          const SizedBox(height: 20),
+          for (var row = 0; row < 7; row++) dayLabel(row),
+        ]),
+      ),
+      Expanded(child: _EndScrollView(child: grid)),
+    ]);
+  }
+
+  Widget _cellAt(ColorScheme s, DateTime d, DateTime rs, DateTime re,
+      int maxVal, double cell) {
+    if (d.isBefore(rs) || d.isAfter(re)) {
+      return SizedBox(width: cell, height: cell + _gap);
+    }
+    final count = widget.data[_key(d)] ?? 0;
+    var level = 0;
+    if (count > 0 && maxVal > 0) {
+      final r = sqrt(count / maxVal);
+      level = r > 0.75 ? 4 : r > 0.5 ? 3 : r > 0.25 ? 2 : 1;
+    }
+    return Padding(
+      padding: const EdgeInsets.only(bottom: _gap),
+      child: Tooltip(
+        message: count > 0 ? '${d.day}/${d.month}/${d.year} — $count' : '',
+        child: Container(
+          width: cell, height: cell,
+          decoration: BoxDecoration(
+            color: _levelColor(s, level),
+            borderRadius: BorderRadius.circular(3),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _YearPill extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final ColorScheme scheme;
+  final TextTheme text;
+  final VoidCallback onTap;
+  const _YearPill({required this.label, required this.selected,
+      required this.scheme, required this.text, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          alignment: Alignment.center,
+          width: 72, height: 36,
+          decoration: BoxDecoration(
+            color: selected ? scheme.primary : scheme.surfaceContainerHigh,
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Text(label,
+              style: text.labelLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: selected ? scheme.onPrimary : scheme.onSurfaceVariant)),
+        ),
       );
 }
