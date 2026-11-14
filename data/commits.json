@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-14T08:51:47Z",
+  "updated": "2026-11-14T08:59:52Z",
   "commits": [
+    {
+      "sha": "a5b0c956d74267ba2c3c41555e390735cfa7bc63",
+      "message": "feat: améliorer le calendrier avec un design GitHub et optimiser le rendu pour de meilleures performances",
+      "date": "2026-11-14T08:59:29Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/a5b0c956d74267ba2c3c41555e390735cfa7bc63",
+      "tags": []
+    },
     {
       "sha": "c5d39baa3be41492f25a26335521691b6aea10eb",
       "message": "feat: redesign calendar interface and improve loading indicators for better user experience",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/79cda0dfbca7a5f50c06e05db7ac36508e8b1518",
-      "tags": []
-    },
-    {
-      "sha": "46d72b3b24bbe27b24fdab1b6e110485225def78",
-      "message": "feat: mettre à jour les icônes et améliorer la navigation dans les pages d'aide et légales",
-      "date": "2026-09-17T20:30:01Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/46d72b3b24bbe27b24fdab1b6e110485225def78",
       "tags": []
     }
   ]
