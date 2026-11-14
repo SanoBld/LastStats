@@ -188,6 +188,7 @@ window.I18N.de = {
   "langAuto": "Automatisch",
   "color.pick": "Farbe",
   "color.save": "In diesem Browser merken",
+  "color.music": "Farben der laufenden Musik",
   "color.random": "Zufällig bei jedem Neuladen",
   "color.mono": "Eine Farbe",
   "color.multi": "Mehrfarbig",

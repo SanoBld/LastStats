@@ -188,6 +188,7 @@ window.I18N.ja = {
   "langAuto": "自動",
   "color.pick": "カラー",
   "color.save": "このブラウザに保存",
+  "color.music": "再生中の音楽の色",
   "color.random": "更新のたびにランダム",
   "color.mono": "単色",
   "color.multi": "マルチカラー",

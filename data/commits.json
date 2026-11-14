@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-14T22:05:00Z",
+  "updated": "2026-11-14T22:07:13Z",
   "commits": [
+    {
+      "sha": "abe2446e2402e4e126d07c0a58e46fbf068113fc",
+      "message": "feat: ajout de traductions pour la couleur de la musique en cours dans plusieurs langues",
+      "date": "2026-11-14T22:05:08Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/abe2446e2402e4e126d07c0a58e46fbf068113fc",
+      "tags": []
+    },
     {
       "sha": "717f6593b7cd4bbfcfd771ef9568005d067b93f0",
       "message": "feat: amélioration de la gestion des transitions et ajout d'un événement personnalisé pour le changement de musique",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/50f61ccd340ccad9f0549b9de60a8b987fc9ae45",
-      "tags": []
-    },
-    {
-      "sha": "419f524c822385a202aa7ecaef4fc3cd233092e0",
-      "message": "feat: refactoriser la section \"Découvrir\" pour séparer les recommandations personnelles et les tendances, améliorer l'indicateur de chargement",
-      "date": "2026-09-22T16:51:50Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/419f524c822385a202aa7ecaef4fc3cd233092e0",
       "tags": []
     }
   ]
