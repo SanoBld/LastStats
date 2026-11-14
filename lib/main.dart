@@ -34,6 +34,7 @@ import 'services/lastfm_service.dart';
 import 'services/crash_log_service.dart';
 import 'services/auto_backup_service.dart';
 import 'widgets/custom_title_bar.dart';
+import 'widgets/skeleton.dart' show M3Loader;
 import 'services/internal_keys.dart';
 import 'theme/m3_motion.dart';
 import 'theme/m3_shapes.dart';
@@ -73,8 +74,8 @@ Future<void> _mainImpl() async {
   // 1000-image limit was constantly evicting and re-decoding images —
   // the source of the reported micro-freezes while scrolling.
   if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
-    PaintingBinding.instance.imageCache.maximumSize = 3000;
-    PaintingBinding.instance.imageCache.maximumSizeBytes = 300 << 20; // 300 MB
+    PaintingBinding.instance.imageCache.maximumSize = 2000;
+    PaintingBinding.instance.imageCache.maximumSizeBytes = 200 << 20; // 200 MB (RAM)
   }
 
   // ── Custom frameless window (Windows / Linux desktop) ────────────────────
@@ -92,6 +93,13 @@ Future<void> _mainImpl() async {
       await windowManager.focus();
     });
   }
+
+  // PC: the window is already visible here, but the data loading below takes
+  // a moment. Draw a light splash screen right now so the window answers
+  // instead of looking frozen; the real app replaces it when ready.
+  final isDesktop = !kIsWeb &&
+      (Platform.isWindows || Platform.isLinux || Platform.isMacOS);
+  if (isDesktop) runApp(const _BootRoot());
 
   final prefs      = await SharedPreferences.getInstance();
   final username   = prefs.getString('ls_username') ?? '';
@@ -251,11 +259,19 @@ Future<void> _mainImpl() async {
     }
   }
 
-  runApp(LastStatsApp(
+  final app = LastStatsApp(
     username:   username,
     apiKey:     apiKey,
     startupTab: startupTab,
-  ));
+  );
+  if (isDesktop) {
+    _bootApp.value = app;
+    // Let the first real frame mount the navigator before the code below
+    // (cold-start notification / link handling) looks for it.
+    await WidgetsBinding.instance.endOfFrame;
+  } else {
+    runApp(app);
+  }
 
   // Cache cleanup — not needed for the first frame, so it runs after the
   // app is already visible instead of blocking startup.
@@ -508,4 +524,53 @@ class LastStatsApp extends StatelessWidget {
         },
       );
     }
+}
+
+// ── PC start-up screen ───────────────────────────────────────────────────────
+// Shown instantly while preferences and caches load, then replaced (with a
+// short fade) by the real app.
+final ValueNotifier<Widget?> _bootApp = ValueNotifier<Widget?>(null);
+
+class _BootRoot extends StatelessWidget {
+  const _BootRoot();
+
+  @override
+  Widget build(BuildContext context) => ValueListenableBuilder<Widget?>(
+        valueListenable: _bootApp,
+        builder: (_, app, _) => AnimatedSwitcher(
+          duration: const Duration(milliseconds: 250),
+          child: app ?? const _BootSplash(key: ValueKey('boot_splash')),
+        ),
+      );
+}
+
+class _BootSplash extends StatelessWidget {
+  const _BootSplash({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = PlatformDispatcher.instance.platformBrightness == Brightness.dark;
+    final theme = ThemeData(
+      useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF6750A4),
+          brightness: dark ? Brightness.dark : Brightness.light),
+    );
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: theme,
+      home: Scaffold(
+        body: Center(
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Text('LastStats',
+                style: TextStyle(
+                    fontSize: 28, fontWeight: FontWeight.w800,
+                    color: theme.colorScheme.primary)),
+            const SizedBox(height: 24),
+            const M3Loader(shrink: true),
+          ]),
+        ),
+      ),
+    );
+  }
 }

@@ -42,6 +42,7 @@
 - Music calendar: always fills the full width and shows the latest weeks that fit your screen; in Charts it now opens on today instead of the start of the year
 - Charts calendar redesigned in the GitHub contribution style (months on top, Mon/Wed/Fri, rounded cells, Less/More legend, year selector), opening on today
 - The home calendar and the shared calendar image now use the same GitHub-style design; removed the Beta badge from the chart export sheet
+- PC: a start-up screen appears instantly while data loads (the window no longer looks frozen at launch); lower image cache memory
 - Performance: lighter calendar rendering, badge shimmer paused while the app is in the background
 - Home calendar now loads enough weeks to fill the card with real data
 - Friend profile: simple loader with a smooth transition instead of the grey placeholder
