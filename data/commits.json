@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-14T20:17:17Z",
+  "updated": "2026-11-14T20:19:13Z",
   "commits": [
+    {
+      "sha": "4d666a51547d48923f4ad2c2f71bba317472b028",
+      "message": "feat: refonte de l'animation de fond musical et mise à jour des chaînes de localisation pour une meilleure clarté",
+      "date": "2026-11-14T20:18:01Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/4d666a51547d48923f4ad2c2f71bba317472b028",
+      "tags": []
+    },
     {
       "sha": "3ef33df201549185a701f3181377ec7eac451e18",
       "message": "feat: ajout de la compatibilité de partage d'image pour la musique, amélioration de l'interface de récapitulatif annuel et mise à jour des libellés de période dans plusieurs langues",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/b5bfdfcad6a09306964ebe3e3813b63da40e56c8",
-      "tags": []
-    },
-    {
-      "sha": "07261a42dbe52aee2cf89749740c6f3e487d16ce",
-      "message": "feat: Upgrade to v3.6.0 with Material 3 Expressive components\n\n- Introduced M3Chip and M3SegmentedButton to replace FilterChip and SegmentedButton across various screens for a more cohesive Material 3 design.\n- Redesigned dashboard and settings pages with new UI elements, including a wavy loading indicator and improved layout for large screens.\n- Enhanced performance and visual consistency with updated animations and motion physics.\n- Added new features such as a date picker for rankings and improved accessibility in settings.\n- Updated changelog to reflect new features and fixes.",
-      "date": "2026-09-21T19:39:37Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/07261a42dbe52aee2cf89749740c6f3e487d16ce",
       "tags": []
     }
   ]
