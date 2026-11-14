@@ -27,6 +27,8 @@ jobs:
       # base-href must match the repo name + /app/ subfolder
       # (site URL: https://sanobld.github.io/LastStats/app/)
       - name: Build web app (Dart)
+        env:
+          LS_WEB_KEY: ${{ secrets.LS_WEB_KEY }}
         run: dart run tool/ci/build_web.dart /LastStats/app/
 
       # Publish only to /app subfolder. keep_files protects the existing /docs folder

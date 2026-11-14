@@ -13,5 +13,6 @@ Future<void> main(List<String> args) async {
   // base-href must match the repo name + /app/ subfolder
   final baseHref = args.isNotEmpty ? args.first : '/';
   await run(['pub', 'get']);
-  await run(['build', 'web', '--release', '--base-href', baseHref]);
+  await run(['build', 'web', '--release',
+    '--dart-define=LS_WEB_KEY=${Platform.environment['LS_WEB_KEY'] ?? ''}', '--base-href', baseHref]);
 }

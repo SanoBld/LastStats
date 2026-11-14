@@ -6,19 +6,32 @@
 //   - "Backup" mode: the user's own key is tried first; on a key/quota error
 //     the request is retried once with the built-in key (see LastFmService).
 import 'dart:math';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'lastfm_service.dart';
 
 class InternalKeys {
   InternalKeys._();
 
-  static const _pool = <String>[
-    '64ea3292f32f8fdae796d6cd0a12a21b',
-    '2f3ca4abee468c40006b104e151553eb',
-    'c24da2031c7db6a6bbcba8c486f6e39e',
-    '4399f75c4c1cedec886c3365dafb5498',
-    'd60cfa9cc84acc54e57971552d9d1ccf',
-  ];
+  // Keys are NOT in the code. They come from build-time secrets:
+  //   --dart-define=LS_KEYS=key1,key2,key3   (apps)
+  //   --dart-define=LS_WEB_KEY=key           (web build only)
+  static const _rawKeys = String.fromEnvironment('LS_KEYS');
+  static const _webKey  = String.fromEnvironment('LS_WEB_KEY');
+
+  // Public backup key, written in the code on purpose (last resort only).
+  static const _publicKey = '4b209f5fef22138422d78a337d7518a4';
+
+  // Secret keys (from build-time defines), used first.
+  static final List<String> _secret = kIsWeb
+      ? (_webKey.isNotEmpty ? [_webKey] : <String>[])
+      : _rawKeys.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+
+  // Full pool = secret keys + public key at the end.
+  static final List<String> _pool = [..._secret, _publicKey];
+
+  // Installs only pick a secret key; the public one is used when none exist.
+  static List<String> get _pickable => _secret.isEmpty ? [_publicKey] : _secret;
 
   static const _kPicked   = 'ls_internal_key';
   static const _kFallback = 'ls_internal_fallback';
@@ -38,7 +51,7 @@ class InternalKeys {
     if (_pool.contains(saved)) return saved;
     // Random.secure: every install draws its own key, so the load is
     // spread evenly over the built-in keys.
-    final key = _pool[Random.secure().nextInt(_pool.length)];
+    final key = _pickable[Random.secure().nextInt(_pickable.length)];
     await p.setString(_kPicked, key);
     return key;
   }

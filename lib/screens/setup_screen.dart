@@ -409,14 +409,20 @@ class _SetupScreenState extends State<SetupScreen>
                               child: Stack(alignment: Alignment.center, children: [
                                 RotationTransition(
                                   turns: _floatAnim,
-                                  child: ClipPath(
-                                    clipper: const ShapeBorderClipper(
-                                        shape: M3CookieBorder(
-                                            lobes: 9, amplitude: 0.07)),
-                                    child: SvgPicture.asset(_logoAsset(context),
-                                        width: 140, height: 140),
+                                  child: Container(
+                                    width: 140, height: 140,
+                                    decoration: ShapeDecoration(
+                                      color: Theme.of(context).brightness == Brightness.dark
+                                          ? Colors.black : const Color(0xFFF5F5F5),
+                                      shape: const M3CookieBorder(
+                                          lobes: 9, amplitude: 0.07),
+                                    ),
                                   ),
                                 ),
+                                // Logo stays still, only the star turns
+                                SvgPicture.asset(
+                                    'assets/icons/app_logo_${Theme.of(context).brightness == Brightness.dark ? 'white' : 'black'}.svg',
+                                    width: 140, height: 140),
                               ]),
                             ),
                             const SizedBox(height: 14),
