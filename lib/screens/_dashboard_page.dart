@@ -398,10 +398,10 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   Future<void> _loadDashboardChart() async {
     if (_dashChartLoading) return;
 
-    // Enough weeks to fill the card: 12 px cells + 2 px gaps.
+    // Enough weeks to fill the card: 10 px cells + 3 px gaps.
     final view = WidgetsBinding.instance.platformDispatcher.views.first;
     final w = view.physicalSize.width / view.devicePixelRatio;
-    final weeks = (((w - 32 - 28) / 14).ceil() + 1).clamp(20, 53);
+    final weeks = ((w - 32 - 28 - 30) / 13).floor().clamp(20, 53);
     _dashDays = weeks * 7;
 
     // Instant paint from cache, if any.
@@ -632,10 +632,11 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     } else if (_dashboardChart == 'monthly') {
       content = _MonthlyCard(monthly: _dashChartMonthly ?? const <String, int>{});
     } else {
-      content = _CompactHeatmap(
-        data:  _dashChartCalendar ?? const <String, int>{},
-        start: calStart,
-        end:   now,
+      content = _GhCalendar(
+        data:    _dashChartCalendar ?? const <String, int>{},
+        start:   calStart,
+        end:     now,
+        compact: true,
       );
     }
 

@@ -24,6 +24,8 @@ class TierShimmer {
     if (ecoModeActiveNotifier.value) return;
     // 80ms (~12fps) — still reads as a smooth sweep, fewer wake-ups than 60ms.
     _timer ??= Timer.periodic(const Duration(milliseconds: 80), (_) {
+      final st = WidgetsBinding.instance.lifecycleState;
+      if (st != null && st != AppLifecycleState.resumed) return; // saves CPU/battery
       phase.value = (phase.value + 0.012) % 1.0;
     });
   }

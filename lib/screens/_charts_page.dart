@@ -664,17 +664,6 @@ class _ChartsPageState extends State<_ChartsPage>
                 child: Text(tx('ui_which_chart'),
                     style: txt.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: scheme.tertiaryContainer,
-                  borderRadius: AppRadius.xlR,
-                ),
-                child: Text(tx('ui_beta'),
-                    style: txt.labelSmall?.copyWith(
-                        color: scheme.onTertiaryContainer,
-                        fontWeight: FontWeight.w700)),
-              ),
             ]),
           ),
           Flexible(
@@ -860,7 +849,7 @@ class _ChartsPageState extends State<_ChartsPage>
         }
         final maxWeeks = heatmapYears.map(weeksFor).reduce((a, b) => a > b ? a : b);
         final natural = (60.0 + maxWeeks * 11.5 + 28).clamp(320.0, 8000.0).toDouble();
-        return (_HeatmapCard(data: calendarForView, start: heatmapStart, end: heatmapEnd), natural);
+        return (_GhCalendar(data: calendarForView, start: heatmapStart, end: heatmapEnd, exportMode: true), 1000.0);
       case 'streaks':
         if (calendarForView == null || calendarForView.isEmpty) return null;
         return (_StreakCard(data: calendarForView), w);
@@ -3301,7 +3290,11 @@ class _EndScrollViewState extends State<_EndScrollView> {
 class _GhCalendar extends StatefulWidget {
   final Map<String, int> data;
   final DateTime start, end;
-  const _GhCalendar({required this.data, required this.start, required this.end});
+  // compact: dashboard card (no title / year selector, shows exactly start..end)
+  // exportMode: share image (fixed cell size, no scrolling, no selector)
+  final bool compact, exportMode;
+  const _GhCalendar({required this.data, required this.start, required this.end,
+      this.compact = false, this.exportMode = false});
   @override
   State<_GhCalendar> createState() => _GhCalendarState();
 }
@@ -3342,7 +3335,7 @@ class _GhCalendarState extends State<_GhCalendar> {
   Widget build(BuildContext context) {
     final s = Theme.of(context).colorScheme;
     final t = Theme.of(context).textTheme;
-    final (rs, re) = _range();
+    final (rs, re) = widget.compact ? (_d(widget.start), _d(widget.end)) : _range();
     final years = _years;
     final selected = _year ?? years.first;
 
@@ -3354,7 +3347,8 @@ class _GhCalendarState extends State<_GhCalendar> {
     }
 
     return LayoutBuilder(builder: (context, box) {
-      final wide = box.maxWidth >= 720 && years.length > 1;
+      final showYears = years.length > 1 && !widget.compact && !widget.exportMode;
+      final wide = box.maxWidth >= 720 && showYears;
       final selectorW = wide ? 96.0 : 0.0;
       final inner = box.maxWidth - selectorW - (wide ? 12 : 0) - 28; // card padding
 
@@ -3397,8 +3391,9 @@ class _GhCalendarState extends State<_GhCalendar> {
       );
 
       return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Padding(padding: const EdgeInsets.only(bottom: 10, left: 2), child: title),
-        if (years.length > 1 && !wide)
+        if (!widget.compact)
+          Padding(padding: const EdgeInsets.only(bottom: 10, left: 2), child: title),
+        if (showYears && !wide)
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: SingleChildScrollView(
@@ -3437,7 +3432,9 @@ class _GhCalendarState extends State<_GhCalendar> {
     final gridStart = rs.subtract(Duration(days: rs.weekday % 7));
     final weeks = (re.difference(gridStart).inDays + 1 + 6) ~/ 7;
     final avail = inner - _labelW;
-    final cell = ((avail - (weeks - 1) * _gap) / weeks).clamp(_minCell, _maxCell);
+    final cell = widget.exportMode
+        ? 14.0
+        : ((avail - (weeks - 1) * _gap) / weeks).clamp(_minCell, _maxCell);
     final step = cell + _gap;
 
     // Month names: the column holding the 1st of a month.
@@ -3504,7 +3501,7 @@ class _GhCalendarState extends State<_GhCalendar> {
           for (var row = 0; row < 7; row++) dayLabel(row),
         ]),
       ),
-      Expanded(child: _EndScrollView(child: grid)),
+      Expanded(child: widget.exportMode ? grid : _EndScrollView(child: RepaintBoundary(child: grid))),
     ]);
   }
 
@@ -3519,18 +3516,19 @@ class _GhCalendarState extends State<_GhCalendar> {
       final r = sqrt(count / maxVal);
       level = r > 0.75 ? 4 : r > 0.5 ? 3 : r > 0.25 ? 2 : 1;
     }
+    final box = Container(
+      width: cell, height: cell,
+      decoration: BoxDecoration(
+        color: _levelColor(s, level),
+        borderRadius: BorderRadius.circular(3),
+      ),
+    );
+    // A Tooltip per cell is costly (~370 of them): only where there is data.
     return Padding(
       padding: const EdgeInsets.only(bottom: _gap),
-      child: Tooltip(
-        message: count > 0 ? '${d.day}/${d.month}/${d.year} — $count' : '',
-        child: Container(
-          width: cell, height: cell,
-          decoration: BoxDecoration(
-            color: _levelColor(s, level),
-            borderRadius: BorderRadius.circular(3),
-          ),
-        ),
-      ),
+      child: count > 0
+          ? Tooltip(message: '${d.day}/${d.month}/${d.year} — $count', child: box)
+          : box,
     );
   }
 }
