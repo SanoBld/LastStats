@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-14T18:53:02Z",
+  "updated": "2026-11-14T20:17:17Z",
   "commits": [
+    {
+      "sha": "3ef33df201549185a701f3181377ec7eac451e18",
+      "message": "feat: ajout de la compatibilité de partage d'image pour la musique, amélioration de l'interface de récapitulatif annuel et mise à jour des libellés de période dans plusieurs langues",
+      "date": "2026-11-14T20:16:53Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/3ef33df201549185a701f3181377ec7eac451e18",
+      "tags": []
+    },
     {
       "sha": "813daefc8d79949f86a766a40a977beee303dd1b",
       "message": "feat: mise à jour du changelog, amélioration de l'interface et ajout de nouvelles fonctionnalités",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/07261a42dbe52aee2cf89749740c6f3e487d16ce",
-      "tags": []
-    },
-    {
-      "sha": "0f8426e9a4a825bc484a483fffd3bef8b745dea3",
-      "message": "feat: ajouter des composants Material 3 et refactoriser les animations et les transitions pour améliorer l'interface utilisateur",
-      "date": "2026-09-21T19:17:17Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/0f8426e9a4a825bc484a483fffd3bef8b745dea3",
       "tags": []
     }
   ]
