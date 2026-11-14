@@ -448,7 +448,7 @@ class AppStringsJa implements AppStrings {
   @override String get commonSave => '保存';
   @override String get dashFallbackWhenNoMusic => '音楽が再生されていないとき';
   @override String get dashFallbackChooseDisplay => '代わりに背景として表示する内容を選択してください';
-  @override String get dashFallbackPeriodLabel => '代替期間';
+  @override String get dashFallbackPeriodLabel => '表示する1位の期間';
   @override String get fallbackPeriod1Week => '1週間';
   @override String get fallbackPeriod1Month => '1ヶ月';
   @override String get fallbackPeriodAllTime => '全期間';

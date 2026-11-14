@@ -448,7 +448,7 @@ class AppStringsIt implements AppStrings {
   @override String get commonSave => 'Salva';
   @override String get dashFallbackWhenNoMusic => 'Quando non c\'è musica in riproduzione';
   @override String get dashFallbackChooseDisplay => 'Scelga cosa mostrare come sfondo al suo posto';
-  @override String get dashFallbackPeriodLabel => 'Periodo di riserva';
+  @override String get dashFallbackPeriodLabel => 'Periodo del n° 1 mostrato';
   @override String get fallbackPeriod1Week => '1 settimana';
   @override String get fallbackPeriod1Month => '1 mese';
   @override String get fallbackPeriodAllTime => 'Sempre';

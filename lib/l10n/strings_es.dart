@@ -497,7 +497,7 @@ class AppStringsEs implements AppStrings {
   @override String get commonSave          => 'Guardar';
   @override String get dashFallbackWhenNoMusic   => 'Cuando no hay música sonando';
   @override String get dashFallbackChooseDisplay => 'Elija qué mostrar de fondo en su lugar';
-  @override String get dashFallbackPeriodLabel   => 'Período de respaldo';
+  @override String get dashFallbackPeriodLabel   => 'Período del n.º 1 mostrado';
   @override String get fallbackPeriod1Week       => '1 semana';
   @override String get fallbackPeriod1Month      => '1 mes';
   @override String get fallbackPeriodAllTime     => 'Todo el tiempo';

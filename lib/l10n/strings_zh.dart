@@ -494,7 +494,7 @@ class AppStringsZh implements AppStrings {
   @override String get commonSave          => '保存';
   @override String get dashFallbackWhenNoMusic   => '当没有音乐播放时';
   @override String get dashFallbackChooseDisplay => '改为选择在背景中显示的内容';
-  @override String get dashFallbackPeriodLabel   => '备用图片时间段';
+  @override String get dashFallbackPeriodLabel   => '显示第1名的时间段';
   @override String get fallbackPeriod1Week       => '1 周';
   @override String get fallbackPeriod1Month      => '1 个月';
   @override String get fallbackPeriodAllTime     => '全部时间';

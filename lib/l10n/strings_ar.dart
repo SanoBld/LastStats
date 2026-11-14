@@ -448,7 +448,7 @@ class AppStringsAr implements AppStrings {
   @override String get commonSave => 'حفظ';
   @override String get dashFallbackWhenNoMusic => 'عند عدم تشغيل أي موسيقى';
   @override String get dashFallbackChooseDisplay => 'اختر ما يُعرض كخلفية بدلًا من ذلك';
-  @override String get dashFallbackPeriodLabel => 'الفترة الاحتياطية';
+  @override String get dashFallbackPeriodLabel => 'فترة المركز الأول المعروض';
   @override String get fallbackPeriod1Week => 'أسبوع واحد';
   @override String get fallbackPeriod1Month => 'شهر واحد';
   @override String get fallbackPeriodAllTime => 'كل الأوقات';

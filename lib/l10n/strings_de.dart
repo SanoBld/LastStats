@@ -448,7 +448,7 @@ class AppStringsDe implements AppStrings {
   @override String get commonSave => 'Speichern';
   @override String get dashFallbackWhenNoMusic => 'Wenn keine Musik läuft';
   @override String get dashFallbackChooseDisplay => 'Wählen Sie, was stattdessen als Hintergrund angezeigt wird';
-  @override String get dashFallbackPeriodLabel => 'Ersatzzeitraum';
+  @override String get dashFallbackPeriodLabel => 'Zeitraum der Top-Auswahl';
   @override String get fallbackPeriod1Week => '1 Woche';
   @override String get fallbackPeriod1Month => '1 Monat';
   @override String get fallbackPeriodAllTime => 'Gesamt';

@@ -687,6 +687,17 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
                     textAlign: TextAlign.center,
                     style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800),
                   ),
+                  if (!_loading && _error == null)
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton.filledTonal(
+                        tooltip: L.commonShare,
+                        icon: _sharing
+                            ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                            : const Icon(Icons.ios_share_rounded),
+                        onPressed: _sharing ? null : _shareImage,
+                      ),
+                    ),
                   Align(
                     alignment: Alignment.centerRight,
                     child: IconButton.filledTonal(
@@ -874,6 +885,67 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
         ],
       ],
     );
+  }
+
+  bool _sharing = false;
+
+  // Renders the share poster off-screen (360x640 at 3x = 1080x1920, same as
+  // the other share images in the app) and opens the system share sheet.
+  Future<void> _shareImage() async {
+    if (_sharing) return;
+    setState(() => _sharing = true);
+    final key = GlobalKey();
+    final overlay = Overlay.of(context, rootOverlay: true);
+    final scheme = Theme.of(context).colorScheme;
+    late OverlayEntry entry;
+    entry = OverlayEntry(builder: (_) => Positioned(
+      left: -20000, top: 0,
+      child: Theme(
+        data: Theme.of(context),
+        child: Material(
+          type: MaterialType.transparency,
+          child: RepaintBoundary(
+            key: key,
+            child: _CompatShareCard(
+              scheme: scheme,
+              me: _myUsername,
+              them: widget.targetUser,
+              score: _score,
+              tier: _compatibilityTierLabel(_score),
+              breakdown: _breakdown,
+              genres: _sharedGenres,
+              artists: _sharedArtists,
+              tracks: _sharedTracks,
+              albums: _sharedAlbums,
+              totalArtists: _totalArtists,
+              totalTracks: _totalTracks,
+              totalAlbums: _totalAlbums,
+            ),
+          ),
+        ),
+      ),
+    ));
+    overlay.insert(entry);
+    try {
+      for (var i = 0; i < 3; i++) {
+        final done = Completer<void>();
+        WidgetsBinding.instance.addPostFrameCallback((_) => done.complete());
+        await done.future;
+      }
+      final rb = key.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      if (rb == null || rb.size.isEmpty) return;
+      final img = await rb.toImage(pixelRatio: 3.0);
+      final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
+      img.dispose();
+      if (bytes == null) return;
+      m3Haptic(M3Haptic.light);
+      await AppShare.shareBytes('laststats_compat_${_myUsername}_${widget.targetUser}.png',
+          bytes.buffer.asUint8List());
+    } catch (_) {
+    } finally {
+      entry.remove();
+      if (mounted) setState(() => _sharing = false);
+    }
   }
 
   // Opens the detail sheet comparing my plays vs theirs for one item.
@@ -1752,6 +1824,152 @@ class _CountPill extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ── Share poster (9:16, 360x640 exported at 3x = 1080x1920) ───────────────────
+
+class _CompatShareCard extends StatelessWidget {
+  final ColorScheme scheme;
+  final String me, them, tier;
+  final double score;
+  final Map<String, double> breakdown;
+  final List<String> genres;
+  final List<_SharedMatch> artists, tracks, albums;
+  final int totalArtists, totalTracks, totalAlbums;
+  const _CompatShareCard({
+    required this.scheme, required this.me, required this.them,
+    required this.score, required this.tier, required this.breakdown,
+    required this.genres, required this.artists, required this.tracks,
+    required this.albums, required this.totalArtists,
+    required this.totalTracks, required this.totalAlbums,
+  });
+
+  Widget _bar(String label, double v) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 3),
+        child: Row(children: [
+          SizedBox(width: 78, child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: scheme.onSurface, fontSize: 11, fontWeight: FontWeight.w700))),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: LinearProgressIndicator(
+                value: v.clamp(0.0, 1.0), minHeight: 8,
+                backgroundColor: scheme.primary.withValues(alpha: 0.15),
+                valueColor: AlwaysStoppedAnimation(scheme.primary),
+              ),
+            ),
+          ),
+          SizedBox(width: 38, child: Text('${(v * 100).round()}%', textAlign: TextAlign.right,
+              style: TextStyle(color: scheme.onSurface, fontSize: 11, fontWeight: FontWeight.w800))),
+        ]),
+      );
+
+  Widget _list(String title, List<_SharedMatch> items) {
+    if (items.isEmpty) return const SizedBox.shrink();
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      ShareLabel(title),
+      const SizedBox(height: 4),
+      for (var i = 0; i < items.length && i < 3; i++)
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Row(children: [
+            ShareRank(n: i + 1, size: 22),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(items[i].name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: scheme.onSurface, fontSize: 13, fontWeight: FontWeight.w800)),
+                if (items[i].artist.isNotEmpty)
+                  Text(items[i].artist, maxLines: 1, overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 10.5, fontWeight: FontWeight.w600)),
+              ]),
+            ),
+          ]),
+        ),
+    ]);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final rows = <(String, String)>[
+      ('artists', tx('cmp_by_artists')),
+      ('genres', tx('cmp_by_genres')),
+      ('tracks', tx('cmp_by_tracks')),
+      ('albums', tx('cmp_by_albums')),
+    ].where((r) => breakdown.containsKey(r.$1)).toList();
+    return Material(
+      color: ShareCardFrame.solidColor(scheme),
+      borderRadius: BorderRadius.circular(28),
+      clipBehavior: Clip.antiAlias,
+      child: Stack(children: [
+        Positioned(top: -60, right: -60, child: ShareBlob(size: 200, color: scheme.primary.withValues(alpha: 0.10))),
+        Positioned(bottom: 90, left: -80, child: ShareBlob(size: 170, lobes: 12, color: scheme.tertiary.withValues(alpha: 0.08))),
+        Positioned(bottom: -80, right: -55, child: ShareBlob(size: 240, lobes: 10, amplitude: 0.09, color: scheme.primary.withValues(alpha: 0.08))),
+        Container(
+          width: 360, height: 640,
+          padding: const EdgeInsets.fromLTRB(14, 30, 14, 8),
+          child: SizedBox(
+            width: 332,
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('$me × $them', maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: scheme.primary, fontSize: 12, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 4),
+              SizedBox(
+                height: 26,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown, alignment: Alignment.centerLeft,
+                  child: Text(tx('ui_music_compatibility'), maxLines: 1,
+                      style: TextStyle(color: scheme.onSurface, fontSize: 23, fontWeight: FontWeight.w900, height: 1.1)),
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Column(mainAxisSize: MainAxisSize.min, children: [
+                        Container(
+                          width: 120, height: 120, alignment: Alignment.center,
+                          decoration: ShapeDecoration(
+                            color: scheme.primaryContainer,
+                            shape: M3CookieBorder(lobes: 10, amplitude: 0.05 + score * 0.12),
+                          ),
+                          child: Text('${(score * 100).round()}%',
+                              style: TextStyle(color: scheme.onPrimaryContainer, fontSize: 34, fontWeight: FontWeight.w900)),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(tier, textAlign: TextAlign.center,
+                            style: TextStyle(color: scheme.primary, fontSize: 15, fontWeight: FontWeight.w800)),
+                      ]),
+                    ),
+                    SizedBox(
+                      height: 56,
+                      child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                        Expanded(child: ShareTile(label: tx('ui_shared_artists'), value: '$totalArtists')),
+                        const SizedBox(width: 8),
+                        Expanded(child: ShareTile(label: tx('ui_shared_tracks'), value: '$totalTracks')),
+                        const SizedBox(width: 8),
+                        Expanded(child: ShareTile(label: tx('ui_shared_albums'), value: '$totalAlbums')),
+                      ]),
+                    ),
+                    if (rows.isNotEmpty)
+                      Column(children: [for (final r in rows) _bar(r.$2, breakdown[r.$1]!)]),
+                    _list(tx('ui_shared_artists'), artists),
+                    _list(tx('ui_shared_tracks'), tracks),
+                  ],
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: ShareMark(color: scheme.onSurfaceVariant.withValues(alpha: 0.7)),
+              ),
+            ]),
+          ),
+        ),
+      ]),
     );
   }
 }

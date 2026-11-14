@@ -2140,7 +2140,7 @@ class _YrShareCard extends StatelessWidget {
         Container(
         width: 360,
         height: 640, // 9:16 (story format), exported at 3x = 1080x1920
-        padding: EdgeInsets.fromLTRB(14, slide != null ? 22 : 30, 14, 18),
+        padding: EdgeInsets.fromLTRB(14, slide != null ? 22 : 30, 14, slide != null ? 12 : 8),
         child: slide != null
           // FittedBox shrinks the content if it is ever taller than the card
           ? FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.topCenter, child: SizedBox(width: 332, child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
@@ -2185,7 +2185,6 @@ class _YrShareCard extends StatelessWidget {
               _list(tx('yr_top_albums'), data.albums, 'albums'),
             ]),
           ),
-          const SizedBox(height: 6),
           Align(
             alignment: Alignment.bottomRight,
             child: ShareMark(color: _yrSoft(scheme).withValues(alpha: 0.7)),

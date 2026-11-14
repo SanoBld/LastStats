@@ -448,7 +448,7 @@ class AppStringsRu implements AppStrings {
   @override String get commonSave => 'Сохранить';
   @override String get dashFallbackWhenNoMusic => 'Когда музыка не играет';
   @override String get dashFallbackChooseDisplay => 'Выберите, что показывать в качестве фона вместо этого';
-  @override String get dashFallbackPeriodLabel => 'Резервный период';
+  @override String get dashFallbackPeriodLabel => 'Период для показанного №1';
   @override String get fallbackPeriod1Week => '1 неделя';
   @override String get fallbackPeriod1Month => '1 месяц';
   @override String get fallbackPeriodAllTime => 'Всё время';

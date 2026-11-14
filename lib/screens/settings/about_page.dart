@@ -545,6 +545,10 @@ class _FoldSectionState extends State<_FoldSection> {
     final scheme = Theme.of(context).colorScheme;
     final items  = widget.children.where((c) => c is! Divider).toList();
     final n      = items.where((c) => c is! Padding).length;
+    // Only a few rows: show them directly, no "show more" needed.
+    if (n <= 4) {
+      return SettingsSection(label: widget.label, children: widget.children);
+    }
     return AnimatedSize(
       duration: const Duration(milliseconds: 280),
       curve: M3Motion.emphasizedDecelerate,

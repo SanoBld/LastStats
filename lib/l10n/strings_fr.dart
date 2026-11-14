@@ -497,7 +497,7 @@ class AppStringsFr implements AppStrings {
   @override String get commonSave          => 'Enregistrer';
   @override String get dashFallbackWhenNoMusic   => "Quand aucune musique n'est en cours";
   @override String get dashFallbackChooseDisplay => "Choisissez ce qui s'affiche en arrière-plan à la place";
-  @override String get dashFallbackPeriodLabel   => 'Période de secours';
+  @override String get dashFallbackPeriodLabel   => 'Période du #1 affiché';
   @override String get fallbackPeriod1Week       => '1 semaine';
   @override String get fallbackPeriod1Month      => '1 mois';
   @override String get fallbackPeriodAllTime     => 'Tout le temps';
