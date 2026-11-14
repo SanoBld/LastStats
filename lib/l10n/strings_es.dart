@@ -529,7 +529,7 @@ class AppStringsEs implements AppStrings {
   @override String get aboutOpenSourceLibs => 'Bibliotecas de código abierto';
   @override String get aboutOpenSourceLibsSub => 'Todos los paquetes de Flutter usados para crear la app.';
   @override String get aboutLicenseSection => 'Licencia';
-  @override String get aboutLicenseText => 'Este proyecto se publica bajo la licencia MIT: es libre de usarlo, modificarlo, duplicarlo o redistribuirlo, solo cíteme.';
+  @override String get aboutLicenseText => 'Este proyecto se publica bajo la licencia GNU GPL v3: es libre de usarlo, modificarlo y redistribuirlo, siempre que las obras derivadas sigan siendo de código abierto con la misma licencia y se mencione mi nombre.';
   @override String get aboutLicenseLink => 'Ver licencia completa';
   @override String get languageAiNote => 'Las traducciones fueron generadas por IA y pueden contener imprecisiones.';
   @override String get aboutAiDevNote => 'La IA también se usó para desarrollar esta app.';
@@ -993,6 +993,16 @@ const Map<String, String> kTxEs = {
   'lvl': 'Nivel {n}',
   'lvl_history': 'Historial de niveles',
   'set_mblur_t': "Desenfoque de movimiento",
+  'menu_copied': "Copiado",
+  'menu_select': "Seleccionar",
+  'sel_count': "{n} seleccionados",
+  'sel_remove': "Quitar de favoritos",
+  'sel_cancel': "Cancelar",
+  'set_density_t': "Densidad",
+  'set_density_s': "Compacta, cómoda o amplia",
+  'menu_add_folder': "Añadir a una carpeta",
+  'menu_copy_title': "Copiar título",
+  'menu_copy_both': "Copiar artista – título",
   'set_mblur_s': "Desenfoque suave en las transiciones de página y apariciones",
   'ui_widget_bg': "Fondo del widget",
   'ui_widget_bg_d': "Póster usa las formas del tema; Liso es negro o blanco según claro/oscuro; Ninguno es transparente",

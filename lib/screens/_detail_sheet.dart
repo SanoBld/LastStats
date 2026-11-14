@@ -4174,7 +4174,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                   ),
                 ])),
                 const SizedBox(width: 10),
-                Text('${_fmt(plays)}', style: text.labelMedium?.copyWith(
+                Text(_fmt(plays), style: text.labelMedium?.copyWith(
                     color: scheme.primary, fontWeight: FontWeight.w800)),
               ]),
             ),

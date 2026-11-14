@@ -405,6 +405,7 @@ class _TopListBodyState extends State<_TopListBody>
             return M3InkWell(
               key: ValueKey('rank_row_${widget.type}_${idx}_$name'),
               onTap: () { _haptic(_HapticImpact.light); _showDetail(ctx, item); },
+              onLongPress: () => showTrackMenu(ctx, name: name, artist: artist, type: widget.type),
               borderRadius: AppRadius.smR,
               child: _FadeSlideIn(
                 // Stagger each item slightly for a cascade effect

@@ -9,8 +9,10 @@ import 'package:flutter/material.dart';
 import '../theme/m3_motion.dart';
 import '../widgets/m3_components.dart';
 import '../widgets/skeleton.dart';
+import '../widgets/m3_popup_menu.dart';
 import '../app_state.dart';
 import '../l10n/l10n.dart';
+import '../l10n/extra_strings.dart';
 import '../services/data_cache.dart';
 import '../services/lastfm_service.dart';
 import '../services/favorites_folders_service.dart' show FavoritesFoldersService;
@@ -32,6 +34,27 @@ class _FavoritesPageState extends State<FavoritesPage> {
   bool           _loading = true;
   String         _query   = '';
   _SortMode      _sort    = _SortMode.recent;
+  // Multi-select: keys of the selected tracks. Empty = normal mode.
+  final Set<String> _sel = {};
+  bool _selecting = false;
+
+  String _k(Map t) => lovedKey((t['artist']?['name'] ?? '').toString(), (t['name'] ?? '').toString());
+
+  void _toggle(Map t) {
+    setState(() {
+      final k = _k(t);
+      if (!_sel.remove(k)) _sel.add(k);
+      if (_sel.isEmpty) _selecting = false;
+    });
+  }
+
+  void _endSelect() => setState(() { _sel.clear(); _selecting = false; });
+
+  Future<void> _removeSelected() async {
+    final list = _tracks.where((t) => _sel.contains(_k(t as Map))).toList();
+    _endSelect();
+    for (final t in list) { await _remove(Map<String, dynamic>.from(t as Map)); }
+  }
 
   @override
   void initState() {
@@ -121,15 +144,47 @@ Expanded(child: M3Switcher(
                 hint: L.favSearchHint,
                 onChanged: (v) => setState(() => _query = v),
               ),
-              M3ButtonGroup<_SortMode>(
-                items: [
-                  (_SortMode.recent,   L.favSortRecent),
-                  (_SortMode.oldest,   L.favSortOldest),
-                  (_SortMode.artistAz, L.favSortArtistAz),
-                  (_SortMode.titleAz,  L.favSortTitleAz),
-                ],
-                selected: _sort,
-                onSelected: (m) => setState(() => _sort = m),
+              if (_selecting)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 8, 4),
+                  child: Row(children: [
+                    Expanded(child: Text(tx('sel_count', {'n': '${_sel.length}'}),
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700))),
+                    IconButton(
+                      tooltip: tx('sel_remove'),
+                      icon: const Icon(Icons.heart_broken_rounded),
+                      onPressed: _removeSelected,
+                    ),
+                    IconButton(
+                      tooltip: tx('sel_cancel'),
+                      icon: const Icon(Icons.close_rounded),
+                      onPressed: _endSelect,
+                    ),
+                  ]),
+                ),
+              // Sort: one chip that opens the options bubble.
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                child: Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Builder(builder: (chipCtx) {
+                    final labels = {_SortMode.recent: L.favSortRecent, _SortMode.oldest: L.favSortOldest, _SortMode.artistAz: L.favSortArtistAz, _SortMode.titleAz: L.favSortTitleAz};
+                    return M3Chip(
+                      avatar: const Icon(Icons.sort_rounded),
+                      label: Text(labels[_sort]!),
+                      selected: false,
+                      onSelected: (_) => showM3Menu(chipCtx, groups: [[
+                        for (final e in labels.entries)
+                          M3MenuItem(
+                            label: e.value,
+                            icon: Icons.sort_rounded,
+                            selected: e.key == _sort,
+                            onTap: () => setState(() => _sort = e.key),
+                          ),
+                      ]]),
+                    );
+                  }),
+                ),
               ),
               const SizedBox(height: 8),
               Expanded(
@@ -154,8 +209,13 @@ Expanded(child: M3Switcher(
                               count: items.length,
                               child: _FavoriteListTile(
                                 track:  t,
-                                onTap:  () => showDetailSheet(ctx, Map<String, dynamic>.from(t), 'tracks', widget.service),
+                                onTap:  () => _selecting
+                                    ? _toggle(t as Map)
+                                    : showDetailSheet(ctx, Map<String, dynamic>.from(t), 'tracks', widget.service),
                                 onRemove: () => _remove(t),
+                                selecting: _selecting,
+                                selected: _sel.contains(_k(t as Map)),
+                                onSelect: () { setState(() => _selecting = true); _toggle(t as Map); if (_sel.isEmpty) setState(() => _selecting = true); },
                               ),
                             ),
                           );
@@ -173,11 +233,16 @@ class _FavoriteListTile extends StatelessWidget {
   final Map<String, dynamic> track;
   final VoidCallback         onTap;
   final VoidCallback         onRemove;
+  final bool                 selecting, selected;
+  final VoidCallback?        onSelect;
 
   const _FavoriteListTile({
     required this.track,
     required this.onTap,
     required this.onRemove,
+    this.selecting = false,
+    this.selected = false,
+    this.onSelect,
   });
 
   String _extractImage(dynamic raw) {
@@ -202,7 +267,10 @@ class _FavoriteListTile extends StatelessWidget {
       artist: artist,
       imageUrl: rawUrl,
       onTap: onTap,
-      trailing: GestureDetector(
+      onSelect: selecting ? null : onSelect,
+      trailing: selecting
+          ? Checkbox(value: selected, onChanged: (_) => onTap())
+          : GestureDetector(
         onLongPress: () => showFolderAssignSheet(context, name: name, artist: artist, image: rawUrl),
         child: IconButton.filledTonal(
           icon: Icon(Icons.favorite_rounded,

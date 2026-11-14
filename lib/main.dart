@@ -2,7 +2,7 @@
 import 'dart:async';
 import 'dart:io' show Platform;
 import 'dart:math' show Random;
-import 'dart:ui' show PlatformDispatcher;
+import 'dart:ui' show PlatformDispatcher, PointerDeviceKind;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -179,6 +179,7 @@ Future<void> _mainImpl() async {
   pcModeNotifier.value   = prefs.getString('ls_pc_mode') ?? 'auto';
   navLabelNotifier.value     = prefs.getBool('ls_nav_labels')      ?? true;
   hapticFeedbackNotifier.value = prefs.getBool('ls_haptic_feedback') ?? true;
+  densityNotifier.value = prefs.getInt('ls_density') ?? 1;
   motionBlurNotifier.value = prefs.getBool('ls_motion_blur') ?? true;
   livingArtworkNotifier.value = prefs.getBool('ls_living_artwork') ?? true;
   motionArtworkNotifier.value = prefs.getBool('ls_motion_artwork') ?? true;
@@ -492,8 +493,22 @@ class LastStatsApp extends StatelessWidget {
                                       theme:     lTheme,
                                       darkTheme: dTheme,
                                       themeMode: mode,
+                                      // Mouse drag + always-visible scrollbar on PC.
+                                      scrollBehavior: const _DesktopScrollBehavior(),
+                                      // Slower fade when the accent colour changes.
+                                      themeAnimationDuration: const Duration(milliseconds: 500),
+                                      themeAnimationCurve: Curves.easeInOut,
                                       builder: (context, child) =>
-                                          AppTextScale(child: DesktopTitleBarShell(child: ColoredBox(color: Theme.of(context).colorScheme.surface, child: child!))),
+                                          ValueListenableBuilder<int>(
+                                            valueListenable: densityNotifier,
+                                            builder: (ctx, d, _) => Theme(
+                                              data: Theme.of(ctx).copyWith(
+                                                visualDensity: VisualDensity(
+                                                    horizontal: d == 0 ? -2.0 : d == 2 ? 1.0 : 0.0,
+                                                    vertical:   d == 0 ? -2.0 : d == 2 ? 1.0 : 0.0)),
+                                              child: AppTextScale(child: DesktopTitleBarShell(child: ColoredBox(color: Theme.of(ctx).colorScheme.surface, child: child!))),
+                                            ),
+                                          ),
                                       home: (username.isNotEmpty && apiKey.isNotEmpty)
                                           ? HomeScreen(username: username, apiKey: apiKey,
                                               startupTab: startupTab)
@@ -600,4 +615,16 @@ class _KeyboardFocusGuard with WidgetsBindingObserver {
       }
     });
   }
+}
+
+/// Lets the mouse drag lists and shows a scrollbar on desktop.
+class _DesktopScrollBehavior extends MaterialScrollBehavior {
+  const _DesktopScrollBehavior();
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.stylus,
+        PointerDeviceKind.trackpad,
+      };
 }

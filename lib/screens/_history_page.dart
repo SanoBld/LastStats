@@ -411,6 +411,7 @@ class _HistTrackRow extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       clipBehavior: Clip.antiAlias,
       child: M3InkWell(
+      onLongPress: () => showTrackMenu(context, name: tit, artist: art),
       onTap: () {
         _haptic(_HapticImpact.light);
         showDetailSheet(

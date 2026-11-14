@@ -477,7 +477,7 @@ class AppStringsDe implements AppStrings {
   @override String get aboutOpenSourceLibs => 'Open-Source-Bibliotheken';
   @override String get aboutOpenSourceLibsSub => 'Alle Flutter-Pakete, die für diese App verwendet wurden.';
   @override String get aboutLicenseSection => 'Lizenz';
-  @override String get aboutLicenseText => 'Dieses Projekt steht unter der MIT-Lizenz: Sie dürfen es frei nutzen, verändern, duplizieren oder weiterverbreiten, nennen Sie einfach meinen Namen.';
+  @override String get aboutLicenseText => 'Dieses Projekt steht unter der GNU GPL v3: Sie dürfen es frei nutzen, verändern und weitergeben, solange abgeleitete Werke unter derselben Lizenz quelloffen bleiben und mein Name genannt wird.';
   @override String get aboutLicenseLink => 'Vollständige Lizenz ansehen';
   @override String get languageAiNote => 'Die Übersetzungen wurden von KI erstellt und können Ungenauigkeiten enthalten.';
   @override String get aboutAiDevNote => 'KI wurde auch bei der Entwicklung dieser App eingesetzt.';
@@ -964,6 +964,16 @@ const Map<String, String> kTxDe = {
   'lvl': 'Level {n}',
   'lvl_history': 'Levelverlauf',
   'set_mblur_t': "Bewegungsunschärfe",
+  'menu_copied': "Kopiert",
+  'menu_select': "Auswählen",
+  'sel_count': "{n} ausgewählt",
+  'sel_remove': "Aus Favoriten entfernen",
+  'sel_cancel': "Abbrechen",
+  'set_density_t': "Dichte",
+  'set_density_s': "Kompakt, komfortabel oder luftig",
+  'menu_add_folder': "Zu einem Ordner hinzufügen",
+  'menu_copy_title': "Titel kopieren",
+  'menu_copy_both': "Künstler – Titel kopieren",
   'set_mblur_s': "Weiche Unschärfe bei Seitenübergängen und Einblendungen",
   'ui_widget_bg': "Widget-Hintergrund",
   'ui_widget_bg_d': "Poster nutzt Theme-Formen; Einfarbig ist schwarz oder weiß je nach Hell/Dunkel; Keiner ist transparent",

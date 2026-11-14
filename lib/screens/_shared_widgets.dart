@@ -33,18 +33,11 @@ class _FadeSlideIn extends StatefulWidget {
 class _FadeSlideInState extends State<_FadeSlideIn>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
-  late final Animation<double>   _fade;
-  late final Animation<Offset>   _slide;
 
   @override
   void initState() {
     super.initState();
     _ctrl  = AnimationController(vsync: this, duration: widget.duration);
-    _fade  = CurvedAnimation(parent: _ctrl, curve: M3Motion.emphasizedDecelerate);
-    _slide = Tween<Offset>(
-      begin: const Offset(0, 0.06),
-      end:   Offset.zero,
-    ).animate(CurvedAnimation(parent: _ctrl, curve: M3Motion.emphasizedDecelerate));
 
     if (widget.skipAnimation) {
       _ctrl.value = 1.0; // already "arrived" — no fade/slide to play
@@ -104,8 +97,8 @@ class _PressScaleState extends State<_PressScale> {
 // ── Pulsing status dot (used in NowPlayingCard and friend cards) ──────────────
 class _PulsingDot extends StatefulWidget {
   final Color color;
-  final double size;
-  const _PulsingDot({required this.color, this.size = 7});
+  double get size => 7;
+  const _PulsingDot({required this.color});
 
   @override
   State<_PulsingDot> createState() => _PulsingDotState();
@@ -258,6 +251,14 @@ class _SmartImageState extends State<_SmartImage> {
     final px = (widget.size * MediaQuery.of(context).devicePixelRatio).round();
     return _shaped(Image.network(url, width: widget.size, height: widget.size, fit: BoxFit.cover,
         cacheWidth: px, cacheHeight: px,
+        // Smooth fade-in when the artwork appears or changes.
+        frameBuilder: (_, child, frame, sync) => sync
+            ? child
+            : AnimatedOpacity(
+                opacity: frame == null ? 0 : 1,
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOut,
+                child: child),
         loadingBuilder: (_, child, p) => p == null ? child : _loadingBox(s),
         errorBuilder: (_, _, _) => _fallbackBox(s)));
   }

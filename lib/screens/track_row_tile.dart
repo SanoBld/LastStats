@@ -9,6 +9,8 @@
 import 'package:flutter/material.dart';
 import '../services/image_service.dart';
 import '../theme/story_style.dart';
+import '../widgets/m3_popup_menu.dart';
+import '../widgets/m3_marquee.dart';
 
 class TrackRowTile extends StatelessWidget {
   final String name;
@@ -16,6 +18,7 @@ class TrackRowTile extends StatelessWidget {
   final String imageUrl; // raw Last.fm url, used as a fallback while resolving
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
+  final VoidCallback? onSelect; // adds "Select" to the bubble
   final Widget? trailing;
 
   const TrackRowTile({
@@ -25,15 +28,23 @@ class TrackRowTile extends StatelessWidget {
     required this.imageUrl,
     this.onTap,
     this.onLongPress,
+    this.onSelect,
     this.trailing,
   });
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return ListTile(
+    // Long press / right click opens the bubble; old long-press action
+    // ("add to folder") is its first entry.
+    return GestureDetector(
+      behavior: HitTestBehavior.deferToChild,
+      onSecondaryTapUp: (d) => showTrackMenu(context,
+          name: name, artist: artist, at: d.globalPosition, onAddToFolder: onLongPress, onSelect: onSelect),
+      child: ListTile(
       onTap: onTap,
-      onLongPress: onLongPress,
+      onLongPress: () => showTrackMenu(context,
+          name: name, artist: artist, onAddToFolder: onLongPress, onSelect: onSelect),
       leading: ClipRRect(
         borderRadius: AppRadius.smR,
         child: SizedBox(
@@ -60,10 +71,10 @@ class TrackRowTile extends StatelessWidget {
           ),
         ),
       ),
-      title: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis),
+      title: M3Marquee(name),
       subtitle: artist.isEmpty ? null : Text(artist, maxLines: 1, overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
       trailing: trailing,
-    );
+    ));
   }
 }

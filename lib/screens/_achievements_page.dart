@@ -668,8 +668,7 @@ Expanded(child: history.isEmpty
 // materials instead of a flat color block.
 class _AchvTierSurface extends StatefulWidget {
   final CardTier tier;
-  final Widget? child;
-  const _AchvTierSurface({required this.tier, this.child});
+  const _AchvTierSurface({required this.tier});
 
   @override
   State<_AchvTierSurface> createState() => _AchvTierSurfaceState();
@@ -694,7 +693,6 @@ class _AchvTierSurfaceState extends State<_AchvTierSurface> {
     if (grad == null) {
       return Container(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        child: widget.child,
       );
     }
     return ValueListenableBuilder<double>(
@@ -711,7 +709,6 @@ class _AchvTierSurfaceState extends State<_AchvTierSurface> {
           child: child,
         );
       },
-      child: widget.child,
     );
   }
 }

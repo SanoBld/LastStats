@@ -477,7 +477,7 @@ class AppStringsJa implements AppStrings {
   @override String get aboutOpenSourceLibs => 'オープンソースライブラリ';
   @override String get aboutOpenSourceLibsSub => 'このアプリの構築に使用したすべての Flutter パッケージ。';
   @override String get aboutLicenseSection => 'ライセンス';
-  @override String get aboutLicenseText => 'このプロジェクトは MIT ライセンスの下で公開されています。自由に使用、改変、複製、再配布できますが、私の名前を記載してください。';
+  @override String get aboutLicenseText => 'このプロジェクトは GNU GPL v3 ライセンスの下で公開されています。派生物が同じライセンスでオープンソースのままであり、私の名前を記載する限り、自由に使用、改変、再配布できます。';
   @override String get aboutLicenseLink => 'ライセンス全文を見る';
   @override String get languageAiNote => '翻訳は AI によって生成されており、不正確な場合があります。';
   @override String get aboutAiDevNote => 'このアプリの開発にも AI が使用されています。';
@@ -963,6 +963,16 @@ const Map<String, String> kTxJa = {
   'lvl': 'レベル {n}',
   'lvl_history': 'レベル履歴',
   'set_mblur_t': "モーションブラー",
+  'menu_copied': "コピーしました",
+  'menu_select': "選択",
+  'sel_count': "{n} 件を選択中",
+  'sel_remove': "お気に入りから削除",
+  'sel_cancel': "キャンセル",
+  'set_density_t': "密度",
+  'set_density_s': "コンパクト、標準、ゆったり",
+  'menu_add_folder': "フォルダに追加",
+  'menu_copy_title': "タイトルをコピー",
+  'menu_copy_both': "アーティスト – タイトルをコピー",
   'set_mblur_s': "ページ遷移や表示時のやわらかなぼかし",
   'ui_widget_bg': "ウィジェットの背景",
   'ui_widget_bg_d': "ポスターはテーマの形を使用、無地はライト/ダークに応じて黒または白、なしは透明",

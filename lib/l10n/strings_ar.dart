@@ -477,7 +477,7 @@ class AppStringsAr implements AppStrings {
   @override String get aboutOpenSourceLibs => 'مكتبات مفتوحة المصدر';
   @override String get aboutOpenSourceLibsSub => 'جميع حزم Flutter المستخدمة لبناء التطبيق.';
   @override String get aboutLicenseSection => 'الرخصة';
-  @override String get aboutLicenseText => 'هذا المشروع منشور بموجب رخصة MIT: يمكنك استخدامه أو تعديله أو نسخه أو إعادة توزيعه بحرية، فقط مع ذكر اسمي.';
+  @override String get aboutLicenseText => 'هذا المشروع منشور بموجب رخصة GNU GPL v3: يمكنك استخدامه وتعديله وإعادة توزيعه بحرية، بشرط أن تبقى الأعمال المشتقة مفتوحة المصدر بالرخصة نفسها مع ذكر اسمي.';
   @override String get aboutLicenseLink => 'عرض الرخصة الكاملة';
   @override String get languageAiNote => 'تم إنشاء الترجمات بواسطة الذكاء الاصطناعي وقد تحتوي على أخطاء.';
   @override String get aboutAiDevNote => 'استُخدم الذكاء الاصطناعي أيضًا في تطوير هذا التطبيق.';
@@ -964,6 +964,16 @@ const Map<String, String> kTxAr = {
   'lvl': 'المستوى {n}',
   'lvl_history': 'سجل المستويات',
   'set_mblur_t': "ضبابية الحركة",
+  'menu_copied': "تم النسخ",
+  'menu_select': "تحديد",
+  'sel_count': "تم تحديد {n}",
+  'sel_remove': "إزالة من المفضلة",
+  'sel_cancel': "إلغاء",
+  'set_density_t': "الكثافة",
+  'set_density_s': "مضغوطة أو مريحة أو واسعة",
+  'menu_add_folder': "إضافة إلى مجلد",
+  'menu_copy_title': "نسخ العنوان",
+  'menu_copy_both': "نسخ الفنان – العنوان",
   'set_mblur_s': "ضبابية ناعمة أثناء انتقالات الصفحات وظهور العناصر",
   'ui_widget_bg': "خلفية الودجت",
   'ui_widget_bg_d': "الملصق يستخدم أشكال السمة؛ الموحّد أسود أو أبيض حسب الفاتح/الداكن؛ بلا خلفية شفافة",

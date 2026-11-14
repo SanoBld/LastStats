@@ -37,7 +37,7 @@ Name:     laststats
 Version:  $RPM_VERSION
 Release:  1
 Summary:  Last.fm statistics, charts and listening recaps
-License:  MIT
+License:  GPL-3.0-only
 URL:      https://github.com/SanoBld/LastStats
 # Same GTK soname on Fedora and openSUSE, so one package works on both.
 Requires: libgtk-3.so.0()(64bit)

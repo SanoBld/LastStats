@@ -526,7 +526,7 @@ class AppStringsZh implements AppStrings {
   @override String get aboutOpenSourceLibs => '开源库';
   @override String get aboutOpenSourceLibsSub => '构建此应用所使用的所有 Flutter 包。';
   @override String get aboutLicenseSection => '许可证';
-  @override String get aboutLicenseText => '本项目基于 MIT 许可证发布：您可以自由使用、修改、复制或再分发，只需注明出处即可。';
+  @override String get aboutLicenseText => '本项目基于 GNU GPL v3 许可证发布：您可以自由使用、修改和再分发，但衍生作品必须以相同许可证开源，并注明我的名字。';
   @override String get aboutLicenseLink => '查看完整许可证';
   @override String get languageAiNote => '翻译内容由 AI 生成，可能存在不准确之处。';
   @override String get aboutAiDevNote => '本应用的开发也使用了 AI。';
@@ -990,6 +990,16 @@ const Map<String, String> kTxZh = {
   'lvl': '等级 {n}',
   'lvl_history': '等级历史',
   'set_mblur_t': "动态模糊",
+  'menu_copied': "已复制",
+  'menu_select': "选择",
+  'sel_count': "已选 {n} 项",
+  'sel_remove': "从收藏中移除",
+  'sel_cancel': "取消",
+  'set_density_t': "密度",
+  'set_density_s': "紧凑、舒适或宽松",
+  'menu_add_folder': "添加到文件夹",
+  'menu_copy_title': "复制标题",
+  'menu_copy_both': "复制艺人 – 标题",
   'set_mblur_s': "页面切换和内容出现时的柔和模糊",
   'ui_widget_bg': "小组件背景",
   'ui_widget_bg_d': "海报使用主题形状;纯色根据浅色/深色为黑色或白色;无为透明",

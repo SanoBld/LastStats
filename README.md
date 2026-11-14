@@ -11,7 +11,7 @@
   <a href="https://github.com/SanoBld/LastStats/releases"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fsanobld.github.io%2FLastStats%2Fdata%2Fbadge-version.json&style=flat-square" alt="Latest release"></a>
   <a href="https://github.com/SanoBld/LastStats/releases"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fsanobld.github.io%2FLastStats%2Fdata%2Fbadge-downloads.json&style=flat-square" alt="Total downloads"></a>
   <a href="https://github.com/SanoBld/LastStats/stargazers"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fsanobld.github.io%2FLastStats%2Fdata%2Fbadge-stars.json&style=flat-square" alt="Stars"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-7C3AED?style=flat-square" alt="License"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL%20v3-7C3AED?style=flat-square" alt="License"></a>
   <a href="https://discord.gg/JjqmkQgZBs"><img src="https://img.shields.io/badge/Discord-Join-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord"></a>
 </p>
 
@@ -176,7 +176,7 @@ Found a bug or have an idea? [Open an issue](https://github.com/SanoBld/LastStat
 
 The full legal notice (publisher, data processed, your rights, third-party services) is here: [sanobld.github.io/LastStats/legal.html](https://sanobld.github.io/LastStats/legal.html). It is also reachable in the app, under Settings → About.
 
-**License.** The code is released under the [MIT License](LICENSE) © 2026 Sano Bld. You can use, modify and redistribute it, just credit us. Open-source packages keep their own licenses, visible in the app.
+**License.** The code is released under the [GNU GPL v3](LICENSE) © 2026 Sano Bld. You can use, modify and redistribute it as long as derivative works stay open source under the same license and credit the author. Open-source packages keep their own licenses, visible in the app.
 
 **AI.** AI helped with part of the development and with the in-app translations.
 

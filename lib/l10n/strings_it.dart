@@ -477,7 +477,7 @@ class AppStringsIt implements AppStrings {
   @override String get aboutOpenSourceLibs => 'Librerie open source';
   @override String get aboutOpenSourceLibsSub => "Tutti i pacchetti Flutter usati per creare l'app.";
   @override String get aboutLicenseSection => 'Licenza';
-  @override String get aboutLicenseText => 'Questo progetto è pubblicato con licenza MIT: è libero di usarlo, modificarlo, duplicarlo o ridistribuirlo, basta citarmi.';
+  @override String get aboutLicenseText => 'Questo progetto è pubblicato con licenza GNU GPL v3: è libero di usarlo, modificarlo e ridistribuirlo, purché le opere derivate restino open source con la stessa licenza e venga citato il mio nome.';
   @override String get aboutLicenseLink => 'Vedi la licenza completa';
   @override String get languageAiNote => "Le traduzioni sono state generate dall'IA e potrebbero contenere imprecisioni.";
   @override String get aboutAiDevNote => "L'IA è stata usata anche per sviluppare questa app.";
@@ -964,6 +964,16 @@ const Map<String, String> kTxIt = {
   'lvl': 'Livello {n}',
   'lvl_history': 'Cronologia livelli',
   'set_mblur_t': "Sfocatura di movimento",
+  'menu_copied': "Copiato",
+  'menu_select': "Seleziona",
+  'sel_count': "{n} selezionati",
+  'sel_remove': "Rimuovi dai preferiti",
+  'sel_cancel': "Annulla",
+  'set_density_t': "Densità",
+  'set_density_s': "Compatta, comoda o ariosa",
+  'menu_add_folder': "Aggiungi a una cartella",
+  'menu_copy_title': "Copia titolo",
+  'menu_copy_both': "Copia artista – titolo",
   'set_mblur_s': "Sfocatura leggera durante le transizioni di pagina e le comparse",
   'ui_widget_bg': "Sfondo del widget",
   'ui_widget_bg_d': "Poster usa le forme del tema; Tinta unita è nero o bianco in base a chiaro/scuro; Nessuno è trasparente",

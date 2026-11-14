@@ -529,7 +529,7 @@ class AppStringsFr implements AppStrings {
   @override String get aboutOpenSourceLibs => 'Bibliothèques open source';
   @override String get aboutOpenSourceLibsSub => "Tous les packages Flutter utilisés pour construire l'app.";
   @override String get aboutLicenseSection => 'Licence';
-  @override String get aboutLicenseText => "Ce projet est publié sous licence MIT : libre à vous de l'utiliser, le modifier, le dupliquer ou le redistribuer, tant que vous me citez.";
+  @override String get aboutLicenseText => "Ce projet est publié sous licence GNU GPL v3 : vous pouvez l'utiliser, le modifier et le redistribuer librement, à condition que les œuvres dérivées restent open source sous la même licence et que mon nom soit cité.";
   @override String get aboutLicenseLink => 'Voir la licence complète';
   @override String get languageAiNote => 'Les traductions ont été générées par IA et peuvent contenir des imprécisions.';
   @override String get aboutAiDevNote => "L'IA a aussi été utilisée pour le développement de cette app.";
@@ -993,6 +993,16 @@ const Map<String, String> kTxFr = {
   'lvl': 'Niveau {n}',
   'lvl_history': 'Historique des niveaux',
   'set_mblur_t': "Flou d'animation",
+  'menu_copied': "Copié",
+  'menu_select': "Sélectionner",
+  'sel_count': "{n} sélectionné(s)",
+  'sel_remove': "Retirer des favoris",
+  'sel_cancel': "Annuler",
+  'set_density_t': "Densité",
+  'set_density_s': "Compacte, confortable ou aérée",
+  'menu_add_folder': "Ajouter à un dossier",
+  'menu_copy_title': "Copier le titre",
+  'menu_copy_both': "Copier artiste – titre",
   'set_mblur_s': "Léger flou lors des transitions de page et des apparitions",
   'about_insp_podium': "Inspiration : flou doux sur les transitions d'arrivée / de départ",
   'about_insp_metrolist': "Inspiration : glissement + fondu entre les onglets (Material 3)",

@@ -53,3 +53,14 @@
 - Updated the first-launch introduction: new animation blur option, texts that match the current settings, no more mention of the removed style
 - Profile share image: "LastStats" is now at the bottom left and the source (Last.fm) sits just above the QR code
 
+**Metrolist-inspired (design ideas)**
+- New: options bubble. Long-press (or right-click on PC) a track in History, Rankings, Favorites or folders: it opens a bubble next to it, growing from the pressed spot, with connected rounded blocks. Open on Last.fm, Spotify, YouTube Music, Apple Music or Deezer (with their logos), copy the title, copy "artist - title", add to a folder
+- Favorites: sort is now a single chip that opens the bubble; new multi-select (long-press > Select, tick several tracks, remove them all at once)
+- Brand logos: real Apple logo for iOS in the website download window, real logos (Apple, Deezer, Spotify, GitHub, YouTube Music) in Settings > About; added Windows, Linux, Android, Telegram, Instagram, YouTube and Buy Me a Coffee logos
+- Animations: equalizer bars on the "Now playing" badge, confetti at the end of the year recap, smooth fade when artwork appears or changes, slower fade when the accent colour changes, long titles scroll by themselves in track lists
+- New: "Density" option in Appearance (Compact, Comfortable, Airy), saved and translated in the 10 languages
+- PC: lists can be dragged with the mouse; Android 14+: predictive back gesture enabled
+
+**License**
+- LastStats is now released under the GNU GPL v3 (was MIT), copyright Sano Bld. New LICENSE and NOTICE.md; README, website legal page, About page, RPM package and the 10 translations updated. Versions released before this stay under MIT
+

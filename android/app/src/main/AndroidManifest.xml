@@ -45,6 +45,7 @@
 
     <application
         android:label="LastStats"
+        android:enableOnBackInvokedCallback="true"
         android:allowBackup="false"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">

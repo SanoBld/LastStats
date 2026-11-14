@@ -477,7 +477,7 @@ class AppStringsRu implements AppStrings {
   @override String get aboutOpenSourceLibs => 'Библиотеки с открытым кодом';
   @override String get aboutOpenSourceLibsSub => 'Все пакеты Flutter, использованные для создания приложения.';
   @override String get aboutLicenseSection => 'Лицензия';
-  @override String get aboutLicenseText => 'Этот проект выпущен под лицензией MIT: вы можете свободно использовать, изменять, копировать или распространять его, просто указывайте автора.';
+  @override String get aboutLicenseText => 'Этот проект выпущен под лицензией GNU GPL v3: вы можете свободно использовать, изменять и распространять его при условии, что производные работы останутся открытыми под той же лицензией и будет указано моё имя.';
   @override String get aboutLicenseLink => 'Посмотреть полную лицензию';
   @override String get languageAiNote => 'Переводы созданы с помощью ИИ и могут содержать неточности.';
   @override String get aboutAiDevNote => 'ИИ также использовался при разработке этого приложения.';
@@ -964,6 +964,16 @@ const Map<String, String> kTxRu = {
   'lvl': 'Уровень {n}',
   'lvl_history': 'История уровней',
   'set_mblur_t': "Размытие при движении",
+  'menu_copied': "Скопировано",
+  'menu_select': "Выбрать",
+  'sel_count': "Выбрано: {n}",
+  'sel_remove': "Убрать из избранного",
+  'sel_cancel': "Отмена",
+  'set_density_t': "Плотность",
+  'set_density_s': "Компактная, удобная или свободная",
+  'menu_add_folder': "Добавить в папку",
+  'menu_copy_title': "Копировать название",
+  'menu_copy_both': "Копировать исполнителя – название",
   'set_mblur_s': "Лёгкое размытие при переходах между страницами и появлении элементов",
   'ui_widget_bg': "Фон виджета",
   'ui_widget_bg_d': "Постер использует формы темы; Однотонный — чёрный или белый в зависимости от светлой/тёмной темы; Нет — прозрачный",

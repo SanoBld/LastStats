@@ -1091,7 +1091,11 @@ class _YearRecapPageState extends State<YearRecapPage> {
     return Stack(children: [
       PageView(
         controller: _pages,
-        onPageChanged: (i) { setState(() => _slide = i); _playForSlide(i); },
+        onPageChanged: (i) {
+          setState(() => _slide = i);
+          _playForSlide(i);
+          if (i == slides.length - 1 && slides.length > 1) showM3Confetti(context);
+        },
         children: slides,
       ),
       // Tap zones (left third = back, right two thirds = next), like a story.

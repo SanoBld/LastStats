@@ -6,11 +6,11 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../l10n/l10n.dart';
-import '../../app_state.dart';
 import '../../services/update_service.dart';
 import 'settings_helpers.dart';
 import 'settings_rows.dart';
 import '../../widgets/m3_components.dart';
+import '../../widgets/brand_icon.dart';
 import '../../theme/m3_motion.dart';
 import 'readme_page.dart';
 
@@ -107,7 +107,7 @@ class AboutPage extends StatelessWidget {
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           ListTile(
-            leading: const Icon(Icons.code_rounded),
+            leading: const BrandIcon('assets/icons/github.svg', Icons.code_rounded, size: 24),
             title: Text(L.settingsSourceCode,
                 style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
             subtitle: Text(L.settingsSourceCodeSub,
@@ -256,7 +256,7 @@ class AboutPage extends StatelessWidget {
             leading: const Icon(Icons.gavel_rounded),
             title: Text(L.aboutLicenseLink,
                 style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-            subtitle: const Text('MIT License'),
+            subtitle: const Text('GNU GPL v3'),
             trailing: const Icon(Icons.open_in_new_rounded, size: 16),
             onTap: () => _open('https://github.com/SanoBld/LastStats/blob/master/LICENSE'),
           ),
@@ -373,18 +373,21 @@ class AboutPage extends StatelessWidget {
           const Divider(height: 1, indent: 16, endIndent: 16),
           _PoweredByTile(
             icon: Icons.smart_display_rounded,
+            asset: 'assets/icons/ytmusic.svg',
             label: 'YouTube Music',
             url: 'https://music.youtube.com',
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           _PoweredByTile(
             icon: Icons.apple_rounded,
+            asset: 'assets/icons/apple.svg',
             label: 'iTunes Search API',
             url: 'https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/iTuneSearchAPI',
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           _PoweredByTile(
             icon: Icons.graphic_eq_rounded,
+            asset: 'assets/icons/deezer.svg',
             label: 'Deezer API',
             url: 'https://developers.deezer.com',
           ),
@@ -445,18 +448,21 @@ class AboutPage extends StatelessWidget {
           const Divider(height: 1, indent: 16, endIndent: 16),
           _PoweredByTile(
             icon: Icons.headphones_rounded,
+            asset: 'assets/icons/spotify.svg',
             label: 'Spotify',
             url: 'https://open.spotify.com',
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           _PoweredByTile(
             icon: Icons.apple_rounded,
+            asset: 'assets/icons/applemusic.svg',
             label: 'Apple Music',
             url: 'https://music.apple.com',
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           _PoweredByTile(
             icon: Icons.code_rounded,
+            asset: 'assets/icons/github.svg',
             label: 'GitHub',
             url: 'https://github.com',
           ),
@@ -541,13 +547,16 @@ class _SafeSvgIcon extends StatelessWidget {
 class _PoweredByTile extends StatelessWidget {
   final IconData icon;
   final String label, url;
-  const _PoweredByTile({required this.icon, required this.label, required this.url});
+  final String? asset; // brand logo (SVG); falls back to [icon]
+  const _PoweredByTile({required this.icon, required this.label, required this.url, this.asset});
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return ListTile(
-      leading: Icon(icon, color: scheme.primary, size: 22),
+      leading: asset != null
+          ? BrandIcon(asset!, icon, size: 22, color: scheme.primary)
+          : Icon(icon, color: scheme.primary, size: 22),
       title: Text(label,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
       trailing: const Icon(Icons.open_in_new_rounded, size: 16),

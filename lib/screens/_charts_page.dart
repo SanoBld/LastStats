@@ -848,7 +848,6 @@ class _ChartsPageState extends State<_ChartsPage>
           return (cells / 7).ceil();
         }
         final maxWeeks = heatmapYears.map(weeksFor).reduce((a, b) => a > b ? a : b);
-        final natural = (60.0 + maxWeeks * 11.5 + 28).clamp(320.0, 8000.0).toDouble();
         return (_GhCalendar(data: calendarForView, start: heatmapStart, end: heatmapEnd, exportMode: true), 1000.0);
       case 'streaks':
         if (calendarForView == null || calendarForView.isEmpty) return null;
@@ -1487,11 +1486,6 @@ class _FadeInSection extends StatefulWidget {
 class _FadeInSectionState extends State<_FadeInSection> with SingleTickerProviderStateMixin {
   late final AnimationController _c = AnimationController(
       vsync: this, duration: const Duration(milliseconds: 650));
-  late final Animation<double> _fade = CurvedAnimation(parent: _c, curve: M3Motion.emphasizedDecelerate);
-  late final Animation<Offset> _slide = Tween<Offset>(
-    begin: const Offset(0, 0.06),
-    end:   Offset.zero,
-  ).animate(CurvedAnimation(parent: _c, curve: M3Motion.emphasizedDecelerate));
 
   @override
   void initState() {
