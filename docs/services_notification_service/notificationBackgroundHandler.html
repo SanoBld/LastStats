@@ -68,8 +68,12 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@pragma(&#39;vm:entry-point&#39;)
-Future&lt;void&gt; notificationBackgroundHandler(NotificationResponse r) =&gt;
-    NotificationService.handleAction(r);</code></pre>
+Future&lt;void&gt; notificationBackgroundHandler(NotificationResponse r) async {
+  &#47;&#47; Background isolate: plugins (shared_preferences, notifications) must be
+  &#47;&#47; registered first, otherwise the action silently does nothing.
+  try { DartPluginRegistrant.ensureInitialized(); } catch (_) {}
+  try { await NotificationService.handleAction(r); } catch (_) {}
+}</code></pre>
 </section>
 
 

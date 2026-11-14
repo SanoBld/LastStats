@@ -173,9 +173,10 @@ Widget build(BuildContext context) {
               border: Border.all(
                   color: scheme.outlineVariant.withValues(alpha: 0.35)),
             ),
-            child: Text(
-              body,
+            child: MarkdownLite(
+              text: body,
               style: text.bodyLarge?.copyWith(height: 1.5),
+              linkColor: scheme.primary,
             ),
           ),
         ],

@@ -132,6 +132,9 @@ Widget build(BuildContext context) {
         const SizedBox(height: 4),
         Text(L.aboutTagline,
             style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+        const SizedBox(height: 4),
+        Text(&#39;© 2026 Sano Bld · GPL-3.0&#39;,
+            style: text.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
         const SizedBox(height: 24),
       ])),
 
@@ -156,14 +159,6 @@ Widget build(BuildContext context) {
 
       &#47;&#47; ── App info ──────────────────────────────────────────────────────
       SettingsSection(label: L.aboutAppInfo, children: [
-        ListTile(
-          leading: const Icon(Icons.info_outline_rounded),
-          title: Text(L.settingsVersion,
-              style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-          trailing: Text(UpdateService.displayVersion ?? &#39;dev&#39;,
-              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-        ),
-        const Divider(height: 1, indent: 16, endIndent: 16),
         ListTile(
           leading: const Icon(Icons.web_rounded),
           title: Text(L.settingsWebVersion,
@@ -193,6 +188,22 @@ Widget build(BuildContext context) {
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
           trailing: const Icon(Icons.open_in_new_rounded, size: 16),
           onTap: () =&gt; _open(&#39;https:&#47;&#47;github.com&#47;SanoBld&#47;LastStats&#39;),
+        ),
+      ]),
+
+      const SizedBox(height: 16),
+
+      &#47;&#47; ── Support ───────────────────────────────────────────────────────
+      SettingsSection(label: L.settingsAboutSupport, children: [
+        ListTile(
+          leading: _SafeSvgIcon(asset: &#39;assets&#47;icons&#47;discord.svg&#39;,
+              fallback: Icons.forum_rounded, color: scheme.primary),
+          title: Text(L.aboutDiscord,
+              style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+          subtitle: Text(L.aboutDiscordSub,
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+          trailing: const Icon(Icons.open_in_new_rounded, size: 16),
+          onTap: () =&gt; _open(&#39;https:&#47;&#47;discord.gg&#47;JjqmkQgZBs&#39;),
         ),
       ]),
 
@@ -258,28 +269,11 @@ Widget build(BuildContext context) {
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           ListTile(
-            leading: const Icon(Icons.swap_horiz_rounded),
-            title: const Text(&#39;Metrolist&#39;, style: TextStyle(fontWeight: FontWeight.w600)),
-            subtitle: Text(tx(&#39;about_insp_metrolist&#39;), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-            trailing: const Icon(Icons.open_in_new_rounded, size: 16),
-            onTap: () =&gt; _open(&#39;https:&#47;&#47;github.com&#47;MetrolistGroup&#47;Metrolist&#39;),
-          ),
-          const Divider(height: 1, indent: 16, endIndent: 16),
-          ListTile(
             leading: const Icon(Icons.auto_awesome_rounded),
             title: const Text(&#39;Material 3 skill&#39;, style: TextStyle(fontWeight: FontWeight.w600)),
             subtitle: Text(tx(&#39;about_insp_m3skill&#39;), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
             trailing: const Icon(Icons.open_in_new_rounded, size: 16),
             onTap: () =&gt; _open(&#39;https:&#47;&#47;github.com&#47;hamen&#47;material-3-skill&#39;),
-          ),
-          const Divider(height: 1, indent: 16, endIndent: 16),
-          ListTile(
-            leading: const Icon(Icons.description_outlined),
-            title: const Text(&#39;ThemeData.useMaterial3&#39;,
-                style: TextStyle(fontWeight: FontWeight.w600)),
-            subtitle: Text(tx(&#39;ui_flutter_api_reference_&#39;), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-            trailing: const Icon(Icons.open_in_new_rounded, size: 16),
-            onTap: () =&gt; _open(&#39;https:&#47;&#47;api.flutter.dev&#47;flutter&#47;material&#47;ThemeData&#47;useMaterial3.html&#39;),
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           ListTile(
@@ -398,32 +392,6 @@ Widget build(BuildContext context) {
 
       const SizedBox(height: 16),
 
-      &#47;&#47; ── Support ───────────────────────────────────────────────────────
-      SettingsSection(label: L.settingsAboutSupport, children: [
-        ListTile(
-          leading: const Icon(Icons.star_rounded),
-          title: Text(L.settingsAboutSupport,
-              style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-          subtitle: Text(L.settingsAboutSupportSub,
-              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-          trailing: const Icon(Icons.open_in_new_rounded, size: 16),
-          onTap: () =&gt; _open(&#39;https:&#47;&#47;github.com&#47;SanoBld&#47;LastStats&#39;),
-        ),
-        const Divider(height: 1, indent: 16, endIndent: 16),
-        ListTile(
-          leading: _SafeSvgIcon(asset: &#39;assets&#47;icons&#47;discord.svg&#39;,
-              fallback: Icons.forum_rounded, color: scheme.primary),
-          title: Text(L.aboutDiscord,
-              style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-          subtitle: Text(L.aboutDiscordSub,
-              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-          trailing: const Icon(Icons.open_in_new_rounded, size: 16),
-          onTap: () =&gt; _open(&#39;https:&#47;&#47;discord.gg&#47;JjqmkQgZBs&#39;),
-        ),
-      ]),
-
-      const SizedBox(height: 16),
-
       &#47;&#47; ── Keyboard shortcuts (desktop) ─────────────────────────────────
       _FoldSection(label: L.aboutShortcuts, children: [
         Padding(
@@ -493,12 +461,6 @@ Widget build(BuildContext context) {
           icon: Icons.menu_book_rounded,
           label: &#39;Wikipedia &#47; Wikimedia Commons&#39;,
           url: &#39;https:&#47;&#47;www.wikipedia.org&#39;,
-        ),
-        const Divider(height: 1, indent: 16, endIndent: 16),
-        _PoweredByTile(
-          icon: Icons.flutter_dash_rounded,
-          label: &#39;Flutter&#39;,
-          url: &#39;https:&#47;&#47;flutter.dev&#39;,
         ),
         const Divider(height: 1, indent: 16, endIndent: 16),
         _PoweredByTile(

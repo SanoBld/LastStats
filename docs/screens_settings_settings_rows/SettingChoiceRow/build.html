@@ -116,6 +116,21 @@ Widget build(BuildContext context) {
     subtitle: description == null || description!.isEmpty ? null : Text(description!),
     trailing: current.isEmpty ? null : _ValuePill(current.first),
     onTap: () async {
+      &#47;&#47; Bubble for normal lists; sheet kept for font previews &#47; very long lists.
+      if (!previewFonts &amp;&amp; options.length &lt;= 14) {
+        await showM3Menu(context, groups: [
+          [
+            for (final o in options)
+              M3MenuItem(
+                label: o.$2,
+                icon: o.$3 ?? Icons.circle_outlined,
+                selected: o.$1 == value,
+                onTap: () { if (o.$1 != value) onChanged(o.$1); },
+              ),
+          ],
+        ]);
+        return;
+      }
       final r = await showModalBottomSheet&lt;String&gt;(
         sheetAnimationStyle: kM3SheetAnimation,
         context: context,
