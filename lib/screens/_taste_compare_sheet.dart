@@ -10,6 +10,7 @@ void showTasteCompareSheet(
     sheetAnimationStyle: kM3SheetAnimation,
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     showDragHandle: true,
     backgroundColor: Theme.of(context).colorScheme.surface,
     shape: const RoundedRectangleBorder(
@@ -680,11 +681,20 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  tx('ui_music_compatibility'),
-                  textAlign: TextAlign.center,
-                  style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-                ),
+                Stack(alignment: Alignment.center, children: [
+                  Text(
+                    tx('ui_music_compatibility'),
+                    textAlign: TextAlign.center,
+                    style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: IconButton.filledTonal(
+                      icon: const Icon(Icons.close_rounded),
+                      onPressed: () => Navigator.of(context).maybePop(),
+                    ),
+                  ),
+                ]),
                 const SizedBox(height: 4),
                 Text(
                   _loading
@@ -871,6 +881,7 @@ class _TasteCompareSheetState extends State<_TasteCompareSheet> {
     showModalBottomSheet(
     sheetAnimationStyle: kM3SheetAnimation,
       context: context,
+      useSafeArea: true,
       showDragHandle: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
@@ -1037,6 +1048,10 @@ class _RankedListTile extends StatelessWidget {
     return M3InkWell(
       borderRadius: AppRadius.mdR,
       onTap: onTap,
+      onLongPress: () => showTrackMenu(context,
+          name: match.name,
+          artist: match.artist,
+          type: match.type == 'track' ? 'tracks' : match.type == 'album' ? 'albums' : 'artists'),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         child: Row(

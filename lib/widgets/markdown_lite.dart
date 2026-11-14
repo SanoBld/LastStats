@@ -25,6 +25,9 @@ class MarkdownLite extends StatelessWidget {
   static final RegExp _boldRegex   = RegExp(r'\*\*(.+?)\*\*');
   static final RegExp _italicRegex = RegExp(r'(?<!\*)\*(?!\*)(.+?)\*(?!\*)|_(.+?)_');
   static final RegExp _codeRegex   = RegExp(r'`([^`]+)`');
+  static final RegExp _underRegex  = RegExp(r'__(.+?)__');
+  static final RegExp _strikeRegex = RegExp(r'~~(.+?)~~');
+  static final RegExp _markRegex   = RegExp(r'==(.+?)==');
 
   Future<void> _openUrl(String rawUrl) async {
     final cleaned = rawUrl.replaceAll(RegExp(r'[)\].,;!?]+$'), '');
@@ -40,9 +43,12 @@ class MarkdownLite extends StatelessWidget {
     final tokens = <_Token>[
       ..._urlRegex.allMatches(line).map((m) => _Token(m.start, m.end, _TokType.url, m.group(0)!)),
       ..._boldRegex.allMatches(line).map((m) => _Token(m.start, m.end, _TokType.bold, m.group(1)!)),
+      ..._underRegex.allMatches(line).map((m) => _Token(m.start, m.end, _TokType.underline, m.group(1)!)),
+      ..._strikeRegex.allMatches(line).map((m) => _Token(m.start, m.end, _TokType.strike, m.group(1)!)),
+      ..._markRegex.allMatches(line).map((m) => _Token(m.start, m.end, _TokType.mark, m.group(1)!)),
       ..._codeRegex.allMatches(line).map((m) => _Token(m.start, m.end, _TokType.code, m.group(1)!)),
       ..._italicRegex.allMatches(line).map((m) => _Token(m.start, m.end, _TokType.italic, m.group(1) ?? m.group(2) ?? '')),
-    ]..sort((a, b) => a.start.compareTo(b.start));
+    ]..sort((a, b) => a.start != b.start ? a.start.compareTo(b.start) : b.end.compareTo(a.end));
 
     // Remove overlaps, first match wins.
     final cleaned = <_Token>[];
@@ -78,6 +84,15 @@ class MarkdownLite extends StatelessWidget {
           break;
         case _TokType.italic:
           spans.add(TextSpan(text: t.text, style: const TextStyle(fontStyle: FontStyle.italic)));
+          break;
+        case _TokType.underline:
+          spans.add(TextSpan(text: t.text, style: const TextStyle(decoration: TextDecoration.underline)));
+          break;
+        case _TokType.strike:
+          spans.add(TextSpan(text: t.text, style: const TextStyle(decoration: TextDecoration.lineThrough)));
+          break;
+        case _TokType.mark:
+          spans.add(TextSpan(text: t.text, style: TextStyle(backgroundColor: linkColor.withValues(alpha: 0.28))));
           break;
         case _TokType.code:
           spans.add(TextSpan(
@@ -226,7 +241,7 @@ class MarkdownLite extends StatelessWidget {
   }
 }
 
-enum _TokType { url, bold, italic, code }
+enum _TokType { url, bold, italic, code, underline, strike, mark }
 
 class _Token {
   final int start, end;

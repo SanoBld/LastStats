@@ -7,6 +7,7 @@
 
 import 'package:flutter/material.dart';
 import '../widgets/m3_components.dart';
+import '../widgets/markdown_lite.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../l10n/l10n.dart';
 import '../services/account_manager.dart';
@@ -111,9 +112,10 @@ class NotificationDetailPage extends StatelessWidget {
                 border: Border.all(
                     color: scheme.outlineVariant.withValues(alpha: 0.35)),
               ),
-              child: Text(
-                body,
+              child: MarkdownLite(
+                text: body,
                 style: text.bodyLarge?.copyWith(height: 1.5),
+                linkColor: scheme.primary,
               ),
             ),
           ],

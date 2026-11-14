@@ -141,51 +141,6 @@ class _RankingsPageState extends State<_RankingsPage>
           ),
           const SizedBox(height: 10),
 
-          // Year + month selectors as bubble menus.
-          if (_availableYears.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
-              child: Row(children: [
-                Builder(builder: (ctx) => M3Chip(
-                  label: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Text(_selectedYear == null ? L.rankingsAllYears : '$_selectedYear'),
-                    const Icon(Icons.arrow_drop_down_rounded, size: 20),
-                  ]),
-                  selected: _selectedYear != null,
-                  showCheckmark: false,
-                  onSelected: (_) => showM3Menu(ctx, groups: [[
-                    for (final y in [0, ..._availableYears])
-                      M3MenuItem(
-                        label: y == 0 ? L.rankingsAllYears : '$y',
-                        icon: y == 0 ? Icons.all_inclusive_rounded : Icons.event_rounded,
-                        selected: y == 0 ? _selectedYear == null : y == _selectedYear,
-                        onTap: () => setState(() => _selectedYear = y == 0 ? null : y),
-                      ),
-                  ]]),
-                )),
-                if (_selectedYear != null) ...[
-                  const SizedBox(width: 8),
-                  Builder(builder: (ctx) => M3Chip(
-                    label: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Text(_selectedMonth == 0 ? L.rankingsWholeYear : L.months[_selectedMonth]),
-                      const Icon(Icons.arrow_drop_down_rounded, size: 20),
-                    ]),
-                    selected: _selectedMonth != 0,
-                    showCheckmark: false,
-                    onSelected: (_) => showM3Menu(ctx, groups: [[
-                      for (final m in List.generate(13, (i) => i))
-                        M3MenuItem(
-                          label: m == 0 ? L.rankingsWholeYear : L.months[m],
-                          icon: m == 0 ? Icons.date_range_rounded : Icons.calendar_month_rounded,
-                          selected: m == _selectedMonth,
-                          onTap: () => setState(() => _selectedMonth = m),
-                        ),
-                    ]]),
-                  )),
-                ],
-              ]),
-            ),
-
           M3TabSwitch(
             controller: _tabs,
             labels: [L.commonArtists, L.commonAlbums, L.commonTracks],

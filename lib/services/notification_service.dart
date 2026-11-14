@@ -2,6 +2,7 @@
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:convert';
+import 'dart:ui' show DartPluginRegistrant;
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -215,6 +216,10 @@ class NotificationService {
   /// Marks every shown message as read and clears LastStats notifications
   /// (a download still in progress and sync progress are kept).
   static Future<void> _markAllRead([List<String> extraIds = const []]) async {
+    // Cancel first: this must work even if preferences are unavailable.
+    for (final id in [_idMilestone, _idDailyRecap, _idWeeklyRecap, _idGrand, _idUpdate, _idYearRecap]) {
+      try { await _plugin.cancel(id); } catch (_) {}
+    }
     final prefs = await SharedPreferences.getInstance();
     await prefs.reload();
     final seen = (prefs.getStringList('ls_news_seen') ?? <String>[]).toList();
@@ -241,6 +246,7 @@ class NotificationService {
       try { await _plugin.cancel(id); } catch (_) {}
     }
     await prefs.setStringList('ls_news_seen', seen);
+    await prefs.setBool('ls_news_readall_pending', true); // app marks the rest on resume
   }
 
   /// Public: marks [ids] (all in-app news) as read and clears notifications.
@@ -770,5 +776,9 @@ class NotificationService {
 }
 
 @pragma('vm:entry-point')
-Future<void> notificationBackgroundHandler(NotificationResponse r) =>
-    NotificationService.handleAction(r);
+Future<void> notificationBackgroundHandler(NotificationResponse r) async {
+  // Background isolate: plugins (shared_preferences, notifications) must be
+  // registered first, otherwise the action silently does nothing.
+  try { DartPluginRegistrant.ensureInitialized(); } catch (_) {}
+  try { await NotificationService.handleAction(r); } catch (_) {}
+}

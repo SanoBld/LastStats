@@ -61,6 +61,20 @@
 - New: "Density" option in Appearance (Compact, Comfortable, Airy), saved and translated in the 10 languages
 - PC: lists can be dragged with the mouse; Android 14+: predictive back gesture enabled
 
+- Options bubble now replaces the choice sheets in Settings (video quality, modes, etc.); it scrolls when the list is long. Font pickers keep their preview sheet
+- Removed: the interface density option (Compact / Comfortable / Airy)
+- "Now playing" card: smooth appear / disappear (slides in with fade and blur, the page below moves gradually instead of jumping); a track change only cross-fades
+
+**Interface**
+- Music compatibility: close button, safe-area sheet (no longer under the status bar), long-press a shared item for the options bubble
+- Descriptions in announcements and notification details now support **bold**, __underline__, ==highlight==, ~~strikethrough~~, *italic*, `code` and links
+- Settings > About reorganised: duplicates removed (version, GitHub link, Metrolist, Flutter, ThemeData), support right after app info, owner and licence in the header
+- App icon: the Nothing icons (dark and light, red dot) are back in the picker
+
+**Fixes**
+- Android notification: the "Mark all as read" button now works when the app is closed (background plugins registered, in-app news marked read on return)
+- Rankings: removed the duplicated year / month buttons, the date chip opens the picker again
+
 **License**
 - LastStats is now released under the GNU GPL v3 (was MIT), copyright Sano Bld. New LICENSE and NOTICE.md; README, website legal page, About page, RPM package and the 10 translations updated. Versions released before this stay under MIT
 

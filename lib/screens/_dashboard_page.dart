@@ -229,6 +229,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     if (state == AppLifecycleState.resumed) {
       _startTimers();
       _refreshLive(); // catch up immediately instead of waiting up to 10s
+      _syncReadAll();
     } else {
       _stopTimers();
     }
@@ -1355,6 +1356,19 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     }).length;
 
     if (mounted) setState(() { _newsItems = allItems; _unreadCount = unread; });
+  }
+
+  // "Mark all read" tapped on an Android notification while the app was closed.
+  Future<void> _syncReadAll() async {
+    final p = await SharedPreferences.getInstance();
+    await p.reload();
+    if (p.getBool('ls_news_readall_pending') == true) {
+      final seen = (p.getStringList('ls_news_seen') ?? <String>[]).toSet();
+      for (final i in _newsItems) { seen.add((i['id'] ?? '').toString()); }
+      await p.setStringList('ls_news_seen', seen.toList());
+      await p.setBool('ls_news_readall_pending', false);
+    }
+    await _recountUnread();
   }
 
   // Recount unread items (after the news page was closed).
