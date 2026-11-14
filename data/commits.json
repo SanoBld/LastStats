@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-14T21:01:16Z",
+  "updated": "2026-11-14T22:02:57Z",
   "commits": [
+    {
+      "sha": "2bfd33cdaa20de3140fbfd9b4fd5d3329f8debd5",
+      "message": "feat: ajout de la gestion des clés d'API via des variables d'environnement pour les builds Android et Web",
+      "date": "2026-11-14T22:02:37Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/2bfd33cdaa20de3140fbfd9b4fd5d3329f8debd5",
+      "tags": []
+    },
     {
       "sha": "cc63f0c7795d3f607e7994674de5a0c375572d7b",
       "message": "feat: mise à jour des composants M3 et ajout d'une nouvelle icône SVG pour améliorer l'interface utilisateur",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/4c17a1757b398528bff160585681a4fcdb4ab9a4",
-      "tags": []
-    },
-    {
-      "sha": "fb2fdf7a9ad5523771ab60404b86a7200e8ef9bc",
-      "message": "feat: Update loading indicators to M3Spinner and enhance UI with Material You shapes\n\n- Replaced CircularProgressIndicator with M3Spinner across various screens for a consistent loading experience.\n- Introduced M3ShapedBox for images to utilize Material You shapes (cookie, circle, clover, etc.) in lists and details.\n- Enhanced page transitions to prevent background visibility during animations.\n- Updated buttons and chips to follow Material You design principles, including tonal buttons and animated filters.\n- Improved loading indicators with a new wavy shape and color customization options.\n- Added new components like M3NetImage for network images with shape and loader.",
-      "date": "2026-09-21T20:29:35Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/fb2fdf7a9ad5523771ab60404b86a7200e8ef9bc",
       "tags": []
     }
   ]
