@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-14T09:23:40Z",
+  "updated": "2026-11-14T09:33:14Z",
   "commits": [
+    {
+      "sha": "0a94bcaf1f134379d3cd750ebe6f0775aa2867fb",
+      "message": "feat: améliorer la gestion du clavier et dédupliquer les résultats de recherche pour une meilleure expérience utilisateur",
+      "date": "2026-11-14T09:32:55Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/0a94bcaf1f134379d3cd750ebe6f0775aa2867fb",
+      "tags": []
+    },
     {
       "sha": "49bf031fdbfcfef26bc5b5c88b7594b89be4ee14",
       "message": "feat: ajouter un écran de démarrage pour améliorer l'expérience de chargement des données sur PC",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/7c63aff1d99084af742911e1f43704a5460b1e05",
-      "tags": []
-    },
-    {
-      "sha": "433c5b623ab649fbaa532059dd370588e32faa8a",
-      "message": "feat: ajouter un alignement centré pour les éléments markdown et corriger les liens relatifs dans le README",
-      "date": "2026-09-17T20:44:58Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/433c5b623ab649fbaa532059dd370588e32faa8a",
       "tags": []
     }
   ]
