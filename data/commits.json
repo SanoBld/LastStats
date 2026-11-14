@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-14T18:07:42Z",
+  "updated": "2026-11-14T18:53:02Z",
   "commits": [
+    {
+      "sha": "813daefc8d79949f86a766a40a977beee303dd1b",
+      "message": "feat: mise à jour du changelog, amélioration de l'interface et ajout de nouvelles fonctionnalités",
+      "date": "2026-11-14T18:42:01Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/813daefc8d79949f86a766a40a977beee303dd1b",
+      "tags": []
+    },
     {
       "sha": "342e88f5573a2ed6f52a26159dc025c8747e9bef",
       "message": "feat: supprimer la gestion de la densité de l'interface utilisateur et améliorer les sélecteurs de date",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/0f8426e9a4a825bc484a483fffd3bef8b745dea3",
-      "tags": []
-    },
-    {
-      "sha": "c4df8b63815e1c552f6cb7081f4dd8e3e0edc303",
-      "message": "feat: remplacer CircularProgressIndicator par M3LoadingIndicator dans plusieurs pages",
-      "date": "2026-09-21T19:10:13Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/c4df8b63815e1c552f6cb7081f4dd8e3e0edc303",
       "tags": []
     }
   ]
