@@ -459,9 +459,9 @@ class AppStringsAr implements AppStrings {
   @override String get fallbackTypeCustomImage => 'صورة مخصصة';
   @override String get fallbackWillShowCustomUrl => 'سيُعرض: رابط صورة مخصصة';
   @override String get dashAnimationBlurSection => 'الحركة والتمويه';
-  @override String get dashMusicAnimationTitle => 'حركة الموسيقى';
-  @override String get dashMusicAnimationSub => 'عند تشغيل الموسيقى، تتلاشى صورة الرأس وتتحرك ببطء، على غرار Apple Music.';
-  @override String get dashMusicAnimationInfo => 'يُضبط التمويه تلقائيًا عند تفعيل هذا الوضع. شريط التمويه أعلاه لا تأثير له أثناء تشغيل الموسيقى.';
+  @override String get dashMusicAnimationTitle => 'خلفية موسيقى متحركة';
+  @override String get dashMusicAnimationSub => 'عند تشغيل الموسيقى تتحول صورة الرأس إلى خلفية حيّة: ضبابية وألوان منسابة وتنفّس هادئ.';
+  @override String get dashMusicAnimationInfo => 'الضبابية تلقائية في هذا الوضع (المنزلق بلا تأثير). إذا كان غلاف الفيديو مفعّلاً فسيُعرض فوقها وتتوقف الخلفية مؤقتاً.';
   @override String get settingsTopAlbumsSection => 'أفضل الألبومات';
   @override String get dashRecentPlaysLabel => 'التشغيلات الأخيرة';
   @override String get dashStatCardsSectionLabel => 'بطاقات الإحصائيات';

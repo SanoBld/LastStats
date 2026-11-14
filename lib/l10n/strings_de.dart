@@ -459,9 +459,9 @@ class AppStringsDe implements AppStrings {
   @override String get fallbackTypeCustomImage => 'Eigenes Bild';
   @override String get fallbackWillShowCustomUrl => 'Wird angezeigt: eigene Bild-URL';
   @override String get dashAnimationBlurSection => 'Animation & Weichzeichnung';
-  @override String get dashMusicAnimationTitle => 'Musikanimation';
-  @override String get dashMusicAnimationSub => 'Während Musik läuft, verschwimmt und bewegt sich das Kopfbild sanft, wie bei Apple Music.';
-  @override String get dashMusicAnimationInfo => 'Die Weichzeichnung wird in diesem Modus automatisch eingestellt. Der obige Regler hat keine Wirkung, während Musik läuft.';
+  @override String get dashMusicAnimationTitle => 'Animierter Musik-Hintergrund';
+  @override String get dashMusicAnimationSub => 'Beim Abspielen wird das Kopfbild zu einem lebendigen Hintergrund: Unschärfe, wandernde Farben und sanftes Atmen.';
+  @override String get dashMusicAnimationInfo => 'Die Unschärfe ist in diesem Modus automatisch (der Regler wirkt nicht). Ist das Videocover aktiv, läuft es darüber und der Hintergrund pausiert.';
   @override String get settingsTopAlbumsSection => 'Top-Alben';
   @override String get dashRecentPlaysLabel => 'Letzte Wiedergaben';
   @override String get dashStatCardsSectionLabel => 'Statistikkarten';

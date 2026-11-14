@@ -510,9 +510,9 @@ class AppStringsPt implements AppStrings {
   @override String get fallbackWillShowCustomUrl => 'Mostrará: URL de imagem personalizada';
 
   @override String get dashAnimationBlurSection  => 'Animação e desfoque';
-  @override String get dashMusicAnimationTitle   => 'Animação de música';
-  @override String get dashMusicAnimationSub     => 'Quando uma música toca, a imagem desfoca e se move suavemente, como no Apple Music.';
-  @override String get dashMusicAnimationInfo    => 'O desfoque é aplicado automaticamente neste modo. O controle de desfoque acima não tem efeito enquanto a música toca.';
+  @override String get dashMusicAnimationTitle   => 'Fundo animado de música';
+  @override String get dashMusicAnimationSub     => 'Enquanto a música toca, a imagem do cabeçalho vira um fundo vivo: desfoque, cores que se movem e uma respiração suave.';
+  @override String get dashMusicAnimationInfo    => 'O desfoque é automático neste modo (o controle não tem efeito). Se a capa em vídeo estiver ativa, ela toca por cima e o fundo pausa.';
 
   @override String get settingsTopAlbumsSection  => 'Top Álbuns';
   @override String get dashRecentPlaysLabel      => 'Reproduções recentes';

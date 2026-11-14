@@ -459,9 +459,9 @@ class AppStringsRu implements AppStrings {
   @override String get fallbackTypeCustomImage => 'Своё изображение';
   @override String get fallbackWillShowCustomUrl => 'Будет показано: URL своего изображения';
   @override String get dashAnimationBlurSection => 'Анимация и размытие';
-  @override String get dashMusicAnimationTitle => 'Музыкальная анимация';
-  @override String get dashMusicAnimationSub => 'Когда играет музыка, изображение заголовка медленно размывается и смещается, как в Apple Music.';
-  @override String get dashMusicAnimationInfo => 'Размытие устанавливается автоматически, когда включён этот режим. Ползунок размытия выше не действует, пока играет музыка.';
+  @override String get dashMusicAnimationTitle => 'Анимированный фон музыки';
+  @override String get dashMusicAnimationSub => 'Во время воспроизведения изображение шапки становится живым фоном: размытие, плавающие цвета и мягкое «дыхание».';
+  @override String get dashMusicAnimationInfo => 'В этом режиме размытие автоматическое (ползунок не действует). Если включена видеообложка, она играет поверх, а фон ставится на паузу.';
   @override String get settingsTopAlbumsSection => 'Топ альбомов';
   @override String get dashRecentPlaysLabel => 'Недавние прослушивания';
   @override String get dashStatCardsSectionLabel => 'Карточки статистики';

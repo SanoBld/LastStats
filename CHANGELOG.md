@@ -76,6 +76,8 @@
 - Dashboard settings: "Backup period" renamed to a clearer label (period of the top pick shown when nothing is playing), in all 10 languages
 - Settings > About: sections with only a few rows are shown directly, no "show more"
 
+- Dashboard header "Music animation" rebuilt as a real living background (three drifting layers, single blur, soft colour wash, gentle breathing); no longer a copy of the Apple Music effect. It pauses when the video cover plays on top and in eco mode, and is renamed "Animated music background"
+
 **Fixes**
 - Android notification: the "Mark all as read" button now works when the app is closed (background plugins registered, in-app news marked read on return)
 - Rankings: removed the duplicated year / month buttons, the date chip opens the picker again

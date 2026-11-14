@@ -1954,6 +1954,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                           key: ValueKey('ambient_$_headerImageUrl'),
                           url: _headerImageUrl,
                           scheme: scheme,
+                          paused: dashMotionNotifier.value && motionArtworkNotifier.value && _npMotionUrl != null,
                         )
                       : _headerImageUrl.isNotEmpty
                           ? _BlurredHeaderImage(
@@ -3793,12 +3794,16 @@ class _SyncProgressChip extends StatelessWidget {
 }
 
 
-// ── Ambient header (Apple Music-style breathing animation) ────────────────────
+// ── Ambient header: living blurred background while music plays ──────────────
+// Three copies of the cover drift on slow looping paths (different speeds and
+// sizes), are blurred once together and breathe softly, with a colour wash
+// from the theme on top. Pauses when a video cover covers it or in eco mode.
 
 class _AmbientHeader extends StatefulWidget {
   final String      url;
   final ColorScheme scheme;
-  const _AmbientHeader({super.key, required this.url, required this.scheme});
+  final bool        paused;
+  const _AmbientHeader({super.key, required this.url, required this.scheme, this.paused = false});
 
   @override
   State<_AmbientHeader> createState() => _AmbientHeaderState();
@@ -3806,74 +3811,100 @@ class _AmbientHeader extends StatefulWidget {
 
 class _AmbientHeaderState extends State<_AmbientHeader>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
-  late final Animation<double>   _scale;
-  late final Animation<double>   _dx;
-  late final Animation<double>   _dy;
+  late final AnimationController _ctrl =
+      AnimationController(vsync: this, duration: const Duration(seconds: 36));
 
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 8),
-    );
-
-    _scale = Tween<double>(begin: 1.0, end: 1.08)
-        .animate(CurvedAnimation(parent: _ctrl, curve: M3Motion.emphasized));
-
-    _dx = Tween<double>(begin: -8.0, end: 8.0)
-        .animate(CurvedAnimation(parent: _ctrl, curve: M3Motion.emphasized));
-    _dy = Tween<double>(begin: -5.0, end: 5.0)
-        .animate(CurvedAnimation(parent: _ctrl, curve: M3Motion.emphasized));
-    ecoModeActiveNotifier.addListener(_applyEco);
-    _applyEco();
+    ecoModeActiveNotifier.addListener(_apply);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _apply());
   }
 
-  void _applyEco() {
+  @override
+  void didUpdateWidget(covariant _AmbientHeader old) {
+    super.didUpdateWidget(old);
+    if (old.paused != widget.paused) _apply();
+  }
+
+  void _apply() {
     if (!mounted) return;
-    if (ecoModeActiveNotifier.value) {
-      _ctrl.stop(); // static background: no endless 60/120 fps redraw
+    final stop = ecoModeActiveNotifier.value || widget.paused || M3Motion.reduced(context);
+    if (stop) {
+      _ctrl.stop();
     } else if (!_ctrl.isAnimating) {
-      _ctrl.repeat(reverse: true);
+      _ctrl.repeat();
     }
   }
 
   @override
   void dispose() {
-    ecoModeActiveNotifier.removeListener(_applyEco);
+    ecoModeActiveNotifier.removeListener(_apply);
     _ctrl.dispose();
     super.dispose();
   }
 
+  Widget _layer(double t, {required double k, required double scale, required double dx,
+      required double dy, required double rot, required double phase, required double opacity}) {
+    final a = 2 * math.pi * (t * k + phase);
+    return Opacity(
+      opacity: opacity,
+      child: Transform(
+        alignment: Alignment.center,
+        transform: Matrix4.identity()
+          // ignore: deprecated_member_use
+          ..translate(math.sin(a) * dx, math.cos(a * 0.8) * dy)
+          // ignore: deprecated_member_use
+          ..scale(scale + 0.06 * math.sin(a * 2))
+          ..rotateZ(math.sin(a * 0.5) * rot),
+        child: HeaderImageService.image(widget.url,
+            onError: () => _GradientHeader(scheme: widget.scheme)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    const double ambientBlur = 18.0;
-
+    if (widget.url.isEmpty) return _GradientHeader(scheme: widget.scheme);
+    final scheme = widget.scheme;
     return ClipRect(
-      child: AnimatedBuilder(
-        animation: _ctrl,
-        builder: (_, child) => Transform(
-          alignment: Alignment.center,
-          transform: Matrix4.identity()
-            // ignore: deprecated_member_use
-            ..scale(_scale.value)
-            // ignore: deprecated_member_use
-            ..translate(_dx.value, _dy.value),
-          child: child,
+      child: Stack(fit: StackFit.expand, children: [
+        RepaintBoundary(
+          child: ImageFiltered(
+            imageFilter: ImageFilter.blur(sigmaX: 26, sigmaY: 26, tileMode: TileMode.mirror),
+            child: AnimatedBuilder(
+              animation: _ctrl,
+              builder: (_, _) {
+                final t = _ctrl.value;
+                return Stack(fit: StackFit.expand, children: [
+                  _layer(t, k: 1, scale: 1.30, dx: 26, dy: 16, rot: 0.05, phase: 0.0, opacity: 1.0),
+                  _layer(t, k: 2, scale: 1.55, dx: 40, dy: 22, rot: 0.12, phase: 0.33, opacity: 0.55),
+                  _layer(t, k: 3, scale: 1.80, dx: 54, dy: 30, rot: 0.20, phase: 0.66, opacity: 0.40),
+                ]);
+              },
+            ),
+          ),
         ),
-        child: widget.url.isNotEmpty
-            ? RepaintBoundary(child: ImageFiltered(
-                imageFilter: ImageFilter.blur(
-                  sigmaX: ambientBlur,
-                  sigmaY: ambientBlur,
-                  tileMode: TileMode.mirror,
+        // Slow colour wash from the theme, drifting the other way.
+        AnimatedBuilder(
+          animation: _ctrl,
+          builder: (_, _) {
+            final a = 2 * math.pi * _ctrl.value * 2;
+            return DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: Alignment(math.cos(a) * 0.8, math.sin(a) * 0.6),
+                  radius: 1.1,
+                  colors: [
+                    scheme.primary.withValues(alpha: 0.22),
+                    Colors.transparent,
+                  ],
                 ),
-                child: HeaderImageService.image(widget.url,
-                    onError: () => _GradientHeader(scheme: widget.scheme)),
-              ))
-            : _GradientHeader(scheme: widget.scheme),
-      ),
+              ),
+            );
+          },
+        ),
+      ]),
     );
   }
 }

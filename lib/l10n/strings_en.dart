@@ -510,9 +510,9 @@ class AppStringsEn implements AppStrings {
   @override String get fallbackWillShowCustomUrl => 'Will show: custom image URL';
 
   @override String get dashAnimationBlurSection  => 'Animation & Blur';
-  @override String get dashMusicAnimationTitle   => 'Music animation';
-  @override String get dashMusicAnimationSub     => 'When music is playing, the header image slowly blurs and drifts, like Apple Music.';
-  @override String get dashMusicAnimationInfo    => 'Blur is set automatically when this mode is active. The blur slider above has no effect while music is playing.';
+  @override String get dashMusicAnimationTitle   => 'Animated music background';
+  @override String get dashMusicAnimationSub     => 'While music plays, the header image becomes a living background: blur, drifting colours and gentle breathing.';
+  @override String get dashMusicAnimationInfo    => 'Blur is automatic in this mode (the slider has no effect). If the video cover is on, it plays on top and the background pauses.';
 
   @override String get settingsTopAlbumsSection  => 'Top Albums';
   @override String get dashRecentPlaysLabel      => 'Recent plays';

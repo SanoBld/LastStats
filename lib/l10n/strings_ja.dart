@@ -459,9 +459,9 @@ class AppStringsJa implements AppStrings {
   @override String get fallbackTypeCustomImage => 'カスタム画像';
   @override String get fallbackWillShowCustomUrl => '表示内容：カスタム画像URL';
   @override String get dashAnimationBlurSection => 'アニメーションとぼかし';
-  @override String get dashMusicAnimationTitle => '音楽アニメーション';
-  @override String get dashMusicAnimationSub => '音楽が再生されているとき、ヘッダー画像がApple Musicのようにゆっくりとぼやけて動きます。';
-  @override String get dashMusicAnimationInfo => 'このモードが有効な間、ぼかしは自動的に設定されます。上のぼかしスライダーは音楽再生中は効果がありません。';
+  @override String get dashMusicAnimationTitle => '音楽アニメーション背景';
+  @override String get dashMusicAnimationSub => '音楽の再生中、ヘッダー画像がぼかし・流れる色・やわらかな呼吸感を持つ動く背景になります。';
+  @override String get dashMusicAnimationInfo => 'このモードではぼかしは自動です（スライダーは無効）。動画カバーが有効な場合は動画が上に表示され、背景は一時停止します。';
   @override String get settingsTopAlbumsSection => 'トップアルバム';
   @override String get dashRecentPlaysLabel => '最近の再生';
   @override String get dashStatCardsSectionLabel => '統計カード';

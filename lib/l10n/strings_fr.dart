@@ -510,9 +510,9 @@ class AppStringsFr implements AppStrings {
   @override String get fallbackWillShowCustomUrl => "Affichera : URL d'image personnalisée";
 
   @override String get dashAnimationBlurSection  => 'Animation & Flou';
-  @override String get dashMusicAnimationTitle   => 'Animation musique';
-  @override String get dashMusicAnimationSub     => "Quand une musique joue, l'image se floute et bouge doucement, comme dans Apple Music.";
-  @override String get dashMusicAnimationInfo    => "Le flou est appliqué automatiquement dans ce mode. Le curseur de flou ci-dessus n'a aucun effet pendant la lecture.";
+  @override String get dashMusicAnimationTitle   => 'Fond animé musique';
+  @override String get dashMusicAnimationSub     => 'Quand une musique joue, l\'image de l\'en-tête devient un fond vivant : flou, dérive des couleurs et respiration douce.';
+  @override String get dashMusicAnimationInfo    => 'Le flou est automatique dans ce mode (le curseur n\'agit pas). Si la pochette vidéo est active, elle passe par-dessus et le fond se met en pause.';
 
   @override String get settingsTopAlbumsSection  => 'Albums les plus écoutés';
   @override String get dashRecentPlaysLabel      => 'Écoutes récentes';

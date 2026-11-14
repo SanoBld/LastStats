@@ -459,9 +459,9 @@ class AppStringsIt implements AppStrings {
   @override String get fallbackTypeCustomImage => 'Immagine personalizzata';
   @override String get fallbackWillShowCustomUrl => 'Verrà mostrato: URL immagine personalizzata';
   @override String get dashAnimationBlurSection => 'Animazione e sfocatura';
-  @override String get dashMusicAnimationTitle => 'Animazione musicale';
-  @override String get dashMusicAnimationSub => 'Quando la musica è in riproduzione, l\'immagine di intestazione si sfoca e si muove lentamente, come Apple Music.';
-  @override String get dashMusicAnimationInfo => 'La sfocatura viene impostata automaticamente in questa modalità. Il cursore sopra non ha effetto durante la riproduzione.';
+  @override String get dashMusicAnimationTitle => 'Sfondo animato musica';
+  @override String get dashMusicAnimationSub => 'Mentre suona la musica, l\'immagine dell\'intestazione diventa uno sfondo vivo: sfocatura, colori che si spostano e un respiro delicato.';
+  @override String get dashMusicAnimationInfo => 'La sfocatura è automatica in questa modalità (il cursore non ha effetto). Se la copertina video è attiva, va sopra e lo sfondo si mette in pausa.';
   @override String get settingsTopAlbumsSection => 'Album principali';
   @override String get dashRecentPlaysLabel => 'Riproduzioni recenti';
   @override String get dashStatCardsSectionLabel => 'Schede statistiche';

@@ -507,9 +507,9 @@ class AppStringsZh implements AppStrings {
   @override String get fallbackWillShowCustomUrl => '将显示：自定义图片链接';
 
   @override String get dashAnimationBlurSection  => '动画与模糊';
-  @override String get dashMusicAnimationTitle   => '音乐动画';
-  @override String get dashMusicAnimationSub     => '播放音乐时，头图会缓慢模糊并漂移，类似 Apple Music。';
-  @override String get dashMusicAnimationInfo    => '此模式开启时模糊会自动应用。播放音乐期间，上方的模糊滑块无效。';
+  @override String get dashMusicAnimationTitle   => '音乐动态背景';
+  @override String get dashMusicAnimationSub     => '播放音乐时，顶部图片会变成动态背景：模糊、流动的色彩和轻柔的呼吸感。';
+  @override String get dashMusicAnimationInfo    => '此模式下模糊为自动（滑块无效）。如果启用了视频封面，视频会显示在上层，背景将暂停。';
 
   @override String get settingsTopAlbumsSection  => '热门专辑';
   @override String get dashRecentPlaysLabel      => '最近播放';
