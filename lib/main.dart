@@ -233,6 +233,10 @@ Future<void> _mainImpl() async {
   if (!kIsWeb) {
     final isMobile = Platform.isAndroid || Platform.isIOS;
     if (isMobile) {
+      // Closing the keyboard with the back gesture / shortcut leaves the text
+      // field focused, so the keyboard pops back up when you tap elsewhere
+      // later. Drop that focus as soon as the keyboard is gone.
+      WidgetsBinding.instance.addObserver(_KeyboardFocusGuard());
       // Mobile still awaits: WorkManager scheduling right below needs
       // notification channels to exist first.
       await NotificationService.init();
@@ -572,5 +576,28 @@ class _BootSplash extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+
+// ── Keyboard closed => release the text field's focus ─────────────────────
+class _KeyboardFocusGuard with WidgetsBindingObserver {
+  double _last = 0;
+
+  @override
+  void didChangeMetrics() {
+    final views = WidgetsBinding.instance.platformDispatcher.views;
+    if (views.isEmpty) return;
+    final h = views.first.viewInsets.bottom;
+    final closed = _last > 0 && h == 0;
+    _last = h;
+    if (!closed) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final node = FocusManager.instance.primaryFocus;
+      final ctx = node?.context;
+      if (ctx != null && ctx.findAncestorWidgetOfExactType<EditableText>() != null) {
+        node!.unfocus();
+      }
+    });
   }
 }

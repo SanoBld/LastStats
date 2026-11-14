@@ -155,13 +155,14 @@ class _SearchPageState extends State<_SearchPage> {
           widget.service.searchAlbums(q,  limit: 10),
           widget.service.searchTracks(q,  limit: 10),
         ]);
+        if (LibraryMerge.splitOn) await LibraryMerge.ensureKnown(widget.service, null);
         if (mounted) {
           setState(() {
           _allResults = {
             _kSearchProfiles: res[0],
-            _kSearchArtists:  res[1],
-            _kSearchAlbums:   res[2],
-            _kSearchTracks:   res[3],
+            _kSearchArtists:  LibraryMerge.dedupeSearch('artists', res[1]),
+            _kSearchAlbums:   LibraryMerge.dedupeSearch('albums',  res[2]),
+            _kSearchTracks:   LibraryMerge.dedupeSearch('tracks',  res[3]),
           };
           _results   = [];
           _searching = false;
@@ -176,11 +177,18 @@ class _SearchPageState extends State<_SearchPage> {
           case _kSearchAlbums:   res = await widget.service.searchAlbums(q,  limit: 15); break;
           default:               res = await widget.service.searchTracks(q,  limit: 15);
         }
+        if (LibraryMerge.splitOn) await LibraryMerge.ensureKnown(widget.service, null);
+        final shown = switch (_tab) {
+          _kSearchArtists => LibraryMerge.dedupeSearch('artists', res),
+          _kSearchAlbums  => LibraryMerge.dedupeSearch('albums',  res),
+          _kSearchProfiles => res,
+          _               => LibraryMerge.dedupeSearch('tracks',  res),
+        };
         if (mounted) {
           setState(() {
-            _results = res; _allResults = {}; _searching = false;
+            _results = shown; _allResults = {}; _searching = false;
             _page = 1; _loadingMore = false;
-            _hasMore = res.length >= _pageSize(_tab);
+            _hasMore = res.length >= _pageSize(_tab); // raw page size
           });
         }
       }
@@ -217,12 +225,22 @@ class _SearchPageState extends State<_SearchPage> {
       };
       // Query or tab changed while loading: drop this page.
       if (!mounted || tab != _tab || q != _ctrl.text.trim()) return;
-      final seen = {for (final m in _results) _itemKey(m)};
-      final fresh = [for (final m in res) if (seen.add(_itemKey(m))) m];
+      if (LibraryMerge.splitOn) await LibraryMerge.ensureKnown(widget.service, null);
+      final combined = switch (tab) {
+        _kSearchArtists  => LibraryMerge.dedupeSearch('artists', [..._results, ...res]),
+        _kSearchAlbums   => LibraryMerge.dedupeSearch('albums',  [..._results, ...res]),
+        _kSearchProfiles => () {
+            final seen = {for (final m in _results) _itemKey(m)};
+            return [..._results, for (final m in res) if (seen.add(_itemKey(m))) m];
+          }(),
+        _                => LibraryMerge.dedupeSearch('tracks',  [..._results, ...res]),
+      };
+      if (!mounted || tab != _tab || q != _ctrl.text.trim()) return;
+      final grew = combined.length > _results.length;
       setState(() {
-        _results     = [..._results, ...fresh];
+        _results     = combined;
         _page        = next;
-        _hasMore     = fresh.isNotEmpty && res.length >= size;
+        _hasMore     = grew && res.length >= size;
         _loadingMore = false;
       });
     } catch (_) {

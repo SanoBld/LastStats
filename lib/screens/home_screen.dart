@@ -300,7 +300,11 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (_, showLabels, _) => NavigationBar(
           height: showLabels ? null : 56,
           selectedIndex: _idx,
-          onDestinationSelected: (i) { _haptic(_HapticImpact.selection); setState(() => _idx = i); },
+          onDestinationSelected: (i) {
+            _haptic(_HapticImpact.selection);
+            FocusManager.instance.primaryFocus?.unfocus(); // no keyboard left behind
+            setState(() => _idx = i);
+          },
           destinations: _narrowDestinations,
         ),
       ),
@@ -369,6 +373,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 items:         _railItems,
                                 onSelected: (i) {
                                   _haptic(_HapticImpact.selection);
+                                  FocusManager.instance.primaryFocus?.unfocus();
                                   setState(() => _idx = i);
                                 },
                               ),

@@ -52,16 +52,17 @@ class LibraryMerge {
       r'\s+(feat\.?|ft\.?|featuring)\s+.+$', caseSensitive: false);
 
   static final _trackNoise = RegExp(
-      r'remaster|version|edit|mono|stereo|deluxe|bonus|explicit|clean|single|'
-      r'album|radio|feat|ft\.|featuring|with |from |original|official|lyric|'
-      r'video|audio|expanded|anniversary|re-?record|taylor|soundtrack|ost|'
-      r'theme|anthem|edition',
+      r'remaster|version|\bedit\b|\bmono\b|stereo|deluxe|bonus|explicit|\bclean\b|'
+      r'\bsingle\b|\balbum\b|radio|\bfeat|\bft\.|featuring|\bwith |\bfrom |'
+      r'\boriginal\b|official|lyric|\bvideo\b|\baudio\b|expanded|anniversary|'
+      r're-?record|taylor.?s version|soundtrack|\bost\b|\btheme\b|anthem|edition',
       caseSensitive: false);
   // A suffix that means a genuinely different recording: never stripped.
   static final _trackDistinct = RegExp(
       r'remix|rmx|mix|instrumental|acoustic|cover|demo|karaoke|sped|slowed|'
       r'reverb|nightcore|vip|flip|bootleg|mashup|cappella|interlude|skit|live|'
-      r'unplugged|session|\bpt\b|part|vol|\bno\.?\s*\d|\bii+\b',
+      r'unplugged|session|\bpt\b|part|vol|\bno\.?\s*\d|\bii+\b|'
+      r'\bdub\b|extended|orchestral|piano|stripped|medley',
       caseSensitive: false);
   static final _albumNoise = RegExp(
       r'deluxe|edition|remaster|expanded|anniversary|bonus|explicit|clean|'
@@ -74,20 +75,45 @@ class LibraryMerge {
   // "(2011 Remaster)" goes; arbitrary text like "(League of Legends
   // Worlds Anthem)" also goes; "(Remix)", "(Live)", "(Part 2)" stay.
   static final _alwaysNoise = RegExp(
-      r'remaster|radio edit|single version|album version|feat|ft\.|featuring',
+      r'remaster|radio edit|single version|album version|\bfeat|\bft\.|featuring',
       caseSensitive: false);
   static bool _stripTrack(String c) =>
       _alwaysNoise.hasMatch(c) || !_trackDistinct.hasMatch(c);
 
+  // Only a bracket at the END of the title can be a version tag, so a title
+  // that starts with one — "(I Can't Get No) Satisfaction" — stays whole.
+  static final _trailBracket =
+      RegExp(r'\s*[\(\[\{]([^\)\]\}]*)[\)\]\}]\s*$');
+
   static String cleanTrack(String title) {
     var t = title.trim();
-    t = t.replaceAllMapped(_bracket, (m) => _stripTrack(m.group(1) ?? '') ? '' : m.group(0)!);
-    final d = _dashTail.firstMatch(t);
-    if (d != null) {
-      final c = d.group(1) ?? '';
-      if (_trackNoise.hasMatch(c) && !_trackDistinct.hasMatch(c)) t = t.substring(0, d.start);
+    // Version words in a bracket anywhere (feat., remaster...) always go.
+    t = t.replaceAllMapped(_bracket,
+        (m) => _alwaysNoise.hasMatch(m.group(1) ?? '') ? '' : m.group(0)!);
+    // Then peel version tags off the end, as many as there are:
+    // "Song - 2011 Remaster (feat. X)" -> "Song".
+    for (var i = 0; i < 6; i++) {
+      var changed = false;
+      final b = _trailBracket.firstMatch(t);
+      if (b != null && b.start > 0 && _stripTrack(b.group(1) ?? '')) {
+        t = t.substring(0, b.start).trimRight();
+        changed = true;
+      }
+      final d = _dashTail.firstMatch(t);
+      if (d != null) {
+        final c = d.group(1) ?? '';
+        if (_trackNoise.hasMatch(c) && !_trackDistinct.hasMatch(c)) {
+          t = t.substring(0, d.start).trimRight();
+          changed = true;
+        }
+      }
+      final f = _featTail.firstMatch(t);
+      if (f != null && f.start > 0) {
+        t = t.substring(0, f.start).trimRight();
+        changed = true;
+      }
+      if (!changed) break;
     }
-    t = t.replaceAll(_featTail, '');
     t = t.trim();
     return t.isEmpty ? title.trim() : t;
   }
@@ -113,8 +139,16 @@ class LibraryMerge {
 
   static String artistKey(String name) {
     var k = alnum(name);
+    // Names made only of symbols ("!!!", "???") would all share the empty key.
+    if (k.isEmpty) return fold(name.trim());
     if (k.startsWith('the') && k.length > 6) k = k.substring(3);
     return k;
+  }
+
+  // Title key; symbol-only titles ("???", "!!!") keep their own text.
+  static String _titleKey(String cleaned, String original) {
+    final k = alnum(cleaned);
+    return k.isEmpty ? fold(original.trim()) : k;
   }
 
   /// Individual artists behind a credit. [known] = artist keys the user
@@ -151,10 +185,10 @@ class LibraryMerge {
   }
 
   static String trackKey(String title, String artist, Set<String> known) =>
-      '${alnum(cleanTrack(title))}|${artistKey(primaryArtist(artist, known))}';
+      '${_titleKey(cleanTrack(title), title)}|${artistKey(primaryArtist(artist, known))}';
 
   static String albumKey(String title, String artist, Set<String> known) =>
-      '${alnum(cleanAlbum(title))}|${artistKey(primaryArtist(artist, known))}';
+      '${_titleKey(cleanAlbum(title), title)}|${artistKey(primaryArtist(artist, known))}';
 
   /// True when two items are the same thing under the active options.
   static bool same(String type, String n1, String a1, String n2, String a2,
@@ -164,6 +198,61 @@ class LibraryMerge {
       case 'albums':  return albumKey(n1, a1, known) == albumKey(n2, a2, known);
       default:        return trackKey(n1, a1, known) == trackKey(n2, a2, known);
     }
+  }
+
+  // ── Search results ─────────────────────────────────────────────────────
+  // Last.fm search returns the same artist several times ("GIMS", "Gims",
+  // "GIMS (FR)"...). Artists that are the same once case, accents and
+  // punctuation are ignored are always shown once (the most listened wins).
+  // With the options on, versions of a track / album are linked too, and
+  // collaboration credits ("A & B", "A feat. B") are hidden from artist
+  // results since they are credited to the real artists.
+  static int _listeners(dynamic e) =>
+      e is Map ? (int.tryParse((e['listeners'] ?? '0').toString()) ?? 0) : 0;
+
+  static final _tailBracket = RegExp(r'\s*[\(\[][^\)\]]*[\)\]]\s*$');
+
+  static List<dynamic> dedupeSearch(String type, List<dynamic> list) {
+    final known = splitOn ? _allKnown : const <String>{};
+    final order = <String>[];
+    final best  = <String, dynamic>{};
+    final count = <String, int>{};
+    for (final e in list) {
+      if (e is! Map) continue;
+      final name = (e['name'] ?? '').toString();
+      if (name.isEmpty) continue;
+      String key;
+      if (type == 'artists') {
+        if (splitOn && artistParts(name, known, ambiguous: true).length > 1) continue;
+        key = artistKey(mergeOn ? name.replaceFirst(_tailBracket, '') : name);
+      } else if (!mergeOn) {
+        key = '${alnum(name)}|${artistKey(_artistNameOf(e))}';
+      } else if (type == 'albums') {
+        key = albumKey(name, _artistNameOf(e), known);
+      } else {
+        key = trackKey(name, _artistNameOf(e), known);
+      }
+      if (key.isEmpty || key == '|') key = name;
+      count[key] = (count[key] ?? 0) + 1;
+      final cur = best[key];
+      if (cur == null) {
+        order.add(key);
+        best[key] = e;
+      } else {
+        // Prefer the plain title ("Song") over a tagged one ("Song (Remastered)"),
+        // then the most listened.
+        bool plain(dynamic x) {
+          final n = (x['name'] ?? '').toString();
+          return type == 'artists' ||
+              (type == 'albums' ? cleanAlbum(n) : cleanTrack(n)) == n.trim();
+        }
+        final pe = plain(e), pc = plain(cur);
+        if ((pe && !pc) || (pe == pc && _listeners(e) > _listeners(cur))) {
+          best[key] = e;
+        }
+      }
+    }
+    return [for (final k in order) best[k]];
   }
 
   // ── Comparison keys (taste compare): legacy lower-case keys when both
@@ -178,7 +267,7 @@ class LibraryMerge {
 
   static String ckTitle(String title, {bool album = false}) => !mergeOn
       ? title.toLowerCase()
-      : alnum(album ? cleanAlbum(title) : cleanTrack(title));
+      : _titleKey(album ? cleanAlbum(title) : cleanTrack(title), title);
 
   // ── Known artists (per Last.fm user) ───────────────────────────────────
   static final Map<String, Set<String>> _known = {};
