@@ -10,6 +10,7 @@ import '../../services/update_service.dart';
 import 'settings_helpers.dart';
 import 'settings_rows.dart';
 import '../../widgets/m3_components.dart';
+import '../../theme/m3_shapes.dart';
 import '../../widgets/brand_icon.dart';
 import '../../theme/m3_motion.dart';
 import 'readme_page.dart';
@@ -39,10 +40,10 @@ class AboutPage extends StatelessWidget {
 
         // ── Logo / header ─────────────────────────────────────────────────
         Center(child: Column(children: [
-          M3CookieBadge(
-            size: 104,
-            color: scheme.primaryContainer,
-            child: SvgPicture.asset(_logoAsset(context), width: 68, height: 68),
+          ClipPath(
+            clipper: const ShapeBorderClipper(
+                shape: M3CookieBorder(lobes: 8, amplitude: 0.07)),
+            child: SvgPicture.asset(_logoAsset(context), width: 104, height: 104),
           ),
           const SizedBox(height: 14),
           Text('LastStats',
@@ -135,7 +136,8 @@ class AboutPage extends StatelessWidget {
           label: tx('ui_favorites'),
           children: [
             ListTile(
-              leading: const Icon(Icons.library_music_rounded),
+              leading: _SafeSvgIcon(asset: 'assets/icons/metrolist.svg',
+                  fallback: Icons.library_music_rounded, color: scheme.primary),
               title: const Text('Metrolist',
                   style: TextStyle(fontWeight: FontWeight.w600)),
               subtitle: Text(tx('ui_advanced_youtube_music'), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),

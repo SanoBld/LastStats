@@ -961,7 +961,7 @@ class _SyncBatteryStepState extends State<_SyncBatteryStep> {
                     ),
                     Wrap(spacing: 8, runSpacing: 8, children: [
                       for (final h in _freqs)
-                        ChoiceChip(
+                        M3Chip(
                           label: Text(h == 1 ? tx('onb_every_1h') : tx('onb_every_h', {'h': '$h'})),
                           selected: _freq == h,
                           onSelected: (_) => _setFreq(h),

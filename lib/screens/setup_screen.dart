@@ -409,19 +409,13 @@ class _SetupScreenState extends State<SetupScreen>
                               child: Stack(alignment: Alignment.center, children: [
                                 RotationTransition(
                                   turns: _floatAnim,
-                                  child: Container(
-                                    width: 140, height: 140,
-                                    decoration: ShapeDecoration(
-                                      color: scheme.primaryContainer,
-                                      shape: const M3CookieBorder(
-                                          lobes: 9, amplitude: 0.07),
-                                    ),
+                                  child: ClipPath(
+                                    clipper: const ShapeBorderClipper(
+                                        shape: M3CookieBorder(
+                                            lobes: 9, amplitude: 0.07)),
+                                    child: SvgPicture.asset(_logoAsset(context),
+                                        width: 140, height: 140),
                                   ),
-                                ),
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(22),
-                                  child: SvgPicture.asset(_logoAsset(context),
-                                      width: 76, height: 76),
                                 ),
                               ]),
                             ),
