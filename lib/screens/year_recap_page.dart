@@ -1603,7 +1603,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
         if (_yrInstant)
           Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
             Expanded(
-              child: Text('${label.toUpperCase()} :',
+              child: Text('${label.toUpperCase()}${localeNotifier.value == 'fr' ? ' :' : ':'}',
                   textAlign: TextAlign.left,
                   style: TextStyle(color: s.primary, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 1.0, height: 1.25)),
             ),

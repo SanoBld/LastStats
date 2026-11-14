@@ -44,6 +44,7 @@
 - The home calendar and the shared calendar image now use the same GitHub-style design; removed the Beta badge from the chart export sheet
 - Link versions / split collaborations: smarter title cleaning (a title starting with a bracket stays whole, several version tags are removed together) and the options now apply to search results; duplicate artists in search (GIMS, Gims...) are shown once
 - Link versions: fixed titles/artists made only of symbols ("???", "!!!") being merged together, and words like "Lost" or "Ghost" after a dash no longer count as a version tag
+- Year recap: lighter, funnier wording in all 10 languages; fixed the French-style " :" spacing showing in other languages
 - Closing the keyboard now also removes the cursor from the text field, so it no longer pops back up on other tabs
 - PC: a start-up screen appears instantly while data loads (the window no longer looks frozen at launch); lower image cache memory
 - Performance: lighter calendar rendering, badge shimmer paused while the app is in the background
