@@ -968,8 +968,6 @@ const Map<String, String> kTxJa = {
   'sel_count': "{n} 件を選択中",
   'sel_remove': "お気に入りから削除",
   'sel_cancel': "キャンセル",
-  'set_density_t': "密度",
-  'set_density_s': "コンパクト、標準、ゆったり",
   'menu_add_folder': "フォルダに追加",
   'menu_copy_title': "タイトルをコピー",
   'menu_copy_both': "アーティスト – タイトルをコピー",

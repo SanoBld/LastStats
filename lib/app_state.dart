@@ -86,8 +86,6 @@ final pcModeNotifier = ValueNotifier<String>('auto');
 // Haptic feedback on key interactions.
 // Saved as 'ls_haptic_feedback' in SharedPreferences.
 final hapticFeedbackNotifier = ValueNotifier<bool>(true);
-// UI density: 0 compact, 1 comfortable (default), 2 airy. Saved as 'ls_density'.
-final densityNotifier = ValueNotifier<int>(1);
 
 // Soft blur during transitions and reveals. Saved as 'ls_motion_blur'.
 final motionBlurNotifier = ValueNotifier<bool>(true);

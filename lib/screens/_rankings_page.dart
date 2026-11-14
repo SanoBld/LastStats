@@ -141,53 +141,49 @@ class _RankingsPageState extends State<_RankingsPage>
           ),
           const SizedBox(height: 10),
 
-          // Year selector — same FilterChip row, same place as the Charts tab
-          if (_availableYears.isNotEmpty) ...[
+          // Year + month selectors as bubble menus.
+          if (_availableYears.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SizedBox(
-                height: 44,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  // Android-style stretch at the edges, not the iOS rubber-band bounce.
-                  physics: const ClampingScrollPhysics(),
-                  children: [0, ..._availableYears].map((year) {
-                    final selected = year == 0 ? _selectedYear == null : year == _selectedYear;
-                    final label    = year == 0 ? L.rankingsAllYears : '$year';
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: M3Chip(
-                        label: Text(label),
-                        selected: selected,
-                        showCheckmark: false,
-                        onSelected: (_) {
-                          _haptic(_HapticImpact.selection);
-                          setState(() => _selectedYear = year == 0 ? null : year);
-                        },
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
+              child: Row(children: [
+                Builder(builder: (ctx) => M3Chip(
+                  label: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text(_selectedYear == null ? L.rankingsAllYears : '$_selectedYear'),
+                    const Icon(Icons.arrow_drop_down_rounded, size: 20),
+                  ]),
+                  selected: _selectedYear != null,
+                  showCheckmark: false,
+                  onSelected: (_) => showM3Menu(ctx, groups: [[
+                    for (final y in [0, ..._availableYears])
+                      M3MenuItem(
+                        label: y == 0 ? L.rankingsAllYears : '$y',
+                        icon: y == 0 ? Icons.all_inclusive_rounded : Icons.event_rounded,
+                        selected: y == 0 ? _selectedYear == null : y == _selectedYear,
+                        onTap: () => setState(() => _selectedYear = y == 0 ? null : y),
                       ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
-            const SizedBox(height: 4),
-          ],
-
-          // Month selector — only shown for a specific selected year.
-          if (_selectedYear != null)
-            SizedBox(
-              height: 44,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-                children: [0, ...List.generate(12, (i) => i + 1)].map((m) {
-                  final sel   = m == _selectedMonth;
-                  final label = m == 0 ? L.rankingsWholeYear : L.months[m];
-                  return Padding(padding: const EdgeInsets.only(right: 8),
-                    child: M3Chip(label: Text(label), selected: sel, showCheckmark: false,
-                        onSelected: (_) { if (!sel) { _haptic(_HapticImpact.selection); setState(() => _selectedMonth = m); } }));
-                }).toList(),
-              ),
+                  ]]),
+                )),
+                if (_selectedYear != null) ...[
+                  const SizedBox(width: 8),
+                  Builder(builder: (ctx) => M3Chip(
+                    label: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Text(_selectedMonth == 0 ? L.rankingsWholeYear : L.months[_selectedMonth]),
+                      const Icon(Icons.arrow_drop_down_rounded, size: 20),
+                    ]),
+                    selected: _selectedMonth != 0,
+                    showCheckmark: false,
+                    onSelected: (_) => showM3Menu(ctx, groups: [[
+                      for (final m in List.generate(13, (i) => i))
+                        M3MenuItem(
+                          label: m == 0 ? L.rankingsWholeYear : L.months[m],
+                          icon: m == 0 ? Icons.date_range_rounded : Icons.calendar_month_rounded,
+                          selected: m == _selectedMonth,
+                          onTap: () => setState(() => _selectedMonth = m),
+                        ),
+                    ]]),
+                  )),
+                ],
+              ]),
             ),
 
           M3TabSwitch(

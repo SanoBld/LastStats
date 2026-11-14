@@ -969,8 +969,6 @@ const Map<String, String> kTxRu = {
   'sel_count': "Выбрано: {n}",
   'sel_remove': "Убрать из избранного",
   'sel_cancel': "Отмена",
-  'set_density_t': "Плотность",
-  'set_density_s': "Компактная, удобная или свободная",
   'menu_add_folder': "Добавить в папку",
   'menu_copy_title': "Копировать название",
   'menu_copy_both': "Копировать исполнителя – название",

@@ -969,8 +969,6 @@ const Map<String, String> kTxAr = {
   'sel_count': "تم تحديد {n}",
   'sel_remove': "إزالة من المفضلة",
   'sel_cancel': "إلغاء",
-  'set_density_t': "الكثافة",
-  'set_density_s': "مضغوطة أو مريحة أو واسعة",
   'menu_add_folder': "إضافة إلى مجلد",
   'menu_copy_title': "نسخ العنوان",
   'menu_copy_both': "نسخ الفنان – العنوان",

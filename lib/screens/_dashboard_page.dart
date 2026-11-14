@@ -2180,31 +2180,10 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
 
               // ── Now playing ─────────────────────────────────────────────
               // Key changes when track changes → animation triggers only then
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 400),
-                switchInCurve:  M3Motion.emphasizedDecelerate,
-                switchOutCurve: M3Motion.emphasizedAccelerate,
-                transitionBuilder: (child, anim) => FadeTransition(
-                  opacity: anim,
-                  child: SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(0, 0.08),
-                      end:   Offset.zero,
-                    ).animate(CurvedAnimation(parent: anim, curve: M3Motion.emphasizedDecelerate)),
-                    child: child,
-                  ),
-                ),
-                child: (_showNowPlay && _nowPlaying != null)
-                    ? Column(
-                        key: ValueKey(
-                          '${_nowPlaying!['name']}_${_nowPlaying!['artist']?['#text']}',
-                        ),
-                        children: [
-                          _NowPlayingCard(track: _nowPlaying!, service: widget.service, motionUrl: _npMotionUrl),
-                          const SizedBox(height: 12),
-                        ],
-                      )
-                    : const SizedBox.shrink(key: ValueKey('nowplaying_empty')),
+              _NpReveal(
+                visible: _showNowPlay && _nowPlaying != null,
+                trackKey: '${_nowPlaying?['name']}_${_nowPlaying?['artist']?['#text']}',
+                builder: () => _NowPlayingCard(track: _nowPlaying!, service: widget.service, motionUrl: _npMotionUrl),
               ),
 
               // ── Swipeable week/month/year highlights strip ───────────────
@@ -4609,5 +4588,76 @@ Future<ui.Image?> _renderShareCardOffscreen(BuildContext ctx, Widget child, {req
     return await rb.toImage(pixelRatio: 3.0);
   } finally {
     entry.remove();
+  }
+}
+
+/// Now-playing card: slides in/out with height growth, fade and blur
+/// (no pop). On track change only a soft blur/fade cross-fade runs.
+class _NpReveal extends StatelessWidget {
+  final bool visible;
+  final String trackKey;
+  final Widget Function() builder;
+  const _NpReveal({required this.visible, required this.trackKey, required this.builder});
+
+  static Widget _blur(Animation<double> a, Widget child, bool on) => AnimatedBuilder(
+        animation: a,
+        child: child,
+        builder: (_, c) {
+          final sigma = on ? (1 - a.value) * 10 : 0.0;
+          return sigma < 0.1
+              ? c!
+              : ImageFiltered(
+                  imageFilter: ImageFilter.blur(
+                      sigmaX: sigma, sigmaY: sigma, tileMode: TileMode.decal),
+                  child: c);
+        },
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    final reduced = M3Motion.reduced(context);
+    final blur = M3Motion.blurOn && !reduced;
+    return AnimatedSwitcher(
+      duration: reduced ? Duration.zero : const Duration(milliseconds: 550),
+      reverseDuration: reduced ? Duration.zero : const Duration(milliseconds: 380),
+      switchInCurve: M3Motion.emphasizedDecelerate,
+      switchOutCurve: M3Motion.emphasizedAccelerate,
+      layoutBuilder: (cur, prev) => Stack(
+        alignment: Alignment.topCenter,
+        children: [...prev, if (cur != null) cur],
+      ),
+      transitionBuilder: (child, anim) {
+        final curved = CurvedAnimation(
+            parent: anim,
+            curve: M3Motion.emphasizedDecelerate,
+            reverseCurve: M3Motion.emphasizedAccelerate);
+        return SizeTransition(
+          sizeFactor: curved,
+          axisAlignment: -1,
+          child: FadeTransition(
+            opacity: curved,
+            child: SlideTransition(
+              position: Tween<Offset>(begin: const Offset(0, -0.25), end: Offset.zero)
+                  .animate(curved),
+              child: _blur(anim, child, blur),
+            ),
+          ),
+        );
+      },
+      child: visible
+          ? Column(
+              key: const ValueKey('np_on'),
+              children: [
+                AnimatedSwitcher(
+                  duration: reduced ? Duration.zero : const Duration(milliseconds: 350),
+                  transitionBuilder: (child, anim) =>
+                      FadeTransition(opacity: anim, child: _blur(anim, child, blur)),
+                  child: KeyedSubtree(key: ValueKey(trackKey), child: builder()),
+                ),
+                const SizedBox(height: 12),
+              ],
+            )
+          : const SizedBox.shrink(key: ValueKey('np_off')),
+    );
   }
 }

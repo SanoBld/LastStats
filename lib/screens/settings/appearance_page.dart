@@ -1161,28 +1161,6 @@ class _HapticSectionState extends State<_HapticSection> {
             if (v) HapticFeedback.mediumImpact(); // confirm it works
           },
         ),
-        ValueListenableBuilder<int>(
-          valueListenable: densityNotifier,
-          builder: (_, d, _) => ListTile(
-            leading: Icon(Icons.density_medium_rounded, color: scheme.primary),
-            title: Text(tx('set_density_t')),
-            subtitle: Text(tx('set_density_s')),
-            trailing: SegmentedButton<int>(
-              showSelectedIcon: false,
-              segments: const [
-                ButtonSegment(value: 0, icon: Icon(Icons.density_small_rounded)),
-                ButtonSegment(value: 1, icon: Icon(Icons.density_medium_rounded)),
-                ButtonSegment(value: 2, icon: Icon(Icons.density_large_rounded)),
-              ],
-              selected: {d},
-              onSelectionChanged: (v) async {
-                final p = await SharedPreferences.getInstance();
-                await p.setInt('ls_density', v.first);
-                densityNotifier.value = v.first;
-              },
-            ),
-          ),
-        ),
         ValueListenableBuilder<bool>(
           valueListenable: motionBlurNotifier,
           builder: (_, on, _) => SettingSwitchRow(

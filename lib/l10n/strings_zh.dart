@@ -995,8 +995,6 @@ const Map<String, String> kTxZh = {
   'sel_count': "已选 {n} 项",
   'sel_remove': "从收藏中移除",
   'sel_cancel': "取消",
-  'set_density_t': "密度",
-  'set_density_s': "紧凑、舒适或宽松",
   'menu_add_folder': "添加到文件夹",
   'menu_copy_title': "复制标题",
   'menu_copy_both': "复制艺人 – 标题",

@@ -969,8 +969,6 @@ const Map<String, String> kTxIt = {
   'sel_count': "{n} selezionati",
   'sel_remove': "Rimuovi dai preferiti",
   'sel_cancel': "Annulla",
-  'set_density_t': "Densità",
-  'set_density_s': "Compatta, comoda o ariosa",
   'menu_add_folder': "Aggiungi a una cartella",
   'menu_copy_title': "Copia titolo",
   'menu_copy_both': "Copia artista – titolo",

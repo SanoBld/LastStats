@@ -998,8 +998,6 @@ const Map<String, String> kTxPt = {
   'sel_count': "{n} selecionados",
   'sel_remove': "Remover dos favoritos",
   'sel_cancel': "Cancelar",
-  'set_density_t': "Densidade",
-  'set_density_s': "Compacta, confortável ou ampla",
   'menu_add_folder': "Adicionar a uma pasta",
   'menu_copy_title': "Copiar título",
   'menu_copy_both': "Copiar artista – título",

@@ -18,6 +18,7 @@ import '../../theme/m3_shapes.dart';
 import '../../theme/m3_motion.dart';
 import '../../widgets/m3_components.dart';
 import '../../widgets/brand_icon.dart';
+import '../../widgets/m3_popup_menu.dart';
 
 // ── Base tile ───────────────────────────────────────────────────────────────
 
@@ -254,6 +255,21 @@ class SettingChoiceRow extends StatelessWidget {
       subtitle: description == null || description!.isEmpty ? null : Text(description!),
       trailing: current.isEmpty ? null : _ValuePill(current.first),
       onTap: () async {
+        // Bubble for normal lists; sheet kept for font previews / very long lists.
+        if (!previewFonts && options.length <= 14) {
+          await showM3Menu(context, groups: [
+            [
+              for (final o in options)
+                M3MenuItem(
+                  label: o.$2,
+                  icon: o.$3 ?? Icons.circle_outlined,
+                  selected: o.$1 == value,
+                  onTap: () { if (o.$1 != value) onChanged(o.$1); },
+                ),
+            ],
+          ]);
+          return;
+        }
         final r = await showModalBottomSheet<String>(
           sheetAnimationStyle: kM3SheetAnimation,
           context: context,

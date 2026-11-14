@@ -998,8 +998,6 @@ const Map<String, String> kTxEs = {
   'sel_count': "{n} seleccionados",
   'sel_remove': "Quitar de favoritos",
   'sel_cancel': "Cancelar",
-  'set_density_t': "Densidad",
-  'set_density_s': "Compacta, cómoda o amplia",
   'menu_add_folder': "Añadir a una carpeta",
   'menu_copy_title': "Copiar título",
   'menu_copy_both': "Copiar artista – título",

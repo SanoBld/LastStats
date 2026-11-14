@@ -998,8 +998,6 @@ const Map<String, String> kTxEn = {
   'sel_count': "{n} selected",
   'sel_remove': "Remove from favorites",
   'sel_cancel': "Cancel",
-  'set_density_t': "Density",
-  'set_density_s': "Compact, comfortable or airy",
   'menu_add_folder': "Add to a folder",
   'menu_copy_title': "Copy title",
   'menu_copy_both': "Copy artist – title",

@@ -969,8 +969,6 @@ const Map<String, String> kTxDe = {
   'sel_count': "{n} ausgewählt",
   'sel_remove': "Aus Favoriten entfernen",
   'sel_cancel': "Abbrechen",
-  'set_density_t': "Dichte",
-  'set_density_s': "Kompakt, komfortabel oder luftig",
   'menu_add_folder': "Zu einem Ordner hinzufügen",
   'menu_copy_title': "Titel kopieren",
   'menu_copy_both': "Künstler – Titel kopieren",

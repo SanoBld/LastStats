@@ -75,7 +75,8 @@ class _MenuLayer extends StatelessWidget {
     final size = mq.size;
     final width = (size.width - 24).clamp(180.0, 260.0);
     final count = groups.fold<int>(0, (a, g) => a + g.length);
-    final height = count * _itemH + (count - groups.length) * 2 + (groups.length - 1) * 8 + 12;
+    final maxH = size.height - mq.padding.vertical - 48;
+    final height = (count * _itemH + (count - groups.length) * 2 + (groups.length - 1) * 8 + 12).clamp(0.0, maxH);
 
     final rightHalf = anchor.center.dx > size.width / 2;
     var left = rightHalf ? anchor.right - width : anchor.left;
@@ -95,7 +96,9 @@ class _MenuLayer extends StatelessWidget {
     final reduced = M3Motion.reduced(context);
     final scheme = Theme.of(context).colorScheme;
 
-    Widget menu = Material(
+    Widget menu = ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: height),
+      child: Material(
       color: scheme.surfaceContainerLow,
       elevation: 6,
       shadowColor: Colors.black.withValues(alpha: 0.35),
@@ -106,15 +109,17 @@ class _MenuLayer extends StatelessWidget {
         padding: const EdgeInsets.all(6),
         child: SizedBox(
           width: width - 12,
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            for (var g = 0; g < groups.length; g++) ...[
-              if (g > 0) const SizedBox(height: 8),
-              _Group(items: groups[g]),
-            ],
-          ]),
+          child: SingleChildScrollView(
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              for (var g = 0; g < groups.length; g++) ...[
+                if (g > 0) const SizedBox(height: 8),
+                _Group(items: groups[g]),
+              ],
+            ]),
+          ),
         ),
       ),
-    );
+    ));
 
     menu = FadeTransition(
       opacity: curved,
