@@ -221,8 +221,22 @@ Widget build(BuildContext context) {
                                     theme:     lTheme,
                                     darkTheme: dTheme,
                                     themeMode: mode,
+                                    &#47;&#47; Mouse drag + always-visible scrollbar on PC.
+                                    scrollBehavior: const _DesktopScrollBehavior(),
+                                    &#47;&#47; Slower fade when the accent colour changes.
+                                    themeAnimationDuration: const Duration(milliseconds: 500),
+                                    themeAnimationCurve: Curves.easeInOut,
                                     builder: (context, child) =&gt;
-                                        AppTextScale(child: DesktopTitleBarShell(child: ColoredBox(color: Theme.of(context).colorScheme.surface, child: child!))),
+                                        ValueListenableBuilder&lt;int&gt;(
+                                          valueListenable: densityNotifier,
+                                          builder: (ctx, d, _) =&gt; Theme(
+                                            data: Theme.of(ctx).copyWith(
+                                              visualDensity: VisualDensity(
+                                                  horizontal: d == 0 ? -2.0 : d == 2 ? 1.0 : 0.0,
+                                                  vertical:   d == 0 ? -2.0 : d == 2 ? 1.0 : 0.0)),
+                                            child: AppTextScale(child: DesktopTitleBarShell(child: ColoredBox(color: Theme.of(ctx).colorScheme.surface, child: child!))),
+                                          ),
+                                        ),
                                     home: (username.isNotEmpty &amp;&amp; apiKey.isNotEmpty)
                                         ? HomeScreen(username: username, apiKey: apiKey,
                                             startupTab: startupTab)

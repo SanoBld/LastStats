@@ -110,9 +110,16 @@ and</li>
   <pre class="language-dart"><code class="language-dart">@override
 Widget build(BuildContext context) {
   final scheme = Theme.of(context).colorScheme;
-  return ListTile(
+  &#47;&#47; Long press &#47; right click opens the bubble; old long-press action
+  &#47;&#47; (&quot;add to folder&quot;) is its first entry.
+  return GestureDetector(
+    behavior: HitTestBehavior.deferToChild,
+    onSecondaryTapUp: (d) =&gt; showTrackMenu(context,
+        name: name, artist: artist, at: d.globalPosition, onAddToFolder: onLongPress, onSelect: onSelect),
+    child: ListTile(
     onTap: onTap,
-    onLongPress: onLongPress,
+    onLongPress: () =&gt; showTrackMenu(context,
+        name: name, artist: artist, onAddToFolder: onLongPress, onSelect: onSelect),
     leading: ClipRRect(
       borderRadius: AppRadius.smR,
       child: SizedBox(
@@ -139,11 +146,11 @@ Widget build(BuildContext context) {
         ),
       ),
     ),
-    title: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis),
+    title: M3Marquee(name),
     subtitle: artist.isEmpty ? null : Text(artist, maxLines: 1, overflow: TextOverflow.ellipsis,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
     trailing: trailing,
-  );
+  ));
 }</code></pre>
 </section>
 

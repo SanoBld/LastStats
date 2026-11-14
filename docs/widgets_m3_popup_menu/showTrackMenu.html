@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the showTrackMenu function from the m3_popup_menu library, for the Dart programming language.">
+  <title>showTrackMenu function - m3_popup_menu library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../static-assets/styles.css?v1">
+  <link rel="icon" href="../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../index.html">laststats_mobile</a></li>
+    <li><a href="../widgets_m3_popup_menu/">widgets&#47;m3_popup_menu.dart</a></li>
+    <li class="self-crumb">showTrackMenu function</li>
+  </ol>
+  <div class="self-name">showTrackMenu</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+  <div
+      id="dartdoc-main-content"
+      class="main-content"
+      data-above-sidebar="widgets_m3_popup_menu&#47;widgets_m3_popup_menu-library-sidebar.html"
+      data-below-sidebar="">
+      <div>
+<h1><span class="kind-function">showTrackMenu</span> function 
+ 
+</h1></div>
+
+    <section class="multi-line-signature">
+        
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+<span class="name ">showTrackMenu</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="showTrackMenu-param-context"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/widgets/BuildContext-class.html">BuildContext</a></span> <span class="parameter-name">context</span>, {</span></li>
+<li><span class="parameter" id="showTrackMenu-param-name"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span></li>
+<li><span class="parameter" id="showTrackMenu-param-artist"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">artist</span>, </span></li>
+<li><span class="parameter" id="showTrackMenu-param-at"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Offset-class.html">Offset</a>?</span> <span class="parameter-name">at</span>, </span></li>
+<li><span class="parameter" id="showTrackMenu-param-onAddToFolder"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/VoidCallback.html">VoidCallback</a>?</span> <span class="parameter-name">onAddToFolder</span>, </span></li>
+<li><span class="parameter" id="showTrackMenu-param-onSelect"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/VoidCallback.html">VoidCallback</a>?</span> <span class="parameter-name">onSelect</span>, </span></li>
+<li><span class="parameter" id="showTrackMenu-param-type"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">type</span> = <span class="default-value">&#39;tracks&#39;</span>, </span></li>
+</ol>})
+
+        
+
+    </section>
+    
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; showTrackMenu(
+  BuildContext context, {
+  required String name,
+  required String artist,
+  Offset? at,
+  VoidCallback? onAddToFolder,
+  VoidCallback? onSelect, &#47;&#47; starts multi-select (lists that support it)
+  String type = &#39;tracks&#39;, &#47;&#47; &#39;tracks&#39; | &#39;albums&#39; | &#39;artists&#39;
+}) {
+  final isArtist = type == &#39;artists&#39;;
+  String enc(String v) =&gt; Uri.encodeComponent(v);
+  final q = enc((isArtist ? name : &#39;$artist $name&#39;).trim());
+  final lastfm = isArtist
+      ? &#39;https:&#47;&#47;www.last.fm&#47;music&#47;${enc(name)}&#39;
+      : artist.isEmpty
+          ? &#39;https:&#47;&#47;www.last.fm&#47;search?q=${enc(name)}&#39;
+          : type == &#39;albums&#39;
+              ? &#39;https:&#47;&#47;www.last.fm&#47;music&#47;${enc(artist)}&#47;${enc(name)}&#39;
+              : &#39;https:&#47;&#47;www.last.fm&#47;music&#47;${enc(artist)}&#47;_&#47;${enc(name)}&#39;;
+  Future&lt;void&gt; open(String url) =&gt;
+      launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+  final messenger = ScaffoldMessenger.maybeOf(context);
+  void copy(String text) {
+    Clipboard.setData(ClipboardData(text: text));
+    messenger?.showSnackBar(SnackBar(
+      content: Text(tx(&#39;menu_copied&#39;)),
+      duration: const Duration(seconds: 2),
+      behavior: SnackBarBehavior.floating,
+    ));
+  }
+
+  return showM3Menu(context, at: at, groups: [
+    if (onAddToFolder != null || onSelect != null)
+      [
+        if (onSelect != null)
+          M3MenuItem(label: tx(&#39;menu_select&#39;), icon: Icons.checklist_rounded, onTap: onSelect),
+        if (onAddToFolder != null)
+          M3MenuItem(label: tx(&#39;menu_add_folder&#39;), icon: Icons.create_new_folder_rounded, onTap: onAddToFolder),
+      ],
+    [
+      M3MenuItem(label: &#39;Last.fm&#39;, icon: Icons.open_in_new_rounded,
+          asset: &#39;assets&#47;icons&#47;lastfm.svg&#39;, onTap: () =&gt; open(lastfm)),
+      M3MenuItem(label: &#39;Spotify&#39;, icon: Icons.open_in_new_rounded,
+          asset: &#39;assets&#47;icons&#47;spotify.svg&#39;, onTap: () =&gt; open(&#39;https:&#47;&#47;open.spotify.com&#47;search&#47;$q&#39;)),
+      M3MenuItem(label: &#39;YouTube Music&#39;, icon: Icons.open_in_new_rounded,
+          asset: &#39;assets&#47;icons&#47;ytmusic.svg&#39;, onTap: () =&gt; open(&#39;https:&#47;&#47;music.youtube.com&#47;search?q=$q&#39;)),
+      M3MenuItem(label: &#39;Apple Music&#39;, icon: Icons.open_in_new_rounded,
+          asset: &#39;assets&#47;icons&#47;applemusic.svg&#39;, onTap: () =&gt; open(&#39;https:&#47;&#47;music.apple.com&#47;search?term=$q&#39;)),
+      M3MenuItem(label: &#39;Deezer&#39;, icon: Icons.open_in_new_rounded,
+          asset: &#39;assets&#47;icons&#47;deezer.svg&#39;, onTap: () =&gt; open(&#39;https:&#47;&#47;www.deezer.com&#47;search&#47;$q&#39;)),
+    ],
+    [
+      M3MenuItem(label: tx(&#39;menu_copy_title&#39;), icon: Icons.content_copy_rounded, onTap: () =&gt; copy(name)),
+      if (artist.isNotEmpty &amp;&amp; !isArtist)
+        M3MenuItem(label: tx(&#39;menu_copy_both&#39;), icon: Icons.copy_all_rounded, onTap: () =&gt; copy(&#39;$artist – $name&#39;)),
+    ],
+  ]);
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../index.html">laststats_mobile</a></li>
+    <li><a href="../widgets_m3_popup_menu/">m3_popup_menu</a></li>
+    <li class="self-crumb">showTrackMenu function</li>
+</ol>
+
+    <h5>m3_popup_menu library</h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div><!--/.sidebar-offcanvas-left-->
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+</main>
+<footer>
+  <span class="no-break">
+    laststats_mobile
+      4.3.0+31
+  </span>
+  
+</footer>
+
+
+<script src="../static-assets/highlight.pack.js?v1"></script>
+<script src="../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+
