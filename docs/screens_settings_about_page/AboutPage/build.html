@@ -118,10 +118,10 @@ Widget build(BuildContext context) {
 
       &#47;&#47; ── Logo &#47; header ─────────────────────────────────────────────────
       Center(child: Column(children: [
-        M3CookieBadge(
-          size: 104,
-          color: scheme.primaryContainer,
-          child: SvgPicture.asset(_logoAsset(context), width: 68, height: 68),
+        ClipPath(
+          clipper: const ShapeBorderClipper(
+              shape: M3CookieBorder(lobes: 8, amplitude: 0.07)),
+          child: SvgPicture.asset(_logoAsset(context), width: 104, height: 104),
         ),
         const SizedBox(height: 14),
         Text(&#39;LastStats&#39;,
@@ -214,7 +214,8 @@ Widget build(BuildContext context) {
         label: tx(&#39;ui_favorites&#39;),
         children: [
           ListTile(
-            leading: const Icon(Icons.library_music_rounded),
+            leading: _SafeSvgIcon(asset: &#39;assets&#47;icons&#47;metrolist.svg&#39;,
+                fallback: Icons.library_music_rounded, color: scheme.primary),
             title: const Text(&#39;Metrolist&#39;,
                 style: TextStyle(fontWeight: FontWeight.w600)),
             subtitle: Text(tx(&#39;ui_advanced_youtube_music&#39;), style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
