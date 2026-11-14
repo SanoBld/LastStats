@@ -69,7 +69,6 @@
 - Music compatibility: close button, safe-area sheet (no longer under the status bar), long-press a shared item for the options bubble
 - Descriptions in announcements and notification details now support **bold**, __underline__, ==highlight==, ~~strikethrough~~, *italic*, `code` and links
 - Settings > About reorganised: duplicates removed (version, GitHub link, Metrolist, Flutter, ThemeData), support right after app info, owner and licence in the header
-- App icon: the Nothing icons (dark and light, red dot) are back in the picker
 
 - Music compatibility can now be shared as an image (9:16, 1080x1920 like the other shares): score, shared counts, breakdown bars, top shared artists and tracks
 - Year recap image: the LastStats logo sits lower, leaving more room for the lists
