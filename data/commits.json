@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-14T22:07:13Z",
+  "updated": "2026-11-14T22:12:35Z",
   "commits": [
+    {
+      "sha": "0b5c0dfca4af02f5c324c2d6070a7a967dc0f217",
+      "message": "feat: restauration des icônes Nothing dans le sélecteur d'icônes de l'application",
+      "date": "2026-11-14T22:12:12Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/0b5c0dfca4af02f5c324c2d6070a7a967dc0f217",
+      "tags": []
+    },
     {
       "sha": "abe2446e2402e4e126d07c0a58e46fbf068113fc",
       "message": "feat: ajout de traductions pour la couleur de la musique en cours dans plusieurs langues",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/3e57a94eea811f28a8f0637453eae8a1b2bb7cca",
-      "tags": []
-    },
-    {
-      "sha": "50f61ccd340ccad9f0549b9de60a8b987fc9ae45",
-      "message": "feat: ajouter des groupes de bascule pour \"Pour toi\" et \"Tendances Last.fm\" dans les paramètres du tableau de bord",
-      "date": "2026-09-22T18:26:19Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/50f61ccd340ccad9f0549b9de60a8b987fc9ae45",
       "tags": []
     }
   ]
