@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-14T15:39:42Z",
+  "updated": "2026-11-14T17:57:03Z",
   "commits": [
+    {
+      "sha": "342e88f5573a2ed6f52a26159dc025c8747e9bef",
+      "message": "feat: supprimer la gestion de la densité de l'interface utilisateur et améliorer les sélecteurs de date",
+      "date": "2026-11-14T17:56:43Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/342e88f5573a2ed6f52a26159dc025c8747e9bef",
+      "tags": []
+    },
     {
       "sha": "fd359711876dc6ed55183e8e697fe36214233ce4",
       "message": "Add new SVG icons and implement M3 widgets for enhanced UI features\n\n- Added SVG icons for GitHub, Instagram, Linux, Telegram, Windows, and YouTube.\n- Introduced M3Confetti widget for a confetti burst effect.\n- Created M3EqualizerBars widget for animated equalizer bars.\n- Implemented M3Marquee widget for scrolling text display.\n- Developed M3PopupMenu widget for a customizable options menu.",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/c4df8b63815e1c552f6cb7081f4dd8e3e0edc303",
-      "tags": []
-    },
-    {
-      "sha": "058aee614b9c19b632f225daef436c4e5f4ad1f8",
-      "message": "Refactor animations to use Material 3 motion and shapes\n\n- Replaced various animation curves with M3Motion.emphasizedDecelerate and M3Motion.emphasized for smoother transitions across multiple screens including history, rankings, and settings.\n- Introduced M3Switcher for consistent animation behavior in widget transitions.\n- Added M3CookieBorder shape for buttons to enhance visual consistency with Material 3 design.\n- Updated modal bottom sheets and dialog animations to use kM3SheetAnimation and kM3DialogAnimation for uniformity.\n- Adjusted button styles to incorporate new shapes and animations, ensuring a cohesive user experience.",
-      "date": "2026-09-21T18:46:18Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/058aee614b9c19b632f225daef436c4e5f4ad1f8",
       "tags": []
     }
   ]
