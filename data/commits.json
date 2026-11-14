@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-14T20:28:47Z",
+  "updated": "2026-11-14T20:50:05Z",
   "commits": [
+    {
+      "sha": "cc63f0c7795d3f607e7994674de5a0c375572d7b",
+      "message": "feat: mise à jour des composants M3 et ajout d'une nouvelle icône SVG pour améliorer l'interface utilisateur",
+      "date": "2026-11-14T20:49:43Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/cc63f0c7795d3f607e7994674de5a0c375572d7b",
+      "tags": []
+    },
     {
       "sha": "4d666a51547d48923f4ad2c2f71bba317472b028",
       "message": "feat: refonte de l'animation de fond musical et mise à jour des chaînes de localisation pour une meilleure clarté",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/fb2fdf7a9ad5523771ab60404b86a7200e8ef9bc",
-      "tags": []
-    },
-    {
-      "sha": "b5bfdfcad6a09306964ebe3e3813b63da40e56c8",
-      "message": "feat: ajouter des boutons et des animations Material 3, refactoriser l'historique et les détails",
-      "date": "2026-09-21T19:59:31Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/b5bfdfcad6a09306964ebe3e3813b63da40e56c8",
       "tags": []
     }
   ]
