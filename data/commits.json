@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-14T13:06:12Z",
+  "updated": "2026-11-14T14:13:11Z",
   "commits": [
+    {
+      "sha": "e54ae6cd2843a5c5de408c445277c42caef031f7",
+      "message": "Update localization strings for year recap feature in multiple languages\n\n- Enhanced Spanish, French, Italian, Japanese, Portuguese, Russian, and Chinese strings for better user engagement and clarity.\n- Improved phrasing in various sections including loading messages, error messages, and user statistics to create a more friendly and relatable tone.\n- Adjusted formatting for consistency in displaying labels based on locale in the year recap page.",
+      "date": "2026-11-14T13:59:45Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/e54ae6cd2843a5c5de408c445277c42caef031f7",
+      "tags": []
+    },
     {
       "sha": "0a94bcaf1f134379d3cd750ebe6f0775aa2867fb",
       "message": "feat: améliorer la gestion du clavier et dédupliquer les résultats de recherche pour une meilleure expérience utilisateur",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/292e6410b7512cfb9ac41e98a9d92ebefa05a63e",
-      "tags": []
-    },
-    {
-      "sha": "7c63aff1d99084af742911e1f43704a5460b1e05",
-      "message": "feat: ajouter une fonctionnalité de lightbox et une table des matières interactive pour le README",
-      "date": "2026-09-17T20:52:00Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/7c63aff1d99084af742911e1f43704a5460b1e05",
       "tags": []
     }
   ]
