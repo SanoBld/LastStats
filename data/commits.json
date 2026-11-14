@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-14T05:21:18Z",
+  "updated": "2026-11-14T08:42:10Z",
   "commits": [
+    {
+      "sha": "c5d39baa3be41492f25a26335521691b6aea10eb",
+      "message": "feat: redesign calendar interface and improve loading indicators for better user experience",
+      "date": "2026-11-14T08:39:56Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/c5d39baa3be41492f25a26335521691b6aea10eb",
+      "tags": []
+    },
     {
       "sha": "d741f2f0e7de89b7cdddd879be500c6955f378e1",
       "message": "feat: améliorer l'affichage des données avec un centrage et une mise à l'échelle des textes",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/46d72b3b24bbe27b24fdab1b6e110485225def78",
-      "tags": []
-    },
-    {
-      "sha": "ead33e6bddb0130133f7231d0e030f12cc9b0159",
-      "message": "Update legal page and add new icons\n\n- Changed the title of the legal page to \"LastStats\".\n- Updated the meta description for better SEO.\n- Added light and dark mode favicons for improved user experience.\n- Included a logo in the navigation bar linking to the homepage.\n- Updated footer links to include Aide, GitHub, Download, Discord, and Legal notice.\n- Added new app logo images for both light and dark themes.",
-      "date": "2026-09-17T15:36:44Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/ead33e6bddb0130133f7231d0e030f12cc9b0159",
       "tags": []
     }
   ]
