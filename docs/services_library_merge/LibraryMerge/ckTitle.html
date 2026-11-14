@@ -70,7 +70,7 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static String ckTitle(String title, {bool album = false}) =&gt; !mergeOn
     ? title.toLowerCase()
-    : alnum(album ? cleanAlbum(title) : cleanTrack(title));</code></pre>
+    : _titleKey(album ? cleanAlbum(title) : cleanTrack(title), title);</code></pre>
 </section>
 
 

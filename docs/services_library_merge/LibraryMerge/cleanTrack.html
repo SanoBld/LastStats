@@ -69,13 +69,33 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static String cleanTrack(String title) {
   var t = title.trim();
-  t = t.replaceAllMapped(_bracket, (m) =&gt; _stripTrack(m.group(1) ?? &#39;&#39;) ? &#39;&#39; : m.group(0)!);
-  final d = _dashTail.firstMatch(t);
-  if (d != null) {
-    final c = d.group(1) ?? &#39;&#39;;
-    if (_trackNoise.hasMatch(c) &amp;&amp; !_trackDistinct.hasMatch(c)) t = t.substring(0, d.start);
+  &#47;&#47; Version words in a bracket anywhere (feat., remaster...) always go.
+  t = t.replaceAllMapped(_bracket,
+      (m) =&gt; _alwaysNoise.hasMatch(m.group(1) ?? &#39;&#39;) ? &#39;&#39; : m.group(0)!);
+  &#47;&#47; Then peel version tags off the end, as many as there are:
+  &#47;&#47; &quot;Song - 2011 Remaster (feat. X)&quot; -&gt; &quot;Song&quot;.
+  for (var i = 0; i &lt; 6; i++) {
+    var changed = false;
+    final b = _trailBracket.firstMatch(t);
+    if (b != null &amp;&amp; b.start &gt; 0 &amp;&amp; _stripTrack(b.group(1) ?? &#39;&#39;)) {
+      t = t.substring(0, b.start).trimRight();
+      changed = true;
+    }
+    final d = _dashTail.firstMatch(t);
+    if (d != null) {
+      final c = d.group(1) ?? &#39;&#39;;
+      if (_trackNoise.hasMatch(c) &amp;&amp; !_trackDistinct.hasMatch(c)) {
+        t = t.substring(0, d.start).trimRight();
+        changed = true;
+      }
+    }
+    final f = _featTail.firstMatch(t);
+    if (f != null &amp;&amp; f.start &gt; 0) {
+      t = t.substring(0, f.start).trimRight();
+      changed = true;
+    }
+    if (!changed) break;
   }
-  t = t.replaceAll(_featTail, &#39;&#39;);
   t = t.trim();
   return t.isEmpty ? title.trim() : t;
 }</code></pre>

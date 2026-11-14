@@ -69,6 +69,8 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static String artistKey(String name) {
   var k = alnum(name);
+  &#47;&#47; Names made only of symbols (&quot;!!!&quot;, &quot;???&quot;) would all share the empty key.
+  if (k.isEmpty) return fold(name.trim());
   if (k.startsWith(&#39;the&#39;) &amp;&amp; k.length &gt; 6) k = k.substring(3);
   return k;
 }</code></pre>

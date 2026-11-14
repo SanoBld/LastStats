@@ -70,7 +70,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static String albumKey(String title, String artist, Set&lt;String&gt; known) =&gt;
-    &#39;${alnum(cleanAlbum(title))}|${artistKey(primaryArtist(artist, known))}&#39;;</code></pre>
+    &#39;${_titleKey(cleanAlbum(title), title)}|${artistKey(primaryArtist(artist, known))}&#39;;</code></pre>
 </section>
 
 

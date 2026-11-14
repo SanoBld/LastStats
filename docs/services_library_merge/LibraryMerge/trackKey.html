@@ -70,7 +70,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static String trackKey(String title, String artist, Set&lt;String&gt; known) =&gt;
-    &#39;${alnum(cleanTrack(title))}|${artistKey(primaryArtist(artist, known))}&#39;;</code></pre>
+    &#39;${_titleKey(cleanTrack(title), title)}|${artistKey(primaryArtist(artist, known))}&#39;;</code></pre>
 </section>
 
 
