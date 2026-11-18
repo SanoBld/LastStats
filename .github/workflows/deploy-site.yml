@@ -71,6 +71,13 @@ jobs:
             }' > site/data/commits.json
           jq '{updated, count: (.commits | length)}' site/data/commits.json
 
+      # app news: static copy of news.json (made by publish-news), same idea as releases.json
+      - name: Copy news data
+        run: |
+          mkdir -p site/data
+          curl -fsSL "https://sanobld.github.io/LastStats/news.json" -o site/data/news.json || echo '{"items":[]}' > site/data/news.json
+          jq '{count: (.items | length)}' site/data/news.json
+
       # README + default branch: the site reads this copy instead of calling the API
       - name: Generate README data
         env:

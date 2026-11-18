@@ -74,6 +74,8 @@ jobs:
             '.items = ([$newitem] + .items) | .items |= .[:30]' \
             existing.json > public/news.json
 
+          # copy for the website (data/news.json), next to the root file
+          mkdir -p public/data && cp public/news.json public/data/news.json
           cat public/news.json
 
       - name: Publish news.json to gh-pages
