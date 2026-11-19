@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-19T19:38:36Z",
+  "updated": "2026-11-19T20:05:39Z",
   "commits": [
+    {
+      "sha": "219f4cfc2ee69d430e28cdd8bf41c4c5428a06d2",
+      "message": "Refactor account management and integration with ListenBrainz\n\n- Removed the add account functionality and associated dialog from the account page.\n- Updated connections page to remove Last.fm web login option.\n- Adjusted setup screen to ensure only the ListenBrainz account is saved.\n- Introduced setSingle method in AccountManager to manage single active account.\n- Enhanced API registry to support additional ListenBrainz hosts.\n- Improved LB adapter to handle user healing and similar artist retrieval.\n- Updated notification worker to adapt to ListenBrainz mode.\n- Modified widget service to prevent Last.fm queries in ListenBrainz mode.\n- Improved AppImage build script for better dependency management and error handling.",
+      "date": "2026-11-19T20:03:09Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/219f4cfc2ee69d430e28cdd8bf41c4c5428a06d2",
+      "tags": []
+    },
     {
       "sha": "69df36493c46fc9ffb78f110de9cdc32998a10bd",
       "message": "feat: Ajouter un workflow pour synchroniser la version de pubspec.yaml avec CHANGELOG.md",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/ddf3d14eac7c8c38739b161bd17d80655826a706",
-      "tags": []
-    },
-    {
-      "sha": "173b0bbb76780d0ce6d5ef3b5a0080e9944ddbe1",
-      "message": "Refactor UI components and update localization strings\n\n- Updated the About, Account, FAQ, Language, and Version History pages to use a consistent design with rounded cards and updated icons.\n- Changed the styling of destructive actions to use a red container with matching icons.\n- Improved localization strings for Arabic, German, English, Spanish, French, Italian, Japanese, Portuguese, Russian, and Chinese to enhance clarity and naturalness.\n- Adjusted border radius for various UI elements across settings pages for a more cohesive look.\n- Introduced a new M3CookieBadge component for better visual representation of icons in the settings.",
-      "date": "2026-09-23T20:17:03Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/173b0bbb76780d0ce6d5ef3b5a0080e9944ddbe1",
       "tags": []
     }
   ]
