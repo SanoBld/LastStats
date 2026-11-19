@@ -3,6 +3,8 @@ import 'package:crypto/crypto.dart';
 import 'api_http.dart';
 import 'library_merge.dart';
 import 'internal_keys.dart';
+import 'data_source.dart';
+import 'lb_adapter.dart';
 
 class LastFmService {
   final String apiKey;
@@ -39,6 +41,8 @@ class LastFmService {
   }
 
   Future<dynamic> _call(Map<String, String> params) async {
+    // ListenBrainz mode: never contact Last.fm, answer from ListenBrainz
+    if (DataSource.lb) return LbAdapter.call(params, username);
     try {
       return await _get(params, apiKey);
     } on _KeyRejected {
@@ -88,6 +92,7 @@ class LastFmService {
   }
 
   Future<dynamic> _callSigned(Map<String, String> params, {bool post = false}) async {
+    if (DataSource.lb) return LbAdapter.callSigned(params, apiKey);
     final base   = {...params, 'api_key': apiKey};
     final sig    = _sign(base);
     final full   = {...base, 'api_sig': sig, 'format': 'json'};

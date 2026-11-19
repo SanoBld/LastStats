@@ -424,7 +424,7 @@ class _SettingsPageState extends State<_SettingsPage> {
     try {
       final p      = await SharedPreferences.getInstance();
       final apiKey = p.getString('ls_apikey') ?? '';
-      if (apiKey.isEmpty) return;
+      if (apiKey.isEmpty || DataSource.lb) return;
 
       final uri = Uri.parse(
         'https://ws.audioscrobbler.com/2.0/'

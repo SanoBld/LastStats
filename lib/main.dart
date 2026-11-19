@@ -36,6 +36,7 @@ import 'services/auto_backup_service.dart';
 import 'widgets/custom_title_bar.dart';
 import 'widgets/skeleton.dart' show M3Loader;
 import 'services/internal_keys.dart';
+import 'services/data_source.dart';
 import 'theme/m3_motion.dart';
 import 'theme/m3_shapes.dart';
 import 'theme/m3_interaction.dart';
@@ -106,6 +107,7 @@ Future<void> _mainImpl() async {
   final apiKey     = prefs.getString('ls_apikey')   ?? '';
   final startupTab = prefs.getInt('ls_startup_tab') ?? 0;
   await InternalKeys.loadFallback(prefs);
+  await DataSource.load();
 
   // First launch: pick a random accent instead of the default purple.
   if (prefs.getString('ls_accent') == null && username.isEmpty) {

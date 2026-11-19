@@ -1,3 +1,4 @@
+import 'services/data_source.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 
@@ -184,7 +185,7 @@ final secretKeyNotifier = ValueNotifier<String>('');
 final sessionKeyNotifier = ValueNotifier<String>('');
 
 /// True once the user has authorized favorites (loved tracks) access.
-bool get favoritesEnabled => sessionKeyNotifier.value.isNotEmpty;
+bool get favoritesEnabled => DataSource.lb || sessionKeyNotifier.value.isNotEmpty;
 
 // Cache of "artist|track" (lowercased) keys currently loved — powers the
 // discreet heart badges in recent tracks, history, and search results.

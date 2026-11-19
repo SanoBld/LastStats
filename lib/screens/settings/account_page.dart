@@ -3,6 +3,7 @@
 //  AccountPage — Last.fm account management (multi-account, max 3)
 // ══════════════════════════════════════════════════════════════════════════
 
+import '../../services/data_source.dart';
 import '../../theme/m3_interaction.dart';
 import 'dart:convert';
 import '../../widgets/m3_components.dart';
@@ -105,6 +106,7 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   Future<void> _fetchAvatar(String username, String apiKey) async {
+    if (DataSource.lb) return; // Last.fm only
     try {
       final uri = Uri.parse(
         'https://ws.audioscrobbler.com/2.0/'
@@ -707,6 +709,21 @@ class _AccountPageState extends State<AccountPage> {
               ),
             ],
           ),
+
+        const SizedBox(height: 16),
+
+        SettingsSection(
+          label: tx('acct_switch'),
+          children: [
+            ListTile(
+              leading: Icon(Icons.swap_horiz_rounded, color: scheme.primary),
+              title: Text(tx('acct_switch')),
+              subtitle: Text(tx('acct_switch_s')),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const SetupScreen())),
+            ),
+          ],
+        ),
 
         const SizedBox(height: 16),
 

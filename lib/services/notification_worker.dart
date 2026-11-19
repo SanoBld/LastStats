@@ -20,6 +20,7 @@ import 'scrobbles_file_cache.dart';
 import 'widget_service.dart';
 import 'auto_backup_service.dart';
 import 'api_http.dart';
+import 'data_source.dart';
 import 'api_usage.dart';
 
 // ── Task names ───────────────────────────────────────────────────────────────
@@ -219,6 +220,7 @@ String _shortDate(DateTime d) =>
 // notification so the user sees it happening even with the app closed.
 
 Future<void> _runScrobbleSync() async {
+  await DataSource.load();
   final prefs = await SharedPreferences.getInstance();
   if (!(prefs.getBool(_kSyncEnabled) ?? false)) return;
 
@@ -264,6 +266,8 @@ Future<void> _runScrobbleSync() async {
 // ── Milestone check ──────────────────────────────────────────────────────────
 
 Future<void> _runMilestoneCheck() async {
+  await DataSource.load();
+  if (DataSource.lb) return; // uses Last.fm directly: not in ListenBrainz mode
   final prefs = await SharedPreferences.getInstance();
 
   final intervalOn = prefs.getBool(_kMilestoneEnabled) ?? false;
@@ -315,6 +319,8 @@ bool _yearRecapEnabled(SharedPreferences prefs) =>
     (prefs.getBool(_kNotifNewsEnabled) ?? false);
 
 Future<void> _runRecapCheck() async {
+  await DataSource.load();
+  if (DataSource.lb) return; // uses Last.fm directly: not in ListenBrainz mode
   final prefs = await SharedPreferences.getInstance();
   final now   = DateTime.now();
 

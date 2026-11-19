@@ -3,6 +3,7 @@
 // Pushes Last.fm data to Android home screen widgets via home_widget.
 // Keep it simple: fetch, save keys, ask Android to redraw each widget.
 
+import 'data_source.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart' show Brightness, Color, ColorScheme, Colors;
 import 'package:home_widget/home_widget.dart';
@@ -71,6 +72,7 @@ class WidgetService {
       }
       if (themeOnly) return;
 
+      await DataSource.load();
       final api = LastFmService(apiKey: apiKey, username: username);
 
       // Total scrobbles + user avatar

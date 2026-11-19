@@ -1,5 +1,6 @@
 // lib/screens/settings/notifications_page.dart
 
+import '../../services/data_source.dart';
 import '../../l10n/extra_strings.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/m3_components.dart';
@@ -282,6 +283,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                 ),
                 const SizedBox(height: 16),
 
+                // Milestones + recaps use the Last.fm API: hidden with ListenBrainz
+                if (!DataSource.lb) ...[
                 // ── Section: Milestones ────────────────────────────────────
                 SettingsSection(label: L.onboardMilestonesSection, children: [
                   SwitchListTile(
@@ -399,6 +402,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   ],
                 ]),
                 const SizedBox(height: 16),
+
+                ],
 
                 // ── Section: Scrobble sync ──────────────────────────────────
                 SettingsSection(label: L.notifSyncSection, children: [
