@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-19T20:21:50Z",
+  "updated": "2026-11-19T21:02:05Z",
   "commits": [
+    {
+      "sha": "5133c89bc0d321982c338857ea10bd88a2286508",
+      "message": "feat: Ajouter le besoin d'un User-Agent pour ListenBrainz et ajuster les délais d'attente pour MusicBrainz",
+      "date": "2026-11-19T20:56:46Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/5133c89bc0d321982c338857ea10bd88a2286508",
+      "tags": []
+    },
     {
       "sha": "3df72d0126bccb487423e54828b9154047950255",
       "message": "feat: Mettre à jour les runners Ubuntu pour les builds Linux",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/24bd36f5dc179ef9ff3ee3e8ce82b75add575f45",
-      "tags": []
-    },
-    {
-      "sha": "1b0b51462dfd407f12788f9d0eb34a00e078e2fd",
-      "message": "feat: refactor settings UI to use SettingActionGroup for consistency",
-      "date": "2026-09-23T21:02:51Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/1b0b51462dfd407f12788f9d0eb34a00e078e2fd",
       "tags": []
     }
   ]
