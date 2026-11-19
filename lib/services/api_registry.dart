@@ -98,14 +98,16 @@ class ApiRegistry {
     ApiDef(
       id: 'listenbrainz', name: 'ListenBrainz', category: ApiCategory.listening,
       hosts: ['api.listenbrainz.org', 'labs.api.listenbrainz.org'],
-      headerLimits: true, maxWaitMs: 8000,
+      // MetaBrainz blocks anonymous scrapers (default Dart User-Agent) and
+      // cuts the TLS connection: always identify the app.
+      headerLimits: true, maxWaitMs: 8000, needsUserAgent: true,
     ),
     ApiDef(
       id: 'musicbrainz', name: 'MusicBrainz', category: ApiCategory.metadata,
       hosts: ['musicbrainz.org'],
       official: ApiRule(1, 1000),
       ceiling:  ApiRule(1, 1100),
-      maxWaitMs: 4000, cooldownMs: 30000, needsUserAgent: true,
+      maxWaitMs: 15000, cooldownMs: 30000, needsUserAgent: true,
     ),
     ApiDef(
       id: 'coverart', name: 'Cover Art Archive', category: ApiCategory.artwork,
