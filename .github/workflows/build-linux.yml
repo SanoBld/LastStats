@@ -76,7 +76,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: laststats-linux-${{ matrix.arch }}-appimage
-          path: LastStats-linux-${{ matrix.arch }}.AppImage
+          path: LastStats-${{ matrix.arch == 'x64' && 'x86_64' || 'aarch64' }}.AppImage
       - uses: actions/upload-artifact@v4
         with:
           name: laststats-linux-${{ matrix.arch }}-rpm

@@ -29,7 +29,8 @@ elif command -v zypper >/dev/null 2>&1; then
   $SUDO zypper --non-interactive --no-gpg-checks install "$TMP/$F"
 else
   # Any other distro: portable AppImage in your home folder (no root needed).
-  F="LastStats-linux-$A.AppImage"; dl "$F"
+  M=x86_64; [ "$A" = arm64 ] && M=aarch64
+  F="LastStats-$M.AppImage"; dl "$F"
   mkdir -p "$HOME/.local/bin" "$HOME/.local/share/applications" "$HOME/.local/share/icons"
   install -m 755 "$TMP/$F" "$HOME/.local/bin/laststats"
   ( cd "$TMP" && "$HOME/.local/bin/laststats" --appimage-extract laststats.png >/dev/null 2>&1 \

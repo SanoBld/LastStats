@@ -225,8 +225,8 @@ jobs:
             | `LastStats-linux-x64.rpm` | **Linux x64 (Fedora/openSUSE/RHEL) — recommended installer** |
             | `LastStats-linux-arm64.rpm` | **Linux ARM64 (Fedora/openSUSE) — recommended installer** |
             | `install-linux.sh` | Linux, any CPU: picks the right package for your distro |
-            | `LastStats-linux-x64.AppImage` | Linux x64, any distro (portable) |
-            | `LastStats-linux-arm64.AppImage` | Linux ARM64, any distro (portable) |
+            | `LastStats-x86_64.AppImage` | Linux x64, any distro (portable) |
+            | `LastStats-aarch64.AppImage` | Linux ARM64, any distro (portable) |
             | `laststats-linux.zip`   | Linux x64, manual install |
             | `laststats-linux-arm64.zip` | Linux ARM64, manual install |
             | `LastStats-macos-arm64.dmg` | **macOS Apple Silicon (M1 and later) — recommended installer** (drag to Applications) |
