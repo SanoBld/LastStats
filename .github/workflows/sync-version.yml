@@ -1,0 +1,41 @@
+# Keeps pubspec.yaml's `version:` in sync with the newest heading of
+# CHANGELOG.md (e.g. "## v4.4.0" -> version: 4.4.0+<build>) on every push
+# that changes the changelog. The release workflow still sets the final
+# version on release, so the two never disagree.
+name: Sync pubspec version
+
+on:
+  push:
+    branches: [ master ]
+    paths: [ 'CHANGELOG.md' ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update pubspec.yaml from CHANGELOG.md
+        run: |
+          VER=$(grep -m1 -E '^## v[0-9]' CHANGELOG.md | tr -d '\r' | sed -E 's/^## v//; s/[[:space:]].*$//')
+          if [ -z "$VER" ]; then echo "No version heading found."; exit 0; fi
+          CUR=$(grep -m1 '^version:' pubspec.yaml | tr -d '\r')
+          BUILD=$(echo "$CUR" | sed -nE 's/.*\+([0-9]+).*/\1/p')
+          NEW="version: $VER${BUILD:++$BUILD}"
+          echo "pubspec: '$CUR' -> '$NEW'"
+          sed -i "s/^version: .*/$NEW/" pubspec.yaml
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- pubspec.yaml; then
+            echo "Already up to date."; exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pubspec.yaml
+          git commit -m "chore: sync pubspec version with changelog [skip ci]"
+          git push
