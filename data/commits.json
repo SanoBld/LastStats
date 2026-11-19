@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-19T08:27:09Z",
+  "updated": "2026-11-19T19:14:53Z",
   "commits": [
+    {
+      "sha": "0c6b1189ebe08736293380e4f93fe91dc36f3db0",
+      "message": "feat: Implement ListenBrainz support and data source switching\n\n- Added DataSource class to manage the current data source (Last.fm or ListenBrainz).\n- Integrated LbAdapter to handle API calls to ListenBrainz, mimicking Last.fm's JSON structure.\n- Updated LastFmService to conditionally call ListenBrainz API based on the selected data source.\n- Modified notification_worker and widget_service to load data source settings at runtime.\n- Introduced source_switch functionality to allow users to switch between Last.fm and ListenBrainz, with options to transfer, merge, or fresh start their scrobbles.\n- Implemented user prompts for data source switching decisions and progress indicators during data transfers.",
+      "date": "2026-11-19T19:00:40Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/0c6b1189ebe08736293380e4f93fe91dc36f3db0",
+      "tags": []
+    },
     {
       "sha": "4bdd5ee30761e9085da0b214a1bc81f969963d35",
       "message": "feat: suppression des liens \"Actus\" dans le pied de page des pages news et releases",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/f6d90d1e9b3010a37847a8251ed8c1a05aae1424",
-      "tags": []
-    },
-    {
-      "sha": "4a61e7604e97b9d2fe090a2ee30dc6105cfdc92a",
-      "message": "Add discover filters and settings for personalized recommendations\n\n- Implemented new localized strings for discover filters in French, Italian, Japanese, Portuguese, Russian, and Chinese.\n- Enhanced the dashboard page to include settings for discover filters, allowing users to customize their experience with options for smart ordering, layout, and solo filters.\n- Updated the discover section to display filters based on user preferences, including the ability to show filters in a scrolling, wrapping, or list format.\n- Introduced functionality to record user interactions with filters to improve the relevance of recommendations.\n- Added UI elements in the settings page to manage discover filter preferences, including a dialog for selecting solo filters.",
-      "date": "2026-09-23T18:47:57Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/4a61e7604e97b9d2fe090a2ee30dc6105cfdc92a",
       "tags": []
     }
   ]
