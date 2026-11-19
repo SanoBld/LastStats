@@ -12,3 +12,26 @@
 .nw-body { margin: .7rem 0 0; font-size: .95rem; line-height: 1.55; white-space: pre-line; overflow-wrap: anywhere; }
 .nw-body a { color: var(--md-primary); text-decoration: underline; }
 .nw-row.is-alert .rel-badge { background: var(--md-error-container, #FFDAD6); color: var(--md-on-error-container, #410002); }
+
+/* mobile: same toolbar on news, pushes and versions pages */
+@media (max-width: 640px) {
+  .rel-toolbar { flex-direction: row; flex-wrap: wrap; align-items: center; gap: .6rem; }
+  /* all filters visible: they wrap onto several lines */
+  .rel-toolbar .rel-filter { flex: 1 1 100%; width: 100%; flex-wrap: wrap; gap: 6px; }
+  .rel-toolbar .rel-filter .rel-filter-btn { flex: 1 1 auto; padding: 0 .9rem; white-space: nowrap; border-radius: var(--r-chip); min-height: 40px; }
+  /* translate button on the same line as the search bar */
+  .rel-toolbar .cm-tr-btn { flex: 0 0 auto; }
+  /* versions page: translate button + search share one line */
+  .rel-layout { flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .rel-layout > * { flex: 1 1 100%; min-width: 0; }
+  .rel-layout > .cm-tr-btn { flex: 0 0 auto; }
+  .rel-layout > .rel-search { flex: 1 1 0; width: auto; }
+  .rel-toolbar .cm-search, .rel-toolbar .rel-search { flex: 1 1 0; min-width: 0; width: auto; max-width: none; }
+  .nw-row { padding: .9rem 1rem; }
+  .nw-title { font-size: 1rem; flex-basis: 60%; }
+}
+/* small phones: five nav buttons must fit */
+@media (max-width: 480px) {
+  .nav-toggles { gap: .25rem; }
+  .nav-toggles .nav-logo { width: 40px; height: 40px; }
+}

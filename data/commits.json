@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-19T07:34:46Z",
+  "updated": "2026-11-19T08:27:09Z",
   "commits": [
+    {
+      "sha": "4bdd5ee30761e9085da0b214a1bc81f969963d35",
+      "message": "feat: suppression des liens \"Actus\" dans le pied de page des pages news et releases",
+      "date": "2026-11-19T08:24:51Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/4bdd5ee30761e9085da0b214a1bc81f969963d35",
+      "tags": []
+    },
     {
       "sha": "b4eec3f1f0d7c7bd678ff16909f508145817d3b8",
       "message": "Fix AppImage: bundle GStreamer, rename without 'linux'",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/4a61e7604e97b9d2fe090a2ee30dc6105cfdc92a",
-      "tags": []
-    },
-    {
-      "sha": "01a1988f01b729db3033ed57428daf57bc0381c3",
-      "message": "feat: ajouter la réorganisation des sections et le défilement infini dans le tableau de bord",
-      "date": "2026-09-23T18:20:10Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/01a1988f01b729db3033ed57428daf57bc0381c3",
       "tags": []
     }
   ]
