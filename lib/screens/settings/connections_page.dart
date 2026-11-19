@@ -4,6 +4,7 @@ import '../../theme/m3_shapes.dart';
 import 'package:flutter/foundation.dart'
     show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
+import '../../services/data_source.dart';
 import '../../l10n/extra_strings.dart';
 import '../../l10n/l10n.dart';
 import '../../services/account_manager.dart';
@@ -85,6 +86,30 @@ class _ConnectionsPageState extends State<ConnectionsPage> {
       appBar: M3AppBar(title: tx('conn_btn_t')),
       body: ListView(padding: const EdgeInsets.all(20), children: [
         // ── Last.fm ──
+        if (DataSource.lb)
+          _ServiceCard(
+            logo: Icon(Icons.favorite_rounded, size: 28, color: scheme.onPrimaryContainer),
+            title: 'ListenBrainz',
+            status: '@${widget.username}',
+            connected: true,
+            description: Text(tx('conn_lb_desc'), style: body),
+            actions: [
+              _ActionButton(
+                style: _BtnStyle.filled,
+                icon: Icons.key_rounded,
+                label: tx('acct_lb_token'),
+                onPressed: () =>
+                    _open(AccountPage(username: widget.username, keysOnly: true)),
+              ),
+              _ActionButton(
+                style: _BtnStyle.tonal,
+                icon: Icons.manage_accounts_rounded,
+                label: tx('conn_manage'),
+                onPressed: () => _open(AccountPage(username: widget.username)),
+              ),
+            ],
+          )
+        else
         _ServiceCard(
           logo: BrandIcon('assets/icons/lastfm.svg', Icons.bar_chart_rounded,
               size: 28, color: scheme.onPrimaryContainer),

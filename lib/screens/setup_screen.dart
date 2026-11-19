@@ -357,6 +357,11 @@ class _SetupScreenState extends State<SetupScreen>
       ),
       M3LabelButton(
         kind: M3ButtonKind.text, height: 44, icon: Icons.open_in_new_rounded,
+        label: tx('lfm_create'),
+        onTap: () => _open('https://www.last.fm/join'),
+      ),
+      M3LabelButton(
+        kind: M3ButtonKind.text, height: 44, icon: Icons.open_in_new_rounded,
         label: tx('lb_create'),
         onTap: () => _open('https://listenbrainz.org/login/musicbrainz/?login_hint=register'),
       ),
@@ -649,7 +654,7 @@ class _SetupScreenState extends State<SetupScreen>
                               color: scheme.surfaceContainer,
                               borderRadius: BorderRadius.circular(32),
                             ),
-                            child: Column(
+                            child: AnimatedSwitcher(duration: const Duration(milliseconds: 300), switchInCurve: Curves.easeOutCubic, switchOutCurve: Curves.easeInCubic, layoutBuilder: (cur, prev) => Stack(alignment: Alignment.topCenter, children: [...prev, if (cur != null) cur]), transitionBuilder: (c, a) => FadeTransition(opacity: a, child: SlideTransition(position: Tween<Offset>(begin: const Offset(0.06, 0), end: Offset.zero).animate(a), child: c)), child: Column(key: ValueKey<String>(_service ?? 'choice'),
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 if (_service == null) ..._choiceWidgets(scheme, text)
@@ -861,7 +866,7 @@ class _SetupScreenState extends State<SetupScreen>
                                 ),
                                 ]
                               ],
-                            ),
+                            )),
                           ),
                         ),
                       ),

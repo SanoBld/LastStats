@@ -84,3 +84,12 @@
 **License**
 - LastStats is now released under the GNU GPL v3 (was MIT), copyright Sano Bld. New LICENSE and NOTICE.md; README, website legal page, About page, RPM package and the 10 translations updated. Versions released before this stay under MIT
 
+**ListenBrainz**
+- New: choose between Last.fm and ListenBrainz on the login screen, with help links (Last.fm Pro, create an account for each service). Last.fm is marked as a paid API (API key requires Last.fm Pro from December 1); ListenBrainz is free and only needs your user token
+- ListenBrainz mode: the app reads everything from ListenBrainz and never contacts Last.fm (profile, tops, recent listens, loved tracks, friends, charts). Search, tags and artwork come from MusicBrainz and Cover Art Archive. Anything ListenBrainz cannot provide is hidden. Last.fm mode is unchanged
+- Existing users stay logged in on Last.fm and go straight to the dashboard after the update; only logged-out users see the login screen
+- Switching service (login screen or Settings > Account) with local scrobbles in the app: transfer them to ListenBrainz, merge both histories (Last.fm wins on conflicts) or start fresh. Nothing is deleted unless you choose to start fresh
+- Settings adapt to the service: ListenBrainz card and token section in Connections / Account, profile link to listenbrainz.org, no API key info or extra accounts in ListenBrainz mode
+- Login screen: smooth transition between the service choice and the forms, formal address in all texts, 10 languages
+- Fixed: ListenBrainz requests are retried on temporary network errors ("Connection terminated during handshake")
+

@@ -27,10 +27,25 @@ class LbAdapter {
     '3month': 'quarter', '6month': 'half_yearly', '12month': 'year',
   };
 
+  // Network errors (e.g. "Connection terminated during handshake") are often
+  // transient: retry a couple of times before giving up.
+  static Future<dynamic> _getRetry(Uri uri) async {
+    Object? last;
+    for (var i = 0; i < 3; i++) {
+      try {
+        return await ApiHttp.get(uri).timeout(_timeout);
+      } catch (e) {
+        last = e;
+        await Future.delayed(Duration(milliseconds: 600 * (i + 1)));
+      }
+    }
+    throw last!;
+  }
+
   // ── HTTP helper: returns the "payload" map, or null (204 / 404 / error) ──
   static Future<Map<String, dynamic>?> _get(String path,
       [Map<String, String>? q]) async {
-    final res = await ApiHttp.get(Uri.https(_host, path, q)).timeout(_timeout);
+    final res = await _getRetry(Uri.https(_host, path, q));
     if (res.statusCode == 204 || res.statusCode == 404) return null;
     if (res.statusCode == 429) throw Exception('ListenBrainz rate limit reached (HTTP 429)');
     if (res.statusCode != 200) throw Exception('HTTP ${res.statusCode}');

@@ -6,6 +6,7 @@
 import '../../services/data_source.dart';
 import '../../theme/m3_interaction.dart';
 import 'dart:convert';
+import 'package:url_launcher/url_launcher.dart';
 import '../../widgets/m3_components.dart';
 import '../../theme/m3_shapes.dart';
 import 'package:flutter/material.dart';
@@ -325,6 +326,8 @@ class _AccountPageState extends State<AccountPage> {
     await p.remove('ls_apikey');
     await p.remove('ls_accounts');
     await p.remove('ls_active_account');
+    await p.remove('ls_lb_username');
+    await p.remove('ls_lb_token');
     // Last.fm data must not outlive the session (and must not leak to the
     // next account that logs in on this device).
     await CacheOwner.purge();
@@ -340,6 +343,7 @@ class _AccountPageState extends State<AccountPage> {
 
   // API keys + favorites connection (shown on the Connections page).
   Widget _apiKeysSection(AccountEntry active, ColorScheme scheme, TextTheme text) {
+    if (DataSource.lb) return _lbTokenSection(active, scheme, text);
     return SettingsSection(
             label: L.acctApiKeysSection,
             children: [
@@ -489,6 +493,38 @@ class _AccountPageState extends State<AccountPage> {
           );
   }
 
+  Widget _lbTokenSection(AccountEntry active, ColorScheme scheme, TextTheme text) {
+    return SettingsSection(
+      label: tx('acct_lb_token'),
+      children: [
+        ListTile(
+          leading: Icon(Icons.key_rounded, color: scheme.primary, size: 20),
+          title: Text(tx('acct_lb_token')),
+          subtitle: Text(_obscureApiKey ? '•' * 20 : active.apiKey,
+              style: text.bodySmall?.copyWith(
+                  color: scheme.onSurfaceVariant, fontFamily: 'monospace')),
+          onTap: () => _copyKey(active.apiKey),
+          trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+            IconButton(
+              icon: Icon(_obscureApiKey
+                  ? Icons.visibility_outlined : Icons.visibility_off_outlined, size: 20),
+              onPressed: () => setState(() => _obscureApiKey = !_obscureApiKey),
+            ),
+            IconButton(
+              icon: const Icon(Icons.copy_rounded, size: 20),
+              onPressed: () => _copyKey(active.apiKey),
+            ),
+          ]),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+          child: Text(tx('acct_lb_info'),
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
@@ -630,7 +666,8 @@ class _AccountPageState extends State<AccountPage> {
 
             // Add account button
             const Divider(height: 1, indent: 16, endIndent: 16),
-            if (_accounts.length < AccountManager.maxAccounts)
+            if (DataSource.lb) const SizedBox.shrink()
+            else if (_accounts.length < AccountManager.maxAccounts)
               ListTile(
                 leading: Container(
                   width: 40, height: 40,
@@ -670,8 +707,8 @@ class _AccountPageState extends State<AccountPage> {
 
         const SizedBox(height: 16),
 
-        // ── API key info ───────────────────────────────────────────────────
-        Container(
+        // ── API key info (Last.fm only) ──
+        if (!DataSource.lb) Container(
           padding: const EdgeInsets.all(13),
           decoration: BoxDecoration(
             color: scheme.secondaryContainer.withValues(alpha: 0.4),
@@ -697,13 +734,19 @@ class _AccountPageState extends State<AccountPage> {
         // ── Last.fm profile link ───────────────────────────────────────────
         if (active != null)
           SettingsSection(
-            label: L.acctLastfmProfileSection,
+            label: DataSource.lb ? tx('acct_lb_profile') : L.acctLastfmProfileSection,
             children: [
               ListTile(
                 leading: Icon(Icons.open_in_new_rounded, color: scheme.primary, size: 20),
-                title: Text(L.acctViewOnLastfm),
+                title: Text(DataSource.lb ? tx('acct_lb_view') : L.acctViewOnLastfm),
+                onTap: () => launchUrl(Uri.parse(DataSource.lb
+                    ? 'https://listenbrainz.org/user/${Uri.encodeComponent(active.username)}/'
+                    : 'https://www.last.fm/user/${Uri.encodeComponent(active.username)}'),
+                    mode: LaunchMode.externalApplication),
                 subtitle: Text(
-                  'last.fm/user/${active.username}',
+                  DataSource.lb
+                      ? 'listenbrainz.org/user/${active.username}'
+                      : 'last.fm/user/${active.username}',
                   style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                 ),
               ),
