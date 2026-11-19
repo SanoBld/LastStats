@@ -76,7 +76,7 @@
   if (_pool.contains(saved)) return saved;
   &#47;&#47; Random.secure: every install draws its own key, so the load is
   &#47;&#47; spread evenly over the built-in keys.
-  final key = _pool[Random.secure().nextInt(_pool.length)];
+  final key = _pickable[Random.secure().nextInt(_pickable.length)];
   await p.setString(_kPicked, key);
   return key;
 }</code></pre>

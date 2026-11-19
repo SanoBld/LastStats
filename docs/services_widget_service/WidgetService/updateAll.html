@@ -111,6 +111,7 @@
     }
     if (themeOnly) return;
 
+    await DataSource.load();
     final api = LastFmService(apiKey: apiKey, username: username);
 
     &#47;&#47; Total scrobbles + user avatar
