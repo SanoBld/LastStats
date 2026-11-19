@@ -1,6 +1,24 @@
 {
-  "updated": "2026-11-19T19:14:53Z",
+  "updated": "2026-11-19T19:26:49Z",
   "commits": [
+    {
+      "sha": "69df36493c46fc9ffb78f110de9cdc32998a10bd",
+      "message": "feat: Ajouter un workflow pour synchroniser la version de pubspec.yaml avec CHANGELOG.md",
+      "date": "2026-11-19T19:24:58Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/69df36493c46fc9ffb78f110de9cdc32998a10bd",
+      "tags": []
+    },
+    {
+      "sha": "9cdf5f37051fb613011a4803e5c891968bdc4625",
+      "message": "Update localization strings for Last.fm and ListenBrainz integration\n\n- Revised English, Spanish, French, Italian, Japanese, Portuguese, Russian, and Chinese localization strings to reflect changes in Last.fm API requirements and ListenBrainz account creation.\n- Enhanced user instructions for creating accounts and managing tokens across multiple languages.\n- Added new strings for Last.fm account creation and ListenBrainz profile links.\n- Implemented UI updates in account and connections settings to accommodate ListenBrainz integration.\n- Improved error handling and retry logic for network requests in the ListenBrainz adapter.",
+      "date": "2026-11-19T19:24:27Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/9cdf5f37051fb613011a4803e5c891968bdc4625",
+      "tags": []
+    },
     {
       "sha": "0c6b1189ebe08736293380e4f93fe91dc36f3db0",
       "message": "feat: Implement ListenBrainz support and data source switching\n\n- Added DataSource class to manage the current data source (Last.fm or ListenBrainz).\n- Integrated LbAdapter to handle API calls to ListenBrainz, mimicking Last.fm's JSON structure.\n- Updated LastFmService to conditionally call ListenBrainz API based on the selected data source.\n- Modified notification_worker and widget_service to load data source settings at runtime.\n- Introduced source_switch functionality to allow users to switch between Last.fm and ListenBrainz, with options to transfer, merge, or fresh start their scrobbles.\n- Implemented user prompts for data source switching decisions and progress indicators during data transfers.",
@@ -2695,24 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/173b0bbb76780d0ce6d5ef3b5a0080e9944ddbe1",
-      "tags": []
-    },
-    {
-      "sha": "4a508d9f21a91d96bf57c597b3a3036bd360affe",
-      "message": "Refactor settings UI components to use new SettingRow widgets\n\n- Replaced manual UI construction in PcModeSection with SettingChoiceRow for better consistency and maintainability.\n- Updated SettingsSection to utilize SettingTile for uniform styling across different setting types.\n- Introduced SettingTile and _ValuePill for improved visual representation of settings.\n- Refactored StartupPage to use SettingChoiceRow for startup tab selection, enhancing readability and reducing boilerplate code.\n- Simplified sync frequency selection in SyncPage by using SettingChoiceRow, improving user experience and code clarity.\n- Removed redundant code and improved overall structure for better maintainability.",
-      "date": "2026-09-23T19:56:14Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/4a508d9f21a91d96bf57c597b3a3036bd360affe",
-      "tags": []
-    },
-    {
-      "sha": "f6d90d1e9b3010a37847a8251ed8c1a05aae1424",
-      "message": "feat(settings): add reusable setting rows and sheets for consistent UI components\n\n- Implemented SettingSwitchRow for toggle settings.\n- Created SettingActionRow for action items with tap functionality.\n- Developed SettingChoiceRow for single option selection with a modal sheet.\n- Added SettingSliderRow for numeric input with a slider.\n- Introduced SettingTextRow for text input with dialog support.\n- Implemented PickSortSheet for item selection and sorting with solo options.",
-      "date": "2026-09-23T19:10:39Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/f6d90d1e9b3010a37847a8251ed8c1a05aae1424",
       "tags": []
     }
   ]
