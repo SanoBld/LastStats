@@ -1,6 +1,14 @@
 {
   "items": [
     {
+      "id": "news_1795078638",
+      "title": "Back Up Your Last.fm History on ListenBrainz Now",
+      "body": "Before Last.fm's API becomes paid on December 1st, it is strongly recommended that you back up all your listening history to ListenBrainz (https://listenbrainz.org/).  Creating a free account and importing your Last.fm scrobbles now ensures your music data remains safe, accessible, and ready for future free open-source integrations in LastStats.",
+      "type": "info",
+      "emoji": "💾",
+      "date": "19/11"
+    },
+    {
       "id": "news_1795029889",
       "title": "Important Update: Last.fm API Changes & Future of LastStats",
       "body": "Starting December 1st, Last.fm will require a paid Last.fm Pro subscription to own and use an API key.   Because LastStats is a completely free and independent open-source project, I cannot afford to pay for a subscription to keep the built-in backup API key active. As a result, the app's default access to Last.fm will stop working on December 1st.  What this means for you: • Already using your own API key? You don't need to generate a new key or change anything in the app—just make sure the Last.fm account linked to your key has an active Last.fm Pro subscription (https://www.last.fm/pro) by December 1st. • Using the app's default key? You will need to subscribe to Last.fm Pro (https://www.last.fm/pro), generate your own personal API key, and enter it in the app's Settings. • Free open-source alternative: I am working on adding full support for ListenBrainz (by MetaBrainz / MusicBrainz) as a free alternative. Building this integration will take some time, so please bear with me!  Thank you for your understanding and support while I adapt the app to this sudden change.",
