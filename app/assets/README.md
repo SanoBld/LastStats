@@ -121,7 +121,7 @@ curl -fsSL https://github.com/SanoBld/LastStats/releases/latest/download/install
 
 - **Debian / Ubuntu / Mint:** `sudo apt install ./LastStats-linux-<arch>.deb` (remove with `sudo apt remove laststats`)
 - **Fedora / openSUSE / RHEL:** `sudo dnf install ./LastStats-linux-<arch>.rpm` (remove with `sudo dnf remove laststats`)
-- **No install:** `LastStats-linux-<arch>.AppImage`, then `chmod +x` and run it
+- **No install:** `LastStats-<x86_64|aarch64>.AppImage`, then `chmod +x` and run it
 - **Manual:** `laststats-linux.zip` (x64) or `laststats-linux-arm64.zip`, extract and run `LastStats`
 
 ### iOS
