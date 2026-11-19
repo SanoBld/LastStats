@@ -28,10 +28,10 @@ jobs:
       matrix:
         include:
           - arch: x64
-            runner: ubuntu-latest
+            runner: ubuntu-22.04                # older glibc = AppImage runs on more distros
             zip: laststats-linux.zip            # name kept: used by UpdateService
           - arch: arm64
-            runner: ubuntu-24.04-arm            # GitHub-hosted native ARM64 runner
+            runner: ubuntu-22.04-arm            # GitHub-hosted native ARM64 runner (older glibc)
             zip: laststats-linux-arm64.zip
     runs-on: ${{ matrix.runner }}
     steps:

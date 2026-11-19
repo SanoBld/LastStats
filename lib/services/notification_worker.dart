@@ -266,8 +266,7 @@ Future<void> _runScrobbleSync() async {
 // ── Milestone check ──────────────────────────────────────────────────────────
 
 Future<void> _runMilestoneCheck() async {
-  await DataSource.load();
-  if (DataSource.lb) return; // uses Last.fm directly: not in ListenBrainz mode
+  await DataSource.load(); // ListenBrainz mode: the count comes from ListenBrainz
   final prefs = await SharedPreferences.getInstance();
 
   final intervalOn = prefs.getBool(_kMilestoneEnabled) ?? false;
@@ -320,7 +319,6 @@ bool _yearRecapEnabled(SharedPreferences prefs) =>
 
 Future<void> _runRecapCheck() async {
   await DataSource.load();
-  if (DataSource.lb) return; // uses Last.fm directly: not in ListenBrainz mode
   final prefs = await SharedPreferences.getInstance();
   final now   = DateTime.now();
 
@@ -331,6 +329,9 @@ Future<void> _runRecapCheck() async {
     await prefs.setInt(_kYearLast, now.year);
     await NotificationService.showYearRecap(now.year - 1);
   }
+
+  // Daily / weekly summaries read Last.fm directly: not in ListenBrainz mode.
+  if (DataSource.lb) return;
 
   if (prefs.getBool(_kDailyEnabled) ?? false) {
     final targetH = prefs.getInt(_kDailyHour) ?? 21;
@@ -389,6 +390,14 @@ const _lfmBase = 'https://ws.audioscrobbler.com/2.0/';
 
 Future<int?> _fetchPlaycount(String user, String key) async {
   try {
+    if (DataSource.lb) {
+      final r = await ApiHttp.get(Uri.https('api.listenbrainz.org',
+              '/1/user/${Uri.encodeComponent(user)}/listen-count'))
+          .timeout(const Duration(seconds: 10));
+      if (r.statusCode != 200) return null;
+      final j = jsonDecode(r.body) as Map;
+      return int.tryParse('${(j['payload'] as Map?)?['count'] ?? ''}');
+    }
     final uri = Uri.parse(
         '$_lfmBase?method=user.getinfo&user=$user&api_key=$key&format=json');
     final res = await ApiHttp.get(uri).timeout(const Duration(seconds: 10));

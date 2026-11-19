@@ -12,7 +12,11 @@
 //  https://listenbrainz.readthedocs.io/en/latest/users/api/index.html
 // ══════════════════════════════════════════════════════════════════════════
 
+import 'dart:async';
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../l10n/extra_strings.dart';
+import 'account_manager.dart';
 import 'api_http.dart';
 import 'listenbrainz_service.dart';
 
@@ -28,18 +32,45 @@ class LbAdapter {
   };
 
   // Network errors (e.g. "Connection terminated during handshake") are often
-  // transient: retry a couple of times before giving up.
+  // transient: retry a few times (fresh connection each time, growing pause)
+  // before giving up, then show a readable message instead of the raw error.
+  static bool _isNet(Object e) {
+    final m = e.toString().toLowerCase();
+    return m.contains('handshake') || m.contains('socket') ||
+        m.contains('clientexception') || m.contains('timeout') ||
+        m.contains('connection') || m.contains('failed host lookup');
+  }
+
   static Future<dynamic> _getRetry(Uri uri) async {
     Object? last;
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 4; i++) {
       try {
-        return await ApiHttp.get(uri).timeout(_timeout);
+        final res = await ApiHttp.get(uri).timeout(_timeout);
+        // 5xx answers are usually momentary too
+        if (res.statusCode >= 500 && i < 3) {
+          await Future.delayed(Duration(milliseconds: 700 * (i + 1)));
+          continue;
+        }
+        return res;
       } catch (e) {
         last = e;
-        await Future.delayed(Duration(milliseconds: 600 * (i + 1)));
+        await Future.delayed(Duration(milliseconds: 700 * (i + 1)));
       }
     }
+    if (last != null && _isNet(last)) throw Exception(tx('lb_neterr'));
     throw last!;
+  }
+
+  // Same as _get, but returns whatever the endpoint answers (some
+  // "popularity" / labs endpoints answer with a bare JSON list).
+  static Future<dynamic> _getAny(String path,
+      [Map<String, String>? q, String host = _host]) async {
+    final res = await _getRetry(Uri.https(host, path, q));
+    if (res.statusCode == 204 || res.statusCode == 404) return null;
+    if (res.statusCode != 200) throw Exception('HTTP ${res.statusCode}');
+    final body = jsonDecode(utf8.decode(res.bodyBytes));
+    if (body is Map && body['payload'] != null) return body['payload'];
+    return body;
   }
 
   // ── HTTP helper: returns the "payload" map, or null (204 / 404 / error) ──
@@ -79,7 +110,8 @@ class LbAdapter {
   // ── Entry point ─────────────────────────────────────────────────────────
   static Future<dynamic> call(Map<String, String> p, String username) async {
     final method = p['method'] ?? '';
-    final user   = (p['user'] != null && p['user']!.isNotEmpty) ? p['user']! : username;
+    final rawUser = (p['user'] != null && p['user']!.isNotEmpty) ? p['user']! : username;
+    final user    = _alias[rawUser] ?? rawUser;
     final limit  = int.tryParse(p['limit'] ?? '') ?? 50;
     final page   = int.tryParse(p['page'] ?? '') ?? 1;
 
@@ -103,43 +135,77 @@ class LbAdapter {
       case 'artist.getInfo':       return _artistInfo(p['artist'] ?? '', p['mbid']);
       case 'artist.getTopTags':
         return {'toptags': {'tag': await _artistTags(p['artist'] ?? '', p['mbid'])}};
+      case 'artist.getSimilar':    return _similar(p['artist'] ?? '', p['mbid'], limit);
+      case 'artist.getTopTracks':  return _artistTopTracks(p['artist'] ?? '', p['mbid'], limit);
+      case 'artist.getTopAlbums':  return _artistTopAlbums(p['artist'] ?? '', p['mbid'], limit);
+      case 'album.getInfo':        return _albumInfo(p['album'] ?? '', p['artist'] ?? '', p['mbid']);
+      case 'track.getInfo':        return _trackInfo(p['track'] ?? '', p['artist'] ?? '');
       case 'artist.search':        return _mbSearchArtists(p['artist'] ?? '', limit, page);
       case 'album.search':         return _mbSearchAlbums(p['album'] ?? '', limit, page);
       case 'track.search':         return _mbSearchTracks(p['track'] ?? '', limit, page);
 
-      // Not provided by ListenBrainz: empty answers, the app hides these parts
-      case 'album.getInfo':
-        return {'album': {
-          'name': p['album'] ?? '', 'artist': p['artist'] ?? '', 'url': '',
-          'tags': {'tag': []}, 'tracks': {'track': []},
-        }};
-      case 'track.getInfo':
-        return {'track': {
-          'name': p['track'] ?? '', 'artist': {'name': p['artist'] ?? ''},
-          'toptags': {'tag': []},
-        }};
-      case 'artist.getSimilar':    return {'similarartists': {'artist': []}};
-      case 'artist.getTopTracks':  return {'toptracks': {'track': []}};
-      case 'artist.getTopAlbums':  return {'topalbums': {'album': []}};
     }
     throw Exception('Not available with ListenBrainz ($method)');
   }
 
   // ── user.getInfo ────────────────────────────────────────────────────────
+  // Old Last.fm user names can stay in the saved accounts after a switch to
+  // ListenBrainz: "listen-count" then answers 404. We re-ask the token which
+  // user it belongs to and use that name from then on.
+  static final Map<String, String> _alias = {};
+
+  static Future<String?> _healUser(String stale) async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      final token = p.getString('ls_lb_token') ?? '';
+      if (token.isEmpty) return null;
+      final res = await ApiHttp.get(
+        Uri.https(_host, '/1/validate-token'),
+        headers: {'Authorization': 'Token $token'},
+      ).timeout(_timeout);
+      final b = jsonDecode(utf8.decode(res.bodyBytes));
+      final name = (b is Map && b['valid'] == true) ? _s(b['user_name']) : '';
+      if (name.isEmpty || name.toLowerCase() == stale.toLowerCase()) return null;
+      _alias[stale] = name;
+      await p.setString('ls_username', name);
+      await p.setString('ls_lb_username', name);
+      await AccountManager.setSingle(AccountEntry(username: name, apiKey: token));
+      return name;
+    } catch (_) {
+      return null;
+    }
+  }
+
   static Future<Map<String, dynamic>> _userInfo(String user) async {
-    final count = await _get('/1/user/${Uri.encodeComponent(user)}/listen-count');
-    if (count == null) throw Exception('User not found');
+    var u = user;
+    Future<Map<String, dynamic>?> count() =>
+        _get('/1/user/${Uri.encodeComponent(u)}/listen-count');
+
+    var c = await count();
+    if (c == null) {
+      // The account may exist without any listen yet
+      final probe = await _get('/1/user/${Uri.encodeComponent(u)}/listens', {'count': '1'});
+      if (probe != null) c = {'count': 0};
+    }
+    if (c == null) {
+      final healed = await _healUser(u);
+      if (healed != null) {
+        u = healed;
+        c = await count();
+      }
+    }
+    if (c == null) throw Exception('User not found');
     // The oldest listen gives a "member since" date
     int since = 0;
     try {
-      final l = await _get('/1/user/${Uri.encodeComponent(user)}/listens',
+      final l = await _get('/1/user/${Uri.encodeComponent(u)}/listens',
           {'count': '1', 'time_range': '1'});
       since = _i(l?['oldest_listen_ts']);
     } catch (_) {}
     return {'user': {
-      'name': user, 'realname': user,
-      'url': 'https://listenbrainz.org/user/${Uri.encodeComponent(user)}/',
-      'playcount': '${_i(count['count'])}', 'country': '',
+      'name': u, 'realname': u,
+      'url': 'https://listenbrainz.org/user/${Uri.encodeComponent(u)}/',
+      'playcount': '${_i(c['count'])}', 'country': '',
       'registered': {'unixtime': '$since', '#text': '$since'},
       'image': _img(''),
     }};
@@ -407,26 +473,75 @@ class LbAdapter {
   // Rules: a descriptive User-Agent is required and max ~1 request/second.
   // Docs: https://musicbrainz.org/doc/MusicBrainz_API
   static DateTime _mbLast = DateTime.fromMillisecondsSinceEpoch(0);
-  static final Map<String, dynamic> _mbCache = {};
+  static final Map<String, Map<String, dynamic>> _mbCache = {};
+  // All MusicBrainz calls go through one queue: the "All" search tab asks for
+  // artists, albums and tracks at the same time, and without a queue those
+  // requests left together and were refused (HTTP 503) -> empty results.
+  static Future<void> _mbQueue = Future<void>.value();
 
-  static Future<Map<String, dynamic>?> _mb(String path, Map<String, String> q) async {
+  static Future<Map<String, dynamic>?> _mb(String path, Map<String, String> q) {
     final key = '$path?${q.entries.map((e) => '${e.key}=${e.value}').join('&')}';
-    if (_mbCache.containsKey(key)) return _mbCache[key];
-    final wait = DateTime.now().difference(_mbLast).inMilliseconds;
-    if (wait < 1100) await Future.delayed(Duration(milliseconds: 1100 - wait));
-    _mbLast = DateTime.now();
-    final res = await ApiHttp.get(
-      Uri.https('musicbrainz.org', '/ws/2/$path', {...q, 'fmt': 'json'}),
-      headers: const {
-        'User-Agent': 'LastStats/4 (https://github.com/SanoBld/LastStats)',
-        'Accept': 'application/json',
-      },
-    ).timeout(_timeout);
-    if (res.statusCode != 200) return null;
-    final body = jsonDecode(utf8.decode(res.bodyBytes));
-    final m = body is Map<String, dynamic> ? body : null;
-    _mbCache[key] = m;
-    return m;
+    final hit = _mbCache[key];
+    if (hit != null) return Future.value(hit);
+    final prev = _mbQueue;
+    final gate = Completer<void>();
+    _mbQueue = gate.future;
+    return () async {
+      try {
+        await prev;
+        final again = _mbCache[key];
+        if (again != null) return again;
+        for (var attempt = 0; attempt < 2; attempt++) {
+          final wait = DateTime.now().difference(_mbLast).inMilliseconds;
+          if (wait < 1100) await Future.delayed(Duration(milliseconds: 1100 - wait));
+          _mbLast = DateTime.now();
+          try {
+            final res = await ApiHttp.get(
+              Uri.https('musicbrainz.org', '/ws/2/$path', {...q, 'fmt': 'json'}),
+              headers: const {
+                'User-Agent': 'LastStats/4 (https://github.com/SanoBld/LastStats)',
+                'Accept': 'application/json',
+              },
+            ).timeout(_timeout);
+            if (res.statusCode == 503 || res.statusCode == 429) {
+              await Future.delayed(const Duration(milliseconds: 1500));
+              continue; // one more try
+            }
+            if (res.statusCode != 200) return null;
+            final body = jsonDecode(utf8.decode(res.bodyBytes));
+            if (body is! Map<String, dynamic>) return null;
+            _mbCache[key] = body;
+            return body;
+          } catch (_) {
+            if (attempt == 1) return null;
+          }
+        }
+        return null;
+      } finally {
+        gate.complete();
+      }
+    }();
+  }
+
+  // Lucene special characters must be escaped, otherwise searches such as
+  // "AC/DC", "P!nk" or "Sigur Rós (live)" make MusicBrainz answer an error.
+  static final _luceneSpecial = RegExp(r'([+\-!(){}\[\]^"~*?:\\/]|&&|\|\|)');
+  static String _esc(String s) =>
+      s.replaceAllMapped(_luceneSpecial, (m) => '\\${m[0]}');
+  static String _phrase(String s) =>
+      s.replaceAll('\\', '\\\\').replaceAll('"', '\\"');
+
+  /// "daft punk one": every word must be found in one of [fields]; the last
+  /// word is a prefix, so results already show while the user is typing.
+  static String _qry(String q, List<String> fields) {
+    final toks = q.trim().split(RegExp(r'\s+')).where((t) => t.isNotEmpty).toList();
+    final parts = <String>[];
+    for (var i = 0; i < toks.length; i++) {
+      var t = _esc(toks[i].toLowerCase());
+      if (i == toks.length - 1 && toks[i].length >= 3) t = '$t*';
+      parts.add('+(${fields.map((f) => '$f:$t').join(' ')})');
+    }
+    return parts.join(' ');
   }
 
   static String _credit(dynamic ac) =>
@@ -474,7 +589,9 @@ class LbAdapter {
       }};
 
   static Future<Map<String, dynamic>> _mbSearchArtists(String q, int limit, int page) async {
-    final d = await _mb('artist', {'query': q, 'limit': '$limit', 'offset': '${(page - 1) * limit}'});
+    final query = _qry(q, ['artist', 'alias']);
+    if (query.isEmpty) return _matches('artist', 'artist', const [], 0);
+    final d = await _mb('artist', {'query': query, 'limit': '$limit', 'offset': '${(page - 1) * limit}'});
     final l = (d?['artists'] as List?) ?? [];
     return _matches('artist', 'artist', [for (final a in l.whereType<Map>()) {
       'name': _s(a['name']), 'mbid': _s(a['id']), 'url': '', 'listeners': '0',
@@ -483,7 +600,9 @@ class LbAdapter {
   }
 
   static Future<Map<String, dynamic>> _mbSearchAlbums(String q, int limit, int page) async {
-    final d = await _mb('release-group', {'query': q, 'limit': '$limit', 'offset': '${(page - 1) * limit}'});
+    final query = _qry(q, ['releasegroup', 'artist']);
+    if (query.isEmpty) return _matches('album', 'album', const [], 0);
+    final d = await _mb('release-group', {'query': query, 'limit': '$limit', 'offset': '${(page - 1) * limit}'});
     final l = (d?['release-groups'] as List?) ?? [];
     return _matches('album', 'album', [for (final a in l.whereType<Map>()) {
       'name': _s(a['title']), 'artist': _credit(a['artist-credit']),
@@ -493,12 +612,179 @@ class LbAdapter {
   }
 
   static Future<Map<String, dynamic>> _mbSearchTracks(String q, int limit, int page) async {
-    final d = await _mb('recording', {'query': q, 'limit': '$limit', 'offset': '${(page - 1) * limit}'});
+    final query = _qry(q, ['recording', 'artist']);
+    if (query.isEmpty) return _matches('track', 'track', const [], 0);
+    final d = await _mb('recording', {'query': query, 'limit': '$limit', 'offset': '${(page - 1) * limit}'});
     final l = (d?['recordings'] as List?) ?? [];
     return _matches('track', 'track', [for (final t in l.whereType<Map>()) {
       'name': _s(t['title']), 'artist': _credit(t['artist-credit']),
       'mbid': _s(t['id']), 'url': '', 'listeners': '0', 'image': _img(''),
     }], _i(d?['count']));
+  }
+
+  // ══ Artist pages without Last.fm ═════════════════════════════════════════
+  // Top tracks / albums: ListenBrainz "popularity" statistics (by artist MBID).
+  // Similar artists: ListenBrainz Labs. Album / track details: MusicBrainz.
+  static const _simAlgo =
+      'session_based_days_9000_session_300_contribution_5_threshold_15_limit_50_skip_30';
+
+  static Future<Map<String, dynamic>> _similar(String name, String? mbid, int limit) async {
+    try {
+      final id = await _artistId(name, mbid);
+      if (id == null) return {'similarartists': {'artist': []}};
+      final d = await _getAny('/similar-artists/json',
+          {'artist_mbids': id, 'algorithm': _simAlgo}, 'labs.api.listenbrainz.org');
+      final list = (d is List ? d : const []).whereType<Map>()
+          .where((a) => _s(a['artist_mbid']) != id).take(limit).toList();
+      var top = 1;
+      for (final a in list) {
+        final sc = a['score'] is num ? (a['score'] as num).toInt() : 0;
+        if (sc > top) top = sc;
+      }
+      return {'similarartists': {'artist': [for (final a in list) {
+        'name': _s(a['name']), 'mbid': _s(a['artist_mbid']), 'url': '',
+        'image': _img(''),
+        'match': ((a['score'] is num ? (a['score'] as num) : 0) / top).toStringAsFixed(3),
+      }]}};
+    } catch (_) {
+      return {'similarartists': {'artist': []}};
+    }
+  }
+
+  static Future<Map<String, dynamic>> _artistTopTracks(String name, String? mbid, int limit) async {
+    try {
+      final id = await _artistId(name, mbid);
+      final d = id == null ? null : await _getAny('/1/popularity/top-recordings-for-artist/$id');
+      final list = d is List ? d : (d is Map ? ((d['recordings'] as List?) ?? const []) : const []);
+      return {'toptracks': {'track': [for (final t in list.whereType<Map>().take(limit)) {
+        'name': _s(t['recording_name']), 'mbid': _s(t['recording_mbid']),
+        'playcount': '${_i(t['total_listen_count'])}',
+        'listeners': '${_i(t['total_user_count'])}',
+        'artist': {'name': _s(t['artist_name']).isEmpty ? name : _s(t['artist_name']), 'mbid': id ?? ''},
+        'url': '', 'duration': '0',
+        'image': _img(_cover(t['caa_id'], t['caa_release_mbid'])),
+      }]}};
+    } catch (_) {
+      return {'toptracks': {'track': []}};
+    }
+  }
+
+  static Future<Map<String, dynamic>> _artistTopAlbums(String name, String? mbid, int limit) async {
+    try {
+      final id = await _artistId(name, mbid);
+      final d = id == null ? null : await _getAny('/1/popularity/top-release-groups-for-artist/$id');
+      final list = d is List ? d : (d is Map ? ((d['release_groups'] as List?) ?? const []) : const []);
+      return {'topalbums': {'album': [for (final a in list.whereType<Map>().take(limit)) {
+        'name': _s(a['release_group_name']), 'mbid': _s(a['release_group_mbid']),
+        'playcount': '${_i(a['total_listen_count'])}',
+        'artist': {'name': _s(a['artist_name']).isEmpty ? name : _s(a['artist_name']), 'mbid': id ?? ''},
+        'url': '',
+        'image': _img(_cover(a['caa_id'], a['caa_release_mbid'])),
+      }]}};
+    } catch (_) {
+      return {'topalbums': {'album': []}};
+    }
+  }
+
+  static List<Map<String, dynamic>> _tagList(dynamic tags) {
+    final l = ((tags as List?) ?? const []).whereType<Map>().toList()
+      ..sort((a, b) => _i(b['count']).compareTo(_i(a['count'])));
+    final seen = <String>{};
+    return <Map<String, dynamic>>[for (final t in l)
+      if (seen.add(_s(t['name']).toLowerCase())) {'name': _s(t['name']), 'url': ''}].take(8).toList();
+  }
+
+  static Future<Map<String, dynamic>> _albumInfo(String album, String artist, String? mbid) async {
+    Map<String, dynamic> shell([String img = '']) => {'album': {
+      'name': album, 'artist': artist, 'url': '', 'mbid': mbid ?? '',
+      'image': _img(img), 'tags': {'tag': []}, 'tracks': {'track': []},
+    }};
+    try {
+      var rg = mbid ?? '';
+      if (rg.isEmpty) {
+        if (album.isEmpty) return shell();
+        final q = 'releasegroup:"${_phrase(album)}"'
+            '${artist.isEmpty ? '' : ' AND artist:"${_phrase(artist)}"'}';
+        final s = await _mb('release-group', {'query': q, 'limit': '1'});
+        final l = (s?['release-groups'] as List?) ?? [];
+        if (l.isEmpty) return shell();
+        rg = _s((l.first as Map)['id']);
+      }
+      final cover = 'https://coverartarchive.org/release-group/$rg/front-500';
+      final d = await _mb('release-group/$rg', {'inc': 'artist-credits+tags+genres+releases'});
+      if (d == null) return shell(cover);
+      final by = _credit(d['artist-credit']);
+      final artistName = by.isEmpty ? artist : by;
+
+      // Track list: the earliest official release of the album
+      final rels = ((d['releases'] as List?) ?? const []).whereType<Map>().toList()
+        ..sort((a, b) {
+          final oa = _s(a['status']) == 'Official' ? 0 : 1;
+          final ob = _s(b['status']) == 'Official' ? 0 : 1;
+          if (oa != ob) return oa - ob;
+          final da = _s(a['date']), db = _s(b['date']);
+          if (da.isEmpty != db.isEmpty) return da.isEmpty ? 1 : -1;
+          return da.compareTo(db);
+        });
+      final tracks = <Map<String, dynamic>>[];
+      if (rels.isNotEmpty) {
+        final r = await _mb('release/${_s(rels.first['id'])}', {'inc': 'recordings'});
+        var n = 0;
+        for (final m in ((r?['media'] as List?) ?? const []).whereType<Map>()) {
+          for (final t in ((m['tracks'] as List?) ?? const []).whereType<Map>()) {
+            n++;
+            tracks.add({
+              'name': _s(t['title']), 'url': '',
+              'duration': '${_i(t['length']) ~/ 1000}',
+              'artist': {'name': artistName},
+              '@attr': {'rank': '$n'},
+            });
+          }
+        }
+      }
+      return {'album': {
+        'name': _s(d['title']).isEmpty ? album : _s(d['title']),
+        'artist': artistName, 'mbid': rg,
+        'url': 'https://musicbrainz.org/release-group/$rg',
+        'image': _img(cover), 'listeners': '0', 'playcount': '0',
+        'tags': {'tag': _tagList([...((d['genres'] as List?) ?? const []), ...((d['tags'] as List?) ?? const [])])},
+        'tracks': {'track': tracks},
+      }};
+    } catch (_) {
+      return shell();
+    }
+  }
+
+  static Future<Map<String, dynamic>> _trackInfo(String track, String artist) async {
+    Map<String, dynamic> shell() => {'track': {
+      'name': track, 'artist': {'name': artist}, 'toptags': {'tag': []},
+    }};
+    try {
+      if (track.isEmpty) return shell();
+      final q = 'recording:"${_phrase(track)}"'
+          '${artist.isEmpty ? '' : ' AND artist:"${_phrase(artist)}"'}';
+      final s = await _mb('recording', {'query': q, 'limit': '1'});
+      final l = (s?['recordings'] as List?) ?? [];
+      if (l.isEmpty) return shell();
+      final t = l.first as Map;
+      final by = _credit(t['artist-credit']);
+      final rels = ((t['releases'] as List?) ?? const []).whereType<Map>().toList();
+      return {'track': {
+        'name': _s(t['title']).isEmpty ? track : _s(t['title']),
+        'mbid': _s(t['id']),
+        'url': 'https://musicbrainz.org/recording/${_s(t['id'])}',
+        'duration': '${_i(t['length'])}', // milliseconds, like Last.fm
+        'listeners': '0', 'playcount': '0',
+        'artist': {'name': by.isEmpty ? artist : by, 'mbid': ''},
+        if (rels.isNotEmpty) 'album': {
+          'title': _s(rels.first['title']), 'artist': by.isEmpty ? artist : by,
+          'image': _img('https://coverartarchive.org/release/${_s(rels.first['id'])}/front-250'),
+        },
+        'toptags': {'tag': _tagList(t['tags'])},
+      }};
+    } catch (_) {
+      return shell();
+    }
   }
 
   // ══ Love / unlove = ListenBrainz feedback ════════════════════════════════

@@ -4,7 +4,6 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import '../../services/data_source.dart';
-import '../../theme/m3_interaction.dart';
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 import '../../widgets/m3_components.dart';
@@ -258,40 +257,6 @@ class _AccountPageState extends State<AccountPage> {
       ),
       (_) => false,
     );
-  }
-
-  // ── Add an account ────────────────────────────────────────────────────────
-
-  Future<void> _addAccount() async {
-    if (_accounts.length >= AccountManager.maxAccounts) return;
-
-    final result = await showDialog<AccountEntry>(
-    animationStyle: kM3DialogAnimation,
-      context: context,
-      builder: (_) => _AddAccountDialog(
-        existingApiKey: _accounts.isNotEmpty
-            ? _accounts[_activeIndex].apiKey
-            : null,
-      ),
-    );
-    if (result == null || !mounted) return;
-
-    final added = await AccountManager.add(result);
-    if (!mounted) return;
-
-    if (!added) {
-      showAppSnackBar(context, SnackBar(
-        content: Text(L.acctAlreadyAddedOrFull),
-        behavior: SnackBarBehavior.floating,
-      ));
-    } else {
-      await _load();
-      if (!mounted) return;
-      showAppSnackBar(context, SnackBar(
-        content: Text(L.acctAddedSuccess(result.username)),
-        behavior: SnackBarBehavior.floating,
-      ));
-    }
   }
 
   // ── Logout all ────────────────────────────────────────────────────────────
@@ -664,44 +629,6 @@ class _AccountPageState extends State<AccountPage> {
               ]);
             }),
 
-            // Add account button
-            const Divider(height: 1, indent: 16, endIndent: 16),
-            if (DataSource.lb) const SizedBox.shrink()
-            else if (_accounts.length < AccountManager.maxAccounts)
-              ListTile(
-                leading: Container(
-                  width: 40, height: 40,
-                  decoration: BoxDecoration(
-                    color: scheme.secondaryContainer,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(Icons.add_rounded,
-                      color: scheme.onSecondaryContainer, size: 22),
-                ),
-                title: Text(
-                  L.acctAddAnAccount,
-                  style: text.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600, color: scheme.primary),
-                ),
-                subtitle: Text(
-                  L.acctSlotsRemaining(AccountManager.maxAccounts - _accounts.length),
-                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-                ),
-                onTap: _addAccount,
-              )
-            else
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Row(children: [
-                  Icon(Icons.info_outline_rounded,
-                      size: 16, color: scheme.onSurfaceVariant),
-                  const SizedBox(width: 8),
-                  Text(
-                    L.acctMaxReached(AccountManager.maxAccounts),
-                    style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-                  ),
-                ]),
-              ),
           ],
         ),
 
@@ -794,150 +721,6 @@ class _AccountPageState extends State<AccountPage> {
     );
   }
 }
-
-// ══════════════════════════════════════════════════════════════════════════
-//  Add account dialog
-// ══════════════════════════════════════════════════════════════════════════
-
-class _AddAccountDialog extends StatefulWidget {
-  final String? existingApiKey;
-
-  const _AddAccountDialog({this.existingApiKey});
-
-  @override
-  State<_AddAccountDialog> createState() => _AddAccountDialogState();
-}
-
-class _AddAccountDialogState extends State<_AddAccountDialog> {
-  final _usernameCtrl = TextEditingController();
-  final _apiKeyCtrl   = TextEditingController();
-  bool  _sameApiKey   = false;
-  bool  _useInternal  = false;
-  bool  _obscureKey   = true;
-  String? _error;
-
-  @override
-  void dispose() {
-    _usernameCtrl.dispose();
-    _apiKeyCtrl.dispose();
-    super.dispose();
-  }
-
-  Future<void> _submit() async {
-    final username = _usernameCtrl.text.trim();
-    final apiKey   = _sameApiKey
-        ? (widget.existingApiKey ?? '')
-        : (_useInternal ? await InternalKeys.pick() : _apiKeyCtrl.text.trim());
-    if (!mounted) return;
-
-    if (username.isEmpty) {
-      setState(() => _error = L.acctUsernameRequired);
-      return;
-    }
-    if (apiKey.isEmpty) {
-      setState(() => _error = L.acctApiKeyRequired);
-      return;
-    }
-    Navigator.pop(context, AccountEntry(username: username, apiKey: apiKey));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
-
-    return AlertDialog(
-      title: Text(L.acctAddAnAccount),
-      content: SingleChildScrollView(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-
-          TextField(
-            controller: _usernameCtrl,
-            autofocus: true,
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              labelText: L.acctUsernameLabel, hintText: 'SanoBld',
-              prefixIcon: const Icon(Icons.person_outline_rounded),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            onChanged: (_) { if (_error != null) setState(() => _error = null); },
-          ),
-
-          if (widget.existingApiKey != null) ...[
-            const SizedBox(height: 10),
-            M3InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: () => setState(() {
-                _sameApiKey = !_sameApiKey;
-                if (_error != null) _error = null;
-              }),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(children: [
-                  Checkbox(
-                    value: _sameApiKey,
-                    onChanged: (v) => setState(() {
-                      _sameApiKey = v ?? false;
-                      if (_error != null) _error = null;
-                    }),
-                  ),
-                  Expanded(
-                    child: Text(
-                      L.acctSameApiKey,
-                      style: text.bodySmall,
-                    ),
-                  ),
-                ]),
-              ),
-            ),
-          ],
-
-          if (!_sameApiKey)
-            InternalKeyToggle(
-              value:     _useInternal,
-              onChanged: (v) => setState(() { _useInternal = v; _error = null; }),
-            ),
-
-          if (!_sameApiKey && !_useInternal) ...[
-            const SizedBox(height: 10),
-            TextField(
-              controller: _apiKeyCtrl,
-              obscureText: _obscureKey,
-              decoration: InputDecoration(
-                labelText: L.acctApiKeyLabel,
-                prefixIcon: const Icon(Icons.key_rounded),
-                suffixIcon: IconButton(
-                  icon: Icon(_obscureKey
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined),
-                  onPressed: () => setState(() => _obscureKey = !_obscureKey),
-                ),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              onChanged: (_) { if (_error != null) setState(() => _error = null); },
-            ),
-          ],
-
-          if (_error != null) ...[
-            const SizedBox(height: 8),
-            Text(_error!, style: TextStyle(color: scheme.error, fontSize: 12)),
-          ],
-        ]),
-      ),
-      actions: [
-        FilledButton.tonal(
-          onPressed: () => Navigator.pop(context),
-          child: Text(L.commonCancel),
-        ),
-        FilledButton(
-          onPressed: _submit,
-          child: Text(L.acctAdd),
-        ),
-      ],
-    );
-  }
-}
-
 
 // ══════════════════════════════════════════════════════════════════════════
 //  Change API key dialog

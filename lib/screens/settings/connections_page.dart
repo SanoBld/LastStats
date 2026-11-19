@@ -1,20 +1,14 @@
 // Profile > Connection page: one card per service, with its status and
 // big buttons for each action.
 import '../../theme/m3_shapes.dart';
-import 'package:flutter/foundation.dart'
-    show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
 import '../../services/data_source.dart';
 import '../../l10n/extra_strings.dart';
-import '../../l10n/l10n.dart';
-import '../../services/account_manager.dart';
-import '../../services/internal_keys.dart';
 import '../../services/motion_artwork_service.dart';
 import '../../services/spotify_canvas_service.dart';
 import '../../widgets/brand_icon.dart';
 import '../../widgets/m3_components.dart';
 import 'account_page.dart';
-import 'lastfm_login_page.dart';
 import 'spotify_login_page.dart';
 
 class ConnectionsPage extends StatefulWidget {
@@ -27,12 +21,6 @@ class ConnectionsPage extends StatefulWidget {
 
 class _ConnectionsPageState extends State<ConnectionsPage> {
   bool _sp = false;
-
-  // The website logins run in a WebView: phones only.
-  bool get _canWebLogin =>
-      !kIsWeb &&
-      (defaultTargetPlatform == TargetPlatform.android ||
-          defaultTargetPlatform == TargetPlatform.iOS);
 
   @override
   void initState() {
@@ -60,17 +48,6 @@ class _ConnectionsPageState extends State<ConnectionsPage> {
     final ok = await SpotifyLoginPage.open(context);
     if (ok) MotionArtworkService.clearMemory();
     if (mounted) setState(() => _sp = ok);
-  }
-
-  // Log in on the Last.fm website: the account is added with the
-  // built-in API key (no key needed from the user).
-  Future<void> _lfmWeb() async {
-    final name = await LastfmLoginPage.open(context);
-    if (name == null || !mounted) return;
-    final ok = await AccountManager.add(
-        AccountEntry(username: name, apiKey: await InternalKeys.pick()));
-    if (!mounted) return;
-    _snack(ok ? L.acctAddedSuccess(name) : L.acctAlreadyAddedOrFull);
   }
 
   void _open(Widget page) =>
@@ -126,14 +103,6 @@ class _ConnectionsPageState extends State<ConnectionsPage> {
               onPressed: () =>
                   _open(AccountPage(username: widget.username, keysOnly: true)),
             ),
-            // Method 2: website login (not recommended)
-            if (_canWebLogin)
-              _ActionButton(
-                style: _BtnStyle.outlined,
-                icon: Icons.login_rounded,
-                label: '${tx('conn_lfm_web')} (${tx('not_rec')})',
-                onPressed: _lfmWeb,
-              ),
             _ActionButton(
               style: _BtnStyle.tonal,
               icon: Icons.manage_accounts_rounded,

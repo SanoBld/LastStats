@@ -100,6 +100,16 @@ class AccountManager {
     return true;
   }
 
+  /// Remplace toute la liste par un seul compte actif (changement de service
+  /// Last.fm <-> ListenBrainz : les anciens comptes de l'autre service ne
+  /// doivent pas rester, sinon l'app interroge le mauvais nom d'utilisateur).
+  static Future<void> setSingle(AccountEntry entry) async {
+    if (!entry.isValid) return;
+    final p = await SharedPreferences.getInstance();
+    await _save([entry]);
+    await p.setInt(_kActive, 0);
+  }
+
   /// Supprime le compte à [index].
   /// Le compte principal (index 0 avec un seul compte) ne peut pas être
   /// supprimé via cette méthode — utiliser le flux de déconnexion globale.

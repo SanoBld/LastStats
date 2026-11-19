@@ -22,6 +22,7 @@ import 'dart:convert';
 import '../services/api_http.dart';
 import '../services/data_source.dart';
 import '../services/source_switch.dart';
+import '../services/account_manager.dart';
 
 // ══════════════════════════════════════════════════════════════════════════
 //  SetupScreen — credentials entry (animated redesign)
@@ -301,6 +302,9 @@ class _SetupScreenState extends State<SetupScreen>
       await prefs.remove('ls_session_key');
       await prefs.setString('ls_lb_username', name);
       await prefs.setString('ls_lb_token', token);
+      // The saved account list must only hold this ListenBrainz account
+      // (an old Last.fm name there made every request answer "User not found").
+      await AccountManager.setSingle(AccountEntry(username: name, apiKey: token));
       final fromLb = DataSource.lb;
       await DataSource.set(listenbrainz: true);
 
@@ -484,6 +488,8 @@ class _SetupScreenState extends State<SetupScreen>
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('ls_username', username);
         await prefs.setString('ls_apikey',   apiKey);
+        // Coming back from ListenBrainz: drop its account from the list
+        if (fromLb) await AccountManager.setSingle(AccountEntry(username: username, apiKey: apiKey));
       } else {
         // A backup import (if used) writes credentials to disk straight
         // away, regardless of this checkbox — clear them here so "don't

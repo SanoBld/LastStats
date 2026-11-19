@@ -121,6 +121,9 @@ class WidgetService {
 
       // Save every value the widgets might show.
       await HomeWidget.saveWidgetData<String>('username', username);
+      // Tells the native (Kotlin) refresher that Last.fm must not be queried:
+      // in ListenBrainz mode the data above comes from ListenBrainz.
+      await HomeWidget.saveWidgetData<bool>('lb_mode', DataSource.lb);
       await HomeWidget.saveWidgetData<String>('avatar_url', avatarUrl);
       await HomeWidget.saveWidgetData<String>('total_scrobbles', totalScrobbles);
       await HomeWidget.saveWidgetData<String>('track_name', trackName);

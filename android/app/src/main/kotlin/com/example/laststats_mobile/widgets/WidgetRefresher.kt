@@ -61,6 +61,9 @@ object WidgetRefresher {
         val user = data.getString("username", "") ?: ""
         val key = data.getString("api_key", "") ?: ""
         if (user.isEmpty() || key.isEmpty()) { done(false); return }
+        // ListenBrainz mode: the app itself refreshes the widgets (the name and
+        // token saved here are not valid for Last.fm).
+        if (data.getBoolean("lb_mode", false)) { done(false); return }
         val now = System.currentTimeMillis()
         val doTrack = track && now - data.getLong("native_track_at", 0L) >= TRACK_EVERY_MS
         val doTotal = total && now - data.getLong("native_total_at", 0L) >= COUNTS_EVERY_MS

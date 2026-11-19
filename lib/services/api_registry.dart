@@ -97,7 +97,7 @@ class ApiRegistry {
     _lastfm,
     ApiDef(
       id: 'listenbrainz', name: 'ListenBrainz', category: ApiCategory.listening,
-      hosts: ['api.listenbrainz.org'],
+      hosts: ['api.listenbrainz.org', 'labs.api.listenbrainz.org'],
       headerLimits: true, maxWaitMs: 8000,
     ),
     ApiDef(

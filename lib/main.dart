@@ -103,11 +103,25 @@ Future<void> _mainImpl() async {
   if (isDesktop) runApp(const _BootRoot());
 
   final prefs      = await SharedPreferences.getInstance();
-  final username   = prefs.getString('ls_username') ?? '';
-  final apiKey     = prefs.getString('ls_apikey')   ?? '';
+  var username     = prefs.getString('ls_username') ?? '';
+  var apiKey       = prefs.getString('ls_apikey')   ?? '';
   final startupTab = prefs.getInt('ls_startup_tab') ?? 0;
   await InternalKeys.loadFallback(prefs);
   await DataSource.load();
+  // ListenBrainz mode: always use the ListenBrainz name + token, even if an
+  // old Last.fm name is still saved as the active account.
+  if (DataSource.lb) {
+    final lbUser  = prefs.getString('ls_lb_username') ?? '';
+    final lbToken = prefs.getString('ls_lb_token')    ?? '';
+    if (lbUser.isNotEmpty && lbUser != username) {
+      username = lbUser;
+      await prefs.setString('ls_username', lbUser);
+    }
+    if (lbToken.isNotEmpty && lbToken != apiKey) {
+      apiKey = lbToken;
+      await prefs.setString('ls_apikey', lbToken);
+    }
+  }
 
   // First launch: pick a random accent instead of the default purple.
   if (prefs.getString('ls_accent') == null && username.isEmpty) {
