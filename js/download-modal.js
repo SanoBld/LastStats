@@ -32,7 +32,7 @@
   const linuxFiles = (arch) => [
     f('deb', `LastStats-linux-${arch}.deb`),
     f('rpm', `LastStats-linux-${arch}.rpm`),
-    f('appimage', `LastStats-linux-${arch}.AppImage`),
+    f('appimage', `LastStats-${arch === 'x64' ? 'x86_64' : 'aarch64'}.AppImage`, [`LastStats-linux-${arch}.AppImage`]),
     f('zip', arch === 'x64' ? 'laststats-linux.zip' : 'laststats-linux-arm64.zip'),
     f('script', 'install-linux.sh'),
   ];

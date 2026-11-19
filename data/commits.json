@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-19T07:08:43Z",
+  "updated": "2026-11-19T07:16:22Z",
   "commits": [
+    {
+      "sha": "b4eec3f1f0d7c7bd678ff16909f508145817d3b8",
+      "message": "Fix AppImage: bundle GStreamer, rename without 'linux'",
+      "date": "2026-11-19T07:16:00Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/b4eec3f1f0d7c7bd678ff16909f508145817d3b8",
+      "tags": []
+    },
     {
       "sha": "437ac987c44e08659122dd3c699ab663e5742bb1",
       "message": "Add news feature with dedicated page and data handling\n\n- Implemented a new news page (news.html) to display announcements from LastStats.\n- Added functionality to fetch and display news data from news.json.\n- Introduced filtering options for news items (all, features, fixes, updates, alerts, info).\n- Created a new CSS file (news.css) for styling the news page and its components.\n- Updated existing workflows to copy news data for the website.\n- Enhanced internationalization support for news-related texts in multiple languages.\n- Added navigation links to the news page across various site sections.",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/01a1988f01b729db3033ed57428daf57bc0381c3",
-      "tags": []
-    },
-    {
-      "sha": "6e9a820d736af0a5c4f4c7a4c1c2eadfb742c2f4",
-      "message": "feat: enhance dashboard with ListenBrainz and Taste Engine services\n\n- Added ListenBrainzService for fetching real-time global charts.\n- Introduced TasteEngine for personalized recommendations based on user listening data.\n- Updated home screen to include new services.\n- Modified dashboard settings to expand discover sources and update labels.\n- Improved logic for managing user preferences and displaying recommendations.",
-      "date": "2026-09-23T16:13:02Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/6e9a820d736af0a5c4f4c7a4c1c2eadfb742c2f4",
       "tags": []
     }
   ]
