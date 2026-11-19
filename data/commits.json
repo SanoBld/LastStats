@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-19T20:05:39Z",
+  "updated": "2026-11-19T20:11:21Z",
   "commits": [
+    {
+      "sha": "3df72d0126bccb487423e54828b9154047950255",
+      "message": "feat: Mettre à jour les runners Ubuntu pour les builds Linux",
+      "date": "2026-11-19T20:09:14Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/3df72d0126bccb487423e54828b9154047950255",
+      "tags": []
+    },
     {
       "sha": "219f4cfc2ee69d430e28cdd8bf41c4c5428a06d2",
       "message": "Refactor account management and integration with ListenBrainz\n\n- Removed the add account functionality and associated dialog from the account page.\n- Updated connections page to remove Last.fm web login option.\n- Adjusted setup screen to ensure only the ListenBrainz account is saved.\n- Introduced setSingle method in AccountManager to manage single active account.\n- Enhanced API registry to support additional ListenBrainz hosts.\n- Improved LB adapter to handle user healing and similar artist retrieval.\n- Updated notification worker to adapt to ListenBrainz mode.\n- Modified widget service to prevent Last.fm queries in ListenBrainz mode.\n- Improved AppImage build script for better dependency management and error handling.",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/1b0b51462dfd407f12788f9d0eb34a00e078e2fd",
-      "tags": []
-    },
-    {
-      "sha": "ddf3d14eac7c8c38739b161bd17d80655826a706",
-      "message": "feat: refactor snackbar usage to use showAppSnackBar for consistency and improved animations",
-      "date": "2026-09-23T20:37:43Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/ddf3d14eac7c8c38739b161bd17d80655826a706",
       "tags": []
     }
   ]
