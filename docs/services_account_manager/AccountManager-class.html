@@ -220,6 +220,21 @@ Si le compte supprimé était actif, bascule sur l'index 0.
 
 </dd>
 
+        <dt id="setSingle" class="callable">
+  <span class="name"><a href="../services_account_manager/AccountManager/setSingle.html">setSingle</a></span><span class="signature">(<wbr><span class="parameter" id="setSingle-param-entry"><span class="type-annotation"><a href="../services_account_manager/AccountEntry-class.html">AccountEntry</a></span> <span class="parameter-name">entry</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Remplace toute la liste par un seul compte actif (changement de service
+Last.fm &lt;-&gt; ListenBrainz : les anciens comptes de l'autre service ne
+doivent pas rester, sinon l'app interroge le mauvais nom d'utilisateur).
+  
+
+</dd>
+
         <dt id="switchTo" class="callable">
   <span class="name"><a href="../services_account_manager/AccountManager/switchTo.html">switchTo</a></span><span class="signature">(<wbr><span class="parameter" id="switchTo-param-index"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">index</span></span>)
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>

@@ -160,6 +160,9 @@
 
     &#47;&#47; Save every value the widgets might show.
     await HomeWidget.saveWidgetData&lt;String&gt;(&#39;username&#39;, username);
+    &#47;&#47; Tells the native (Kotlin) refresher that Last.fm must not be queried:
+    &#47;&#47; in ListenBrainz mode the data above comes from ListenBrainz.
+    await HomeWidget.saveWidgetData&lt;bool&gt;(&#39;lb_mode&#39;, DataSource.lb);
     await HomeWidget.saveWidgetData&lt;String&gt;(&#39;avatar_url&#39;, avatarUrl);
     await HomeWidget.saveWidgetData&lt;String&gt;(&#39;total_scrobbles&#39;, totalScrobbles);
     await HomeWidget.saveWidgetData&lt;String&gt;(&#39;track_name&#39;, trackName);

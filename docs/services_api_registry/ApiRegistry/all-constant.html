@@ -69,15 +69,17 @@
   _lastfm,
   ApiDef(
     id: &#39;listenbrainz&#39;, name: &#39;ListenBrainz&#39;, category: ApiCategory.listening,
-    hosts: [&#39;api.listenbrainz.org&#39;],
-    headerLimits: true, maxWaitMs: 8000,
+    hosts: [&#39;api.listenbrainz.org&#39;, &#39;labs.api.listenbrainz.org&#39;],
+    &#47;&#47; MetaBrainz blocks anonymous scrapers (default Dart User-Agent) and
+    &#47;&#47; cuts the TLS connection: always identify the app.
+    headerLimits: true, maxWaitMs: 8000, needsUserAgent: true,
   ),
   ApiDef(
     id: &#39;musicbrainz&#39;, name: &#39;MusicBrainz&#39;, category: ApiCategory.metadata,
     hosts: [&#39;musicbrainz.org&#39;],
     official: ApiRule(1, 1000),
     ceiling:  ApiRule(1, 1100),
-    maxWaitMs: 4000, cooldownMs: 30000, needsUserAgent: true,
+    maxWaitMs: 15000, cooldownMs: 30000, needsUserAgent: true,
   ),
   ApiDef(
     id: &#39;coverart&#39;, name: &#39;Cover Art Archive&#39;, category: ApiCategory.artwork,

@@ -70,7 +70,8 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;dynamic&gt; call(Map&lt;String, String&gt; p, String username) async {
   final method = p[&#39;method&#39;] ?? &#39;&#39;;
-  final user   = (p[&#39;user&#39;] != null &amp;&amp; p[&#39;user&#39;]!.isNotEmpty) ? p[&#39;user&#39;]! : username;
+  final rawUser = (p[&#39;user&#39;] != null &amp;&amp; p[&#39;user&#39;]!.isNotEmpty) ? p[&#39;user&#39;]! : username;
+  final user    = _alias[rawUser] ?? rawUser;
   final limit  = int.tryParse(p[&#39;limit&#39;] ?? &#39;&#39;) ?? 50;
   final page   = int.tryParse(p[&#39;page&#39;] ?? &#39;&#39;) ?? 1;
 
@@ -94,24 +95,15 @@
     case &#39;artist.getInfo&#39;:       return _artistInfo(p[&#39;artist&#39;] ?? &#39;&#39;, p[&#39;mbid&#39;]);
     case &#39;artist.getTopTags&#39;:
       return {&#39;toptags&#39;: {&#39;tag&#39;: await _artistTags(p[&#39;artist&#39;] ?? &#39;&#39;, p[&#39;mbid&#39;])}};
+    case &#39;artist.getSimilar&#39;:    return _similar(p[&#39;artist&#39;] ?? &#39;&#39;, p[&#39;mbid&#39;], limit);
+    case &#39;artist.getTopTracks&#39;:  return _artistTopTracks(p[&#39;artist&#39;] ?? &#39;&#39;, p[&#39;mbid&#39;], limit);
+    case &#39;artist.getTopAlbums&#39;:  return _artistTopAlbums(p[&#39;artist&#39;] ?? &#39;&#39;, p[&#39;mbid&#39;], limit);
+    case &#39;album.getInfo&#39;:        return _albumInfo(p[&#39;album&#39;] ?? &#39;&#39;, p[&#39;artist&#39;] ?? &#39;&#39;, p[&#39;mbid&#39;]);
+    case &#39;track.getInfo&#39;:        return _trackInfo(p[&#39;track&#39;] ?? &#39;&#39;, p[&#39;artist&#39;] ?? &#39;&#39;);
     case &#39;artist.search&#39;:        return _mbSearchArtists(p[&#39;artist&#39;] ?? &#39;&#39;, limit, page);
     case &#39;album.search&#39;:         return _mbSearchAlbums(p[&#39;album&#39;] ?? &#39;&#39;, limit, page);
     case &#39;track.search&#39;:         return _mbSearchTracks(p[&#39;track&#39;] ?? &#39;&#39;, limit, page);
 
-    &#47;&#47; Not provided by ListenBrainz: empty answers, the app hides these parts
-    case &#39;album.getInfo&#39;:
-      return {&#39;album&#39;: {
-        &#39;name&#39;: p[&#39;album&#39;] ?? &#39;&#39;, &#39;artist&#39;: p[&#39;artist&#39;] ?? &#39;&#39;, &#39;url&#39;: &#39;&#39;,
-        &#39;tags&#39;: {&#39;tag&#39;: []}, &#39;tracks&#39;: {&#39;track&#39;: []},
-      }};
-    case &#39;track.getInfo&#39;:
-      return {&#39;track&#39;: {
-        &#39;name&#39;: p[&#39;track&#39;] ?? &#39;&#39;, &#39;artist&#39;: {&#39;name&#39;: p[&#39;artist&#39;] ?? &#39;&#39;},
-        &#39;toptags&#39;: {&#39;tag&#39;: []},
-      }};
-    case &#39;artist.getSimilar&#39;:    return {&#39;similarartists&#39;: {&#39;artist&#39;: []}};
-    case &#39;artist.getTopTracks&#39;:  return {&#39;toptracks&#39;: {&#39;track&#39;: []}};
-    case &#39;artist.getTopAlbums&#39;:  return {&#39;topalbums&#39;: {&#39;album&#39;: []}};
   }
   throw Exception(&#39;Not available with ListenBrainz ($method)&#39;);
 }</code></pre>
