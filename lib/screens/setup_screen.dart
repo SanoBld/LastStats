@@ -18,13 +18,12 @@ import 'settings/lastfm_login_page.dart';
 import '../services/favorites_auth.dart';
 import '../services/internal_keys.dart';
 import 'onboarding_flow.dart';
-import 'dart:convert';
-import '../services/api_http.dart';
 import '../services/data_source.dart';
 import '../services/source_switch.dart';
 import '../services/account_manager.dart';
 import '../services/lb_auth.dart';
-import 'package:flutter/services.dart' show Clipboard, ClipboardData;
+import '../widgets/brand_icon.dart';
+import 'package:flutter/services.dart' show Clipboard;
 
 // ══════════════════════════════════════════════════════════════════════════
 //  SetupScreen — credentials entry (animated redesign)
@@ -64,7 +63,6 @@ class _SetupScreenState extends State<SetupScreen>
   String? _service;
   final _lbTokenCtrl = TextEditingController();
   bool _lbObscure = true;
-  String? _lbInfo;
   String _clipToken = '';      // a token found in the clipboard
   bool _lbShowOptions = false; // display-name field
 
@@ -271,12 +269,6 @@ class _SetupScreenState extends State<SetupScreen>
     });
   }
 
-  // Phones only: the Last.fm website login runs in a WebView.
-  bool get _canWebLogin =>
-      !kIsWeb &&
-      (defaultTargetPlatform == TargetPlatform.android ||
-          defaultTargetPlatform == TargetPlatform.iOS);
-
   // Log in on the Last.fm website, then connect with the built-in key.
   Future<void> _lastfmWeb() async {
     final name = await LastfmLoginPage.open(context);
@@ -417,6 +409,7 @@ class _SetupScreenState extends State<SetupScreen>
     const SizedBox(height: 18),
     _ServiceTile(
       icon: Icons.favorite_rounded,
+      asset: 'assets/icons/listenbrainz.svg',
       title: 'ListenBrainz',
       badge: '${tx('svc_recommended')} · ${tx('svc_free')}',
       warn: false,
@@ -453,7 +446,7 @@ class _SetupScreenState extends State<SetupScreen>
       kind: M3ButtonKind.text, height: 44, icon: Icons.arrow_back_rounded,
       label: tx('svc_back'),
       onTap: () => setState(() {
-        _service = null; _errorMessage = null; _lbInfo = null; _clipToken = '';
+        _service = null; _errorMessage = null; _clipToken = '';
       }),
     ),
   );
@@ -848,37 +841,9 @@ class _SetupScreenState extends State<SetupScreen>
                                         color: scheme.onSurfaceVariant)),
                                 const SizedBox(height: 18),
 
-                                // Connection method: one compact selector
-                                SegmentedButton<int>(
-                                  showSelectedIcon: false,
-                                  segments: [
-                                    ButtonSegment(value: 0,
-                                        icon: const Icon(Icons.key_rounded, size: 18),
-                                        label: Text(tx('lfm_seg_key'))),
-                                    ButtonSegment(value: 1,
-                                        icon: const Icon(Icons.bolt_rounded, size: 18),
-                                        label: Text(tx('lfm_seg_builtin'))),
-                                    if (_canWebLogin)
-                                      ButtonSegment(value: 2,
-                                          icon: const Icon(Icons.login_rounded, size: 18),
-                                          label: Text(tx('lfm_seg_web'))),
-                                  ],
-                                  selected: {_method},
-                                  onSelectionChanged: (v) => setState(() {
-                                    _method = v.first;
-                                    _useInternalKey = v.first != 0;
-                                  }),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  switch (_method) {
-                                    0 => tx('sm_key_s'),
-                                    1 => tx('sm_builtin_s'),
-                                    _ => tx('lfm_web_sub'),
-                                  },
-                                  style: text.bodySmall?.copyWith(
-                                      color: scheme.onSurfaceVariant),
-                                ),
+                                Text(tx('sm_key_s'),
+                                    style: text.bodySmall?.copyWith(
+                                        color: scheme.onSurfaceVariant)),
                                 const SizedBox(height: 18),
 
                                 // Fields (they grow / shrink with the method)
@@ -1269,7 +1234,9 @@ class _ServiceTile extends StatelessWidget {
   final String title, subtitle, badge;
   final bool warn; // true = warning color (paid), false = free
   final VoidCallback onTap;
+  final String? asset; // real logo, tinted
   const _ServiceTile({
+    this.asset,
     required this.icon,
     required this.title,
     required this.subtitle,
@@ -1290,7 +1257,9 @@ class _ServiceTile extends StatelessWidget {
         M3CookieBadge(
           color: scheme.secondaryContainer,
           size: 48,
-          child: Icon(icon, size: 24, color: scheme.onSecondaryContainer),
+          child: asset != null
+              ? BrandIcon(asset!, icon, size: 26, color: scheme.onSecondaryContainer)
+              : Icon(icon, size: 24, color: scheme.onSecondaryContainer),
         ),
         const SizedBox(width: 14),
         Expanded(

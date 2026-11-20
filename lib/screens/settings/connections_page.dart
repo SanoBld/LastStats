@@ -65,7 +65,8 @@ class _ConnectionsPageState extends State<ConnectionsPage> {
         // ── Last.fm ──
         if (DataSource.lb)
           _ServiceCard(
-            logo: Icon(Icons.favorite_rounded, size: 28, color: scheme.onPrimaryContainer),
+            logo: BrandIcon('assets/icons/listenbrainz.svg', Icons.favorite_rounded,
+              size: 28, color: scheme.onPrimaryContainer),
             title: 'ListenBrainz',
             status: '@${widget.username}',
             connected: true,

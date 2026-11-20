@@ -33,6 +33,10 @@ class InternalKeys {
   // Installs only pick a secret key; the public one is used when none exist.
   static List<String> get _pickable => _secret.isEmpty ? [_publicKey] : _secret;
 
+  /// Public built-in keys are switched OFF (kept in the code, not deleted).
+  /// Set to true to bring them back everywhere (login choice, fallback, key swap).
+  static const bool enabled = false;
+
   static const _kPicked   = 'ls_internal_key';
   static const _kFallback = 'ls_internal_fallback';
 
@@ -46,6 +50,7 @@ class InternalKeys {
 
   /// Returns this install's random built-in key (picked once, then stored).
   static Future<String> pick([SharedPreferences? prefs]) async {
+    if (!enabled) return '';
     final p = prefs ?? await SharedPreferences.getInstance();
     final saved = p.getString(_kPicked) ?? '';
     if (_pool.contains(saved)) return saved;
@@ -57,6 +62,7 @@ class InternalKeys {
   }
 
   static Future<bool> isFallbackEnabled([SharedPreferences? prefs]) async {
+    if (!enabled) return false;
     final p = prefs ?? await SharedPreferences.getInstance();
     return p.getBool(_kFallback) ?? false;
   }
@@ -64,6 +70,7 @@ class InternalKeys {
   /// Applies the stored backup setting to [LastFmService]. Call at startup
   /// and at the start of any background isolate.
   static Future<void> loadFallback([SharedPreferences? prefs]) async {
+    if (!enabled) { LastFmService.fallbackKey = ''; return; }
     final p = prefs ?? await SharedPreferences.getInstance();
     LastFmService.fallbackKey =
         (p.getBool(_kFallback) ?? false) ? await pick(p) : '';

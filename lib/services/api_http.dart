@@ -18,6 +18,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import 'api_registry.dart';
+import 'data_source.dart';
 import 'api_usage.dart';
 
 class ApiHttp {
@@ -67,6 +68,13 @@ class ApiHttp {
   ) async {
     final def =
         (api != null ? ApiRegistry.byId(api) : null) ?? ApiRegistry.forHost(url.host);
+
+    // ListenBrainz mode: the Last.fm API is never contacted (and never counted).
+    if (DataSource.lb && def.id == 'lastfm') {
+      return http.Response('', 403,
+          reasonPhrase: 'Last.fm is disabled in ListenBrainz mode',
+          headers: const {'x-laststats-blocked': '1'});
+    }
 
     Map<String, String>? h = headers;
     if (def.needsUserAgent && !kIsWeb) {

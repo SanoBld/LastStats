@@ -2576,6 +2576,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
   Widget _sourceLogo(String name, Color color) {
     final (asset, fallback) = switch (name) {
       'Last.fm'       => ('assets/icons/lastfm.svg',     Icons.bar_chart_rounded),
+      'ListenBrainz'  => ('assets/icons/listenbrainz.svg', Icons.favorite_rounded),
       'YouTube Music' => ('assets/icons/ytmusic.svg',    Icons.music_video_rounded),
       'Apple Music' || 'iTunes'
                       => ('assets/icons/applemusic.svg', Icons.music_note_rounded),

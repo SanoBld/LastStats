@@ -1601,4 +1601,6 @@ const Map<String, String> kTxEn = {
   'lbl_restore_bad': 'This backup has no usable login.',
   'lbl_restored': 'Backup restored',
   'lbl_step3_t': 'Sign in',
+  'lbl_api_lb': 'Uses your ListenBrainz token. Limit: 1 request per second, handled automatically.',
+  'lbl_key_needed': 'Public keys are turned off: add your own Last.fm API key in Settings › Connections.',
 };

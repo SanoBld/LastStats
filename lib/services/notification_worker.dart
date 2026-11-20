@@ -20,6 +20,7 @@ import 'scrobbles_file_cache.dart';
 import 'widget_service.dart';
 import 'auto_backup_service.dart';
 import 'api_http.dart';
+import 'lb_adapter.dart';
 import 'data_source.dart';
 import 'api_usage.dart';
 
@@ -421,6 +422,24 @@ Future<(int, String)?> _fetchRangeStats(
   try {
     final fromTs = from.millisecondsSinceEpoch ~/ 1000;
     final toTs   = to.millisecondsSinceEpoch   ~/ 1000;
+
+    if (DataSource.lb) {
+      final d = await LbAdapter.call({
+        'method': 'user.getRecentTracks', 'user': user,
+        'from': '$fromTs', 'to': '$toTs', 'limit': '1000',
+      }, user);
+      final rt = (d is Map ? d['recenttracks'] : null) as Map? ?? {};
+      final total = int.tryParse(((rt['@attr'] as Map?)?['total'] ?? '0').toString()) ?? 0;
+      final freq = <String, int>{};
+      for (final t in (rt['track'] as List? ?? [])) {
+        final n = ((t as Map)['artist']?['name'] ?? '').toString().trim();
+        if (n.isNotEmpty) freq[n] = (freq[n] ?? 0) + 1;
+      }
+      final top = freq.isEmpty
+          ? '—'
+          : (freq.entries.toList()..sort((a, b) => b.value.compareTo(a.value))).first.key;
+      return (total, top);
+    }
 
     final uri = Uri.parse(
         '$_lfmBase?method=user.getrecenttracks'

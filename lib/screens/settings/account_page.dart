@@ -363,7 +363,7 @@ class _AccountPageState extends State<AccountPage> {
                   child: Text(tx('key_internal_fav_note'),
                       style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                 ),
-              if (!InternalKeys.isInternal(active.apiKey)) ...[
+              if (InternalKeys.enabled && !InternalKeys.isInternal(active.apiKey)) ...[
                 SettingSwitchRow(
                   icon:     Icons.shield_moon_outlined,
                   title:    tx('key_fallback_title'),
@@ -815,7 +815,7 @@ class _ChangeKeyDialogState extends State<_ChangeKeyDialog> {
             const SizedBox(height: 12),
 
             // Going back to the built-in key only makes sense from your own key.
-            if (!_currentIsInternal)
+            if (InternalKeys.enabled && !_currentIsInternal)
               InternalKeyToggle(
                 value:     _useInternal,
                 onChanged: (v) => setState(() { _useInternal = v; _error = null; }),

@@ -19,6 +19,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n/extra_strings.dart';
 import 'account_manager.dart';
 import 'api_http.dart';
+import 'all_scrobbles_service.dart';
+import 'scrobbles_file_cache.dart' show ScrobbleRecord;
 import 'listenbrainz_service.dart';
 
 class LbAdapter {
@@ -192,7 +194,8 @@ class LbAdapter {
       case 'user.getTopArtists':   return _topArtists(user, p['period'], limit, page);
       case 'user.getTopAlbums':    return _topAlbums(user, p['period'], limit, page);
       case 'user.getTopTracks':    return _topTracks(user, p['period'], limit, page);
-      case 'user.getRecentTracks': return _recent(user, limit, page, p['from'], p['to']);
+      case 'user.getRecentTracks':
+        return {'recenttracks': await _recent(user, limit, page, p['from'], p['to'])};
       case 'user.getLovedTracks':  return _loved(user, limit);
       case 'user.getFriends':      return _friends(user, limit);
       case 'user.search':          return _searchUsers(p['user'] ?? '');
@@ -411,6 +414,28 @@ class LbAdapter {
     return total;
   }
 
+  // Exact count between two dates: local storage if every year is stored,
+  // a real download for short ranges, monthly statistics otherwise.
+  static Future<int> _countBetween(String user, int from, int to) async {
+    final y0 = DateTime.fromMillisecondsSinceEpoch(from * 1000).year;
+    final y1 = DateTime.fromMillisecondsSinceEpoch((to - 1) * 1000).year;
+    try {
+      var all = true;
+      for (var y = y0; y <= y1; y++) { if (!AllScrobblesService.isYearCached(y)) all = false; }
+      if (all) {
+        var n = 0;
+        for (var y = y0; y <= y1; y++) {
+          for (final r in AllScrobblesService.getRecordsForYear(y) ?? const <ScrobbleRecord>[]) {
+            if (r.ts >= from && r.ts < to) n++;
+          }
+        }
+        return n;
+      }
+    } catch (_) {}
+    if (to - from <= 100 * 86400) return (await _rangeListens(user, from, to)).length;
+    return _countRange(user, from, to);
+  }
+
   static Future<Map<String, dynamic>> _recent(
       String user, int limit, int page, String? from, String? to) async {
     final fromT = int.tryParse(from ?? '');
@@ -423,9 +448,21 @@ class LbAdapter {
 
     // Monthly counter: only the total matters
     if (fromT != null && toT != null && limit == 1) {
-      final n = await _countRange(user, fromT, toT);
+      final n = await _countBetween(user, fromT, toT);
       return {'track': [], '@attr': {'user': user, 'page': '1', 'perPage': '1',
           'total': '$n', 'totalPages': '$n'}};
+    }
+
+    // Closed range (history day, calendar, recap): one shared download,
+    // then the pages are cut here. Same answer shape as Last.fm.
+    if (fromT != null && toT != null) {
+      final all = await _rangeListens(user, fromT, toT);
+      final start = (page - 1) * lim;
+      final part = start >= all.length
+          ? <Map>[]
+          : all.sublist(start, (start + lim) > all.length ? all.length : start + lim);
+      return {'track': part.map((l) => _trackFrom(l)).toList(),
+          '@attr': _attr(user, page, lim, all.length)};
     }
 
     // ListenBrainz docs: never send min_ts AND max_ts together. We page
@@ -496,12 +533,11 @@ class LbAdapter {
   // with max_ts (1000 listens per call), stops at [fromTs]. Bypasses the
   // short response cache so a sync never reads stale data. Throws on any
   // failed page so the caller never stores a partial range as complete.
-  static Future<List<({int ts, String track, String artist, String album})>>
-      fetchRange(String user, {int? fromTs, int? toTs,
-          void Function(int loaded)? onProgress}) async {
+  static Future<List<Map>> _rawRange(String user, int? fromTs, int? toTs,
+      void Function(int loaded)? onProgress) async {
     final name = _alias[user] ?? user;
     final enc = Uri.encodeComponent(name);
-    final out = <({int ts, String track, String artist, String album})>[];
+    final out = <Map>[];
     int? max = toTs;
     while (true) {
       final res = await _fetch(_uri(_host, '/1/user/$enc/listens', {
@@ -521,9 +557,7 @@ class LbAdapter {
         final ts = _i(l['listened_at']);
         if (ts <= 0) continue;
         if (fromTs != null && ts < fromTs) { reached = true; continue; }
-        final tm = (l['track_metadata'] as Map?) ?? {};
-        out.add((ts: ts, track: _s(tm['track_name']),
-            artist: _s(tm['artist_name']), album: _s(tm['release_name'])));
+        out.add(l);
       }
       onProgress?.call(out.length);
       final last = _i(ls.last['listened_at']);
@@ -532,6 +566,36 @@ class LbAdapter {
       await Future.delayed(const Duration(milliseconds: 250));
     }
     return out;
+  }
+
+  // Short cache + shared request: pages of one range (history day, dashboard
+  // calendar, recap) all read the same download instead of paging in parallel.
+  static final Map<String, ({int at, Future<List<Map>> f})> _rangeCache = {};
+  static Future<List<Map>> _rangeListens(String user, int fromT, int toT) {
+    final key = '$user|$fromT|$toT';
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final c = _rangeCache[key];
+    if (c != null && now - c.at < 45000) return c.f;
+    if (_rangeCache.length > 12) _rangeCache.clear();
+    final f = _rawRange(user, fromT, toT, null);
+    _rangeCache[key] = (at: now, f: f);
+    f.catchError((_) { _rangeCache.remove(key); return <Map>[]; });
+    return f;
+  }
+
+  static Future<List<({int ts, String track, String artist, String album})>>
+      fetchRange(String user, {int? fromTs, int? toTs,
+          void Function(int loaded)? onProgress}) async {
+    final r = await _rawRange(user, fromTs, toTs, onProgress);
+    return [
+      for (final l in r)
+        (
+          ts: _i(l['listened_at']),
+          track: _s((l['track_metadata'] as Map?)?['track_name']),
+          artist: _s((l['track_metadata'] as Map?)?['artist_name']),
+          album: _s((l['track_metadata'] as Map?)?['release_name']),
+        )
+    ];
   }
 
   // ── Loved tracks = ListenBrainz "love" feedback ─────────────────────────

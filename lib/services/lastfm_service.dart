@@ -4,6 +4,7 @@ import 'api_http.dart';
 import 'library_merge.dart';
 import 'internal_keys.dart';
 import 'data_source.dart';
+import '../l10n/extra_strings.dart';
 import 'lb_adapter.dart';
 
 class LastFmService {
@@ -53,6 +54,10 @@ class LastFmService {
   }
 
   Future<dynamic> _get(Map<String, String> params, String key) async {
+    if (DataSource.lb) throw Exception('Last.fm is disabled in ListenBrainz mode');
+    if (!InternalKeys.enabled && InternalKeys.isInternal(key)) {
+      throw Exception(tx('lbl_key_needed'));
+    }
     final uri = Uri.https(_host, _path, {
       ...params,
       'api_key': key,

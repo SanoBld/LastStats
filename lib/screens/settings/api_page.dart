@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/l10n.dart';
 import '../../services/api_registry.dart';
+import '../../services/data_source.dart';
+import '../../l10n/extra_strings.dart';
 import '../../services/api_usage.dart';
 import '../../services/internal_keys.dart';
 import '../../services/storage_manager.dart';
@@ -142,7 +144,13 @@ class _ApiPageState extends State<ApiPage> {
       );
     }
 
-    final defs = [...ApiRegistry.all, ApiRegistry.cdn];
+    // ListenBrainz mode: no Last.fm entry at all. Last.fm mode: ListenBrainz
+    // only appears if it was really used.
+    final defs = [...ApiRegistry.all, ApiRegistry.cdn].where((d) {
+      if (DataSource.lb && d.id == 'lastfm') return false;
+      if (!DataSource.lb && d.id == 'listenbrainz') return ApiUsage.stat(d).total > 0;
+      return true;
+    }).toList();
     final stats = {for (final d in defs) d.id: ApiUsage.stat(d)};
     final today = stats.values.fold<int>(0, (a, s) => a + s.today);
     final errors = stats.values.fold<int>(0, (a, s) => a + s.errors);
@@ -250,6 +258,7 @@ class _ApiPageState extends State<ApiPage> {
     };
     final frac = _fraction(s);
     final isLastfm = s.def.id == 'lastfm';
+    final isLb = s.def.id == 'listenbrainz';
 
     Widget row(String k, String v, {Color? vColor}) => Padding(
           padding: const EdgeInsets.symmetric(vertical: 3),
@@ -300,6 +309,9 @@ class _ApiPageState extends State<ApiPage> {
           s.lastTs > 0 ? '${_when(s.lastTs)} · ${s.lastStatus}' : L.apiNever),
       const SizedBox(height: 6),
       if (isLastfm) ..._lastfmExtras(scheme, text, row)
+      else if (isLb && DataSource.lb)
+        Text(tx('lbl_api_lb'),
+            style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant))
       else
         Text(
           s.def.sharedKey ? L.apiSharedKey : L.apiNoKey,
@@ -324,7 +336,7 @@ class _ApiPageState extends State<ApiPage> {
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
           key: PageStorageKey('api_${s.def.id}'),
-          initiallyExpanded: isLastfm,
+          initiallyExpanded: isLastfm || (isLb && DataSource.lb),
           tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
           childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           title: Text(s.def.name,

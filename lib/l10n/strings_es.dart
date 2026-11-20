@@ -1601,4 +1601,6 @@ const Map<String, String> kTxEs = {
   'lbl_restore_bad': 'Esta copia no contiene un inicio de sesión utilizable.',
   'lbl_restored': 'Copia restaurada',
   'lbl_step3_t': 'Inicia sesión',
+  'lbl_api_lb': 'Usa tu token de ListenBrainz. Límite: 1 solicitud por segundo, gestionada automáticamente.',
+  'lbl_key_needed': 'Las claves públicas están desactivadas: añade tu propia clave API de Last.fm en Ajustes › Conexiones.',
 };

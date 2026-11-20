@@ -627,7 +627,7 @@ class BackupService {
     // device's own pick, so keys stay spread across installs.
     final own = await InternalKeys.pick(p);
     final rawAcc = p.getString('ls_accounts');
-    if (rawAcc != null && rawAcc.isNotEmpty) {
+    if (own.isNotEmpty && rawAcc != null && rawAcc.isNotEmpty) {
       try {
         final list = jsonDecode(rawAcc) as List;
         for (final a in list) {
@@ -638,7 +638,7 @@ class BackupService {
         await p.setString('ls_accounts', jsonEncode(list));
       } catch (_) {}
     }
-    if (InternalKeys.isInternal(p.getString('ls_apikey') ?? '')) {
+    if (own.isNotEmpty && InternalKeys.isInternal(p.getString('ls_apikey') ?? '')) {
       await p.setString('ls_apikey', own);
     }
 

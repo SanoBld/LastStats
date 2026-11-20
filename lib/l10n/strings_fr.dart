@@ -1601,4 +1601,6 @@ const Map<String, String> kTxFr = {
   'lbl_restore_bad': 'Cette sauvegarde ne contient pas de connexion utilisable.',
   'lbl_restored': 'Sauvegarde restaurée',
   'lbl_step3_t': 'Connectez-vous',
+  'lbl_api_lb': 'Utilise votre jeton ListenBrainz. Limite : 1 requête par seconde, gérée automatiquement.',
+  'lbl_key_needed': 'Les clés publiques sont désactivées : ajoutez votre propre clé API Last.fm dans Réglages › Connexions.',
 };
