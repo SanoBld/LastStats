@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-20T16:23:47Z",
+  "updated": "2026-11-20T16:39:41Z",
   "commits": [
+    {
+      "sha": "86af94c5eab9920cd740e0ddc10d0e01baf328e5",
+      "message": "feat: Optimiser la récupération des écoutes récentes avec un meilleur contrôle de pagination et des limites ajustées",
+      "date": "2026-11-20T16:37:09Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/86af94c5eab9920cd740e0ddc10d0e01baf328e5",
+      "tags": []
+    },
     {
       "sha": "cab53b6c5a147a905e47d82e42a55e6d6561a33d",
       "message": "feat: Améliorer la gestion des erreurs et des requêtes HTTP dans LbAdapter",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/f6b2a05f24f22bfabe4eac106bbffc06886fb0cf",
-      "tags": []
-    },
-    {
-      "sha": "1c93863f1e265929938efcfd2dd8adb1f4513a83",
-      "message": "feat: simplifier le comportement des chips d'information en supprimant l'animation de morphing automatique",
-      "date": "2026-09-23T21:42:59Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/1c93863f1e265929938efcfd2dd8adb1f4513a83",
       "tags": []
     }
   ]
