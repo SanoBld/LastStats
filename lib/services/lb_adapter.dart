@@ -697,8 +697,17 @@ class LbAdapter {
   }
 
   static Future<Map<String, dynamic>> _artistInfo(String name, String? mbid) async {
+    var id = mbid ?? '';
+    if (id.isEmpty && name.isNotEmpty) {
+      try {
+        final r = await _mb('artist', {'query': 'artist:"${_phrase(name)}"', 'limit': '1'});
+        final l = (r?['artists'] as List?) ?? [];
+        if (l.isNotEmpty) id = _s((l.first as Map)['id']);
+      } catch (_) {}
+    }
     return {'artist': {
-      'name': name, 'url': '', 'mbid': mbid ?? '',
+      'name': name, 'mbid': id,
+      'url': id.isEmpty ? '' : 'https://musicbrainz.org/artist/$id',
       'tags': {'tag': await _artistTags(name, mbid)},
       'similar': {'artist': []},
       // empty bio: the app then loads the Wikipedia summary by itself

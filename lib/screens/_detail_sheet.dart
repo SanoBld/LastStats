@@ -676,7 +676,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
       'albums'  => ImageService.sourceName('album', _artist, album: _name),
       _         => ImageService.sourceName('track', _artist, track: _name),
     };
-    return name.isNotEmpty ? name : 'Last.fm';
+    return name.isNotEmpty ? name : (DataSource.lb ? 'ListenBrainz' : 'Last.fm');
   }
 
   // User's own play count for this item (not the global Last.fm count).
@@ -1151,16 +1151,21 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     final encodedName   = Uri.encodeComponent(_name);
     final encodedArtist = Uri.encodeComponent(_artist);
 
-    final lfmUrl = switch (widget.type) {
+    final mbType = switch (widget.type) {
+      'artists' => 'artist', 'albums' => 'release_group', _ => 'recording' };
+    final lfmUrl0 = switch (widget.type) {
       'artists' => 'https://www.last.fm/music/$encodedName',
       'albums'  => 'https://www.last.fm/music/$encodedArtist/$encodedName',
       _         => 'https://www.last.fm/music/$encodedArtist/_/$encodedName',
     };
     final q       = widget.type == 'artists' ? _name : '$_name $_artist';
     final encoded = Uri.encodeComponent(q);
+    final lfmUrl = DataSource.lb
+        ? 'https://musicbrainz.org/search?type=$mbType&query=$encoded'
+        : lfmUrl0;
 
     final buttons = [
-      (label: 'Last.fm',  color: const Color(0xFFD51007), icon: Icons.bar_chart_rounded,         asset: 'assets/icons/lastfm.svg',  url: lfmUrl),
+      (label: DataSource.lb ? 'MusicBrainz' : 'Last.fm',  color: DataSource.lb ? const Color(0xFFBA478F) : const Color(0xFFD51007), icon: DataSource.lb ? Icons.album_rounded : Icons.bar_chart_rounded, asset: DataSource.lb ? null : 'assets/icons/lastfm.svg',  url: lfmUrl),
       (label: 'Spotify',  color: const Color(0xFF1DB954), icon: Icons.spatial_audio_off_rounded,  asset: 'assets/icons/spotify.svg', url: 'https://open.spotify.com/search/$encoded'),
       (label: 'YT Music', color: const Color(0xFFFF0033), icon: Icons.music_video_rounded,        asset: 'assets/icons/ytmusic.svg', url: 'https://music.youtube.com/search?q=$encoded'),
       (label: 'Web',      color: Colors.white.withValues(alpha: 0.85), icon: Icons.language_rounded, asset: null, url: 'https://www.google.com/search?q=${Uri.encodeComponent('$q music')}'),

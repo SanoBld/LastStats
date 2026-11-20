@@ -3,6 +3,7 @@
 // nearest corner (scale + fade), actions are connected rounded blocks
 // (big outer corners 20, small inner corners 5, 2 px gap).
 // Design idea inspired by Metrolist (GPL-3.0).
+import '../services/data_source.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -251,8 +252,11 @@ Future<void> showTrackMenu(
           M3MenuItem(label: tx('menu_add_folder'), icon: Icons.create_new_folder_rounded, onTap: onAddToFolder),
       ],
     [
-      M3MenuItem(label: 'Last.fm', icon: Icons.open_in_new_rounded,
-          asset: 'assets/icons/lastfm.svg', onTap: () => open(lastfm)),
+      DataSource.lb
+          ? M3MenuItem(label: 'MusicBrainz', icon: Icons.open_in_new_rounded,
+              onTap: () => open('https://musicbrainz.org/search?type=${isArtist ? 'artist' : type == 'albums' ? 'release_group' : 'recording'}&query=$q'))
+          : M3MenuItem(label: 'Last.fm', icon: Icons.open_in_new_rounded,
+              asset: 'assets/icons/lastfm.svg', onTap: () => open(lastfm)),
       M3MenuItem(label: 'Spotify', icon: Icons.open_in_new_rounded,
           asset: 'assets/icons/spotify.svg', onTap: () => open('https://open.spotify.com/search/$q')),
       M3MenuItem(label: 'YouTube Music', icon: Icons.open_in_new_rounded,
