@@ -119,8 +119,12 @@ the user chose to do about it.</p>
 
   &#47;&#47; Drop sensitive keys the user chose not to restore.
   final exclude = &lt;String&gt;{};
+  &#47;&#47; Which service the backup was made with (old backups = Last.fm).
+  final backupLb = prefsMap[&#39;ls_source&#39;] == &#39;lb&#39; || parsed[&#39;source&#39;] == &#39;lb&#39;;
   if (!restoreApiKey) {
-    exclude.addAll([&#39;ls_apikey&#39;, &#39;ls_username&#39;, &#39;ls_accounts&#39;, &#39;ls_active_account&#39;]);
+    &#47;&#47; Without the login, the service choice stays as on this device.
+    exclude.addAll([&#39;ls_apikey&#39;, &#39;ls_username&#39;, &#39;ls_accounts&#39;, &#39;ls_active_account&#39;,
+        &#39;ls_lb_token&#39;, &#39;ls_lb_username&#39;, &#39;ls_source&#39;]);
     username = null;
     apiKey   = null;
   }
@@ -130,11 +134,29 @@ the user chose to do about it.</p>
     &#47;&#47; favorites, so both are excluded together.
     exclude.addAll([&#39;ls_secret_key&#39;, &#39;ls_session_key&#39;]);
   }
+  &#47;&#47; The scrobble cache label follows the scrobbles really imported.
+  exclude.add(&#39;ls_cache_source&#39;);
   if (exclude.isNotEmpty) {
     prefsMap.removeWhere((k, _) =&gt; exclude.contains(k));
   }
+  if (restoreApiKey) {
+    &#47;&#47; Old &#47; simple backups carry no service: they are Last.fm ones.
+    prefsMap[&#39;ls_source&#39;] = backupLb ? &#39;lb&#39; : &#39;lfm&#39;;
+    if (backupLb &amp;&amp; !prefsMap.containsKey(&#39;ls_lb_token&#39;)) {
+      final k = (apiKey ?? &#39;&#39;).trim();
+      final u = (username ?? &#39;&#39;).trim();
+      if (LbAuth.looksLikeToken(k) &amp;&amp; u.isNotEmpty) {
+        prefsMap[&#39;ls_lb_token&#39;] = LbAuth.clean(k);
+        prefsMap[&#39;ls_lb_username&#39;] = u;
+      }
+    }
+  }
 
   await _applyPrefs(prefsMap);
+  if (restoreApiKey) {
+    await DataSource.load();
+    await LbAuth.reconcileAfterRestore(fallbackUser: username, fallbackKey: apiKey);
+  }
 
   &#47;&#47; ── Scrobbles (optional, can be big) ─────────────────────────────────
   &#47;&#47; &quot;cancelScrobbles&quot; means: user said no, don&#39;t touch scrobbles at all.
@@ -153,13 +175,15 @@ the user chose to do about it.</p>
       Map&lt;String, dynamic&gt;.from(scrobblesRaw),
       mode: importMode,
     );
+    final sp = await SharedPreferences.getInstance();
+    await sp.setString(&#39;ls_cache_source&#39;, backupLb ? &#39;lb&#39; : &#39;lfm&#39;);
   }
 
   final p = await SharedPreferences.getInstance();
   username = p.getString(&#39;ls_username&#39;) ?? username;
   apiKey   = p.getString(&#39;ls_apikey&#39;)   ?? apiKey;
 
-  return BackupResult(success: true, username: username, apiKey: apiKey);
+  return BackupResult(success: true, username: username, apiKey: apiKey, isListenBrainz: DataSource.lb);
 }</code></pre>
 </section>
 

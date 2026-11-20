@@ -102,7 +102,8 @@ Both default to true so nothing changes for existing callers.</p>
     if (!key.startsWith(&#39;ls_&#39;)) continue;
     if (_kBackupExcludeKeys.contains(key)) continue;
     if (!includeApiKey &amp;&amp;
-        (key == &#39;ls_apikey&#39; || key == &#39;ls_username&#39; || key == &#39;ls_accounts&#39; || key == &#39;ls_active_account&#39;)) {
+        (key == &#39;ls_apikey&#39; || key == &#39;ls_username&#39; || key == &#39;ls_accounts&#39; || key == &#39;ls_active_account&#39; ||
+         key == &#39;ls_lb_token&#39; || key == &#39;ls_lb_username&#39;)) {
       continue;
     }
     if (!includeSecretKey &amp;&amp; (key == &#39;ls_secret_key&#39; || key == &#39;ls_session_key&#39;)) {
@@ -189,6 +190,7 @@ Both default to true so nothing changes for existing callers.</p>
     &#39;app&#39;:         &#39;LastStats&#39;,
     &#39;version&#39;:     &#39;4&#39;, &#47;&#47; v4 = added optional full scrobble history
     &#39;exported_at&#39;: now.toIso8601String(), &#47;&#47; backup date, used on restore
+    &#39;source&#39;:      DataSource.lb ? &#39;lb&#39; : &#39;lfm&#39;,
     &#39;username&#39;:    activeUsername,
     &#39;api_key&#39;:     activeApiKey,
     &#39;prefs&#39;:       map,
