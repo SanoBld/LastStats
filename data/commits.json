@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-20T06:05:53Z",
+  "updated": "2026-11-20T15:47:02Z",
   "commits": [
+    {
+      "sha": "fc9ac172f76d5c580f4610fe754f9f9c2c825c9d",
+      "message": "feat: Ajouter la gestion des en-têtes d'authentification pour ListenBrainz et ajuster les délais d'attente",
+      "date": "2026-11-20T15:30:16Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/fc9ac172f76d5c580f4610fe754f9f9c2c825c9d",
+      "tags": []
+    },
     {
       "sha": "5133c89bc0d321982c338857ea10bd88a2286508",
       "message": "feat: Ajouter le besoin d'un User-Agent pour ListenBrainz et ajuster les délais d'attente pour MusicBrainz",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/d2c5506e0ccbff8f94a7f6ceb12ae6fc42927662",
-      "tags": []
-    },
-    {
-      "sha": "24bd36f5dc179ef9ff3ee3e8ce82b75add575f45",
-      "message": "feat: update _PlatformLinkButton to support dynamic shapes and improve layout",
-      "date": "2026-09-23T21:18:34Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/24bd36f5dc179ef9ff3ee3e8ce82b75add575f45",
       "tags": []
     }
   ]
