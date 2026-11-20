@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-20T20:24:13Z",
+  "updated": "2026-11-20T20:28:26Z",
   "commits": [
+    {
+      "sha": "6711f3fae3d22bb5cb6fa28605aa28a86f4d02ce",
+      "message": "feat: Ajouter la prise en charge de la popularité des artistes, albums et pistes via l'API ListenBrainz",
+      "date": "2026-11-20T20:26:19Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/6711f3fae3d22bb5cb6fa28605aa28a86f4d02ce",
+      "tags": []
+    },
     {
       "sha": "78a22c42ebb9c6f8cc35439a7bd88daa664c2faf",
       "message": "feat: Ajouter la prise en charge de MusicBrainz dans les liens et les informations des artistes",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/665c4203cbff7bc7c6776ce94e7da546b3a20da1",
-      "tags": []
-    },
-    {
-      "sha": "29fa8beb2131aa28a56692310698449fec01541f",
-      "message": "feat: ajouter le support des bibliothèques csslib et html, ainsi que du lecteur vidéo",
-      "date": "2026-09-24T19:17:49Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/29fa8beb2131aa28a56692310698449fec01541f",
       "tags": []
     }
   ]
