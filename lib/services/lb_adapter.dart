@@ -696,6 +696,38 @@ class LbAdapter {
     }
   }
 
+  // ── Global listens / listeners: official ListenBrainz popularity API ─────
+  // POST /1/popularity/{artist|recording|release-group}. Returns
+  // total_listen_count and total_user_count (null when unknown -> 0).
+  static final Map<String, ({String listens, String users})> _popCache = {};
+
+  static Future<({String listens, String users})> _popularity(
+      String kind, String mbid) async {
+    const none = (listens: '0', users: '0');
+    if (mbid.isEmpty) return none;
+    final key = '$kind|$mbid';
+    final hit = _popCache[key];
+    if (hit != null) return hit;
+    try {
+      final field = kind.replaceAll('-', '_');
+      final res = await ApiHttp.post(
+        _uri(_host, '/1/popularity/$kind', null),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'${field}_mbids': [mbid]}),
+      ).timeout(_timeout);
+      if (res.statusCode != 200) return none;
+      final b = jsonDecode(utf8.decode(res.bodyBytes));
+      if (b is! List || b.isEmpty || b.first is! Map) return none;
+      final m = b.first as Map;
+      final r = (listens: '${_i(m['total_listen_count'])}',
+          users: '${_i(m['total_user_count'])}');
+      _popCache[key] = r;
+      return r;
+    } catch (_) {
+      return none;
+    }
+  }
+
   static Future<Map<String, dynamic>> _artistInfo(String name, String? mbid) async {
     var id = mbid ?? '';
     if (id.isEmpty && name.isNotEmpty) {
@@ -705,7 +737,9 @@ class LbAdapter {
         if (l.isNotEmpty) id = _s((l.first as Map)['id']);
       } catch (_) {}
     }
+    final pop = await _popularity('artist', id);
     return {'artist': {
+      'stats': {'listeners': pop.users, 'playcount': pop.listens},
       'name': name, 'mbid': id,
       'url': id.isEmpty ? '' : 'https://musicbrainz.org/artist/$id',
       'tags': {'tag': await _artistTags(name, mbid)},
@@ -875,11 +909,12 @@ class LbAdapter {
           }
         }
       }
+      final pop = await _popularity('release-group', rg);
       return {'album': {
         'name': _s(d['title']).isEmpty ? album : _s(d['title']),
         'artist': artistName, 'mbid': rg,
         'url': 'https://musicbrainz.org/release-group/$rg',
-        'image': _img(cover), 'listeners': '0', 'playcount': '0',
+        'image': _img(cover), 'listeners': pop.users, 'playcount': pop.listens,
         'tags': {'tag': _tagList([...((d['genres'] as List?) ?? const []), ...((d['tags'] as List?) ?? const [])])},
         'tracks': {'track': tracks},
       }};
@@ -902,12 +937,13 @@ class LbAdapter {
       final t = l.first as Map;
       final by = _credit(t['artist-credit']);
       final rels = ((t['releases'] as List?) ?? const []).whereType<Map>().toList();
+      final pop = await _popularity('recording', _s(t['id']));
       return {'track': {
         'name': _s(t['title']).isEmpty ? track : _s(t['title']),
         'mbid': _s(t['id']),
         'url': 'https://musicbrainz.org/recording/${_s(t['id'])}',
         'duration': '${_i(t['length'])}', // milliseconds, like Last.fm
-        'listeners': '0', 'playcount': '0',
+        'listeners': pop.users, 'playcount': pop.listens,
         'artist': {'name': by.isEmpty ? artist : by, 'mbid': ''},
         if (rels.isNotEmpty) 'album': {
           'title': _s(rels.first['title']), 'artist': by.isEmpty ? artist : by,

@@ -52,16 +52,76 @@ Widget _pcColumn(BuildContext ctx, Widget child, {double maxWidth = 980}) {
   );
 }
 
+// Content that arrives late (bio, lyrics, stats): fades in, sharpens from a
+// blur (when blur is enabled) and grows to its height smoothly, so nothing
+// ever pops into the layout.
 class _FadeIn extends StatelessWidget {
   final Widget child;
   const _FadeIn({required this.child});
   @override
   Widget build(BuildContext context) => TweenAnimationBuilder<double>(
         tween: Tween(begin: 0, end: 1),
-        duration: const Duration(milliseconds: 350),
-        curve: M3Motion.emphasizedDecelerate,
-        builder: (_, v, c) => Opacity(opacity: v, child: c),
+        duration: const Duration(milliseconds: 520),
+        curve: Curves.easeOutCubic,
+        builder: (_, v, c) {
+          final sigma = (!M3Motion.blurOn || v >= 1) ? 0.0 : 10.0 * (1 - v);
+          return ClipRect(
+            child: Align(
+              alignment: Alignment.topCenter,
+              heightFactor: v.clamp(0.0, 1.0),
+              child: Opacity(
+                opacity: Curves.easeOut.transform(v.clamp(0.0, 1.0)),
+                child: ImageFiltered(
+                  enabled: sigma > 0.3,
+                  imageFilter: ImageFilter.blur(
+                      sigmaX: sigma, sigmaY: sigma, tileMode: TileMode.decal),
+                  child: c,
+                ),
+              ),
+            ),
+          );
+        },
         child: child,
+      );
+}
+
+// Swaps content (loader -> text, original -> translation, number updates)
+// with a blur cross-fade and a smooth height change. Give each state a Key.
+class _BlurSwap extends StatelessWidget {
+  final Widget child;
+  const _BlurSwap({required this.child});
+  @override
+  Widget build(BuildContext context) => AnimatedSize(
+        duration: const Duration(milliseconds: 380),
+        curve: Curves.easeInOutCubic,
+        alignment: Alignment.topCenter,
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 420),
+          switchInCurve: Curves.easeOut,
+          switchOutCurve: Curves.easeIn,
+          layoutBuilder: (cur, prev) => Stack(
+            alignment: Alignment.topCenter,
+            children: [...prev, if (cur != null) cur],
+          ),
+          transitionBuilder: (c, a) => AnimatedBuilder(
+            animation: a,
+            child: c,
+            builder: (_, ch) {
+              final sigma = (!M3Motion.blurOn || a.value >= 1)
+                  ? 0.0 : 8.0 * (1 - a.value);
+              return Opacity(
+                opacity: a.value.clamp(0.0, 1.0),
+                child: ImageFiltered(
+                  enabled: sigma > 0.3,
+                  imageFilter: ImageFilter.blur(
+                      sigmaX: sigma, sigmaY: sigma, tileMode: TileMode.decal),
+                  child: ch,
+                ),
+              );
+            },
+          ),
+          child: child,
+        ),
       );
 }
 
@@ -1255,16 +1315,16 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
     final stats = <Widget>[];
 
     if (widget.type == 'artists' && gl > 0) {
-      stats.add(_StatChip(
+      stats.add(_FadeIn(child: _StatChip(
         icon: Icons.people_rounded, value: _fmt(gl),
         label: L.detailGlobalListeners, scheme: scheme,
-      ));
+      )));
     }
     if (gp > 0) {
-      stats.add(_StatChip(
+      stats.add(_FadeIn(child: _StatChip(
         icon: Icons.play_circle_rounded, value: _fmt(gp),
         label: L.detailGlobalPlays, scheme: scheme,
-      ));
+      )));
     }
 
     stats.add(M3Switcher(
@@ -1497,8 +1557,10 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
           ),
           const SizedBox(height: 8),
 
-          // Animated expand/collapse
-          AnimatedCrossFade(
+          // Animated expand/collapse (blur cross-fade when the text changes)
+          _BlurSwap(child: KeyedSubtree(
+            key: ValueKey('bio-${_showTranslated && _translatedBio.isNotEmpty}-${bio.hashCode}'),
+            child: AnimatedCrossFade(
             duration: const Duration(milliseconds: 320),
             sizeCurve: Curves.easeInOutCubic,
             alignment: Alignment.topCenter,
@@ -1513,7 +1575,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
               text.bodyMedium?.copyWith(color: scheme.onPrimaryContainer, height: 1.55),
               scheme.primary,
             )),
-          ),
+          ))),
           const SizedBox(height: 10),
           Wrap(
             spacing: 8, runSpacing: 8,
@@ -2017,15 +2079,17 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
             ],
           ),
           const SizedBox(height: 8),
-          if (_loadingLyrics)
-            const Center(child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 16),
-              child: M3Spinner(),
-            ))
-          else if (_lyrics.isEmpty)
-            Text(L.detailLyricsNotFound,
-                style: text.bodyMedium?.copyWith(color: scheme.onPrimaryContainer))
-          else ...[
+          _BlurSwap(child: _loadingLyrics
+            ? const Center(key: ValueKey('ly-load'), child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: M3Spinner(),
+              ))
+            : _lyrics.isEmpty
+              ? Text(L.detailLyricsNotFound, key: const ValueKey('ly-none'),
+                  style: text.bodyMedium?.copyWith(color: scheme.onPrimaryContainer))
+              : Column(key: const ValueKey('ly-text'),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
             AnimatedCrossFade(
               duration: const Duration(milliseconds: 320),
               sizeCurve: Curves.easeInOutCubic,
@@ -2047,7 +2111,8 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
                 onTap: () => setState(() => _lyricsExpanded = !_lyricsExpanded),
               ),
             ],
-          ],
+          ]),
+          ),
           const SizedBox(height: 4),
         ],
       )),
