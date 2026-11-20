@@ -72,10 +72,11 @@
     hosts: [&#39;api.listenbrainz.org&#39;, &#39;labs.api.listenbrainz.org&#39;],
     &#47;&#47; MetaBrainz blocks anonymous scrapers (default Dart User-Agent) and
     &#47;&#47; cuts the TLS connection: always identify the app.
-    headerLimits: true, maxWaitMs: 15000, needsUserAgent: true,
-    &#47;&#47; The dashboard fires many calls at once: pace them (~3&#47;s) until the
-    &#47;&#47; X-RateLimit-* headers of the first answers take over.
-    ceiling: ApiRule(3, 1000),
+    &#47;&#47; Docs: &quot;never make more than ONE call per second&quot;. Calls queue up
+    &#47;&#47; (long wait allowed) and X-RateLimit-* headers are honoured.
+    headerLimits: true, maxWaitMs: 120000, needsUserAgent: true,
+    official: ApiRule(1, 1000),
+    ceiling: ApiRule(1, 1000),
   ),
   ApiDef(
     id: &#39;musicbrainz&#39;, name: &#39;MusicBrainz&#39;, category: ApiCategory.metadata,

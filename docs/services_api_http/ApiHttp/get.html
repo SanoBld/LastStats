@@ -59,6 +59,7 @@
 <li><span class="parameter" id="get-param-headers"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span>?</span> <span class="parameter-name">headers</span>, </span></li>
 <li><span class="parameter" id="get-param-api"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">api</span>, </span></li>
 <li><span class="parameter" id="get-param-keyLabel"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">keyLabel</span>, </span></li>
+<li><span class="parameter" id="get-param-timeout"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Duration-class.html">Duration</a>?</span> <span class="parameter-name">timeout</span>, </span></li>
 </ol>})
 
       
@@ -79,8 +80,9 @@ derived from the host. <code>keyLabel</code> tags Last.fm calls by key in use.</
   Map&lt;String, String&gt;? headers,
   String? api,
   String? keyLabel,
+  Duration? timeout,
 }) =&gt;
-    _run(url, api, keyLabel, headers, (h) =&gt; http.get(url, headers: h));</code></pre>
+    _run(url, api, keyLabel, headers, timeout, (h) =&gt; _client.get(url, headers: h));</code></pre>
 </section>
 
 
