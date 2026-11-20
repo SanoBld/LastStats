@@ -80,7 +80,8 @@
     case &#39;user.getTopArtists&#39;:   return _topArtists(user, p[&#39;period&#39;], limit, page);
     case &#39;user.getTopAlbums&#39;:    return _topAlbums(user, p[&#39;period&#39;], limit, page);
     case &#39;user.getTopTracks&#39;:    return _topTracks(user, p[&#39;period&#39;], limit, page);
-    case &#39;user.getRecentTracks&#39;: return _recent(user, limit, page, p[&#39;from&#39;], p[&#39;to&#39;]);
+    case &#39;user.getRecentTracks&#39;:
+      return {&#39;recenttracks&#39;: await _recent(user, limit, page, p[&#39;from&#39;], p[&#39;to&#39;])};
     case &#39;user.getLovedTracks&#39;:  return _loved(user, limit);
     case &#39;user.getFriends&#39;:      return _friends(user, limit);
     case &#39;user.search&#39;:          return _searchUsers(p[&#39;user&#39;] ?? &#39;&#39;);

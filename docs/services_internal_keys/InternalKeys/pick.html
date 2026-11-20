@@ -71,6 +71,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;String&gt; pick([SharedPreferences? prefs]) async {
+  if (!enabled) return &#39;&#39;;
   final p = prefs ?? await SharedPreferences.getInstance();
   final saved = p.getString(_kPicked) ?? &#39;&#39;;
   if (_pool.contains(saved)) return saved;

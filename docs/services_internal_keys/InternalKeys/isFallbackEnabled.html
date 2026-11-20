@@ -68,6 +68,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;bool&gt; isFallbackEnabled([SharedPreferences? prefs]) async {
+  if (!enabled) return false;
   final p = prefs ?? await SharedPreferences.getInstance();
   return p.getBool(_kFallback) ?? false;
 }</code></pre>

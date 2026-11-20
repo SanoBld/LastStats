@@ -72,6 +72,7 @@ and at the start of any background isolate.</p>
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; loadFallback([SharedPreferences? prefs]) async {
+  if (!enabled) { LastFmService.fallbackKey = &#39;&#39;; return; }
   final p = prefs ?? await SharedPreferences.getInstance();
   LastFmService.fallbackKey =
       (p.getBool(_kFallback) ?? false) ? await pick(p) : &#39;&#39;;

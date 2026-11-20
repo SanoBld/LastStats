@@ -74,39 +74,16 @@
   <pre class="language-dart"><code class="language-dart">static Future&lt;List&lt;({int ts, String track, String artist, String album})&gt;&gt;
     fetchRange(String user, {int? fromTs, int? toTs,
         void Function(int loaded)? onProgress}) async {
-  final name = _alias[user] ?? user;
-  final enc = Uri.encodeComponent(name);
-  final out = &lt;({int ts, String track, String artist, String album})&gt;[];
-  int? max = toTs;
-  while (true) {
-    final res = await _fetch(_uri(_host, &#39;&#47;1&#47;user&#47;$enc&#47;listens&#39;, {
-      &#39;count&#39;: &#39;1000&#39;, if (max != null) &#39;max_ts&#39;: &#39;$max&#39;,
-    }));
-    if (res.statusCode == 204 || res.statusCode == 404) break;
-    if (res.statusCode != 200) {
-      throw Exception(&#39;ListenBrainz error\nCode: HTTP ${res.statusCode}&#39;);
-    }
-    final body = jsonDecode(utf8.decode(res.bodyBytes));
-    final payload = body is Map ? body[&#39;payload&#39;] : null;
-    final ls = ((payload is Map ? payload[&#39;listens&#39;] : null) as List? ?? [])
-        .whereType&lt;Map&gt;().toList();
-    if (ls.isEmpty) break;
-    var reached = false;
-    for (final l in ls) {
-      final ts = _i(l[&#39;listened_at&#39;]);
-      if (ts &lt;= 0) continue;
-      if (fromTs != null &amp;&amp; ts &lt; fromTs) { reached = true; continue; }
-      final tm = (l[&#39;track_metadata&#39;] as Map?) ?? {};
-      out.add((ts: ts, track: _s(tm[&#39;track_name&#39;]),
-          artist: _s(tm[&#39;artist_name&#39;]), album: _s(tm[&#39;release_name&#39;])));
-    }
-    onProgress?.call(out.length);
-    final last = _i(ls.last[&#39;listened_at&#39;]);
-    if (reached || ls.length &lt; 1000 || last &lt;= 0) break;
-    max = last; &#47;&#47; max_ts is exclusive
-    await Future.delayed(const Duration(milliseconds: 250));
-  }
-  return out;
+  final r = await _rawRange(user, fromTs, toTs, onProgress);
+  return [
+    for (final l in r)
+      (
+        ts: _i(l[&#39;listened_at&#39;]),
+        track: _s((l[&#39;track_metadata&#39;] as Map?)?[&#39;track_name&#39;]),
+        artist: _s((l[&#39;track_metadata&#39;] as Map?)?[&#39;artist_name&#39;]),
+        album: _s((l[&#39;track_metadata&#39;] as Map?)?[&#39;release_name&#39;]),
+      )
+  ];
 }</code></pre>
 </section>
 
