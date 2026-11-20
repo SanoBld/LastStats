@@ -75,7 +75,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">@override String get faqA5 =&gt; &#39;Только на вашем устройстве. У LastStats нет сервера: скробблы кэшируются локально для быстрого доступа, а данные для входа в Last.fm также хранятся локально. Ничего не отправляется никуда, кроме официального API Last.fm.&#39;;</code></pre>
+  <pre class="language-dart"><code class="language-dart">@override String get faqA5 =&gt; DataSource.lb ? &#39;Только на вашем устройстве. У LastStats нет сервера: скробблы кэшируются локально для быстрого доступа, а данные для входа в ListenBrainz также хранятся локально. Ничего не отправляется никуда, кроме официального API ListenBrainz.&#39; : &#39;Только на вашем устройстве. У LastStats нет сервера: скробблы кэшируются локально для быстрого доступа, а данные для входа в Last.fm также хранятся локально. Ничего не отправляется никуда, кроме официального API Last.fm.&#39;;</code></pre>
 </section>
 
   </section>

@@ -105,7 +105,20 @@ Fusionne avec les records existants.</p>
     int page       = 1;
     int totalPages = 1;
 
-    do {
+    var syncOk = true;
+    if (DataSource.lb) {
+      try {
+        newRecords.addAll(await _lbFetch(service, from: lastTs + 1,
+            onProgress: (n, _) =&gt; progressNotifier.value = AllScrobblesProgress(
+                isLoading: true, isIdle: false, mode: SyncMode.incremental,
+                loaded: n, totalYears: 1)));
+      } catch (e) {
+        debugPrint(&#39;[AllScrobbles] Erreur sync LB : $e&#39;);
+        syncOk = false;
+      }
+      page = 2;
+    }
+    if (!DataSource.lb) do {
       try {
         final data = await service.getRecentTracks(
           limit: 200,
@@ -154,9 +167,14 @@ Fusionne avec les records existants.</p>
         if (page &lt;= totalPages) await Future.delayed(_delay);
       } catch (e) {
         debugPrint(&#39;[AllScrobbles] Erreur sync page=$page : $e&#39;);
+        syncOk = false;
         break;
       }
     } while (page &lt;= totalPages);
+
+    &#47;&#47; Pages arrive newest-first: keeping a partial result would move the
+    &#47;&#47; &quot;last timestamp&quot; forward and leave a permanent hole in the history.
+    if (!syncOk) newRecords.clear();
 
     &#47;&#47; Distribuer les nouveaux records par année et fusionner
     if (newRecords.isNotEmpty) {

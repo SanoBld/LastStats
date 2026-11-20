@@ -75,7 +75,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">@override String get apiStorageOver =&gt; &#39;Über dem 100-MB-Limit der Last.fm-API-Bedingungen. Lösche den Scrobble-Verlauf unter Speicher, um die Bedingungen einzuhalten.&#39;;</code></pre>
+  <pre class="language-dart"><code class="language-dart">@override String get apiStorageOver =&gt; DataSource.lb ? &#39;Über dem 100-MB-Limit der ListenBrainz-API-Bedingungen. Lösche den Scrobble-Verlauf unter Speicher, um die Bedingungen einzuhalten.&#39; : &#39;Über dem 100-MB-Limit der Last.fm-API-Bedingungen. Lösche den Scrobble-Verlauf unter Speicher, um die Bedingungen einzuhalten.&#39;;</code></pre>
 </section>
 
   </section>

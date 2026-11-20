@@ -75,7 +75,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">@override String get faqA5 =&gt; &#39;Uniquement sur votre appareil. LastStats n’a pas de serveur, vos scrobbles sont mis en cache en local pour aller plus vite, et vos identifiants Last.fm restent aussi sur votre appareil. Rien n’est envoyé ailleurs qu’à l’API officielle de Last.fm.&#39;;</code></pre>
+  <pre class="language-dart"><code class="language-dart">@override String get faqA5 =&gt; DataSource.lb ? &#39;Uniquement sur votre appareil. LastStats n’a pas de serveur, vos scrobbles sont mis en cache en local pour aller plus vite, et vos identifiants ListenBrainz restent aussi sur votre appareil. Rien n’est envoyé ailleurs qu’à l’API officielle de ListenBrainz.&#39; : &#39;Uniquement sur votre appareil. LastStats n’a pas de serveur, vos scrobbles sont mis en cache en local pour aller plus vite, et vos identifiants Last.fm restent aussi sur votre appareil. Rien n’est envoyé ailleurs qu’à l’API officielle de Last.fm.&#39;;</code></pre>
 </section>
 
   </section>

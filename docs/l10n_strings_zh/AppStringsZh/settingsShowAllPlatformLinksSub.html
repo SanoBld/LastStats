@@ -75,7 +75,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">@override String get settingsShowAllPlatformLinksSub =&gt; &#39;忽略过滤，显示所有链接（Last.fm、Spotify、YT Music、网页）&#39;;</code></pre>
+  <pre class="language-dart"><code class="language-dart">@override String get settingsShowAllPlatformLinksSub =&gt; DataSource.lb ? &#39;忽略过滤，显示所有链接（ListenBrainz、Spotify、YT Music、网页）&#39; : &#39;忽略过滤，显示所有链接（Last.fm、Spotify、YT Music、网页）&#39;;</code></pre>
 </section>
 
   </section>

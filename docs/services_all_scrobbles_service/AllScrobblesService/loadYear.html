@@ -105,7 +105,19 @@ Stocke les records complets (ts + track + artist + album).</p>
   bool finishedOk = true;
 
   try {
-    do {
+    if (DataSource.lb) {
+      try {
+        records.addAll(await _lbFetch(service,
+            from: from.millisecondsSinceEpoch ~&#47; 1000,
+            to:   to.millisecondsSinceEpoch ~&#47; 1000,
+            onProgress: onProgress));
+      } catch (e) {
+        debugPrint(&#39;[AllScrobbles] LB année=$year : $e&#39;);
+        finishedOk = false;
+      }
+      page = 2; &#47;&#47; skip the Last.fm loop below
+    }
+    if (!DataSource.lb) do {
       try {
         final data = await service.getRecentTracks(
           limit: 200,
@@ -153,6 +165,9 @@ Stocke les records complets (ts + track + artist + album).</p>
       }
     } while (page &lt;= totalPages);
 
+    &#47;&#47; dedupe by timestamp, ascending
+    final seen = &lt;int&gt;{};
+    records.retainWhere((r) =&gt; seen.add(r.ts));
     records.sort((a, b) =&gt; a.ts.compareTo(b.ts));
     await ScrobblesFileCache.setYear(year, records, complete: finishedOk);
     &#47;&#47; Always list the year in meta so its file gets re-read at app start,

@@ -70,6 +70,9 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">String tx(String key, [Map&lt;String, String&gt;? args]) {
   var s = _kTx[localeNotifier.value]?[key] ?? kTxEn[key] ?? kTxFr[key] ?? key;
+  if (DataSource.lb &amp;&amp; s.contains(&#39;Last.fm&#39;) &amp;&amp; !_lfmKeep.hasMatch(key)) {
+    s = s.replaceAll(&#39;Last.fm&#39;, &#39;ListenBrainz&#39;);
+  }
   if (args != null) {
     args.forEach((k, v) { s = s.replaceAll(&#39;{$k}&#39;, v); });
   }

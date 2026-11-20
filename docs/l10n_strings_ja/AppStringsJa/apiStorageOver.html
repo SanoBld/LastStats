@@ -75,7 +75,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">@override String get apiStorageOver =&gt; &#39;Last.fm API 規約の 100 MB 上限を超えています。「ストレージ」でスクロブル履歴を消去してください。&#39;;</code></pre>
+  <pre class="language-dart"><code class="language-dart">@override String get apiStorageOver =&gt; DataSource.lb ? &#39;ListenBrainz API 規約の 100 MB 上限を超えています。「ストレージ」でスクロブル履歴を消去してください。&#39; : &#39;Last.fm API 規約の 100 MB 上限を超えています。「ストレージ」でスクロブル履歴を消去してください。&#39;;</code></pre>
 </section>
 
   </section>

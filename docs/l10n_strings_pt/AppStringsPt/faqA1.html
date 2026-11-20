@@ -75,7 +75,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">@override String get faqA1 =&gt; &#39;Não. O LastStats é um aplicativo de visualização: ele exibe os scrobbles já registrados na sua conta do Last.fm, mas não registra nenhum por conta própria.\n\nPara fazer scrobble automático da sua música, use um app dedicado como o Pano Scrobbler (disponível para Android).&#39;;</code></pre>
+  <pre class="language-dart"><code class="language-dart">@override String get faqA1 =&gt; DataSource.lb ? &#39;Não. O LastStats é um aplicativo de visualização: ele exibe os scrobbles já registrados na sua conta do ListenBrainz, mas não registra nenhum por conta própria.\n\nPara fazer scrobble automático da sua música, use um app dedicado como o Pano Scrobbler (disponível para Android).&#39; : &#39;Não. O LastStats é um aplicativo de visualização: ele exibe os scrobbles já registrados na sua conta do Last.fm, mas não registra nenhum por conta própria.\n\nPara fazer scrobble automático da sua música, use um app dedicado como o Pano Scrobbler (disponível para Android).&#39;;</code></pre>
 </section>
 
   </section>

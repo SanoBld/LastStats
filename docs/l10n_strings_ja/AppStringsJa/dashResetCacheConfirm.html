@@ -75,7 +75,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">@override String get dashResetCacheConfirm =&gt; &#39;ローカルに保存されたスクロブルデータがすべて削除され、Last.fmから再ダウンロードされます。&#39;;</code></pre>
+  <pre class="language-dart"><code class="language-dart">@override String get dashResetCacheConfirm =&gt; DataSource.lb ? &#39;ローカルに保存されたスクロブルデータがすべて削除され、ListenBrainzから再ダウンロードされます。&#39; : &#39;ローカルに保存されたスクロブルデータがすべて削除され、Last.fmから再ダウンロードされます。&#39;;</code></pre>
 </section>
 
   </section>

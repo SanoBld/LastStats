@@ -113,8 +113,11 @@
           M3MenuItem(label: tx(&#39;menu_add_folder&#39;), icon: Icons.create_new_folder_rounded, onTap: onAddToFolder),
       ],
     [
-      M3MenuItem(label: &#39;Last.fm&#39;, icon: Icons.open_in_new_rounded,
-          asset: &#39;assets&#47;icons&#47;lastfm.svg&#39;, onTap: () =&gt; open(lastfm)),
+      DataSource.lb
+          ? M3MenuItem(label: &#39;MusicBrainz&#39;, icon: Icons.open_in_new_rounded,
+              onTap: () =&gt; open(&#39;https:&#47;&#47;musicbrainz.org&#47;search?type=${isArtist ? &#39;artist&#39; : type == &#39;albums&#39; ? &#39;release_group&#39; : &#39;recording&#39;}&amp;query=$q&#39;))
+          : M3MenuItem(label: &#39;Last.fm&#39;, icon: Icons.open_in_new_rounded,
+              asset: &#39;assets&#47;icons&#47;lastfm.svg&#39;, onTap: () =&gt; open(lastfm)),
       M3MenuItem(label: &#39;Spotify&#39;, icon: Icons.open_in_new_rounded,
           asset: &#39;assets&#47;icons&#47;spotify.svg&#39;, onTap: () =&gt; open(&#39;https:&#47;&#47;open.spotify.com&#47;search&#47;$q&#39;)),
       M3MenuItem(label: &#39;YouTube Music&#39;, icon: Icons.open_in_new_rounded,

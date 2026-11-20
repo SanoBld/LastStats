@@ -75,7 +75,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">@override String get faqA5 =&gt; &#39;على جهازك فقط. لا يمتلك LastStats أي خادم: يتم تخزين السكروبلات مؤقتًا محليًا للوصول السريع، وتبقى بيانات اعتماد Last.fm مخزّنة محليًا أيضًا. لا يتم إرسال أي شيء إلى أي جهة سوى واجهة برمجة تطبيقات Last.fm الرسمية.&#39;;</code></pre>
+  <pre class="language-dart"><code class="language-dart">@override String get faqA5 =&gt; DataSource.lb ? &#39;على جهازك فقط. لا يمتلك LastStats أي خادم: يتم تخزين السكروبلات مؤقتًا محليًا للوصول السريع، وتبقى بيانات اعتماد ListenBrainz مخزّنة محليًا أيضًا. لا يتم إرسال أي شيء إلى أي جهة سوى واجهة برمجة تطبيقات ListenBrainz الرسمية.&#39; : &#39;على جهازك فقط. لا يمتلك LastStats أي خادم: يتم تخزين السكروبلات مؤقتًا محليًا للوصول السريع، وتبقى بيانات اعتماد Last.fm مخزّنة محليًا أيضًا. لا يتم إرسال أي شيء إلى أي جهة سوى واجهة برمجة تطبيقات Last.fm الرسمية.&#39;;</code></pre>
 </section>
 
   </section>

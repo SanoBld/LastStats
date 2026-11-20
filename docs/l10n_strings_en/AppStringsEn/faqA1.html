@@ -75,7 +75,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">@override String get faqA1 =&gt; &#39;No. LastStats is a visualisation app: it displays the scrobbles already recorded on your Last.fm account, but it does not record any itself.\n\nTo automatically scrobble your music, use a dedicated app such as Pano Scrobbler (available on Android).&#39;;</code></pre>
+  <pre class="language-dart"><code class="language-dart">@override String get faqA1 =&gt; DataSource.lb ? &#39;No. LastStats is a visualisation app: it displays the scrobbles already recorded on your ListenBrainz account, but it does not record any itself.\n\nTo automatically scrobble your music, use a dedicated app such as Pano Scrobbler (available on Android).&#39; : &#39;No. LastStats is a visualisation app: it displays the scrobbles already recorded on your Last.fm account, but it does not record any itself.\n\nTo automatically scrobble your music, use a dedicated app such as Pano Scrobbler (available on Android).&#39;;</code></pre>
 </section>
 
   </section>

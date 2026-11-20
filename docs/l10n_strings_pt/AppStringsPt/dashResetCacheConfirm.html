@@ -75,7 +75,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">@override String get dashResetCacheConfirm =&gt; &#39;Todos os dados de scrobbles em cache serão excluídos e baixados novamente do Last.fm.&#39;;</code></pre>
+  <pre class="language-dart"><code class="language-dart">@override String get dashResetCacheConfirm =&gt; DataSource.lb ? &#39;Todos os dados de scrobbles em cache serão excluídos e baixados novamente do ListenBrainz.&#39; : &#39;Todos os dados de scrobbles em cache serão excluídos e baixados novamente do Last.fm.&#39;;</code></pre>
 </section>
 
   </section>

@@ -75,7 +75,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">@override String get apiStorageOver =&gt; &#39;已超过 Last.fm API 条款规定的 100 MB 上限。请在“存储”中清除 scrobble 历史记录以符合要求。&#39;;</code></pre>
+  <pre class="language-dart"><code class="language-dart">@override String get apiStorageOver =&gt; DataSource.lb ? &#39;已超过 ListenBrainz API 条款规定的 100 MB 上限。请在“存储”中清除 scrobble 历史记录以符合要求。&#39; : &#39;已超过 Last.fm API 条款规定的 100 MB 上限。请在“存储”中清除 scrobble 历史记录以符合要求。&#39;;</code></pre>
 </section>
 
   </section>

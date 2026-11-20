@@ -75,7 +75,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">@override String get apiStorageOver =&gt; &#39;Oltre il limite di 100 MB fissato dai termini dell\&#39;API di Last.fm. Cancella la cronologia degli scrobble in Archiviazione per rispettarlo.&#39;;</code></pre>
+  <pre class="language-dart"><code class="language-dart">@override String get apiStorageOver =&gt; DataSource.lb ? &#39;Oltre il limite di 100 MB fissato dai termini dell\&#39;API di ListenBrainz. Cancella la cronologia degli scrobble in Archiviazione per rispettarlo.&#39; : &#39;Oltre il limite di 100 MB fissato dai termini dell\&#39;API di Last.fm. Cancella la cronologia degli scrobble in Archiviazione per rispettarlo.&#39;;</code></pre>
 </section>
 
   </section>

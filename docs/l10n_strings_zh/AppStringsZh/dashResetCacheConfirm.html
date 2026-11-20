@@ -75,7 +75,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">@override String get dashResetCacheConfirm =&gt; &#39;所有本地缓存的 scrobble 数据将被删除，并从 Last.fm 重新下载。&#39;;</code></pre>
+  <pre class="language-dart"><code class="language-dart">@override String get dashResetCacheConfirm =&gt; DataSource.lb ? &#39;所有本地缓存的 scrobble 数据将被删除，并从 ListenBrainz 重新下载。&#39; : &#39;所有本地缓存的 scrobble 数据将被删除，并从 Last.fm 重新下载。&#39;;</code></pre>
 </section>
 
   </section>
