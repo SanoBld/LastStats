@@ -100,7 +100,10 @@ class ApiRegistry {
       hosts: ['api.listenbrainz.org', 'labs.api.listenbrainz.org'],
       // MetaBrainz blocks anonymous scrapers (default Dart User-Agent) and
       // cuts the TLS connection: always identify the app.
-      headerLimits: true, maxWaitMs: 8000, needsUserAgent: true,
+      headerLimits: true, maxWaitMs: 15000, needsUserAgent: true,
+      // The dashboard fires many calls at once: pace them (~3/s) until the
+      // X-RateLimit-* headers of the first answers take over.
+      ceiling: ApiRule(3, 1000),
     ),
     ApiDef(
       id: 'musicbrainz', name: 'MusicBrainz', category: ApiCategory.metadata,

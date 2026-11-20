@@ -97,7 +97,8 @@ class ApiHttp {
     if (def.headerLimits) ApiUsage.noteHeaders(def.id, res.headers);
 
     if (throttled) {
-      final ra = int.tryParse(res.headers['retry-after'] ?? '');
+      final ra = int.tryParse(res.headers['retry-after'] ??
+          res.headers['x-ratelimit-reset-in'] ?? '');
       ApiUsage.reportThrottled(def.id, retryAfterMs: ra == null ? null : ra * 1000);
     }
 

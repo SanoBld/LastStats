@@ -41,11 +41,33 @@ class LbAdapter {
         m.contains('connection') || m.contains('failed host lookup');
   }
 
+  // Reads with the user token get higher rate limits than anonymous ones
+  // (ListenBrainz API docs, "Rate limiting"). Only sent to the main API host.
+  static Future<Map<String, String>?> _authHeaders(Uri uri) async {
+    if (uri.host != _host) return null;
+    try {
+      final p = await SharedPreferences.getInstance();
+      final t = p.getString('ls_lb_token') ?? '';
+      return t.isEmpty ? null : {'Authorization': 'Token $t'};
+    } catch (_) {
+      return null;
+    }
+  }
+
   static Future<dynamic> _getRetry(Uri uri) async {
     Object? last;
+    final headers = await _authHeaders(uri);
     for (var i = 0; i < 4; i++) {
       try {
-        final res = await ApiHttp.get(uri).timeout(_timeout);
+        final res = await ApiHttp.get(uri, headers: headers).timeout(_timeout);
+        // 429: wait for the window the server announces, then try again
+        if (res.statusCode == 429 && i < 3) {
+          final secs = int.tryParse(res.headers['x-ratelimit-reset-in'] ??
+                  res.headers['retry-after'] ?? '') ??
+              (i + 1) * 2;
+          await Future.delayed(Duration(seconds: secs.clamp(1, 10)));
+          continue;
+        }
         // 5xx answers are usually momentary too
         if (res.statusCode >= 500 && i < 3) {
           await Future.delayed(Duration(milliseconds: 700 * (i + 1)));
