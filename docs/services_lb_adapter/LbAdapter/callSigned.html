@@ -83,7 +83,7 @@
     headers: {&#39;Authorization&#39;: &#39;Token $token&#39;, &#39;Content-Type&#39;: &#39;application&#47;json&#39;},
     body: jsonEncode({&#39;recording_mbid&#39;: mbid, &#39;score&#39;: method == &#39;track.love&#39; ? 1 : 0}),
   ).timeout(_timeout);
-  if (res.statusCode != 200) throw Exception(&#39;HTTP ${res.statusCode}&#39;);
+  if (res.statusCode != 200) throw Exception(&#39;ListenBrainz error\nCode: HTTP ${res.statusCode} ${res.request?.url.path ?? &#39;&#39;}&#39;);
   return {};
 }</code></pre>
 </section>
