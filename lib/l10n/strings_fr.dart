@@ -3,6 +3,7 @@
 //  French
 // ══════════════════════════════════════════════════════════════════════════
 
+import '../services/data_source.dart';
 import "app_strings.dart";
 
 class AppStringsFr implements AppStrings {
@@ -32,7 +33,7 @@ class AppStringsFr implements AppStrings {
   @override String get cacheApiData                => 'Données API';
   @override String get cacheApiDataSubtitle        => 'Artistes et albums les plus écoutés, écoutes récentes…';
   @override String get cacheScrobbles              => 'Historique des scrobbles';
-  @override String get cacheScrobblesSubtitle      => 'Tout votre historique d\'écoute téléchargé depuis Last.fm';
+  @override String get cacheScrobblesSubtitle      => DataSource.lb ? 'Tout votre historique d\'écoute téléchargé depuis ListenBrainz' : 'Tout votre historique d\'écoute téléchargé depuis Last.fm';
   @override String get cacheClearBtn               => 'Vider';
   @override String get cacheConfirmScrobblesTitle  => "Supprimer l'historique ?";
   @override String get cacheConfirmScrobblesBody   => 'L\'historique complet sera supprimé. Il sera rechargé au prochain démarrage.';
@@ -100,7 +101,7 @@ class AppStringsFr implements AppStrings {
   @override String get searchTitle        => 'Recherche';
   @override String get searchProfiles     => 'Profils';
   @override String get searchHintBar      => 'Artiste, album, titre ou profil…';
-  @override String get searchHintProfiles => 'Recherchez un utilisateur Last.fm';
+  @override String get searchHintProfiles => DataSource.lb ? 'Recherchez un utilisateur ListenBrainz' : 'Recherchez un utilisateur Last.fm';
   @override String get searchHintArtists  => 'Recherchez un artiste';
   @override String get searchHintAlbums   => 'Recherchez un album';
   @override String get searchHintTracks   => 'Recherchez une chanson';
@@ -126,9 +127,9 @@ class AppStringsFr implements AppStrings {
   @override String get dashTrack1          => 'Titre #1';
   @override String get dashNoFriends       => 'Aucun ami trouvé';
   @override String get dashResetCache      => 'Réinitialiser le cache';
-  @override String get dashResetCacheConfirm => 'Toutes les données scrobbles mises en cache seront supprimées et retéléchargées depuis Last.fm.';
+  @override String get dashResetCacheConfirm => DataSource.lb ? 'Toutes les données scrobbles mises en cache seront supprimées et retéléchargées depuis ListenBrainz.' : 'Toutes les données scrobbles mises en cache seront supprimées et retéléchargées depuis Last.fm.';
 
-  @override String get dashFriendsActivity => "Activité de vos amis Last.fm";
+  @override String get dashFriendsActivity => DataSource.lb ? "Activité de vos amis ListenBrainz" : "Activité de vos amis Last.fm";
 
   @override String get settingsTitle             => 'Paramètres';
   @override String get settingsAppearance        => 'Apparence';
@@ -179,9 +180,9 @@ class AppStringsFr implements AppStrings {
   @override String get settingsTopArtistsSection => 'Artistes les plus écoutés';
   @override String get settingsTopTracksSection  => 'Titres les plus écoutés';
   @override String get settingsFriendsSection    => 'Amis';
-  @override String get settingsFriendsSectionSub => 'Activité de vos amis Last.fm';
+  @override String get settingsFriendsSectionSub => DataSource.lb ? 'Activité de vos amis ListenBrainz' : 'Activité de vos amis Last.fm';
   @override String get settingsAccount           => 'Compte';
-  @override String get settingsConnectedProfile  => 'Profil Last.fm connecté';
+  @override String get settingsConnectedProfile  => DataSource.lb ? 'Profil ListenBrainz connecté' : 'Profil Last.fm connecté';
   @override String get settingsLogout            => 'Se déconnecter';
   @override String get settingsLogoutTitle       => 'Se déconnecter ?';
   @override String get settingsLogoutContent     => 'Vos identifiants seront supprimés.';
@@ -291,13 +292,13 @@ class AppStringsFr implements AppStrings {
   @override String get onboardNotifTitle       => 'Restez informé';
   @override String get onboardNotifSub         => 'Choisissez les notifications que vous voulez recevoir et si le téléphone doit vibrer.';
   @override String get onboardFavTitle         => 'Vos profils favoris';
-  @override String get onboardFavSub           => 'Ajoutez des amis Last.fm pour retrouver rapidement leurs profils depuis l\'application.';
-  @override String get onboardFavHint          => 'Nom d\'utilisateur Last.fm';
+  @override String get onboardFavSub           => DataSource.lb ? 'Ajoutez des amis ListenBrainz pour retrouver rapidement leurs profils depuis l\'application.' : 'Ajoutez des amis Last.fm pour retrouver rapidement leurs profils depuis l\'application.';
+  @override String get onboardFavHint          => DataSource.lb ? 'Nom d\'utilisateur ListenBrainz' : 'Nom d\'utilisateur Last.fm';
   @override String get onboardFavAdd           => 'Ajouter';
   @override String get onboardFavEmpty         => 'Aucun favori pour l\'instant';
-  @override String get onboardFavSearchHint    => 'Rechercher un profil Last.fm…';
+  @override String get onboardFavSearchHint    => DataSource.lb ? 'Rechercher un profil ListenBrainz…' : 'Rechercher un profil Last.fm…';
   @override String get onboardFavNoResults     => 'Aucun profil trouvé';
-  @override String get onboardFavFriendsTitle  => 'Vos amis Last.fm';
+  @override String get onboardFavFriendsTitle  => DataSource.lb ? 'Vos amis ListenBrainz' : 'Vos amis Last.fm';
   @override String get onboardFavNoFriends     => "Aucun ami trouvé sur ce compte";
   @override String get onboardFavSelected      => 'Favoris sélectionnés';
   @override String get onboardDashTitle        => 'Votre tableau de bord';
@@ -313,7 +314,7 @@ class AppStringsFr implements AppStrings {
   @override String get settingsMusicPlatform          => 'Plateforme musicale';
   @override String get settingsMusicPlatformSub       => 'Affiche uniquement les liens de votre service musical sur les pages artiste, album et titre';
   @override String get settingsShowAllPlatformLinks    => 'Toujours tout afficher';
-  @override String get settingsShowAllPlatformLinksSub => 'Ignore le filtre et montre tous les liens (Last.fm, Spotify, YT Music, Web)';
+  @override String get settingsShowAllPlatformLinksSub => DataSource.lb ? 'Ignore le filtre et montre tous les liens (ListenBrainz, Spotify, YT Music, Web)' : 'Ignore le filtre et montre tous les liens (Last.fm, Spotify, YT Music, Web)';
   @override String get onboardUpdatesTitle     => 'Mises à jour';
   @override String get onboardUpdatesSub       => 'L\'application vérifie automatiquement si une nouvelle version est disponible.';
   @override String get onboardPreview             => 'Aperçu';
@@ -355,7 +356,7 @@ class AppStringsFr implements AppStrings {
   @override String get detailLookingForPreview     => "Recherche d'un extrait…";
   @override String get detailPreview30Sec          => 'Extrait · 30 sec';
 
-  @override String get setupTagline                => 'Vos stats Last.fm, réinventées.';
+  @override String get setupTagline                => DataSource.lb ? 'Vos stats ListenBrainz, réinventées.' : 'Vos stats Last.fm, réinventées.';
   @override String get setupAnalyseProfile         => 'Analyser un profil';
   @override String get setupConnecting             => 'Connexion…';
   @override String get setupStartAnalysis          => "Lancer l'analyse";
@@ -399,7 +400,7 @@ class AppStringsFr implements AppStrings {
   @override String get settingsCardNotificationsSub  => 'Jalons, récaps quotidiens & hebdo';
   @override String get settingsSync                  => 'Synchronisation';
   @override String get settingsCardSyncSub           => 'Synchro auto des scrobbles en arrière-plan';
-  @override String get settingsCardAccountSub        => 'Profil Last.fm connecté, déconnexion';
+  @override String get settingsCardAccountSub        => DataSource.lb ? 'Profil ListenBrainz connecté, déconnexion' : 'Profil Last.fm connecté, déconnexion';
   @override String get settingsCardCacheSub          => 'Historique, images, données API';
   @override String get settingsCardBackupSub         => 'Exporter et restaurer vos paramètres';
   @override String get settingsCardUpdatesSub        => 'Vérifier les nouvelles versions';
@@ -429,7 +430,7 @@ class AppStringsFr implements AppStrings {
   @override String get pcModeHintAuto    => 'Barre latérale sur grand écran (≥ 720 dp), barre du bas sur petit écran.';
   @override String get pcModeHintOn      => "Toujours utiliser la barre de navigation latérale, quelle que soit la taille de l'écran.";
   @override String get pcModeHintOff     => "Toujours utiliser la barre de navigation du bas, quelle que soit la taille de l'écran.";
-  @override String get aboutTagline               => 'Votre compagnon de stats Last.fm';
+  @override String get aboutTagline               => DataSource.lb ? 'Votre compagnon de stats ListenBrainz' : 'Votre compagnon de stats Last.fm';
   @override String get aboutAppInfo                => 'Informations sur l\'application';
   @override String get aboutScrobbleDownloader     => 'Téléchargeur de scrobbles';
   @override String get aboutScrobbleDownloaderSub  => 'Téléchargez tout votre historique de scrobbles et enregistrez-le dans un fichier';
@@ -682,27 +683,27 @@ class AppStringsFr implements AppStrings {
   @override String get rankingsWholeYear       => 'Toute l\'année';
   @override String get chartsExportGeneratedOn => 'généré le';
   @override String get faqQ1 => 'LastStats scrobble-t-il ma musique ?';
-  @override String get faqA1 => 'Non. LastStats se contente d’afficher les scrobbles déjà enregistrés sur votre compte Last.fm, elle n’en enregistre aucun elle-même.\n\nPour scrobbler automatiquement votre musique, il vous faut une appli dédiée comme Pano Scrobbler (sur Android).';
+  @override String get faqA1 => DataSource.lb ? 'Non. LastStats se contente d’afficher les scrobbles déjà enregistrés sur votre compte ListenBrainz, elle n’en enregistre aucun elle-même.\n\nPour scrobbler automatiquement votre musique, il vous faut une appli dédiée comme Pano Scrobbler (sur Android).' : 'Non. LastStats se contente d’afficher les scrobbles déjà enregistrés sur votre compte Last.fm, elle n’en enregistre aucun elle-même.\n\nPour scrobbler automatiquement votre musique, il vous faut une appli dédiée comme Pano Scrobbler (sur Android).';
   @override String get faqQ3 => 'L’application fonctionne-t-elle sur macOS ou d’autres plateformes ?';
   @override String get faqA3 => 'LastStats est développée et testée sur Android. Le fonctionnement sur les autres plateformes (macOS, Windows, Linux…) n’est pas garanti, des bugs ou comportements inattendus restent possibles.';
   @override String get faqQ4 => 'LastStats est-elle open source ?';
   @override String get faqA4 => 'Oui ! Le code source est en libre accès sur GitHub. C’est un projet indépendant, fait avec passion par SanoBld. Vous pouvez y contribuer, signaler un bug ou juste laisser une étoile ⭐.';
   @override String get faqQ5 => 'Où sont stockées mes données ?';
-  @override String get faqA5 => 'Uniquement sur votre appareil. LastStats n’a pas de serveur, vos scrobbles sont mis en cache en local pour aller plus vite, et vos identifiants Last.fm restent aussi sur votre appareil. Rien n’est envoyé ailleurs qu’à l’API officielle de Last.fm.';
+  @override String get faqA5 => DataSource.lb ? 'Uniquement sur votre appareil. LastStats n’a pas de serveur, vos scrobbles sont mis en cache en local pour aller plus vite, et vos identifiants ListenBrainz restent aussi sur votre appareil. Rien n’est envoyé ailleurs qu’à l’API officielle de ListenBrainz.' : 'Uniquement sur votre appareil. LastStats n’a pas de serveur, vos scrobbles sont mis en cache en local pour aller plus vite, et vos identifiants Last.fm restent aussi sur votre appareil. Rien n’est envoyé ailleurs qu’à l’API officielle de Last.fm.';
   @override String get faqQ6 => 'Comment activer les favoris ?';
   @override String get faqA6 => 'Allez dans Paramètres > Compte et renseignez votre clé secrète Last.fm (vous la trouvez à côté de votre clé API sur last.fm/api/accounts), puis suivez les étapes à l\'écran. Une fois connecté, vous pourrez ajouter des titres en favori directement depuis l\'application. Cette option n\'est pas disponible avec la clé interne de l\'application.';
   @override String get faqQ7 => 'C\'est quoi un \u00abscrobble\u00bb ?';
-  @override String get faqA7 => 'Un scrobble, c\'est un titre enregistr\u00e9 comme \u00e9cout\u00e9 sur votre compte Last.fm, c\'est le terme officiel de Last.fm pour \u00abune \u00e9coute compt\u00e9e\u00bb. Tous vos totaux (top artistes, statistiques, etc.) sont bas\u00e9s dessus.';
+  @override String get faqA7 => DataSource.lb ? 'Un scrobble, c\'est un titre enregistr\u00e9 comme \u00e9cout\u00e9 sur votre compte ListenBrainz, c\'est le terme officiel de ListenBrainz pour \u00abune \u00e9coute compt\u00e9e\u00bb. Tous vos totaux (top artistes, statistiques, etc.) sont bas\u00e9s dessus.' : 'Un scrobble, c\'est un titre enregistr\u00e9 comme \u00e9cout\u00e9 sur votre compte Last.fm, c\'est le terme officiel de Last.fm pour \u00abune \u00e9coute compt\u00e9e\u00bb. Tous vos totaux (top artistes, statistiques, etc.) sont bas\u00e9s dessus.';
   @override String get faqQ8 => 'Comment fonctionnent les niveaux et les succ\u00e8s ?';
   @override String get faqA8 => 'Votre niveau de compte augmente avec votre nombre total de scrobbles, il n\'y a pas de maximum. Les cartes affichent aussi une bordure (du bronze \u00e0 l\'iridescent) selon le nombre d\'\u00e9coutes de l\'artiste, du titre ou de l\'album concern\u00e9. Tout est calcul\u00e9 automatiquement \u00e0 partir de vos statistiques d\u00e9j\u00e0 en cache, sans requ\u00eate suppl\u00e9mentaire.';
   @override String get faqQ9 => 'Comment fonctionne le mode économie d\'énergie ?';
   @override String get faqA9 => 'Le mode économie d\'énergie réduit l\'activité de l\'app pour préserver la batterie : l\'effet de parallaxe au mouvement est désactivé, la fréquence d\'affichage est limitée à environ 60 Hz, les mises à jour en arrière-plan sont moins fréquentes, et les pochettes animées ainsi que les reflets des badges sont mis en pause. Les images, les exports et les cartes de partage gardent leur pleine qualité.\n\nVous pouvez l\'activer en permanence, le faire suivre l\'économiseur de batterie de votre téléphone, ou le déclencher sous un niveau de batterie de votre choix. Vous le trouverez dans Paramètres > Mode économie d\'énergie.';
   @override String get faqQ10 => 'Comment sauvegarder ou restaurer mes données ?';
-  @override String get faqA10 => 'Allez dans Paramètres > Sauvegarde. Vous pouvez exporter un fichier de sauvegarde, avec ou sans votre clé Last.fm selon votre choix, puis l\'importer plus tard sur ce téléphone ou sur un autre appareil pour retrouver vos réglages.';
+  @override String get faqA10 => DataSource.lb ? 'Allez dans Paramètres > Sauvegarde. Vous pouvez exporter un fichier de sauvegarde, avec ou sans votre clé ListenBrainz selon votre choix, puis l\'importer plus tard sur ce téléphone ou sur un autre appareil pour retrouver vos réglages.' : 'Allez dans Paramètres > Sauvegarde. Vous pouvez exporter un fichier de sauvegarde, avec ou sans votre clé Last.fm selon votre choix, puis l\'importer plus tard sur ce téléphone ou sur un autre appareil pour retrouver vos réglages.';
   @override String get faqQ11 => 'L\'application fonctionne-t-elle hors ligne ?';
   @override String get faqA11 => 'Oui, dans une certaine mesure. Les statistiques déjà chargées restent consultables sans connexion grâce au cache local, mais une connexion reste nécessaire pour récupérer de nouveaux scrobbles.';
-  @override String get faqQ12 => 'Puis-je changer de compte Last.fm ?';
-  @override String get faqA12 => 'Oui, vous pouvez enregistrer jusqu\'à 3 comptes Last.fm. Depuis Paramètres > Compte, touchez « Ajouter un compte » puis passez de l\'un à l\'autre quand vous voulez. Le cache local est réinitialisé automatiquement lors du changement, pour que les données de deux comptes ne se mélangent jamais.';
+  @override String get faqQ12 => DataSource.lb ? 'Puis-je changer de compte ListenBrainz ?' : 'Puis-je changer de compte Last.fm ?';
+  @override String get faqA12 => DataSource.lb ? 'Oui, vous pouvez enregistrer jusqu\'à 3 comptes ListenBrainz. Depuis Paramètres > Compte, touchez « Ajouter un compte » puis passez de l\'un à l\'autre quand vous voulez. Le cache local est réinitialisé automatiquement lors du changement, pour que les données de deux comptes ne se mélangent jamais.' : 'Oui, vous pouvez enregistrer jusqu\'à 3 comptes Last.fm. Depuis Paramètres > Compte, touchez « Ajouter un compte » puis passez de l\'un à l\'autre quand vous voulez. Le cache local est réinitialisé automatiquement lors du changement, pour que les données de deux comptes ne se mélangent jamais.';
   @override String get faqQ13 => 'Comment configurer les notifications ?';
   @override String get faqA13 => 'Depuis Paramètres > Notifications, vous pouvez activer une alerte à la fin de chaque synchronisation, choisir la fréquence des alertes, ou désactiver complètement les notifications si vous préférez.';
   @override String get faqQ14 => 'Les images manquent ou chargent sans fin. Que faire ?';
@@ -729,7 +730,7 @@ class AppStringsFr implements AppStrings {
   @override String get achvDescListening => 'Total de titres écoutés (scrobbles), tous artistes confondus.';
   @override String get achvDescArtists => "Nombre d'artistes différents écoutés au moins une fois.";
   @override String get achvDescAlbums => "Nombre d'albums différents écoutés au moins une fois.";
-  @override String get achvDescLoyalty => 'Ancienneté du compte Last.fm.';
+  @override String get achvDescLoyalty => DataSource.lb ? 'Ancienneté du compte ListenBrainz.' : 'Ancienneté du compte Last.fm.';
   @override String get achvCatTracks => 'Titres';
   @override String get achvDescTracks => 'Nombre de titres différents (distincts) écoutés.';
   @override String get achvCatPace => 'Rythme';
@@ -856,9 +857,9 @@ class AppStringsFr implements AppStrings {
   @override String get apiBackupOff => 'Clé de secours : désactivée';
   @override String get apiPerKey => 'Requêtes par clé (aujourd\'hui / total)';
   @override String get apiLastfmNote => 'Last.fm ne publie aucun chiffre : il renvoie l\'erreur 29 quand une IP envoie trop de requêtes, et ses conditions interdisent de contourner cette limite. Environ 5 requêtes par seconde par IP est la valeur habituelle ; l\'app reste sous 4.';
-  @override String get apiStorageTitle => 'Données Last.fm stockées';
+  @override String get apiStorageTitle => DataSource.lb ? 'Données ListenBrainz stockées' : 'Données Last.fm stockées';
   @override String apiStorageValue(String used, String cap) => '$used sur $cap autorisés';
-  @override String get apiStorageOver => 'Au-dessus de la limite de 100 Mo fixée par les conditions de l\'API Last.fm. Videz l\'historique des scrobbles dans Stockage pour être conforme.';
+  @override String get apiStorageOver => DataSource.lb ? 'Au-dessus de la limite de 100 Mo fixée par les conditions de l\'API ListenBrainz. Videz l\'historique des scrobbles dans Stockage pour être conforme.' : 'Au-dessus de la limite de 100 Mo fixée par les conditions de l\'API Last.fm. Videz l\'historique des scrobbles dans Stockage pour être conforme.';
   @override String get apiReset => 'Réinitialiser les compteurs';
   @override String get apiLimiter => 'Limiter les requêtes';
   @override String get apiLimiterSub => 'Ralentit les requêtes pour rester sous les quotas des API. Désactivé = plus rapide, sans attente.';

@@ -3,6 +3,7 @@
 //  Russian
 // ══════════════════════════════════════════════════════════════════════════
 
+import '../services/data_source.dart';
 import "app_strings.dart";
 
 class AppStringsRu implements AppStrings {
@@ -30,7 +31,7 @@ class AppStringsRu implements AppStrings {
   @override String get cacheApiData => 'Данные API';
   @override String get cacheApiDataSubtitle => 'Топ исполнителей, альбомов, недавние треки…';
   @override String get cacheScrobbles => 'История скробблов';
-  @override String get cacheScrobblesSubtitle => 'Вся ваша история прослушиваний, загруженная из Last.fm';
+  @override String get cacheScrobblesSubtitle => DataSource.lb ? 'Вся ваша история прослушиваний, загруженная из ListenBrainz' : 'Вся ваша история прослушиваний, загруженная из Last.fm';
   @override String get cacheClearBtn => 'Очистить';
   @override String get cacheConfirmScrobblesTitle => 'Очистить историю скробблов?';
   @override String get cacheConfirmScrobblesBody => 'Вся история будет удалена и загружена заново при следующем запуске.';
@@ -79,7 +80,7 @@ class AppStringsRu implements AppStrings {
   @override String get searchTitle => 'Поиск';
   @override String get searchProfiles => 'Профили';
   @override String get searchHintBar => 'Исполнитель, альбом, трек или профиль…';
-  @override String get searchHintProfiles => 'Найти пользователя Last.fm';
+  @override String get searchHintProfiles => DataSource.lb ? 'Найти пользователя ListenBrainz' : 'Найти пользователя Last.fm';
   @override String get searchHintArtists => 'Найти исполнителя';
   @override String get searchHintAlbums => 'Найти альбом';
   @override String get searchHintTracks => 'Найти песню';
@@ -103,8 +104,8 @@ class AppStringsRu implements AppStrings {
   @override String get dashTrack1 => 'Трек №1';
   @override String get dashNoFriends => 'Друзья не найдены';
   @override String get dashResetCache => 'Сбросить кэш';
-  @override String get dashResetCacheConfirm => 'Все локально сохранённые данные скробблов будут удалены и загружены заново с Last.fm.';
-  @override String get dashFriendsActivity => 'Активность ваших друзей на Last.fm';
+  @override String get dashResetCacheConfirm => DataSource.lb ? 'Все локально сохранённые данные скробблов будут удалены и загружены заново с ListenBrainz.' : 'Все локально сохранённые данные скробблов будут удалены и загружены заново с Last.fm.';
+  @override String get dashFriendsActivity => DataSource.lb ? 'Активность ваших друзей на ListenBrainz' : 'Активность ваших друзей на Last.fm';
   @override String get settingsTitle => 'Настройки';
   @override String get settingsAppearance => 'Внешний вид';
   @override String get settingsTheme => 'Тема';
@@ -154,9 +155,9 @@ class AppStringsRu implements AppStrings {
   @override String get settingsTopArtistsSection => 'Топ исполнителей';
   @override String get settingsTopTracksSection => 'Топ треков';
   @override String get settingsFriendsSection => 'Друзья';
-  @override String get settingsFriendsSectionSub => 'Активность ваших друзей на Last.fm';
+  @override String get settingsFriendsSectionSub => DataSource.lb ? 'Активность ваших друзей на ListenBrainz' : 'Активность ваших друзей на Last.fm';
   @override String get settingsAccount => 'Аккаунт';
-  @override String get settingsConnectedProfile => 'Подключённый профиль Last.fm';
+  @override String get settingsConnectedProfile => DataSource.lb ? 'Подключённый профиль ListenBrainz' : 'Подключённый профиль Last.fm';
   @override String get settingsLogout => 'Выйти';
   @override String get settingsLogoutTitle => 'Выйти из аккаунта?';
   @override String get settingsLogoutContent => 'Ваши учётные данные будут удалены.';
@@ -258,13 +259,13 @@ class AppStringsRu implements AppStrings {
   @override String get onboardNotifTitle => 'Будьте в курсе';
   @override String get onboardNotifSub => 'Выберите, какие уведомления вы хотите получать и должен ли телефон вибрировать.';
   @override String get onboardFavTitle => 'Ваши избранные профили';
-  @override String get onboardFavSub => 'Добавьте друзей из Last.fm, чтобы быстро открывать их профили в приложении.';
-  @override String get onboardFavHint => 'Имя пользователя Last.fm';
+  @override String get onboardFavSub => DataSource.lb ? 'Добавьте друзей из ListenBrainz, чтобы быстро открывать их профили в приложении.' : 'Добавьте друзей из Last.fm, чтобы быстро открывать их профили в приложении.';
+  @override String get onboardFavHint => DataSource.lb ? 'Имя пользователя ListenBrainz' : 'Имя пользователя Last.fm';
   @override String get onboardFavAdd => 'Добавить';
   @override String get onboardFavEmpty => 'Пока нет избранного';
-  @override String get onboardFavSearchHint => 'Поиск профиля Last.fm…';
+  @override String get onboardFavSearchHint => DataSource.lb ? 'Поиск профиля ListenBrainz…' : 'Поиск профиля Last.fm…';
   @override String get onboardFavNoResults => 'Профиль не найден';
-  @override String get onboardFavFriendsTitle => 'Ваши друзья на Last.fm';
+  @override String get onboardFavFriendsTitle => DataSource.lb ? 'Ваши друзья на ListenBrainz' : 'Ваши друзья на Last.fm';
   @override String get onboardFavNoFriends => 'На этом аккаунте друзья не найдены';
   @override String get onboardFavSelected => 'Выбранное избранное';
   @override String get onboardDashTitle => 'Ваш обзор';
@@ -280,7 +281,7 @@ class AppStringsRu implements AppStrings {
   @override String get settingsMusicPlatform => 'Музыкальная платформа';
   @override String get settingsMusicPlatformSub => 'Показывает на страницах артиста, альбома и трека только ссылки выбранного музыкального сервиса';
   @override String get settingsShowAllPlatformLinks => 'Всегда показывать всё';
-  @override String get settingsShowAllPlatformLinksSub => 'Игнорировать фильтр и показывать все ссылки (Last.fm, Spotify, YT Music, Web)';
+  @override String get settingsShowAllPlatformLinksSub => DataSource.lb ? 'Игнорировать фильтр и показывать все ссылки (ListenBrainz, Spotify, YT Music, Web)' : 'Игнорировать фильтр и показывать все ссылки (Last.fm, Spotify, YT Music, Web)';
   @override String get onboardUpdatesTitle => 'Обновления';
   @override String get onboardUpdatesSub => 'Приложение автоматически проверяет, доступна ли новая версия.';
   @override String get onboardPreview => 'Предпросмотр';
@@ -318,7 +319,7 @@ class AppStringsRu implements AppStrings {
   @override String get settingsTapToDownload => 'Нажмите, чтобы скачать';
   @override String get detailLookingForPreview => 'Поиск превью…';
   @override String get detailPreview30Sec => 'Превью · 30 сек';
-  @override String get setupTagline => 'Ваша статистика Last.fm, переосмысленная.';
+  @override String get setupTagline => DataSource.lb ? 'Ваша статистика ListenBrainz, переосмысленная.' : 'Ваша статистика Last.fm, переосмысленная.';
   @override String get setupAnalyseProfile => 'Проанализировать профиль';
   @override String get setupConnecting => 'Подключение…';
   @override String get setupStartAnalysis => 'Начать анализ';
@@ -356,7 +357,7 @@ class AppStringsRu implements AppStrings {
   @override String get settingsCardNotificationsSub => 'Рубежи, дневные и недельные сводки';
   @override String get settingsSync => 'Синхронизация';
   @override String get settingsCardSyncSub => 'Автоматическая фоновая синхронизация скробблов';
-  @override String get settingsCardAccountSub => 'Подключённый профиль Last.fm, выход';
+  @override String get settingsCardAccountSub => DataSource.lb ? 'Подключённый профиль ListenBrainz, выход' : 'Подключённый профиль Last.fm, выход';
   @override String get settingsCardCacheSub => 'История, изображения, данные API';
   @override String get settingsCardBackupSub => 'Экспорт и восстановление настроек';
   @override String get settingsCardUpdatesSub => 'Проверка новых версий';
@@ -384,7 +385,7 @@ class AppStringsRu implements AppStrings {
   @override String get pcModeHintAuto => 'Боковая панель на широких экранах (≥ 720 dp), нижняя панель на узких.';
   @override String get pcModeHintOn => 'Всегда использовать боковую панель навигации, независимо от размера экрана.';
   @override String get pcModeHintOff => 'Всегда использовать нижнюю панель навигации, независимо от размера экрана.';
-  @override String get aboutTagline => 'Ваш спутник по статистике Last.fm';
+  @override String get aboutTagline => DataSource.lb ? 'Ваш спутник по статистике ListenBrainz' : 'Ваш спутник по статистике Last.fm';
   @override String get aboutAppInfo => 'Информация о приложении';
   @override String get aboutScrobbleDownloader => 'Загрузчик скробблов';
   @override String get aboutScrobbleDownloaderSub => 'Скачайте всю историю скробблов и сохраните её в файл';
@@ -616,27 +617,27 @@ class AppStringsRu implements AppStrings {
   @override String get rankingsWholeYear       => 'Весь год';
   @override String get chartsExportGeneratedOn => 'создано';
   @override String get faqQ1 => 'Скробблит ли LastStats мою музыку?';
-  @override String get faqA1 => 'Нет. LastStats, это приложение для визуализации: оно показывает скробблы, уже записанные в вашем аккаунте Last.fm, но само ничего не записывает.\n\nЧтобы автоматически скробблить музыку, используйте специальное приложение, например Pano Scrobbler (доступно на Android).';
+  @override String get faqA1 => DataSource.lb ? 'Нет. LastStats, это приложение для визуализации: оно показывает скробблы, уже записанные в вашем аккаунте ListenBrainz, но само ничего не записывает.\n\nЧтобы автоматически скробблить музыку, используйте специальное приложение, например Pano Scrobbler (доступно на Android).' : 'Нет. LastStats, это приложение для визуализации: оно показывает скробблы, уже записанные в вашем аккаунте Last.fm, но само ничего не записывает.\n\nЧтобы автоматически скробблить музыку, используйте специальное приложение, например Pano Scrobbler (доступно на Android).';
   @override String get faqQ3 => 'Работает ли приложение на macOS или других платформах?';
   @override String get faqA3 => 'LastStats разрабатывается и тестируется на Android. Работа на других платформах (macOS, Windows, Linux…) не проверена, возможны ошибки или неожиданное поведение.';
   @override String get faqQ4 => 'Является ли LastStats открытым исходным кодом?';
   @override String get faqA4 => 'Да! Исходный код свободно доступен на GitHub. Проект независимый, сделан с любовью SanoBld. Не стесняйтесь вносить вклад, сообщать об ошибках или просто поставить звездочку ⭐.';
   @override String get faqQ5 => 'Где хранятся мои данные?';
-  @override String get faqA5 => 'Только на вашем устройстве. У LastStats нет сервера: скробблы кэшируются локально для быстрого доступа, а данные для входа в Last.fm также хранятся локально. Ничего не отправляется никуда, кроме официального API Last.fm.';
+  @override String get faqA5 => DataSource.lb ? 'Только на вашем устройстве. У LastStats нет сервера: скробблы кэшируются локально для быстрого доступа, а данные для входа в ListenBrainz также хранятся локально. Ничего не отправляется никуда, кроме официального API ListenBrainz.' : 'Только на вашем устройстве. У LastStats нет сервера: скробблы кэшируются локально для быстрого доступа, а данные для входа в Last.fm также хранятся локально. Ничего не отправляется никуда, кроме официального API Last.fm.';
   @override String get faqQ6 => 'Как включить избранное?';
   @override String get faqA6 => 'Откройте Настройки > Аккаунт и введите секретный ключ Last.fm (он находится рядом с API-ключом на last.fm/api/accounts), затем следуйте подсказкам на экране. После подключения вы сможете добавлять треки в избранное прямо из приложения. С встроенным ключом приложения эта функция недоступна.';
   @override String get faqQ7 => '\u0427\u0442\u043e \u0442\u0430\u043a\u043e\u0435 \u00abscrobble\u00bb?';
-  @override String get faqA7 => 'Scrobble \u2014 \u044d\u0442\u043e \u0442\u0440\u0435\u043a, \u0437\u0430\u0444\u0438\u043a\u0441\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0439 \u043a\u0430\u043a \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0430\u043d\u043d\u044b\u0439 \u043d\u0430 \u0432\u0430\u0448\u0435\u043c \u0430\u043a\u043a\u0430\u0443\u043d\u0442\u0435 Last.fm \u2014 \u044d\u0442\u043e \u0441\u043e\u0431\u0441\u0442\u0432\u0435\u043d\u043d\u044b\u0439 \u0442\u0435\u0440\u043c\u0438\u043d Last.fm \u0434\u043b\u044f \u00ab\u0437\u0430\u0441\u0447\u0438\u0442\u0430\u043d\u043d\u043e\u0433\u043e \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u044f\u00bb. \u0412\u0441\u0435 \u0432\u0430\u0448\u0438 \u0438\u0442\u043e\u0433\u0438 (\u0442\u043e\u043f \u0438\u0441\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u0435\u0439, \u0441\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043a\u0430 \u0438 \u0442.\u0434.) \u043e\u0441\u043d\u043e\u0432\u0430\u043d\u044b \u043d\u0430 \u043d\u0451\u043c.';
+  @override String get faqA7 => DataSource.lb ? 'Scrobble \u2014 \u044d\u0442\u043e \u0442\u0440\u0435\u043a, \u0437\u0430\u0444\u0438\u043a\u0441\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0439 \u043a\u0430\u043a \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0430\u043d\u043d\u044b\u0439 \u043d\u0430 \u0432\u0430\u0448\u0435\u043c \u0430\u043a\u043a\u0430\u0443\u043d\u0442\u0435 ListenBrainz \u2014 \u044d\u0442\u043e \u0441\u043e\u0431\u0441\u0442\u0432\u0435\u043d\u043d\u044b\u0439 \u0442\u0435\u0440\u043c\u0438\u043d ListenBrainz \u0434\u043b\u044f \u00ab\u0437\u0430\u0441\u0447\u0438\u0442\u0430\u043d\u043d\u043e\u0433\u043e \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u044f\u00bb. \u0412\u0441\u0435 \u0432\u0430\u0448\u0438 \u0438\u0442\u043e\u0433\u0438 (\u0442\u043e\u043f \u0438\u0441\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u0435\u0439, \u0441\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043a\u0430 \u0438 \u0442.\u0434.) \u043e\u0441\u043d\u043e\u0432\u0430\u043d\u044b \u043d\u0430 \u043d\u0451\u043c.' : 'Scrobble \u2014 \u044d\u0442\u043e \u0442\u0440\u0435\u043a, \u0437\u0430\u0444\u0438\u043a\u0441\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0439 \u043a\u0430\u043a \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0430\u043d\u043d\u044b\u0439 \u043d\u0430 \u0432\u0430\u0448\u0435\u043c \u0430\u043a\u043a\u0430\u0443\u043d\u0442\u0435 Last.fm \u2014 \u044d\u0442\u043e \u0441\u043e\u0431\u0441\u0442\u0432\u0435\u043d\u043d\u044b\u0439 \u0442\u0435\u0440\u043c\u0438\u043d Last.fm \u0434\u043b\u044f \u00ab\u0437\u0430\u0441\u0447\u0438\u0442\u0430\u043d\u043d\u043e\u0433\u043e \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u044f\u00bb. \u0412\u0441\u0435 \u0432\u0430\u0448\u0438 \u0438\u0442\u043e\u0433\u0438 (\u0442\u043e\u043f \u0438\u0441\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u0435\u0439, \u0441\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043a\u0430 \u0438 \u0442.\u0434.) \u043e\u0441\u043d\u043e\u0432\u0430\u043d\u044b \u043d\u0430 \u043d\u0451\u043c.';
   @override String get faqQ8 => '\u041a\u0430\u043a \u0440\u0430\u0431\u043e\u0442\u0430\u044e\u0442 \u0443\u0440\u043e\u0432\u043d\u0438 \u0438 \u0434\u043e\u0441\u0442\u0438\u0436\u0435\u043d\u0438\u044f?';
   @override String get faqA8 => '\u0423\u0440\u043e\u0432\u0435\u043d\u044c \u0430\u043a\u043a\u0430\u0443\u043d\u0442\u0430 \u0440\u0430\u0441\u0442\u0451\u0442 \u0432\u043c\u0435\u0441\u0442\u0435 \u0441 \u043e\u0431\u0449\u0438\u043c \u0447\u0438\u0441\u043b\u043e\u043c scrobble (\u043c\u0430\u043a\u0441\u0438\u043c\u0430\u043b\u044c\u043d\u043e\u0433\u043e \u0443\u0440\u043e\u0432\u043d\u044f \u043d\u0435\u0442). \u041a\u0430\u0440\u0442\u043e\u0447\u043a\u0438 \u0442\u0430\u043a\u0436\u0435 \u043f\u043e\u043b\u0443\u0447\u0430\u044e\u0442 \u0440\u0430\u043c\u043a\u0443 (\u0431\u0440\u043e\u043d\u0437\u0430 \u2192 \u043f\u0435\u0440\u0435\u043b\u0438\u0432\u0447\u0430\u0442\u0430\u044f) \u0432 \u0437\u0430\u0432\u0438\u0441\u0438\u043c\u043e\u0441\u0442\u0438 \u043e\u0442 \u0447\u0438\u0441\u043b\u0430 \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u0439 \u044d\u0442\u043e\u0433\u043e \u0438\u0441\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044f/\u0442\u0440\u0435\u043a\u0430/\u0430\u043b\u044c\u0431\u043e\u043c\u0430. \u0412\u0441\u0451 \u0432\u044b\u0447\u0438\u0441\u043b\u044f\u0435\u0442\u0441\u044f \u0430\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438 \u0438\u0437 \u0443\u0436\u0435 \u0437\u0430\u043a\u044d\u0448\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u043e\u0439 \u043b\u043e\u043a\u0430\u043b\u044c\u043d\u043e\u0439 \u0441\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043a\u0438, \u0431\u0435\u0437 \u0434\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0445 \u0441\u0435\u0442\u0435\u0432\u044b\u0445 \u0437\u0430\u043f\u0440\u043e\u0441\u043e\u0432.';
   @override String get faqQ9 => 'Как работает режим энергосбережения?';
   @override String get faqA9 => 'Режим энергосбережения снижает активность приложения, чтобы экономить заряд: отключается параллакс при наклоне, частота обновления экрана ограничивается примерно 60 Гц, фоновые обновления выполняются реже, а анимированные обложки и блик на значках приостанавливаются. Изображения, экспорт и карточки для публикации сохраняют полное качество.\n\nВы можете включить его постоянно, привязать к системному режиму экономии заряда или включать при падении заряда ниже выбранного уровня. Он находится в разделе «Настройки» > Экономия заряда.';
   @override String get faqQ10 => 'Как сделать резервную копию или восстановить данные?';
-  @override String get faqA10 => 'Откройте Настройки > Резервное копирование. Вы можете экспортировать файл резервной копии с вашим ключом Last.fm или без него, а затем импортировать его на этом телефоне или на другом устройстве, чтобы вернуть свои настройки.';
+  @override String get faqA10 => DataSource.lb ? 'Откройте Настройки > Резервное копирование. Вы можете экспортировать файл резервной копии с вашим ключом ListenBrainz или без него, а затем импортировать его на этом телефоне или на другом устройстве, чтобы вернуть свои настройки.' : 'Откройте Настройки > Резервное копирование. Вы можете экспортировать файл резервной копии с вашим ключом Last.fm или без него, а затем импортировать его на этом телефоне или на другом устройстве, чтобы вернуть свои настройки.';
   @override String get faqQ11 => 'Работает ли приложение офлайн?';
   @override String get faqA11 => 'Да, отчасти. Уже загруженная статистика остаётся доступной офлайн благодаря локальному кешу, но для получения новых скробблов нужно подключение.';
-  @override String get faqQ12 => 'Можно ли сменить аккаунт Last.fm?';
-  @override String get faqA12 => 'Да, можно сохранить до 3 аккаунтов Last.fm. В разделе Настройки > Аккаунт нажмите «Добавить аккаунт» и переключайтесь между ними, когда захотите. При переключении локальный кэш автоматически сбрасывается, чтобы данные двух аккаунтов никогда не смешивались.';
+  @override String get faqQ12 => DataSource.lb ? 'Можно ли сменить аккаунт ListenBrainz?' : 'Можно ли сменить аккаунт Last.fm?';
+  @override String get faqA12 => DataSource.lb ? 'Да, можно сохранить до 3 аккаунтов ListenBrainz. В разделе Настройки > Аккаунт нажмите «Добавить аккаунт» и переключайтесь между ними, когда захотите. При переключении локальный кэш автоматически сбрасывается, чтобы данные двух аккаунтов никогда не смешивались.' : 'Да, можно сохранить до 3 аккаунтов Last.fm. В разделе Настройки > Аккаунт нажмите «Добавить аккаунт» и переключайтесь между ними, когда захотите. При переключении локальный кэш автоматически сбрасывается, чтобы данные двух аккаунтов никогда не смешивались.';
   @override String get faqQ13 => 'Как настроить уведомления?';
   @override String get faqA13 => 'В разделе Настройки > Уведомления можно включить оповещение о завершении синхронизации, выбрать, как часто оно появляется, или полностью отключить уведомления.';
   @override String get faqQ14 => 'Обложки не появляются или грузятся бесконечно. Что делать?';
@@ -700,7 +701,7 @@ class AppStringsRu implements AppStrings {
   @override String get achvDescListening => 'Всего прослушанных треков (скроббл), по всем исполнителям.';
   @override String get achvDescArtists => 'Количество разных исполнителей, прослушанных хотя бы раз.';
   @override String get achvDescAlbums => 'Количество разных альбомов, прослушанных хотя бы раз.';
-  @override String get achvDescLoyalty => 'Как давно существует аккаунт Last.fm.';
+  @override String get achvDescLoyalty => DataSource.lb ? 'Как давно существует аккаунт ListenBrainz.' : 'Как давно существует аккаунт Last.fm.';
   @override String get achvCatTracks => 'Треки';
   @override String get achvDescTracks => 'Количество разных прослушанных треков.';
   @override String get achvCatPace => 'Темп';
@@ -827,9 +828,9 @@ class AppStringsRu implements AppStrings {
   @override String get apiBackupOff => 'Резервный ключ: выкл.';
   @override String get apiPerKey => 'Запросов на ключ (сегодня / всего)';
   @override String get apiLastfmNote => 'Last.fm не публикует цифр: при слишком частых запросах с IP он возвращает ошибку 29, а условия запрещают обход. Обычно ориентир — около 5 запросов в секунду на IP; приложение держится ниже 4.';
-  @override String get apiStorageTitle => 'Сохранённые данные Last.fm';
+  @override String get apiStorageTitle => DataSource.lb ? 'Сохранённые данные ListenBrainz' : 'Сохранённые данные Last.fm';
   @override String apiStorageValue(String used, String cap) => '$used из $cap разрешённых';
-  @override String get apiStorageOver => 'Превышен лимит 100 МБ из условий API Last.fm. Очистите историю скробблов в разделе «Хранилище».';
+  @override String get apiStorageOver => DataSource.lb ? 'Превышен лимит 100 МБ из условий API ListenBrainz. Очистите историю скробблов в разделе «Хранилище».' : 'Превышен лимит 100 МБ из условий API Last.fm. Очистите историю скробблов в разделе «Хранилище».';
   @override String get apiReset => 'Сбросить счётчики';
   @override String get apiLimiter => 'Ограничивать запросы';
   @override String get apiLimiterSub => 'Замедляет запросы, чтобы не превышать лимиты API. Выкл. = быстрее, без ожидания.';

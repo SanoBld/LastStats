@@ -491,6 +491,49 @@ class LbAdapter {
     return {'track': tracks, '@attr': _attr(user, page, lim, total)};
   }
 
+  // ── History download (local storage) ────────────────────────────────────
+  // Direct ListenBrainz loader used by AllScrobblesService: pages downwards
+  // with max_ts (1000 listens per call), stops at [fromTs]. Bypasses the
+  // short response cache so a sync never reads stale data. Throws on any
+  // failed page so the caller never stores a partial range as complete.
+  static Future<List<({int ts, String track, String artist, String album})>>
+      fetchRange(String user, {int? fromTs, int? toTs,
+          void Function(int loaded)? onProgress}) async {
+    final name = _alias[user] ?? user;
+    final enc = Uri.encodeComponent(name);
+    final out = <({int ts, String track, String artist, String album})>[];
+    int? max = toTs;
+    while (true) {
+      final res = await _fetch(_uri(_host, '/1/user/$enc/listens', {
+        'count': '1000', if (max != null) 'max_ts': '$max',
+      }));
+      if (res.statusCode == 204 || res.statusCode == 404) break;
+      if (res.statusCode != 200) {
+        throw Exception('ListenBrainz error\nCode: HTTP ${res.statusCode}');
+      }
+      final body = jsonDecode(utf8.decode(res.bodyBytes));
+      final payload = body is Map ? body['payload'] : null;
+      final ls = ((payload is Map ? payload['listens'] : null) as List? ?? [])
+          .whereType<Map>().toList();
+      if (ls.isEmpty) break;
+      var reached = false;
+      for (final l in ls) {
+        final ts = _i(l['listened_at']);
+        if (ts <= 0) continue;
+        if (fromTs != null && ts < fromTs) { reached = true; continue; }
+        final tm = (l['track_metadata'] as Map?) ?? {};
+        out.add((ts: ts, track: _s(tm['track_name']),
+            artist: _s(tm['artist_name']), album: _s(tm['release_name'])));
+      }
+      onProgress?.call(out.length);
+      final last = _i(ls.last['listened_at']);
+      if (reached || ls.length < 1000 || last <= 0) break;
+      max = last; // max_ts is exclusive
+      await Future.delayed(const Duration(milliseconds: 250));
+    }
+    return out;
+  }
+
   // ── Loved tracks = ListenBrainz "love" feedback ─────────────────────────
   static Future<Map<String, dynamic>> _loved(String user, int limit) async {
     final d = await _get(

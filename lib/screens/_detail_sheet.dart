@@ -2527,7 +2527,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
         ? 'Spotify'
         : (mu.contains('google') || mu.contains('youtube') ? 'YouTube Music' : 'Apple Music');
     final items = <(String, String, String)>[
-      ('Last.fm', 'Last.fm', tx('src_scrobbles_meta')),
+      (DataSource.lb ? 'ListenBrainz' : 'Last.fm', DataSource.lb ? 'ListenBrainz' : 'Last.fm', tx('src_scrobbles_meta')),
       (parts.last, parts.last, tx('src_artwork')),
       if (_previewAvailable == true)
         ('Deezer', 'Deezer', tx('src_audio_preview')),

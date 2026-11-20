@@ -3,6 +3,7 @@
 //  Arabic
 // ══════════════════════════════════════════════════════════════════════════
 
+import '../services/data_source.dart';
 import "app_strings.dart";
 
 class AppStringsAr implements AppStrings {
@@ -30,7 +31,7 @@ class AppStringsAr implements AppStrings {
   @override String get cacheApiData => 'بيانات API';
   @override String get cacheApiDataSubtitle => 'أفضل الفنانين والألبومات والمقاطع الأخيرة…';
   @override String get cacheScrobbles => 'سجل التشغيل';
-  @override String get cacheScrobblesSubtitle => 'سجل استماعك الكامل الذي تم تنزيله من Last.fm';
+  @override String get cacheScrobblesSubtitle => DataSource.lb ? 'سجل استماعك الكامل الذي تم تنزيله من ListenBrainz' : 'سجل استماعك الكامل الذي تم تنزيله من Last.fm';
   @override String get cacheClearBtn => 'مسح';
   @override String get cacheConfirmScrobblesTitle => 'مسح سجل التشغيل؟';
   @override String get cacheConfirmScrobblesBody => 'سيُحذف السجل بالكامل ويُعاد تنزيله عند التشغيل التالي.';
@@ -79,7 +80,7 @@ class AppStringsAr implements AppStrings {
   @override String get searchTitle => 'بحث';
   @override String get searchProfiles => 'الملفات الشخصية';
   @override String get searchHintBar => 'فنان أو ألبوم أو مقطع أو ملف شخصي…';
-  @override String get searchHintProfiles => 'ابحث عن مستخدم Last.fm';
+  @override String get searchHintProfiles => DataSource.lb ? 'ابحث عن مستخدم ListenBrainz' : 'ابحث عن مستخدم Last.fm';
   @override String get searchHintArtists => 'ابحث عن فنان';
   @override String get searchHintAlbums => 'ابحث عن ألبوم';
   @override String get searchHintTracks => 'ابحث عن أغنية';
@@ -103,8 +104,8 @@ class AppStringsAr implements AppStrings {
   @override String get dashTrack1 => 'المقطع رقم 1';
   @override String get dashNoFriends => 'لم يُعثر على أصدقاء';
   @override String get dashResetCache => 'إعادة تعيين التخزين المؤقت';
-  @override String get dashResetCacheConfirm => 'ستُحذف كل بيانات التشغيل المخزنة محليًا ويُعاد تنزيلها من Last.fm.';
-  @override String get dashFriendsActivity => 'نشاط أصدقائك على Last.fm';
+  @override String get dashResetCacheConfirm => DataSource.lb ? 'ستُحذف كل بيانات التشغيل المخزنة محليًا ويُعاد تنزيلها من ListenBrainz.' : 'ستُحذف كل بيانات التشغيل المخزنة محليًا ويُعاد تنزيلها من Last.fm.';
+  @override String get dashFriendsActivity => DataSource.lb ? 'نشاط أصدقائك على ListenBrainz' : 'نشاط أصدقائك على Last.fm';
   @override String get settingsTitle => 'الإعدادات';
   @override String get settingsAppearance => 'المظهر';
   @override String get settingsTheme => 'السمة';
@@ -154,9 +155,9 @@ class AppStringsAr implements AppStrings {
   @override String get settingsTopArtistsSection => 'أفضل الفنانين';
   @override String get settingsTopTracksSection => 'أفضل المقاطع';
   @override String get settingsFriendsSection => 'الأصدقاء';
-  @override String get settingsFriendsSectionSub => 'نشاط أصدقائك على Last.fm';
+  @override String get settingsFriendsSectionSub => DataSource.lb ? 'نشاط أصدقائك على ListenBrainz' : 'نشاط أصدقائك على Last.fm';
   @override String get settingsAccount => 'الحساب';
-  @override String get settingsConnectedProfile => 'ملف Last.fm المتصل';
+  @override String get settingsConnectedProfile => DataSource.lb ? 'ملف ListenBrainz المتصل' : 'ملف Last.fm المتصل';
   @override String get settingsLogout => 'تسجيل الخروج';
   @override String get settingsLogoutTitle => 'تسجيل الخروج؟';
   @override String get settingsLogoutContent => 'سيتم حذف بيانات اعتمادك.';
@@ -258,13 +259,13 @@ class AppStringsAr implements AppStrings {
   @override String get onboardNotifTitle => 'ابقَ على اطلاع';
   @override String get onboardNotifSub => 'اختر الإشعارات التي تريد استلامها، وهل يجب أن يهتز الهاتف.';
   @override String get onboardFavTitle => 'ملفاتك المفضلة';
-  @override String get onboardFavSub => 'أضف أصدقاءك على Last.fm للوصول إلى ملفاتهم الشخصية بسرعة من داخل التطبيق.';
-  @override String get onboardFavHint => 'اسم مستخدم Last.fm';
+  @override String get onboardFavSub => DataSource.lb ? 'أضف أصدقاءك على ListenBrainz للوصول إلى ملفاتهم الشخصية بسرعة من داخل التطبيق.' : 'أضف أصدقاءك على Last.fm للوصول إلى ملفاتهم الشخصية بسرعة من داخل التطبيق.';
+  @override String get onboardFavHint => DataSource.lb ? 'اسم مستخدم ListenBrainz' : 'اسم مستخدم Last.fm';
   @override String get onboardFavAdd => 'إضافة';
   @override String get onboardFavEmpty => 'لا توجد مفضلة بعد';
-  @override String get onboardFavSearchHint => 'ابحث عن ملف Last.fm…';
+  @override String get onboardFavSearchHint => DataSource.lb ? 'ابحث عن ملف ListenBrainz…' : 'ابحث عن ملف Last.fm…';
   @override String get onboardFavNoResults => 'لم يُعثر على ملف شخصي';
-  @override String get onboardFavFriendsTitle => 'أصدقاؤك على Last.fm';
+  @override String get onboardFavFriendsTitle => DataSource.lb ? 'أصدقاؤك على ListenBrainz' : 'أصدقاؤك على Last.fm';
   @override String get onboardFavNoFriends => 'لا يوجد أصدقاء في هذا الحساب';
   @override String get onboardFavSelected => 'المفضلة المختارة';
   @override String get onboardDashTitle => 'شاشتك الرئيسية';
@@ -280,7 +281,7 @@ class AppStringsAr implements AppStrings {
   @override String get settingsMusicPlatform => 'منصة الموسيقى';
   @override String get settingsMusicPlatformSub => 'يعرض في صفحات الفنان والألبوم والمقطوعة روابط خدمة الموسيقى التي اخترتها فقط';
   @override String get settingsShowAllPlatformLinks => 'عرض الكل دائمًا';
-  @override String get settingsShowAllPlatformLinksSub => 'تجاهل الفلتر وعرض كل رابط (Last.fm، Spotify، YT Music، الويب)';
+  @override String get settingsShowAllPlatformLinksSub => DataSource.lb ? 'تجاهل الفلتر وعرض كل رابط (ListenBrainz، Spotify، YT Music، الويب)' : 'تجاهل الفلتر وعرض كل رابط (Last.fm، Spotify، YT Music، الويب)';
   @override String get onboardUpdatesTitle => 'التحديثات';
   @override String get onboardUpdatesSub => 'يتحقق التطبيق تلقائيًا مما إذا كان هناك إصدار جديد متاح.';
   @override String get onboardPreview => 'معاينة';
@@ -318,7 +319,7 @@ class AppStringsAr implements AppStrings {
   @override String get settingsTapToDownload => 'اضغط للتنزيل';
   @override String get detailLookingForPreview => 'جارٍ البحث عن معاينة…';
   @override String get detailPreview30Sec => 'معاينة · 30 ثانية';
-  @override String get setupTagline => 'إحصائياتك على Last.fm، بحلة جديدة.';
+  @override String get setupTagline => DataSource.lb ? 'إحصائياتك على ListenBrainz، بحلة جديدة.' : 'إحصائياتك على Last.fm، بحلة جديدة.';
   @override String get setupAnalyseProfile => 'تحليل ملف شخصي';
   @override String get setupConnecting => 'جارٍ الاتصال…';
   @override String get setupStartAnalysis => 'بدء التحليل';
@@ -356,7 +357,7 @@ class AppStringsAr implements AppStrings {
   @override String get settingsCardNotificationsSub => 'المحطات، الملخصات اليومية والأسبوعية';
   @override String get settingsSync => 'المزامنة';
   @override String get settingsCardSyncSub => 'مزامنة تلقائية للتشغيلات في الخلفية';
-  @override String get settingsCardAccountSub => 'ملف Last.fm المتصل، تسجيل الخروج';
+  @override String get settingsCardAccountSub => DataSource.lb ? 'ملف ListenBrainz المتصل، تسجيل الخروج' : 'ملف Last.fm المتصل، تسجيل الخروج';
   @override String get settingsCardCacheSub => 'السجل، الصور، بيانات API';
   @override String get settingsCardBackupSub => 'تصدير واستعادة إعداداتك';
   @override String get settingsCardUpdatesSub => 'التحقق من الإصدارات الجديدة';
@@ -384,7 +385,7 @@ class AppStringsAr implements AppStrings {
   @override String get pcModeHintAuto => 'الشريط الجانبي على الشاشات العريضة (≥ 720 dp)، والشريط السفلي على الشاشات الضيقة.';
   @override String get pcModeHintOn => 'استخدام الشريط الجانبي للتنقل دائمًا، بغض النظر عن حجم الشاشة.';
   @override String get pcModeHintOff => 'استخدام الشريط السفلي للتنقل دائمًا، بغض النظر عن حجم الشاشة.';
-  @override String get aboutTagline => 'رفيقك لإحصائيات Last.fm';
+  @override String get aboutTagline => DataSource.lb ? 'رفيقك لإحصائيات ListenBrainz' : 'رفيقك لإحصائيات Last.fm';
   @override String get aboutAppInfo => 'معلومات التطبيق';
   @override String get aboutScrobbleDownloader => 'أداة تنزيل التشغيلات';
   @override String get aboutScrobbleDownloaderSub => 'نزّل سجل scrobbles بالكامل واحفظه في ملف';
@@ -616,27 +617,27 @@ class AppStringsAr implements AppStrings {
   @override String get rankingsWholeYear       => 'طوال العام';
   @override String get chartsExportGeneratedOn => 'أُنشئ في';
   @override String get faqQ1 => 'هل يقوم LastStats بتسجيل استماعي (scrobble) لموسيقاي؟';
-  @override String get faqA1 => 'لا. LastStats هو تطبيق لعرض البيانات: يعرض السكروبلات المسجلة بالفعل في حسابك على Last.fm، لكنه لا يسجل أي شيء بنفسه.\n\nلتسجيل موسيقاك تلقائياً، استخدم تطبيقًا مخصصًا مثل Pano Scrobbler (متوفر على أندرويد).';
+  @override String get faqA1 => DataSource.lb ? 'لا. LastStats هو تطبيق لعرض البيانات: يعرض السكروبلات المسجلة بالفعل في حسابك على ListenBrainz، لكنه لا يسجل أي شيء بنفسه.\n\nلتسجيل موسيقاك تلقائياً، استخدم تطبيقًا مخصصًا مثل Pano Scrobbler (متوفر على أندرويد).' : 'لا. LastStats هو تطبيق لعرض البيانات: يعرض السكروبلات المسجلة بالفعل في حسابك على Last.fm، لكنه لا يسجل أي شيء بنفسه.\n\nلتسجيل موسيقاك تلقائياً، استخدم تطبيقًا مخصصًا مثل Pano Scrobbler (متوفر على أندرويد).';
   @override String get faqQ3 => 'هل يعمل التطبيق على macOS أو منصات أخرى؟';
   @override String get faqA3 => 'يتم تطوير واختبار LastStats على أندرويد. الأداء على المنصات الأخرى (macOS، Windows، Linux...) غير متحقق منه، قد تحدث أخطاء أو سلوك غير متوقع.';
   @override String get faqQ4 => 'هل LastStats مفتوح المصدر؟';
   @override String get faqA4 => 'نعم! الكود المصدري متاح بحرية على GitHub. المشروع مستقل، صُنع بشغف من قبل SanoBld. لا تتردد في المساهمة أو الإبلاغ عن الأخطاء أو ترك نجمة ⭐.';
   @override String get faqQ5 => 'أين يتم تخزين بياناتي؟';
-  @override String get faqA5 => 'على جهازك فقط. لا يمتلك LastStats أي خادم: يتم تخزين السكروبلات مؤقتًا محليًا للوصول السريع، وتبقى بيانات اعتماد Last.fm مخزّنة محليًا أيضًا. لا يتم إرسال أي شيء إلى أي جهة سوى واجهة برمجة تطبيقات Last.fm الرسمية.';
+  @override String get faqA5 => DataSource.lb ? 'على جهازك فقط. لا يمتلك LastStats أي خادم: يتم تخزين السكروبلات مؤقتًا محليًا للوصول السريع، وتبقى بيانات اعتماد ListenBrainz مخزّنة محليًا أيضًا. لا يتم إرسال أي شيء إلى أي جهة سوى واجهة برمجة تطبيقات ListenBrainz الرسمية.' : 'على جهازك فقط. لا يمتلك LastStats أي خادم: يتم تخزين السكروبلات مؤقتًا محليًا للوصول السريع، وتبقى بيانات اعتماد Last.fm مخزّنة محليًا أيضًا. لا يتم إرسال أي شيء إلى أي جهة سوى واجهة برمجة تطبيقات Last.fm الرسمية.';
   @override String get faqQ6 => 'كيف أُفعّل المفضلة؟';
   @override String get faqA6 => 'انتقل إلى الإعدادات > الحساب وأدخل مفتاحك السري من Last.fm (تجده بجوار مفتاح API في last.fm/api/accounts)، ثم اتبع الخطوات على الشاشة. بعد الاتصال يمكنك إضافة الأغاني إلى المفضلة مباشرة من التطبيق. هذا الخيار غير متاح مع المفتاح الداخلي للتطبيق.';
   @override String get faqQ7 => '\u0645\u0627 \u0647\u0648 \u0627\u0644\u0640\'scrobble\'\u061f';
-  @override String get faqA7 => '\u0627\u0644\u0640scrobble \u0647\u0648 \u0645\u0642\u0637\u0648\u0639\u0629 \u064a\u062a\u0645 \u062a\u0633\u062c\u064a\u0644\u0647\u0627 \u0643\u0645\u0634\u063a\u0648\u0644\u0629 \u0641\u064a \u062d\u0633\u0627\u0628\u0643 \u0639\u0644\u0649 Last.fm \u2014 \u0625\u0646\u0647 \u0627\u0644\u0645\u0635\u0637\u0644\u062d \u0627\u0644\u0631\u0633\u0645\u064a \u0644\u0640 Last.fm \u0644\u0640 \u0627\u0633\u062a\u0645\u0627\u0639 \u0648\u0627\u062d\u062f \u0645\u062d\u062a\u0633\u0628. \u062c\u0645\u064a\u0639 \u0625\u062d\u0635\u0627\u0626\u064a\u0627\u062a\u0643 (\u0623\u0641\u0636\u0644 \u0627\u0644\u0641\u0646\u0627\u0646\u064a\u0646\u060c \u0627\u0644\u0625\u062d\u0635\u0627\u0626\u064a\u0627\u062a...) \u0645\u0628\u0646\u064a\u0629 \u0639\u0644\u064a\u0647.';
+  @override String get faqA7 => DataSource.lb ? '\u0627\u0644\u0640scrobble \u0647\u0648 \u0645\u0642\u0637\u0648\u0639\u0629 \u064a\u062a\u0645 \u062a\u0633\u062c\u064a\u0644\u0647\u0627 \u0643\u0645\u0634\u063a\u0648\u0644\u0629 \u0641\u064a \u062d\u0633\u0627\u0628\u0643 \u0639\u0644\u0649 ListenBrainz \u2014 \u0625\u0646\u0647 \u0627\u0644\u0645\u0635\u0637\u0644\u062d \u0627\u0644\u0631\u0633\u0645\u064a \u0644\u0640 ListenBrainz \u0644\u0640 \u0627\u0633\u062a\u0645\u0627\u0639 \u0648\u0627\u062d\u062f \u0645\u062d\u062a\u0633\u0628. \u062c\u0645\u064a\u0639 \u0625\u062d\u0635\u0627\u0626\u064a\u0627\u062a\u0643 (\u0623\u0641\u0636\u0644 \u0627\u0644\u0641\u0646\u0627\u0646\u064a\u0646\u060c \u0627\u0644\u0625\u062d\u0635\u0627\u0626\u064a\u0627\u062a...) \u0645\u0628\u0646\u064a\u0629 \u0639\u0644\u064a\u0647.' : '\u0627\u0644\u0640scrobble \u0647\u0648 \u0645\u0642\u0637\u0648\u0639\u0629 \u064a\u062a\u0645 \u062a\u0633\u062c\u064a\u0644\u0647\u0627 \u0643\u0645\u0634\u063a\u0648\u0644\u0629 \u0641\u064a \u062d\u0633\u0627\u0628\u0643 \u0639\u0644\u0649 Last.fm \u2014 \u0625\u0646\u0647 \u0627\u0644\u0645\u0635\u0637\u0644\u062d \u0627\u0644\u0631\u0633\u0645\u064a \u0644\u0640 Last.fm \u0644\u0640 \u0627\u0633\u062a\u0645\u0627\u0639 \u0648\u0627\u062d\u062f \u0645\u062d\u062a\u0633\u0628. \u062c\u0645\u064a\u0639 \u0625\u062d\u0635\u0627\u0626\u064a\u0627\u062a\u0643 (\u0623\u0641\u0636\u0644 \u0627\u0644\u0641\u0646\u0627\u0646\u064a\u0646\u060c \u0627\u0644\u0625\u062d\u0635\u0627\u0626\u064a\u0627\u062a...) \u0645\u0628\u0646\u064a\u0629 \u0639\u0644\u064a\u0647.';
   @override String get faqQ8 => '\u0643\u064a\u0641 \u064a\u0639\u0645\u0644 \u0646\u0638\u0627\u0645 \u0627\u0644\u0645\u0633\u062a\u0648\u064a\u0627\u062a \u0648\u0627\u0644\u0625\u0646\u062c\u0627\u0632\u0627\u062a\u061f';
   @override String get faqA8 => '\u064a\u0631\u062a\u0641\u0639 \u0645\u0633\u062a\u0648\u0649 \u062d\u0633\u0627\u0628\u0643 \u0645\u0639 \u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0640scrobbles (\u0644\u0627 \u064a\u0648\u062c\u062f \u0645\u0633\u062a\u0648\u0649 \u0623\u0642\u0635\u0649). \u062a\u0638\u0647\u0631 \u0627\u0644\u0628\u0637\u0627\u0642\u0627\u062a \u0623\u064a\u0636\u064b\u0627 \u0625\u0637\u0627\u0631\u064b\u0627 (\u0628\u0631\u0648\u0646\u0632\u064a \u2192 \u0645\u062a\u0639\u062f\u062f \u0627\u0644\u0623\u0644\u0648\u0627\u0646) \u062d\u0633\u0628 \u0639\u062f\u062f \u0645\u0631\u0627\u062a \u0627\u0644\u0627\u0633\u062a\u0645\u0627\u0639 \u0644\u0630\u0644\u0643 \u0627\u0644\u0641\u0646\u0627\u0646/\u0627\u0644\u0645\u0642\u0637\u0648\u0639\u0629/\u0627\u0644\u0623\u0644\u0628\u0648\u0645. \u064a\u0643\u0644 \u0634\u064a\u0623 \u064a\u064f\u062d\u0633\u0628 \u062a\u0644\u0642\u0627\u0626\u064a\u064b\u0627 \u0645\u0646 \u0627\u0644\u0625\u062d\u0635\u0627\u0626\u064a\u0627\u062a \u0627\u0644\u0645\u062e\u0632\u0651\u0646\u0629 \u0645\u062d\u0644\u064a\u064b\u0627 \u0628\u0627\u0644\u0641\u0639\u0644\u060c \u0628\u062f\u0648\u0646 \u0623\u064a \u0637\u0644\u0628\u0627\u062a \u0634\u0628\u0643\u0629 \u0625\u0636\u0627\u0641\u064a\u0629.';
   @override String get faqQ9 => 'كيف يعمل وضع توفير الطاقة؟';
   @override String get faqA9 => 'يقلّل وضع توفير الطاقة نشاط التطبيق للحفاظ على البطارية: يتم إيقاف تأثير الإزاحة عند إمالة الجهاز، ويُحدّ معدل تحديث الشاشة بحوالي 60 هرتز، وتصبح التحديثات في الخلفية أقل تكرارًا، وتتوقف الأغلفة المتحركة ولمعان الشارات مؤقتًا. تحتفظ الصور وعمليات التصدير وبطاقات المشاركة بجودتها الكاملة.\n\nيمكنك إبقاؤه مفعّلًا دائمًا، أو جعله يتبع وضع توفير الطاقة في هاتفك، أو تفعيله عند انخفاض البطارية عن مستوى تختاره. ستجده في الإعدادات > توفير البطارية.';
   @override String get faqQ10 => 'كيف أنسخ بياناتي احتياطيًا أو أستعيدها؟';
-  @override String get faqA10 => 'انتقل إلى الإعدادات > النسخ الاحتياطي. يمكنك تصدير ملف نسخة احتياطية مع مفتاح Last.fm أو بدونه حسب رغبتك، ثم استيراده لاحقًا على هذا الهاتف أو على جهاز آخر لاستعادة إعداداتك.';
+  @override String get faqA10 => DataSource.lb ? 'انتقل إلى الإعدادات > النسخ الاحتياطي. يمكنك تصدير ملف نسخة احتياطية مع مفتاح ListenBrainz أو بدونه حسب رغبتك، ثم استيراده لاحقًا على هذا الهاتف أو على جهاز آخر لاستعادة إعداداتك.' : 'انتقل إلى الإعدادات > النسخ الاحتياطي. يمكنك تصدير ملف نسخة احتياطية مع مفتاح Last.fm أو بدونه حسب رغبتك، ثم استيراده لاحقًا على هذا الهاتف أو على جهاز آخر لاستعادة إعداداتك.';
   @override String get faqQ11 => 'هل يعمل التطبيق دون اتصال بالإنترنت؟';
   @override String get faqA11 => 'نعم، إلى حد ما. تبقى الإحصائيات المحمّلة مسبقًا متاحة دون اتصال بفضل التخزين المؤقت المحلي، لكن الاتصال ضروري لجلب تشغيلات جديدة.';
-  @override String get faqQ12 => 'هل يمكنني تغيير حساب Last.fm؟';
-  @override String get faqA12 => 'نعم، يمكنك حفظ ما يصل إلى 3 حسابات على Last.fm. من الإعدادات > الحساب اضغط على «إضافة حساب» ثم بدّل بينها متى شئت. تتم إعادة ضبط ذاكرة التخزين المؤقت المحلية تلقائيًا عند التبديل، فلا تختلط بيانات حسابين أبدًا.';
+  @override String get faqQ12 => DataSource.lb ? 'هل يمكنني تغيير حساب ListenBrainz؟' : 'هل يمكنني تغيير حساب Last.fm؟';
+  @override String get faqA12 => DataSource.lb ? 'نعم، يمكنك حفظ ما يصل إلى 3 حسابات على ListenBrainz. من الإعدادات > الحساب اضغط على «إضافة حساب» ثم بدّل بينها متى شئت. تتم إعادة ضبط ذاكرة التخزين المؤقت المحلية تلقائيًا عند التبديل، فلا تختلط بيانات حسابين أبدًا.' : 'نعم، يمكنك حفظ ما يصل إلى 3 حسابات على Last.fm. من الإعدادات > الحساب اضغط على «إضافة حساب» ثم بدّل بينها متى شئت. تتم إعادة ضبط ذاكرة التخزين المؤقت المحلية تلقائيًا عند التبديل، فلا تختلط بيانات حسابين أبدًا.';
   @override String get faqQ13 => 'كيف أضبط الإشعارات؟';
   @override String get faqA13 => 'من الإعدادات > الإشعارات يمكنك تفعيل تنبيه عند اكتمال المزامنة، واختيار عدد مرات ظهور التنبيهات، أو إيقاف الإشعارات تمامًا.';
   @override String get faqQ14 => 'الصور مفقودة أو تحمّل بلا نهاية. ماذا أفعل؟';
@@ -700,7 +701,7 @@ class AppStringsAr implements AppStrings {
   @override String get achvDescListening => 'إجمالي التشغيلات لكل الفنانين.';
   @override String get achvDescArtists => 'عدد الفنانين المختلفين الذين استمعت إليهم مرة واحدة على الأقل.';
   @override String get achvDescAlbums => 'عدد الألبومات المختلفة التي استمعت إليها مرة واحدة على الأقل.';
-  @override String get achvDescLoyalty => 'مدة وجود حساب Last.fm.';
+  @override String get achvDescLoyalty => DataSource.lb ? 'مدة وجود حساب ListenBrainz.' : 'مدة وجود حساب Last.fm.';
   @override String get achvCatTracks => 'المقاطع';
   @override String get achvDescTracks => 'عدد المقاطع المختلفة التي استمعت إليها.';
   @override String get achvCatPace => 'الوتيرة';
@@ -827,9 +828,9 @@ class AppStringsAr implements AppStrings {
   @override String get apiBackupOff => 'المفتاح الاحتياطي: معطّل';
   @override String get apiPerKey => 'الطلبات لكل مفتاح (اليوم / الإجمالي)';
   @override String get apiLastfmNote => 'لا ينشر Last.fm رقمًا: يرد بالخطأ 29 عندما يرسل عنوان IP طلبات كثيرة، وتمنع شروطه التحايل على ذلك. المعتاد نحو 5 طلبات في الثانية لكل IP، ويبقى التطبيق دون 4.';
-  @override String get apiStorageTitle => 'بيانات Last.fm المخزّنة';
+  @override String get apiStorageTitle => DataSource.lb ? 'بيانات ListenBrainz المخزّنة' : 'بيانات Last.fm المخزّنة';
   @override String apiStorageValue(String used, String cap) => '$used من $cap المسموح';
-  @override String get apiStorageOver => 'تجاوزت حد 100 ميغابايت في شروط واجهة Last.fm. امسح سجل الاستماع من التخزين للامتثال.';
+  @override String get apiStorageOver => DataSource.lb ? 'تجاوزت حد 100 ميغابايت في شروط واجهة ListenBrainz. امسح سجل الاستماع من التخزين للامتثال.' : 'تجاوزت حد 100 ميغابايت في شروط واجهة Last.fm. امسح سجل الاستماع من التخزين للامتثال.';
   @override String get apiReset => 'إعادة ضبط العدادات';
   @override String get apiLimiter => 'تحديد الطلبات';
   @override String get apiLimiterSub => 'يبطئ الطلبات للبقاء ضمن حدود واجهات API. إيقاف = أسرع بدون انتظار.';

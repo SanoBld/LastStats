@@ -3,6 +3,7 @@
 //  English
 // ══════════════════════════════════════════════════════════════════════════
 
+import '../services/data_source.dart';
 import "app_strings.dart";
 
 class AppStringsEn implements AppStrings {
@@ -32,7 +33,7 @@ class AppStringsEn implements AppStrings {
   @override String get cacheApiData                => 'API data';
   @override String get cacheApiDataSubtitle        => 'Top artists, albums, recent tracks…';
   @override String get cacheScrobbles              => 'Scrobble history';
-  @override String get cacheScrobblesSubtitle      => 'Your full listening history downloaded from Last.fm';
+  @override String get cacheScrobblesSubtitle      => DataSource.lb ? 'Your full listening history downloaded from ListenBrainz' : 'Your full listening history downloaded from Last.fm';
   @override String get cacheClearBtn               => 'Clear';
   @override String get cacheConfirmScrobblesTitle  => 'Clear scrobble history?';
   @override String get cacheConfirmScrobblesBody   => 'The full history will be deleted and re-downloaded on next launch.';
@@ -100,7 +101,7 @@ class AppStringsEn implements AppStrings {
   @override String get searchTitle        => 'Search';
   @override String get searchProfiles     => 'Profiles';
   @override String get searchHintBar      => 'Artist, album, track or profile…';
-  @override String get searchHintProfiles => 'Find a Last.fm user';
+  @override String get searchHintProfiles => DataSource.lb ? 'Find a ListenBrainz user' : 'Find a Last.fm user';
   @override String get searchHintArtists  => 'Find an artist';
   @override String get searchHintAlbums   => 'Find an album';
   @override String get searchHintTracks   => 'Find a song';
@@ -126,9 +127,9 @@ class AppStringsEn implements AppStrings {
   @override String get dashTrack1          => 'Track #1';
   @override String get dashNoFriends       => 'No friends found';
   @override String get dashResetCache      => 'Reset cache';
-  @override String get dashResetCacheConfirm => 'All locally cached scrobble data will be deleted and re-downloaded from Last.fm.';
+  @override String get dashResetCacheConfirm => DataSource.lb ? 'All locally cached scrobble data will be deleted and re-downloaded from ListenBrainz.' : 'All locally cached scrobble data will be deleted and re-downloaded from Last.fm.';
 
-  @override String get dashFriendsActivity => "Your Last.fm friends' activity";
+  @override String get dashFriendsActivity => DataSource.lb ? "Your ListenBrainz friends' activity" : "Your Last.fm friends' activity";
 
   @override String get settingsTitle             => 'Settings';
   @override String get settingsAppearance        => 'Appearance';
@@ -179,9 +180,9 @@ class AppStringsEn implements AppStrings {
   @override String get settingsTopArtistsSection => 'Top Artists';
   @override String get settingsTopTracksSection  => 'Top Tracks';
   @override String get settingsFriendsSection    => 'Friends';
-  @override String get settingsFriendsSectionSub => 'Your Last.fm friends\' activity';
+  @override String get settingsFriendsSectionSub => DataSource.lb ? 'Your ListenBrainz friends\' activity' : 'Your Last.fm friends\' activity';
   @override String get settingsAccount           => 'Account';
-  @override String get settingsConnectedProfile  => 'Connected Last.fm profile';
+  @override String get settingsConnectedProfile  => DataSource.lb ? 'Connected ListenBrainz profile' : 'Connected Last.fm profile';
   @override String get settingsLogout            => 'Sign out';
   @override String get settingsLogoutTitle       => 'Sign out?';
   @override String get settingsLogoutContent     => 'Your credentials will be deleted.';
@@ -291,13 +292,13 @@ class AppStringsEn implements AppStrings {
   @override String get onboardNotifTitle       => 'Stay in the loop';
   @override String get onboardNotifSub         => 'Choose which notifications you want to receive and whether the phone should vibrate.';
   @override String get onboardFavTitle         => 'Your favorite profiles';
-  @override String get onboardFavSub           => 'Add Last.fm friends so you can quickly find their profiles from the app.';
-  @override String get onboardFavHint          => 'Last.fm username';
+  @override String get onboardFavSub           => DataSource.lb ? 'Add ListenBrainz friends so you can quickly find their profiles from the app.' : 'Add Last.fm friends so you can quickly find their profiles from the app.';
+  @override String get onboardFavHint          => DataSource.lb ? 'ListenBrainz username' : 'Last.fm username';
   @override String get onboardFavAdd           => 'Add';
   @override String get onboardFavEmpty         => 'No favorites yet';
-  @override String get onboardFavSearchHint    => 'Search a Last.fm profile…';
+  @override String get onboardFavSearchHint    => DataSource.lb ? 'Search a ListenBrainz profile…' : 'Search a Last.fm profile…';
   @override String get onboardFavNoResults     => 'No profile found';
-  @override String get onboardFavFriendsTitle  => 'Your Last.fm friends';
+  @override String get onboardFavFriendsTitle  => DataSource.lb ? 'Your ListenBrainz friends' : 'Your Last.fm friends';
   @override String get onboardFavNoFriends     => 'No friends found on this account';
   @override String get onboardFavSelected      => 'Selected favorites';
   @override String get onboardDashTitle        => 'Your dashboard';
@@ -313,7 +314,7 @@ class AppStringsEn implements AppStrings {
   @override String get settingsMusicPlatform          => 'Music platform';
   @override String get settingsMusicPlatformSub       => 'Only shows links for your chosen music service on artist, album and track pages';
   @override String get settingsShowAllPlatformLinks    => 'Always show all';
-  @override String get settingsShowAllPlatformLinksSub => 'Ignore the filter and show every link (Last.fm, Spotify, YT Music, Web)';
+  @override String get settingsShowAllPlatformLinksSub => DataSource.lb ? 'Ignore the filter and show every link (ListenBrainz, Spotify, YT Music, Web)' : 'Ignore the filter and show every link (Last.fm, Spotify, YT Music, Web)';
   @override String get onboardUpdatesTitle     => 'Updates';
   @override String get onboardUpdatesSub       => 'The app automatically checks whether a new version is available.';
   @override String get onboardPreview             => 'Preview';
@@ -355,7 +356,7 @@ class AppStringsEn implements AppStrings {
   @override String get detailLookingForPreview     => 'Looking for a preview…';
   @override String get detailPreview30Sec          => 'Preview · 30 sec';
 
-  @override String get setupTagline                => 'Your Last.fm stats, reinvented.';
+  @override String get setupTagline                => DataSource.lb ? 'Your ListenBrainz stats, reinvented.' : 'Your Last.fm stats, reinvented.';
   @override String get setupAnalyseProfile         => 'Analyse a profile';
   @override String get setupConnecting             => 'Connecting…';
   @override String get setupStartAnalysis          => 'Start analysis';
@@ -399,7 +400,7 @@ class AppStringsEn implements AppStrings {
   @override String get settingsCardNotificationsSub  => 'Milestones, daily & weekly recaps';
   @override String get settingsSync                  => 'Sync';
   @override String get settingsCardSyncSub           => 'Background scrobble auto-sync';
-  @override String get settingsCardAccountSub        => 'Connected Last.fm profile, sign out';
+  @override String get settingsCardAccountSub        => DataSource.lb ? 'Connected ListenBrainz profile, sign out' : 'Connected Last.fm profile, sign out';
   @override String get settingsCardCacheSub          => 'History, images, API data';
   @override String get settingsCardBackupSub         => 'Export & restore your settings';
   @override String get settingsCardUpdatesSub        => 'Check for new versions';
@@ -429,7 +430,7 @@ class AppStringsEn implements AppStrings {
   @override String get pcModeHintAuto    => 'Side rail on wide screens (≥ 720 dp), bottom bar on narrow screens.';
   @override String get pcModeHintOn      => 'Always use the side navigation rail, regardless of screen size.';
   @override String get pcModeHintOff     => 'Always use the bottom navigation bar, regardless of screen size.';
-  @override String get aboutTagline               => 'Your Last.fm stats companion';
+  @override String get aboutTagline               => DataSource.lb ? 'Your ListenBrainz stats companion' : 'Your Last.fm stats companion';
   @override String get aboutAppInfo                => 'App information';
   @override String get aboutScrobbleDownloader     => 'Scrobble downloader';
   @override String get aboutScrobbleDownloaderSub  => 'Download your whole scrobble history and save it as a file';
@@ -682,27 +683,27 @@ class AppStringsEn implements AppStrings {
   @override String get rankingsWholeYear       => 'Whole year';
   @override String get chartsExportGeneratedOn => 'generated on';
   @override String get faqQ1 => 'Does LastStats scrobble my music?';
-  @override String get faqA1 => 'No. LastStats is a visualisation app: it displays the scrobbles already recorded on your Last.fm account, but it does not record any itself.\n\nTo automatically scrobble your music, use a dedicated app such as Pano Scrobbler (available on Android).';
+  @override String get faqA1 => DataSource.lb ? 'No. LastStats is a visualisation app: it displays the scrobbles already recorded on your ListenBrainz account, but it does not record any itself.\n\nTo automatically scrobble your music, use a dedicated app such as Pano Scrobbler (available on Android).' : 'No. LastStats is a visualisation app: it displays the scrobbles already recorded on your Last.fm account, but it does not record any itself.\n\nTo automatically scrobble your music, use a dedicated app such as Pano Scrobbler (available on Android).';
   @override String get faqQ3 => 'Does the app work on macOS or other platforms?';
   @override String get faqA3 => 'LastStats is developed and tested on Android. Behaviour on other platforms (macOS, Windows, Linux…) is unverified, bugs or unexpected behaviour may occur.';
   @override String get faqQ4 => 'Is LastStats open source?';
   @override String get faqA4 => 'Yes! The source code is freely available on GitHub. The project is independent, built with passion by SanoBld. Feel free to contribute, report bugs, or leave a star ⭐.';
   @override String get faqQ5 => 'Where is my data stored?';
-  @override String get faqA5 => 'On your device only. LastStats has no server: your scrobbles are cached locally for fast access, and your Last.fm credentials are stored locally too. Nothing is sent anywhere except Last.fm\'s official API.';
+  @override String get faqA5 => DataSource.lb ? 'On your device only. LastStats has no server: your scrobbles are cached locally for fast access, and your ListenBrainz credentials are stored locally too. Nothing is sent anywhere except ListenBrainz\'s official API.' : 'On your device only. LastStats has no server: your scrobbles are cached locally for fast access, and your Last.fm credentials are stored locally too. Nothing is sent anywhere except Last.fm\'s official API.';
   @override String get faqQ6 => 'How do I enable favorites?';
   @override String get faqA6 => 'Go to Settings > Account and enter your Last.fm secret key (you can find it next to your API key at last.fm/api/accounts), then follow the steps on screen. Once connected, you can favorite tracks directly from the app. This is not available with the app\'s built-in key.';
   @override String get faqQ7 => 'What is a \'scrobble\'?';
-  @override String get faqA7 => 'A scrobble is a track logged as played on your Last.fm account \u2014 it\'s Last.fm\'s own term for \'one counted listen\'. All your totals (top artists, stats, etc.) are based on it.';
+  @override String get faqA7 => DataSource.lb ? 'A scrobble is a track logged as played on your ListenBrainz account \u2014 it\'s ListenBrainz\'s own term for \'one counted listen\'. All your totals (top artists, stats, etc.) are based on it.' : 'A scrobble is a track logged as played on your Last.fm account \u2014 it\'s Last.fm\'s own term for \'one counted listen\'. All your totals (top artists, stats, etc.) are based on it.';
   @override String get faqQ8 => 'How do levels and achievements work?';
   @override String get faqA8 => 'Your account level grows with your total scrobble count (there\'s no max level). Cards also get a border (bronze \u2192 iridescent) based on how many times that artist/track/album has been played. Everything is computed automatically from stats already cached locally, with no extra network calls.';
   @override String get faqQ9 => 'How does power saving mode work?';
   @override String get faqA9 => 'Power saving mode reduces what the app does to save battery: tilt parallax is turned off, the screen refresh rate is capped at about 60 Hz, background updates run less often, and animated artwork and badge shine are paused. Images, exports and share cards keep full quality.\n\nYou can keep it always on, make it follow your phone\'s own battery saver, or have it turn on below a battery level you choose. You\'ll find it in Settings > Power saving mode.';
   @override String get faqQ10 => 'How do I back up or restore my data?';
-  @override String get faqA10 => 'Go to Settings > Backup. You can export a backup file, with or without your Last.fm key as you prefer, and import it later on this phone or on another device to get your settings back.';
+  @override String get faqA10 => DataSource.lb ? 'Go to Settings > Backup. You can export a backup file, with or without your ListenBrainz key as you prefer, and import it later on this phone or on another device to get your settings back.' : 'Go to Settings > Backup. You can export a backup file, with or without your Last.fm key as you prefer, and import it later on this phone or on another device to get your settings back.';
   @override String get faqQ11 => 'Does the app work offline?';
   @override String get faqA11 => 'Yes, to some extent. Stats already loaded stay available offline thanks to local caching, but a connection is still needed to fetch new scrobbles.';
-  @override String get faqQ12 => 'Can I switch Last.fm accounts?';
-  @override String get faqA12 => 'Yes, you can save up to 3 Last.fm accounts. From Settings > Account, tap "Add an account" and then switch between them whenever you like. The local cache is automatically reset when you switch, so the data of two accounts never gets mixed.';
+  @override String get faqQ12 => DataSource.lb ? 'Can I switch ListenBrainz accounts?' : 'Can I switch Last.fm accounts?';
+  @override String get faqA12 => DataSource.lb ? 'Yes, you can save up to 3 ListenBrainz accounts. From Settings > Account, tap "Add an account" and then switch between them whenever you like. The local cache is automatically reset when you switch, so the data of two accounts never gets mixed.' : 'Yes, you can save up to 3 Last.fm accounts. From Settings > Account, tap "Add an account" and then switch between them whenever you like. The local cache is automatically reset when you switch, so the data of two accounts never gets mixed.';
   @override String get faqQ13 => 'How do I set up notifications?';
   @override String get faqA13 => 'From Settings > Notifications, you can turn on an alert when a sync finishes, choose how often alerts appear, or turn notifications off completely if you prefer.';
   @override String get faqQ14 => 'Artwork is missing or keeps loading. What can I do?';
@@ -729,7 +730,7 @@ class AppStringsEn implements AppStrings {
   @override String get achvDescListening => 'Total tracks scrobbled, across every artist.';
   @override String get achvDescArtists => 'Number of different artists listened to at least once.';
   @override String get achvDescAlbums => 'Number of different albums listened to at least once.';
-  @override String get achvDescLoyalty => 'How long the Last.fm account has existed.';
+  @override String get achvDescLoyalty => DataSource.lb ? 'How long the ListenBrainz account has existed.' : 'How long the Last.fm account has existed.';
   @override String get achvCatTracks => 'Tracks';
   @override String get achvDescTracks => 'Number of different (distinct) tracks listened to.';
   @override String get achvCatPace => 'Pace';
@@ -856,9 +857,9 @@ class AppStringsEn implements AppStrings {
   @override String get apiBackupOff => 'Backup key: off';
   @override String get apiPerKey => 'Requests per key (today / total)';
   @override String get apiLastfmNote => 'Last.fm publishes no number: it answers error 29 when an IP sends too many requests, and its terms forbid working around that. About 5 requests per second per IP is the usual guidance; the app stays under 4.';
-  @override String get apiStorageTitle => 'Last.fm data stored';
+  @override String get apiStorageTitle => DataSource.lb ? 'ListenBrainz data stored' : 'Last.fm data stored';
   @override String apiStorageValue(String used, String cap) => '$used of $cap allowed';
-  @override String get apiStorageOver => 'Over the 100 MB limit set by the Last.fm API terms. Clear the scrobble history in Storage to comply.';
+  @override String get apiStorageOver => DataSource.lb ? 'Over the 100 MB limit set by the ListenBrainz API terms. Clear the scrobble history in Storage to comply.' : 'Over the 100 MB limit set by the Last.fm API terms. Clear the scrobble history in Storage to comply.';
   @override String get apiReset => 'Reset counters';
   @override String get apiLimiter => 'Limit requests';
   @override String get apiLimiterSub => 'Slows down requests to stay under API limits. Off = faster, no waiting.';

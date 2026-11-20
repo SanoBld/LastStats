@@ -170,12 +170,23 @@ class ScrobblesFileCache {
       }
 
       // ── Années connues via la méta ─────────────────────────────────────────
-      final years = _meta == null
-          ? <int>[]
-          : ((_meta!['loaded_years'] as List?)
-                  ?.map((e) => (e as num).toInt())
-                  .toList() ??
-              []);
+      final yearSet = <int>{
+        if (_meta != null)
+          ...((_meta!['loaded_years'] as List?)
+                  ?.map((e) => (e as num).toInt()) ??
+              const <int>[]),
+      };
+      // Also trust the files themselves: a crash between writing a year and
+      // writing meta used to hide that year (and force a re-download).
+      try {
+        for (final k in await CacheBackend.listKeys()) {
+          if (k.startsWith('year_')) {
+            final y = int.tryParse(k.substring(5));
+            if (y != null) yearSet.add(y);
+          }
+        }
+      } catch (_) {}
+      final years = yearSet.toList()..sort();
 
       // Read all raw blobs on the UI isolate (cheap I/O), then decode+parse
       // everything at once in a single background isolate — avoids both

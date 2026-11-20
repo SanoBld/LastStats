@@ -3,6 +3,7 @@
 //  Japanese
 // ══════════════════════════════════════════════════════════════════════════
 
+import '../services/data_source.dart';
 import "app_strings.dart";
 
 class AppStringsJa implements AppStrings {
@@ -30,7 +31,7 @@ class AppStringsJa implements AppStrings {
   @override String get cacheApiData => 'APIデータ';
   @override String get cacheApiDataSubtitle => 'トップアーティスト、アルバム、最近のトラックなど';
   @override String get cacheScrobbles => 'スクロブル履歴';
-  @override String get cacheScrobblesSubtitle => 'Last.fm からダウンロードした再生履歴のすべて';
+  @override String get cacheScrobblesSubtitle => DataSource.lb ? 'ListenBrainz からダウンロードした再生履歴のすべて' : 'Last.fm からダウンロードした再生履歴のすべて';
   @override String get cacheClearBtn => '消去';
   @override String get cacheConfirmScrobblesTitle => 'スクロブル履歴を消去しますか？';
   @override String get cacheConfirmScrobblesBody => '履歴全体が削除され、次回起動時に再ダウンロードされます。';
@@ -79,7 +80,7 @@ class AppStringsJa implements AppStrings {
   @override String get searchTitle => '検索';
   @override String get searchProfiles => 'プロフィール';
   @override String get searchHintBar => 'アーティスト、アルバム、トラック、プロフィールを検索…';
-  @override String get searchHintProfiles => 'Last.fmユーザーを検索';
+  @override String get searchHintProfiles => DataSource.lb ? 'ListenBrainzユーザーを検索' : 'Last.fmユーザーを検索';
   @override String get searchHintArtists => 'アーティストを検索';
   @override String get searchHintAlbums => 'アルバムを検索';
   @override String get searchHintTracks => '曲を検索';
@@ -103,8 +104,8 @@ class AppStringsJa implements AppStrings {
   @override String get dashTrack1 => 'トラック1位';
   @override String get dashNoFriends => 'フレンドが見つかりません';
   @override String get dashResetCache => 'キャッシュをリセット';
-  @override String get dashResetCacheConfirm => 'ローカルに保存されたスクロブルデータがすべて削除され、Last.fmから再ダウンロードされます。';
-  @override String get dashFriendsActivity => 'Last.fmフレンドのアクティビティ';
+  @override String get dashResetCacheConfirm => DataSource.lb ? 'ローカルに保存されたスクロブルデータがすべて削除され、ListenBrainzから再ダウンロードされます。' : 'ローカルに保存されたスクロブルデータがすべて削除され、Last.fmから再ダウンロードされます。';
+  @override String get dashFriendsActivity => DataSource.lb ? 'ListenBrainzフレンドのアクティビティ' : 'Last.fmフレンドのアクティビティ';
   @override String get settingsTitle => '設定';
   @override String get settingsAppearance => '外観';
   @override String get settingsTheme => 'テーマ';
@@ -154,9 +155,9 @@ class AppStringsJa implements AppStrings {
   @override String get settingsTopArtistsSection => 'トップアーティスト';
   @override String get settingsTopTracksSection => 'トップトラック';
   @override String get settingsFriendsSection => 'フレンド';
-  @override String get settingsFriendsSectionSub => 'Last.fmフレンドのアクティビティ';
+  @override String get settingsFriendsSectionSub => DataSource.lb ? 'ListenBrainzフレンドのアクティビティ' : 'Last.fmフレンドのアクティビティ';
   @override String get settingsAccount => 'アカウント';
-  @override String get settingsConnectedProfile => '連携中のLast.fmプロフィール';
+  @override String get settingsConnectedProfile => DataSource.lb ? '連携中のListenBrainzプロフィール' : '連携中のLast.fmプロフィール';
   @override String get settingsLogout => 'サインアウト';
   @override String get settingsLogoutTitle => 'サインアウトしますか？';
   @override String get settingsLogoutContent => '認証情報は削除されます。';
@@ -258,13 +259,13 @@ class AppStringsJa implements AppStrings {
   @override String get onboardNotifTitle => '最新情報をチェック';
   @override String get onboardNotifSub => '受け取る通知の種類と、端末を振動させるかどうかを選択してください。';
   @override String get onboardFavTitle => 'お気に入りのプロフィール';
-  @override String get onboardFavSub => 'Last.fm の友達を追加すると、アプリからすぐにそのプロフィールを開けます。';
-  @override String get onboardFavHint => 'Last.fmユーザー名';
+  @override String get onboardFavSub => DataSource.lb ? 'ListenBrainz の友達を追加すると、アプリからすぐにそのプロフィールを開けます。' : 'Last.fm の友達を追加すると、アプリからすぐにそのプロフィールを開けます。';
+  @override String get onboardFavHint => DataSource.lb ? 'ListenBrainzユーザー名' : 'Last.fmユーザー名';
   @override String get onboardFavAdd => '追加';
   @override String get onboardFavEmpty => 'お気に入りはまだありません';
-  @override String get onboardFavSearchHint => 'Last.fmプロフィールを検索…';
+  @override String get onboardFavSearchHint => DataSource.lb ? 'ListenBrainzプロフィールを検索…' : 'Last.fmプロフィールを検索…';
   @override String get onboardFavNoResults => 'プロフィールが見つかりません';
-  @override String get onboardFavFriendsTitle => 'あなたのLast.fmフレンド';
+  @override String get onboardFavFriendsTitle => DataSource.lb ? 'あなたのListenBrainzフレンド' : 'あなたのLast.fmフレンド';
   @override String get onboardFavNoFriends => 'このアカウントにはフレンドがいません';
   @override String get onboardFavSelected => '選択中のお気に入り';
   @override String get onboardDashTitle => 'あなたのダッシュボード';
@@ -280,7 +281,7 @@ class AppStringsJa implements AppStrings {
   @override String get settingsMusicPlatform => '音楽プラットフォーム';
   @override String get settingsMusicPlatformSub => 'アーティスト、アルバム、曲のページには、選んだ音楽サービスのリンクだけを表示します';
   @override String get settingsShowAllPlatformLinks => '常にすべて表示';
-  @override String get settingsShowAllPlatformLinksSub => 'フィルターを無視してすべてのリンクを表示（Last.fm、Spotify、YT Music、Web）';
+  @override String get settingsShowAllPlatformLinksSub => DataSource.lb ? 'フィルターを無視してすべてのリンクを表示（ListenBrainz、Spotify、YT Music、Web）' : 'フィルターを無視してすべてのリンクを表示（Last.fm、Spotify、YT Music、Web）';
   @override String get onboardUpdatesTitle => 'アップデート';
   @override String get onboardUpdatesSub => '新しいバージョンが公開されているかどうかを自動で確認します。';
   @override String get onboardPreview => 'プレビュー';
@@ -318,7 +319,7 @@ class AppStringsJa implements AppStrings {
   @override String get settingsTapToDownload => 'タップしてダウンロード';
   @override String get detailLookingForPreview => 'プレビューを検索中…';
   @override String get detailPreview30Sec => 'プレビュー・30秒';
-  @override String get setupTagline => 'あなたのLast.fm統計、生まれ変わりました。';
+  @override String get setupTagline => DataSource.lb ? 'あなたのListenBrainz統計、生まれ変わりました。' : 'あなたのLast.fm統計、生まれ変わりました。';
   @override String get setupAnalyseProfile => 'プロフィールを分析';
   @override String get setupConnecting => '接続中…';
   @override String get setupStartAnalysis => '分析を開始';
@@ -356,7 +357,7 @@ class AppStringsJa implements AppStrings {
   @override String get settingsCardNotificationsSub => 'マイルストーン、デイリー・ウィークリーまとめ';
   @override String get settingsSync => '同期';
   @override String get settingsCardSyncSub => 'バックグラウンドでのスクロブル自動同期';
-  @override String get settingsCardAccountSub => '連携中のLast.fmプロフィール、サインアウト';
+  @override String get settingsCardAccountSub => DataSource.lb ? '連携中のListenBrainzプロフィール、サインアウト' : '連携中のLast.fmプロフィール、サインアウト';
   @override String get settingsCardCacheSub => '履歴、画像、APIデータ';
   @override String get settingsCardBackupSub => '設定のエクスポートと復元';
   @override String get settingsCardUpdatesSub => '新しいバージョンを確認';
@@ -384,7 +385,7 @@ class AppStringsJa implements AppStrings {
   @override String get pcModeHintAuto => '広い画面（720dp以上）ではサイドレール、狭い画面ではボトムバーを使用します。';
   @override String get pcModeHintOn => '画面サイズにかかわらず、常にサイドナビゲーションレールを使用します。';
   @override String get pcModeHintOff => '画面サイズにかかわらず、常にボトムナビゲーションバーを使用します。';
-  @override String get aboutTagline => 'あなたのLast.fm統計パートナー';
+  @override String get aboutTagline => DataSource.lb ? 'あなたのListenBrainz統計パートナー' : 'あなたのLast.fm統計パートナー';
   @override String get aboutAppInfo => 'アプリ情報';
   @override String get aboutScrobbleDownloader => 'スクロブルダウンローダー';
   @override String get aboutScrobbleDownloaderSub => 'すべてのスクロブル履歴をダウンロードして、ファイルとして保存します';
@@ -616,27 +617,27 @@ class AppStringsJa implements AppStrings {
   @override String get rankingsWholeYear       => '通年';
   @override String get chartsExportGeneratedOn => '生成日';
   @override String get faqQ1 => 'LastStatsは自分の音楽をスクロブリングしますか？';
-  @override String get faqA1 => 'いいえ。LastStatsは可視化アプリで、すでにLast.fmアカウントに記録されているスクロブルを表示するだけで、自分では記録しません。\n\n音楽を自動でスクロブリングするには、Pano Scrobbler（Android用）などの専用アプリを使用してください。';
+  @override String get faqA1 => DataSource.lb ? 'いいえ。LastStatsは可視化アプリで、すでにListenBrainzアカウントに記録されているスクロブルを表示するだけで、自分では記録しません。\n\n音楽を自動でスクロブリングするには、Pano Scrobbler（Android用）などの専用アプリを使用してください。' : 'いいえ。LastStatsは可視化アプリで、すでにLast.fmアカウントに記録されているスクロブルを表示するだけで、自分では記録しません。\n\n音楽を自動でスクロブリングするには、Pano Scrobbler（Android用）などの専用アプリを使用してください。';
   @override String get faqQ3 => 'macOSや他のプラットフォームでも動作しますか？';
   @override String get faqA3 => 'LastStatsはAndroidで開発・テストされています。他のプラットフォーム（macOS、Windows、Linuxなど）での動作は検証されておらず、不具合や予期しない動作が発生する可能性があります。';
   @override String get faqQ4 => 'LastStatsはオープンソースですか？';
   @override String get faqA4 => 'はい！ソースコードはGitHubで自由に公開されています。このプロジェクトはSanoBldが情熱を持って開発した独立プロジェクトです。ひ売貢献したり、不具合を報告したり、⭐を付けてください。';
   @override String get faqQ5 => 'データはどこに保存されますか？';
-  @override String get faqA5 => 'お使いの端末のみです。LastStatsにはサーバーがなく、スクロブルは高速アクセスのためにローカルにキャッシュされ、Last.fmの認証情報もローカルに保存されます。公式Last.fm API以外にデータが送信されることはありません。';
+  @override String get faqA5 => DataSource.lb ? 'お使いの端末のみです。LastStatsにはサーバーがなく、スクロブルは高速アクセスのためにローカルにキャッシュされ、ListenBrainzの認証情報もローカルに保存されます。公式ListenBrainz API以外にデータが送信されることはありません。' : 'お使いの端末のみです。LastStatsにはサーバーがなく、スクロブルは高速アクセスのためにローカルにキャッシュされ、Last.fmの認証情報もローカルに保存されます。公式Last.fm API以外にデータが送信されることはありません。';
   @override String get faqQ6 => 'お気に入りを有効にするには？';
   @override String get faqA6 => '設定 > アカウントを開き、Last.fmのシークレットキー（last.fm/api/accounts のAPIキーの隣にあります）を入力して、画面の案内に従ってください。接続後は、アプリから直接曲をお気に入りに登録できます。アプリ内蔵キーでは、この機能は使えません。';
   @override String get faqQ7 => '\u300cscrobble\uff08\u30b9\u30af\u30ed\u30d6\u30eb\uff09\u300d\u3068\u306f\uff1f';
-  @override String get faqA7 => '\u300cscrobble\u300d\u3068\u306f\u3001Last.fm\u30a2\u30ab\u30a6\u30f3\u30c8\u306b\u518d\u751f\u3068\u3057\u3066\u8a18\u9332\u3055\u308c\u305f\u697d\u66f2\u3092\u6307\u3057\u3001Last.fm\u56fa\u6709\u306e\u7528\u8a9e\u3067\u300c1\u56de\u306e\u30ab\u30a6\u30f3\u30c8\u3055\u308c\u305f\u518d\u751f\u300d\u3092\u610f\u5473\u3057\u307e\u3059\u3002\u3059\u3079\u3066\u306e\u5408\u8a08\uff08\u30c8\u30c3\u30d7\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8\u3084\u7d71\u8a08\u306a\u3069\uff09\u306f\u3053\u308c\u306b\u57fa\u3065\u3044\u3066\u3044\u307e\u3059\u3002';
+  @override String get faqA7 => DataSource.lb ? '\u300cscrobble\u300d\u3068\u306f\u3001ListenBrainz\u30a2\u30ab\u30a6\u30f3\u30c8\u306b\u518d\u751f\u3068\u3057\u3066\u8a18\u9332\u3055\u308c\u305f\u697d\u66f2\u3092\u6307\u3057\u3001ListenBrainz\u56fa\u6709\u306e\u7528\u8a9e\u3067\u300c1\u56de\u306e\u30ab\u30a6\u30f3\u30c8\u3055\u308c\u305f\u518d\u751f\u300d\u3092\u610f\u5473\u3057\u307e\u3059\u3002\u3059\u3079\u3066\u306e\u5408\u8a08\uff08\u30c8\u30c3\u30d7\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8\u3084\u7d71\u8a08\u306a\u3069\uff09\u306f\u3053\u308c\u306b\u57fa\u3065\u3044\u3066\u3044\u307e\u3059\u3002' : '\u300cscrobble\u300d\u3068\u306f\u3001Last.fm\u30a2\u30ab\u30a6\u30f3\u30c8\u306b\u518d\u751f\u3068\u3057\u3066\u8a18\u9332\u3055\u308c\u305f\u697d\u66f2\u3092\u6307\u3057\u3001Last.fm\u56fa\u6709\u306e\u7528\u8a9e\u3067\u300c1\u56de\u306e\u30ab\u30a6\u30f3\u30c8\u3055\u308c\u305f\u518d\u751f\u300d\u3092\u610f\u5473\u3057\u307e\u3059\u3002\u3059\u3079\u3066\u306e\u5408\u8a08\uff08\u30c8\u30c3\u30d7\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8\u3084\u7d71\u8a08\u306a\u3069\uff09\u306f\u3053\u308c\u306b\u57fa\u3065\u3044\u3066\u3044\u307e\u3059\u3002';
   @override String get faqQ8 => '\u30ec\u30d9\u30eb\u3068\u5b9f\u7e3e\u306e\u4ed5\u7d44\u307f\u306f\uff1f';
   @override String get faqA8 => '\u30a2\u30ab\u30a6\u30f3\u30c8\u30ec\u30d9\u30eb\u306f\u7dcf scrobble \u6570\u306b\u5fdc\u3058\u3066\u4e0a\u304c\u308a\u3001\u4e0a\u9650\u306f\u3042\u308a\u307e\u305b\u3093\u3002\u30ab\u30fc\u30c9\u306b\u306f\u305d\u306e\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8/\u697d\u66f2/\u30a2\u30eb\u30d0\u30e0\u306e\u518d\u751f\u56de\u6570\u306b\u5fdc\u3058\u305f\u679a\u679a(\u30d6\u30ed\u30f3\u30ba\u2192\u865a\u5f69)\u304c\u4ed8\u304d\u307e\u3059\u3002\u3059\u3079\u3066\u30ed\u30fc\u30ab\u30eb\u306b\u30ad\u30e3\u30c3\u30b7\u30e5\u6e08\u307f\u306e\u7d71\u8a08\u304b\u3089\u81ea\u52d5\u8a08\u7b97\u3055\u308c\u3001\u8ffd\u52a0\u306e\u901a\u4fe1\u306f\u767a\u751f\u3057\u307e\u305b\u3093\u3002';
   @override String get faqQ9 => '省電力モードはどのように機能しますか？';
   @override String get faqA9 => '省電力モードでは、バッテリーを節約するためにアプリの動作を抑えます。傾きによるパララックス効果をオフにし、画面のリフレッシュレートを約 60 Hz に制限し、バックグラウンド更新の頻度を下げ、動くカバーやバッジの輝きを一時停止します。画像、エクスポート、シェアカードは通常の品質のままです。\n\n常にオンにするほか、端末の省電力モードに合わせたり、指定したバッテリー残量を下回ったときに自動でオンにしたりできます。設定 > バッテリーセーバー から変更できます。';
   @override String get faqQ10 => 'データのバックアップや復元はどうすればいいですか？';
-  @override String get faqA10 => '設定 > バックアップを開くと、バックアップファイルを書き出せます。Last.fmキーを含めるかどうかは選べます。後からこの端末や別の端末に読み込めば、設定を元に戻せます。';
+  @override String get faqA10 => DataSource.lb ? '設定 > バックアップを開くと、バックアップファイルを書き出せます。ListenBrainzキーを含めるかどうかは選べます。後からこの端末や別の端末に読み込めば、設定を元に戻せます。' : '設定 > バックアップを開くと、バックアップファイルを書き出せます。Last.fmキーを含めるかどうかは選べます。後からこの端末や別の端末に読み込めば、設定を元に戻せます。';
   @override String get faqQ11 => 'オフラインでも使えますか？';
   @override String get faqA11 => 'ある程度は可能です。読み込み済みの統計はローカルキャッシュのおかげでオフラインでも見られますが、新しいスクロブルの取得には通信が必要です。';
-  @override String get faqQ12 => 'Last.fmアカウントを切り替えられますか？';
-  @override String get faqA12 => 'はい、Last.fmアカウントは最大3つまで登録できます。設定 > アカウントで「アカウントを追加」をタップし、好きなときに切り替えてください。切り替えるとローカルキャッシュは自動的にリセットされるので、2つのアカウントのデータが混ざることはありません。';
+  @override String get faqQ12 => DataSource.lb ? 'ListenBrainzアカウントを切り替えられますか？' : 'Last.fmアカウントを切り替えられますか？';
+  @override String get faqA12 => DataSource.lb ? 'はい、ListenBrainzアカウントは最大3つまで登録できます。設定 > アカウントで「アカウントを追加」をタップし、好きなときに切り替えてください。切り替えるとローカルキャッシュは自動的にリセットされるので、2つのアカウントのデータが混ざることはありません。' : 'はい、Last.fmアカウントは最大3つまで登録できます。設定 > アカウントで「アカウントを追加」をタップし、好きなときに切り替えてください。切り替えるとローカルキャッシュは自動的にリセットされるので、2つのアカウントのデータが混ざることはありません。';
   @override String get faqQ13 => '通知はどう設定しますか？';
   @override String get faqA13 => '設定 > 通知から、同期が終わったときの通知をオンにしたり、通知の頻度を選んだり、通知をすべてオフにしたりできます。';
   @override String get faqQ14 => '画像が表示されない／読み込みが終わらない場合は？';
@@ -699,7 +700,7 @@ class AppStringsJa implements AppStrings {
   @override String get achvDescListening => '全アーティスト合計のスクロブル数。';
   @override String get achvDescArtists => '一度でも聴いたことのある異なるアーティストの数。';
   @override String get achvDescAlbums => '一度でも聴いたことのある異なるアルバムの数。';
-  @override String get achvDescLoyalty => 'Last.fmアカウントの利用歴。';
+  @override String get achvDescLoyalty => DataSource.lb ? 'ListenBrainzアカウントの利用歴。' : 'Last.fmアカウントの利用歴。';
   @override String get achvCatTracks => '楽曲';
   @override String get achvDescTracks => '再生した異なる楽曲の数。';
   @override String get achvCatPace => 'ペース';
@@ -826,9 +827,9 @@ class AppStringsJa implements AppStrings {
   @override String get apiBackupOff => '予備キー:オフ';
   @override String get apiPerKey => 'キーごとのリクエスト(今日 / 合計)';
   @override String get apiLastfmNote => 'Last.fm は数値を公開していません。IP からのリクエストが多すぎるとエラー 29 を返し、規約で回避も禁止されています。目安は IP あたり毎秒約 5 リクエストで、アプリは 4 未満に抑えます。';
-  @override String get apiStorageTitle => '保存済みの Last.fm データ';
+  @override String get apiStorageTitle => DataSource.lb ? '保存済みの ListenBrainz データ' : '保存済みの Last.fm データ';
   @override String apiStorageValue(String used, String cap) => '許可された $cap のうち $used';
-  @override String get apiStorageOver => 'Last.fm API 規約の 100 MB 上限を超えています。「ストレージ」でスクロブル履歴を消去してください。';
+  @override String get apiStorageOver => DataSource.lb ? 'ListenBrainz API 規約の 100 MB 上限を超えています。「ストレージ」でスクロブル履歴を消去してください。' : 'Last.fm API 規約の 100 MB 上限を超えています。「ストレージ」でスクロブル履歴を消去してください。';
   @override String get apiReset => 'カウンターをリセット';
   @override String get apiLimiter => 'リクエストを制限';
   @override String get apiLimiterSub => 'API の上限を超えないようにリクエストを遅くします。オフ = 待ち時間なしで高速。';

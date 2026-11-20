@@ -3,6 +3,7 @@
 //  Chinese
 // ══════════════════════════════════════════════════════════════════════════
 
+import '../services/data_source.dart';
 import "app_strings.dart";
 
 class AppStringsZh implements AppStrings {
@@ -32,7 +33,7 @@ class AppStringsZh implements AppStrings {
   @override String get cacheApiData                => 'API 数据';
   @override String get cacheApiDataSubtitle        => '热门艺术家、专辑、最近播放…';
   @override String get cacheScrobbles              => 'Scrobble 历史记录';
-  @override String get cacheScrobblesSubtitle      => '从 Last.fm 下载的完整收听记录';
+  @override String get cacheScrobblesSubtitle      => DataSource.lb ? '从 ListenBrainz 下载的完整收听记录' : '从 Last.fm 下载的完整收听记录';
   @override String get cacheClearBtn               => '清空';
   @override String get cacheConfirmScrobblesTitle  => '删除历史记录？';
   @override String get cacheConfirmScrobblesBody   => '完整历史记录将被删除，下次启动时重新下载。';
@@ -97,7 +98,7 @@ class AppStringsZh implements AppStrings {
   @override String get searchTitle        => '搜索';
   @override String get searchProfiles     => '用户';
   @override String get searchHintBar      => '艺术家、专辑、歌曲或用户…';
-  @override String get searchHintProfiles => '搜索 Last.fm 用户';
+  @override String get searchHintProfiles => DataSource.lb ? '搜索 ListenBrainz 用户' : '搜索 Last.fm 用户';
   @override String get searchHintArtists  => '搜索艺术家';
   @override String get searchHintAlbums   => '搜索专辑';
   @override String get searchHintTracks   => '搜索歌曲';
@@ -123,9 +124,9 @@ class AppStringsZh implements AppStrings {
   @override String get dashTrack1          => '第一歌曲';
   @override String get dashNoFriends       => '未找到好友';
   @override String get dashResetCache      => '重置缓存';
-  @override String get dashResetCacheConfirm => '所有本地缓存的 scrobble 数据将被删除，并从 Last.fm 重新下载。';
+  @override String get dashResetCacheConfirm => DataSource.lb ? '所有本地缓存的 scrobble 数据将被删除，并从 ListenBrainz 重新下载。' : '所有本地缓存的 scrobble 数据将被删除，并从 Last.fm 重新下载。';
 
-  @override String get dashFriendsActivity => '您的 Last.fm 好友动态';
+  @override String get dashFriendsActivity => DataSource.lb ? '您的 ListenBrainz 好友动态' : '您的 Last.fm 好友动态';
 
   @override String get settingsTitle             => '设置';
   @override String get settingsAppearance        => '外观';
@@ -176,9 +177,9 @@ class AppStringsZh implements AppStrings {
   @override String get settingsTopArtistsSection => '热门艺术家';
   @override String get settingsTopTracksSection  => '热门歌曲';
   @override String get settingsFriendsSection    => '好友';
-  @override String get settingsFriendsSectionSub => '您的 Last.fm 好友动态';
+  @override String get settingsFriendsSectionSub => DataSource.lb ? '您的 ListenBrainz 好友动态' : '您的 Last.fm 好友动态';
   @override String get settingsAccount           => '账号';
-  @override String get settingsConnectedProfile  => '已连接的 Last.fm 账号';
+  @override String get settingsConnectedProfile  => DataSource.lb ? '已连接的 ListenBrainz 账号' : '已连接的 Last.fm 账号';
   @override String get settingsLogout            => '退出登录';
   @override String get settingsLogoutTitle       => '退出登录？';
   @override String get settingsLogoutContent     => '您的登录信息将被删除。';
@@ -288,13 +289,13 @@ class AppStringsZh implements AppStrings {
   @override String get onboardNotifTitle       => '及时获知动态';
   @override String get onboardNotifSub         => '选择要接收的通知,以及手机是否需要振动。';
   @override String get onboardFavTitle         => '您的收藏用户';
-  @override String get onboardFavSub           => '添加 Last.fm 好友,以便在应用中快速找到他们的资料。';
-  @override String get onboardFavHint          => 'Last.fm 用户名';
+  @override String get onboardFavSub           => DataSource.lb ? '添加 ListenBrainz 好友,以便在应用中快速找到他们的资料。' : '添加 Last.fm 好友,以便在应用中快速找到他们的资料。';
+  @override String get onboardFavHint          => DataSource.lb ? 'ListenBrainz 用户名' : 'Last.fm 用户名';
   @override String get onboardFavAdd           => '添加';
   @override String get onboardFavEmpty         => '暂无收藏';
-  @override String get onboardFavSearchHint    => '搜索 Last.fm 用户…';
+  @override String get onboardFavSearchHint    => DataSource.lb ? '搜索 ListenBrainz 用户…' : '搜索 Last.fm 用户…';
   @override String get onboardFavNoResults     => '未找到相关用户';
-  @override String get onboardFavFriendsTitle  => '您的 Last.fm 好友';
+  @override String get onboardFavFriendsTitle  => DataSource.lb ? '您的 ListenBrainz 好友' : '您的 Last.fm 好友';
   @override String get onboardFavNoFriends     => '该账号没有好友';
   @override String get onboardFavSelected      => '已选收藏';
   @override String get onboardDashTitle        => '您的仪表盘';
@@ -310,7 +311,7 @@ class AppStringsZh implements AppStrings {
   @override String get settingsMusicPlatform          => '音乐平台';
   @override String get settingsMusicPlatformSub       => '在艺术家、专辑和曲目页面中，仅显示所选音乐服务的链接';
   @override String get settingsShowAllPlatformLinks    => '始终显示全部';
-  @override String get settingsShowAllPlatformLinksSub => '忽略过滤，显示所有链接（Last.fm、Spotify、YT Music、网页）';
+  @override String get settingsShowAllPlatformLinksSub => DataSource.lb ? '忽略过滤，显示所有链接（ListenBrainz、Spotify、YT Music、网页）' : '忽略过滤，显示所有链接（Last.fm、Spotify、YT Music、网页）';
   @override String get onboardUpdatesTitle     => '更新';
   @override String get onboardUpdatesSub       => '应用会自动检查是否有新版本可用。';
   @override String get onboardPreview             => '预览';
@@ -352,7 +353,7 @@ class AppStringsZh implements AppStrings {
   @override String get detailLookingForPreview     => '正在查找试听片段…';
   @override String get detailPreview30Sec          => '试听 · 30 秒';
 
-  @override String get setupTagline                => '您的 Last.fm 统计，焕然一新。';
+  @override String get setupTagline                => DataSource.lb ? '您的 ListenBrainz 统计，焕然一新。' : '您的 Last.fm 统计，焕然一新。';
   @override String get setupAnalyseProfile         => '分析一个账号';
   @override String get setupConnecting             => '连接中…';
   @override String get setupStartAnalysis          => '开始分析';
@@ -396,7 +397,7 @@ class AppStringsZh implements AppStrings {
   @override String get settingsCardNotificationsSub  => '里程碑、每日和每周汇总';
   @override String get settingsSync                  => '同步';
   @override String get settingsCardSyncSub           => '后台自动同步 scrobble 记录';
-  @override String get settingsCardAccountSub        => '已连接的 Last.fm 账号，退出登录';
+  @override String get settingsCardAccountSub        => DataSource.lb ? '已连接的 ListenBrainz 账号，退出登录' : '已连接的 Last.fm 账号，退出登录';
   @override String get settingsCardCacheSub          => '历史记录、图片、API 数据';
   @override String get settingsCardBackupSub         => '导出和恢复您的设置';
   @override String get settingsCardUpdatesSub        => '检查新版本';
@@ -426,7 +427,7 @@ class AppStringsZh implements AppStrings {
   @override String get pcModeHintAuto    => '宽屏（≥ 720 dp）使用侧边栏，窄屏使用底部导航栏。';
   @override String get pcModeHintOn      => '始终使用侧边导航栏，无论屏幕尺寸。';
   @override String get pcModeHintOff     => '始终使用底部导航栏，无论屏幕尺寸。';
-  @override String get aboutTagline               => '您的 Last.fm 统计伴侣';
+  @override String get aboutTagline               => DataSource.lb ? '您的 ListenBrainz 统计伴侣' : '您的 Last.fm 统计伴侣';
   @override String get aboutAppInfo                => '应用信息';
   @override String get aboutScrobbleDownloader     => 'Scrobble 下载器';
   @override String get aboutScrobbleDownloaderSub  => '下载全部 scrobble 历史并保存为文件';
@@ -679,27 +680,27 @@ class AppStringsZh implements AppStrings {
   @override String get rankingsWholeYear       => '全年';
   @override String get chartsExportGeneratedOn => '生成于';
   @override String get faqQ1 => 'LastStats 会记录我的音乐播放记录吗？';
-  @override String get faqA1 => '不会。LastStats 是一款可视化应用：它显示您 Last.fm 账户上已有的播放记录，但本身不会记录任何内容。\n\n如需自动记录音乐播放，请使用专门的应用，例如 Pano Scrobbler（Android 可用）。';
+  @override String get faqA1 => DataSource.lb ? '不会。LastStats 是一款可视化应用：它显示您 ListenBrainz 账户上已有的播放记录，但本身不会记录任何内容。\n\n如需自动记录音乐播放，请使用专门的应用，例如 Pano Scrobbler（Android 可用）。' : '不会。LastStats 是一款可视化应用：它显示您 Last.fm 账户上已有的播放记录，但本身不会记录任何内容。\n\n如需自动记录音乐播放，请使用专门的应用，例如 Pano Scrobbler（Android 可用）。';
   @override String get faqQ3 => '该应用能在 macOS 或其他平台运行吗？';
   @override String get faqA3 => 'LastStats 是在 Android 上开发和测试的。其他平台（macOS、Windows、Linux 等）上的表现未经验证，可能出现错误或异常行为。';
   @override String get faqQ4 => 'LastStats 是开源的吗？';
   @override String get faqA4 => '是的！源代码可在 GitHub 上自由获取。该项目由 SanoBld 独立用心打造。欢迎贡献代码、反馈问题，或点个 ⭐。';
   @override String get faqQ5 => '我的数据存储在哪里？';
-  @override String get faqA5 => '仅存储在您的设备上。LastStats 没有服务器：您的播放记录会在本地缓存以便快速访问，您的 Last.fm 账户信息也保存在本地。除官方 Last.fm API 外，不会向任何地方发送数据。';
+  @override String get faqA5 => DataSource.lb ? '仅存储在您的设备上。LastStats 没有服务器：您的播放记录会在本地缓存以便快速访问，您的 ListenBrainz 账户信息也保存在本地。除官方 ListenBrainz API 外，不会向任何地方发送数据。' : '仅存储在您的设备上。LastStats 没有服务器：您的播放记录会在本地缓存以便快速访问，您的 Last.fm 账户信息也保存在本地。除官方 Last.fm API 外，不会向任何地方发送数据。';
   @override String get faqQ6 => '如何启用收藏功能？';
   @override String get faqA6 => '前往设置 > 账号，输入您的 Last.fm 私密密钥（可在 last.fm/api/accounts 页面中 API 密钥旁边找到），然后按屏幕提示操作。连接成功后，即可直接在应用中收藏歌曲。使用应用内置密钥时无法使用此功能。';
   @override String get faqQ7 => '\u4ec0\u4e48\u662f\u201cscrobble\u201d\uff1f';
-  @override String get faqA7 => 'scrobble \u662f\u6307\u5728\u4f60\u7684 Last.fm \u8d26\u6237\u4e0a\u8bb0\u5f55\u4e00\u6b21\u64ad\u653e\u2014\u2014\u8fd9\u662f Last.fm \u5b98\u65b9\u672f\u8bed\uff0c\u8868\u793a\u201c\u4e00\u6b21\u88ab\u8ba1\u5165\u7684\u64ad\u653e\u201d\u3002\u4f60\u7684\u6240\u6709\u7edf\u8ba1\u6570\u636e\uff08\u6392\u884c\u699c\u3001\u603b\u91cf\u7b49\uff09\u90fd\u57fa\u4e8e\u5b83\u3002';
+  @override String get faqA7 => DataSource.lb ? 'scrobble \u662f\u6307\u5728\u4f60\u7684 ListenBrainz \u8d26\u6237\u4e0a\u8bb0\u5f55\u4e00\u6b21\u64ad\u653e\u2014\u2014\u8fd9\u662f ListenBrainz \u5b98\u65b9\u672f\u8bed\uff0c\u8868\u793a\u201c\u4e00\u6b21\u88ab\u8ba1\u5165\u7684\u64ad\u653e\u201d\u3002\u4f60\u7684\u6240\u6709\u7edf\u8ba1\u6570\u636e\uff08\u6392\u884c\u699c\u3001\u603b\u91cf\u7b49\uff09\u90fd\u57fa\u4e8e\u5b83\u3002' : 'scrobble \u662f\u6307\u5728\u4f60\u7684 Last.fm \u8d26\u6237\u4e0a\u8bb0\u5f55\u4e00\u6b21\u64ad\u653e\u2014\u2014\u8fd9\u662f Last.fm \u5b98\u65b9\u672f\u8bed\uff0c\u8868\u793a\u201c\u4e00\u6b21\u88ab\u8ba1\u5165\u7684\u64ad\u653e\u201d\u3002\u4f60\u7684\u6240\u6709\u7edf\u8ba1\u6570\u636e\uff08\u6392\u884c\u699c\u3001\u603b\u91cf\u7b49\uff09\u90fd\u57fa\u4e8e\u5b83\u3002';
   @override String get faqQ8 => '\u7b49\u7ea7\u4e0e\u6210\u5c31\u7cfb\u7edf\u662f\u600e\u4e48\u8fd0\u4f5c\u7684\uff1f';
   @override String get faqA8 => '\u4f60\u7684\u8d26\u6237\u7b49\u7ea7\u968f\u603b scrobble \u6570\u589e\u957f\uff08\u6ca1\u6709\u4e0a\u9650\uff09\u3002\u5361\u7247\u4e5f\u4f1a\u6839\u636e\u8be5\u827a\u672f\u5bb6/\u6b4c\u66f2/\u4e13\u8f91\u7684\u64ad\u653e\u6b21\u6570\u663e\u793a\u8fb9\u6846\u989c\u8272\uff08\u9752\u94dc\u2192\u4e94\u5f69\uff09\u3002\u8fd9\u4e9b\u90fd\u57fa\u4e8e\u672c\u5730\u5df2\u7f13\u5b58\u7684\u7edf\u8ba1\u6570\u636e\u81ea\u52a8\u8ba1\u7b97\uff0c\u4e0d\u4f1a\u989d\u5916\u8bf7\u6c42\u7f51\u7edc\u3002';
   @override String get faqQ9 => '省电模式是如何工作的？';
   @override String get faqA9 => '省电模式会减少应用的活动以节省电量：关闭倾斜视差效果，将屏幕刷新率限制在约 60 Hz，降低后台更新频率，并暂停动态封面和徽章光泽。图片、导出内容和分享卡片仍保持完整画质。\n\n你可以让它始终开启，也可以跟随手机自带的省电模式，或在电量低于你设定的值时自动开启。可在“设置”>“省电模式”中找到。';
   @override String get faqQ10 => '如何备份或恢复我的数据？';
-  @override String get faqA10 => '前往设置 > 备份，您可以导出备份文件，并自行选择是否包含 Last.fm 密钥。之后可以在本机或其他设备上重新导入，找回您的设置。';
+  @override String get faqA10 => DataSource.lb ? '前往设置 > 备份，您可以导出备份文件，并自行选择是否包含 ListenBrainz 密钥。之后可以在本机或其他设备上重新导入，找回您的设置。' : '前往设置 > 备份，您可以导出备份文件，并自行选择是否包含 Last.fm 密钥。之后可以在本机或其他设备上重新导入，找回您的设置。';
   @override String get faqQ11 => '应用可以离线使用吗？';
   @override String get faqA11 => '可以，在一定程度上。已加载的统计数据会通过本地缓存离线保留，但获取新的 scrobble 仍需要联网。';
-  @override String get faqQ12 => '可以切换 Last.fm 账号吗？';
-  @override String get faqA12 => '可以，最多可保存 3 个 Last.fm 账号。在设置 > 账号中点按“添加账号”，之后可随时在它们之间切换。切换时本地缓存会自动重置，因此两个账号的数据不会混在一起。';
+  @override String get faqQ12 => DataSource.lb ? '可以切换 ListenBrainz 账号吗？' : '可以切换 Last.fm 账号吗？';
+  @override String get faqA12 => DataSource.lb ? '可以，最多可保存 3 个 ListenBrainz 账号。在设置 > 账号中点按“添加账号”，之后可随时在它们之间切换。切换时本地缓存会自动重置，因此两个账号的数据不会混在一起。' : '可以，最多可保存 3 个 Last.fm 账号。在设置 > 账号中点按“添加账号”，之后可随时在它们之间切换。切换时本地缓存会自动重置，因此两个账号的数据不会混在一起。';
   @override String get faqQ13 => '如何设置通知？';
   @override String get faqA13 => '在设置 > 通知中，您可以开启同步完成时的提醒、选择提醒出现的频率，也可以完全关闭通知。';
   @override String get faqQ14 => '图片缺失或一直加载怎么办？';
@@ -726,7 +727,7 @@ class AppStringsZh implements AppStrings {
   @override String get achvDescListening => '所有艺术家的累计播放次数（scrobbles）。';
   @override String get achvDescArtists => '至少收听过一次的不同艺术家数量。';
   @override String get achvDescAlbums => '至少收听过一次的不同专辑数量。';
-  @override String get achvDescLoyalty => 'Last.fm 账号的注册时长。';
+  @override String get achvDescLoyalty => DataSource.lb ? 'ListenBrainz 账号的注册时长。' : 'Last.fm 账号的注册时长。';
   @override String get achvCatTracks => '曲目';
   @override String get achvDescTracks => '收听过的不同曲目数量。';
   @override String get achvCatPace => '节奏';
@@ -853,9 +854,9 @@ class AppStringsZh implements AppStrings {
   @override String get apiBackupOff => '备用密钥:关';
   @override String get apiPerKey => '每个密钥的请求数(今日 / 总计)';
   @override String get apiLastfmNote => 'Last.fm 未公布具体数字:当某个 IP 请求过多时返回错误 29,其条款禁止规避。通常以每个 IP 每秒约 5 次请求为准,应用保持在 4 次以下。';
-  @override String get apiStorageTitle => '已存储的 Last.fm 数据';
+  @override String get apiStorageTitle => DataSource.lb ? '已存储的 ListenBrainz 数据' : '已存储的 Last.fm 数据';
   @override String apiStorageValue(String used, String cap) => '允许的 $cap 中已用 $used';
-  @override String get apiStorageOver => '已超过 Last.fm API 条款规定的 100 MB 上限。请在“存储”中清除 scrobble 历史记录以符合要求。';
+  @override String get apiStorageOver => DataSource.lb ? '已超过 ListenBrainz API 条款规定的 100 MB 上限。请在“存储”中清除 scrobble 历史记录以符合要求。' : '已超过 Last.fm API 条款规定的 100 MB 上限。请在“存储”中清除 scrobble 历史记录以符合要求。';
   @override String get apiReset => '重置计数';
   @override String get apiLimiter => '限制请求';
   @override String get apiLimiterSub => '放慢请求以避免超出 API 限额。关闭 = 更快，无需等待。';

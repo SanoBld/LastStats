@@ -17,6 +17,8 @@ import 'package:flutter/foundation.dart';
 import 'data_cache.dart';
 import 'scrobbles_file_cache.dart';
 import 'lastfm_service.dart';
+import 'data_source.dart';
+import 'lb_adapter.dart';
 
 // ══════════════════════════════════════════════════════════════════════════
 //  Mode de synchronisation
@@ -155,6 +157,17 @@ class AllScrobblesService {
     return DateTime.now().year - 3;
   }
 
+  // ── ListenBrainz: same storage, direct loader ─────────────────────────────
+  static Future<List<ScrobbleRecord>> _lbFetch(LastFmService s,
+      {int? from, int? to, void Function(int loaded, int total)? onProgress}) async {
+    final r = await LbAdapter.fetchRange(s.username, fromTs: from, toTs: to,
+        onProgress: (n) => onProgress?.call(n, 0));
+    return [
+      for (final e in r)
+        ScrobbleRecord(ts: e.ts, track: e.track, artist: e.artist, album: e.album)
+    ];
+  }
+
   // ── Chargement d'une année ────────────────────────────────────────────────
 
   /// Charge (ou recharge) une année entière depuis l'API Last.fm.
@@ -188,7 +201,19 @@ class AllScrobblesService {
     bool finishedOk = true;
 
     try {
-      do {
+      if (DataSource.lb) {
+        try {
+          records.addAll(await _lbFetch(service,
+              from: from.millisecondsSinceEpoch ~/ 1000,
+              to:   to.millisecondsSinceEpoch ~/ 1000,
+              onProgress: onProgress));
+        } catch (e) {
+          debugPrint('[AllScrobbles] LB année=$year : $e');
+          finishedOk = false;
+        }
+        page = 2; // skip the Last.fm loop below
+      }
+      if (!DataSource.lb) do {
         try {
           final data = await service.getRecentTracks(
             limit: 200,
@@ -236,6 +261,9 @@ class AllScrobblesService {
         }
       } while (page <= totalPages);
 
+      // dedupe by timestamp, ascending
+      final seen = <int>{};
+      records.retainWhere((r) => seen.add(r.ts));
       records.sort((a, b) => a.ts.compareTo(b.ts));
       await ScrobblesFileCache.setYear(year, records, complete: finishedOk);
       // Always list the year in meta so its file gets re-read at app start,
@@ -347,7 +375,20 @@ class AllScrobblesService {
       int page       = 1;
       int totalPages = 1;
 
-      do {
+      var syncOk = true;
+      if (DataSource.lb) {
+        try {
+          newRecords.addAll(await _lbFetch(service, from: lastTs + 1,
+              onProgress: (n, _) => progressNotifier.value = AllScrobblesProgress(
+                  isLoading: true, isIdle: false, mode: SyncMode.incremental,
+                  loaded: n, totalYears: 1)));
+        } catch (e) {
+          debugPrint('[AllScrobbles] Erreur sync LB : $e');
+          syncOk = false;
+        }
+        page = 2;
+      }
+      if (!DataSource.lb) do {
         try {
           final data = await service.getRecentTracks(
             limit: 200,
@@ -396,9 +437,14 @@ class AllScrobblesService {
           if (page <= totalPages) await Future.delayed(_delay);
         } catch (e) {
           debugPrint('[AllScrobbles] Erreur sync page=$page : $e');
+          syncOk = false;
           break;
         }
       } while (page <= totalPages);
+
+      // Pages arrive newest-first: keeping a partial result would move the
+      // "last timestamp" forward and leave a permanent hole in the history.
+      if (!syncOk) newRecords.clear();
 
       // Distribuer les nouveaux records par année et fusionner
       if (newRecords.isNotEmpty) {
