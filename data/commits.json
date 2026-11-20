@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-20T16:10:48Z",
+  "updated": "2026-11-20T16:13:13Z",
   "commits": [
+    {
+      "sha": "cab53b6c5a147a905e47d82e42a55e6d6561a33d",
+      "message": "feat: Améliorer la gestion des erreurs et des requêtes HTTP dans LbAdapter",
+      "date": "2026-11-20T16:10:58Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/cab53b6c5a147a905e47d82e42a55e6d6561a33d",
+      "tags": []
+    },
     {
       "sha": "05e42d33d1739c2b528ffa715cd0854695addb39",
       "message": "feat: Améliorer la gestion des requêtes API avec un cache et des délais d'attente pour ListenBrainz",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/1c93863f1e265929938efcfd2dd8adb1f4513a83",
-      "tags": []
-    },
-    {
-      "sha": "b5504371ea7113b190e2bb9448e9a5c1c85edd39",
-      "message": "feat: ajouter des animations de morphing pour les chips d'information et améliorer le feedback tactile",
-      "date": "2026-09-23T21:40:16Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/b5504371ea7113b190e2bb9448e9a5c1c85edd39",
       "tags": []
     }
   ]
