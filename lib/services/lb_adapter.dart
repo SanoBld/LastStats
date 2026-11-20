@@ -413,10 +413,13 @@ class LbAdapter {
 
   static Future<Map<String, dynamic>> _recent(
       String user, int limit, int page, String? from, String? to) async {
-    final lim   = limit < 1 ? 1 : (limit > _maxListens ? _maxListens : limit);
     final fromT = int.tryParse(from ?? '');
     final toT   = int.tryParse(to ?? '');
-    final enc   = Uri.encodeComponent(user);
+    final ranged = fromT != null || toT != null;
+    // History loading (big pages) -> 1000 listens per call = ~10x fewer calls
+    final cap = (ranged && limit >= 200) ? 1000 : _maxListens;
+    final lim = limit < 1 ? 1 : (limit > cap ? cap : limit);
+    final enc = Uri.encodeComponent(user);
 
     // Monthly counter: only the total matters
     if (fromT != null && toT != null && limit == 1) {
@@ -425,11 +428,18 @@ class LbAdapter {
           'total': '$n', 'totalPages': '$n'}};
     }
 
-    // Where does this page start?
+    // ListenBrainz docs: never send min_ts AND max_ts together. We page
+    // downwards with max_ts only and cut at fromT on our side.
+    Future<List<Map>> fetch(int? max) async {
+      final r = await _get('/1/user/$enc/listens', {
+        'count': '$lim', if (max != null) 'max_ts': '$max',
+      });
+      return ((r?['listens'] as List?) ?? []).whereType<Map>().toList();
+    }
+
     final ckey = '$user|$fromT|$toT|$lim';
     int? maxTs = toT;
     if (page > 1) {
-      // start from the nearest page we already know, then walk forward
       var p = 1;
       int? max = toT;
       for (var k = page; k >= 2; k--) {
@@ -437,12 +447,8 @@ class LbAdapter {
         if (c != null) { p = k; max = c; break; }
       }
       while (p < page) {
-        final w = await _get('/1/user/$enc/listens', {
-          'count': '$lim', if (max != null) 'max_ts': '$max',
-          if (fromT != null) 'min_ts': '$fromT',
-        });
-        final wl = (w?['listens'] as List?) ?? [];
-        if (wl.isEmpty) {
+        final wl = await fetch(max);
+        if (wl.isEmpty || (fromT != null && _i(wl.last['listened_at']) < fromT)) {
           return {'track': [], '@attr': _attr(user, page, lim, 0)};
         }
         max = _i(wl.last['listened_at']);
@@ -452,12 +458,13 @@ class LbAdapter {
       maxTs = max;
     }
 
-    final r = await _get('/1/user/$enc/listens', {
-      'count': '$lim', if (maxTs != null) 'max_ts': '$maxTs',
-      if (fromT != null) 'min_ts': '$fromT',
-    });
-    final ls = ((r?['listens'] as List?) ?? []).whereType<Map>().toList();
+    var ls = await fetch(maxTs);
+    var reachedStart = false;
     if (ls.isNotEmpty) _cursor['$ckey|${page + 1}'] = _i(ls.last['listened_at']);
+    if (fromT != null) {
+      if (ls.isNotEmpty && _i(ls.last['listened_at']) < fromT) reachedStart = true;
+      ls = ls.where((l) => _i(l['listened_at']) >= fromT).toList();
+    }
 
     final tracks = <Map<String, dynamic>>[];
     // Now playing comes first (first page, no date range)
@@ -477,7 +484,9 @@ class LbAdapter {
       total = await _listenCount(user);
     } else {
       // unknown total: say "one more page" while the page is full
-      total = (page - 1) * lim + ls.length + (ls.length == lim ? 1 : 0);
+      total = (!reachedStart && ls.isNotEmpty)
+          ? page * lim + 1 // maybe more: ask for one more page
+          : (page - 1) * lim + ls.length;
     }
     return {'track': tracks, '@attr': _attr(user, page, lim, total)};
   }
