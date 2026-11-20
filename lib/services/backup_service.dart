@@ -27,6 +27,8 @@ import 'scrobbles_file_cache.dart';
 import 'all_scrobbles_service.dart';
 import 'lastfm_service.dart';
 import 'internal_keys.dart';
+import 'lb_auth.dart';
+import 'data_source.dart';
 
 /// Runtime-only / session state that should never be exported: timers,
 /// "last notified / last seen" markers, scheduled-task ids and one-off
@@ -154,7 +156,8 @@ class BackupResult {
   final bool success;
   final String? username;
   final String? apiKey;
-  const BackupResult({required this.success, this.username, this.apiKey});
+  final bool isListenBrainz;
+  const BackupResult({required this.success, this.username, this.apiKey, this.isListenBrainz = false});
 }
 
 /// Lightweight look at a backup file's content, used to ask the user which
@@ -169,6 +172,8 @@ class BackupPreview {
   final DateTime? exportedAt;
   // True if this backup file also contains the full scrobble history.
   final bool hasScrobbles;
+  // true when the backup was made in ListenBrainz mode
+  final bool isListenBrainz;
   const BackupPreview({
     required this.raw,
     required this.hasApiKey,
@@ -176,6 +181,7 @@ class BackupPreview {
     this.username,
     this.exportedAt,
     this.hasScrobbles = false,
+    this.isListenBrainz = false,
   });
 }
 
@@ -220,7 +226,8 @@ class BackupService {
       if (!key.startsWith('ls_')) continue;
       if (_kBackupExcludeKeys.contains(key)) continue;
       if (!includeApiKey &&
-          (key == 'ls_apikey' || key == 'ls_username' || key == 'ls_accounts' || key == 'ls_active_account')) {
+          (key == 'ls_apikey' || key == 'ls_username' || key == 'ls_accounts' || key == 'ls_active_account' ||
+           key == 'ls_lb_token' || key == 'ls_lb_username')) {
         continue;
       }
       if (!includeSecretKey && (key == 'ls_secret_key' || key == 'ls_session_key')) {
@@ -307,6 +314,7 @@ class BackupService {
       'app':         'LastStats',
       'version':     '4', // v4 = added optional full scrobble history
       'exported_at': now.toIso8601String(), // backup date, used on restore
+      'source':      DataSource.lb ? 'lb' : 'lfm',
       'username':    activeUsername,
       'api_key':     activeApiKey,
       'prefs':       map,
@@ -417,6 +425,7 @@ class BackupService {
     bool hasApiKey = false;
     bool hasSecretKey = false;
     bool hasScrobbles = false;
+    bool isLb = false;
     DateTime? exportedAt;
 
     if (parsed['app'] == 'LastStats') {
@@ -425,11 +434,14 @@ class BackupService {
         hasApiKey = (prefs['ls_apikey']     ?? '').toString().isNotEmpty ||
                     (parsed['api_key']      ?? '').toString().isNotEmpty;
         hasSecretKey = (prefs['ls_secret_key'] ?? '').toString().isNotEmpty;
+        if ((prefs['ls_lb_token'] ?? '').toString().isNotEmpty) hasApiKey = true;
       }
       username = (parsed['username'] ?? '').toString();
       hasScrobbles = parsed['scrobbles'] is Map && (parsed['scrobbles'] as Map).isNotEmpty;
       final exportedRaw = (parsed['exported_at'] ?? '').toString();
       exportedAt = DateTime.tryParse(exportedRaw);
+      final pm = parsed['prefs'];
+      isLb = (pm is Map ? pm['ls_source'] : null) == 'lb' || parsed['source'] == 'lb';
     } else {
       // Simple format fallback: {"username":"…","api_key":"…"}
       final k = (parsed['api_key'] ?? parsed['apiKey'] ?? parsed['api-key'] ?? '').toString();
@@ -444,6 +456,7 @@ class BackupService {
       username: username.isEmpty ? null : username,
       exportedAt: exportedAt,
       hasScrobbles: hasScrobbles,
+      isListenBrainz: isLb,
     );
   }
 
@@ -524,8 +537,12 @@ class BackupService {
 
     // Drop sensitive keys the user chose not to restore.
     final exclude = <String>{};
+    // Which service the backup was made with (old backups = Last.fm).
+    final backupLb = prefsMap['ls_source'] == 'lb' || parsed['source'] == 'lb';
     if (!restoreApiKey) {
-      exclude.addAll(['ls_apikey', 'ls_username', 'ls_accounts', 'ls_active_account']);
+      // Without the login, the service choice stays as on this device.
+      exclude.addAll(['ls_apikey', 'ls_username', 'ls_accounts', 'ls_active_account',
+          'ls_lb_token', 'ls_lb_username', 'ls_source']);
       username = null;
       apiKey   = null;
     }
@@ -535,11 +552,29 @@ class BackupService {
       // favorites, so both are excluded together.
       exclude.addAll(['ls_secret_key', 'ls_session_key']);
     }
+    // The scrobble cache label follows the scrobbles really imported.
+    exclude.add('ls_cache_source');
     if (exclude.isNotEmpty) {
       prefsMap.removeWhere((k, _) => exclude.contains(k));
     }
+    if (restoreApiKey) {
+      // Old / simple backups carry no service: they are Last.fm ones.
+      prefsMap['ls_source'] = backupLb ? 'lb' : 'lfm';
+      if (backupLb && !prefsMap.containsKey('ls_lb_token')) {
+        final k = (apiKey ?? '').trim();
+        final u = (username ?? '').trim();
+        if (LbAuth.looksLikeToken(k) && u.isNotEmpty) {
+          prefsMap['ls_lb_token'] = LbAuth.clean(k);
+          prefsMap['ls_lb_username'] = u;
+        }
+      }
+    }
 
     await _applyPrefs(prefsMap);
+    if (restoreApiKey) {
+      await DataSource.load();
+      await LbAuth.reconcileAfterRestore(fallbackUser: username, fallbackKey: apiKey);
+    }
 
     // ── Scrobbles (optional, can be big) ─────────────────────────────────
     // "cancelScrobbles" means: user said no, don't touch scrobbles at all.
@@ -558,13 +593,15 @@ class BackupService {
         Map<String, dynamic>.from(scrobblesRaw),
         mode: importMode,
       );
+      final sp = await SharedPreferences.getInstance();
+      await sp.setString('ls_cache_source', backupLb ? 'lb' : 'lfm');
     }
 
     final p = await SharedPreferences.getInstance();
     username = p.getString('ls_username') ?? username;
     apiKey   = p.getString('ls_apikey')   ?? apiKey;
 
-    return BackupResult(success: true, username: username, apiKey: apiKey);
+    return BackupResult(success: true, username: username, apiKey: apiKey, isListenBrainz: DataSource.lb);
   }
 
   static Future<void> _applyPrefs(Map<String, dynamic> prefs) async {
@@ -656,7 +693,7 @@ class BackupService {
     motionArtworkNotifier.value         = p.getBool('ls_motion_artwork')       ?? true;
     dashMotionNotifier.value            = p.getBool('ls_dash_motion')          ?? true;
     motionBlurNotifier.value            = p.getBool('ls_motion_blur')          ?? true;
-    textScaleNotifier.value             = p.getDouble('ls_text_scale')         ?? 1.1;
+    textScaleNotifier.value             = p.getDouble('ls_text_scale')         ?? 1.0;
     appFontNotifier.value               = p.getString('ls_app_font')           ?? 'GoogleSansFlex';
     await CustomFontService.load(p);
     imageShapeNotifier.value            = p.getString('ls_image_shape')        ?? 'mix';

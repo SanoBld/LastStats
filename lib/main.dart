@@ -199,7 +199,7 @@ Future<void> _mainImpl() async {
   livingArtworkNotifier.value = prefs.getBool('ls_living_artwork') ?? true;
   motionArtworkNotifier.value = prefs.getBool('ls_motion_artwork') ?? true;
   dashMotionNotifier.value = prefs.getBool('ls_dash_motion') ?? true;
-  textScaleNotifier.value  = prefs.getDouble('ls_text_scale') ?? 1.1;
+  textScaleNotifier.value  = prefs.getDouble('ls_text_scale') ?? 1.0;
   appFontNotifier.value    = prefs.getString('ls_app_font') ?? 'GoogleSansFlex';
   await CustomFontService.load(prefs);
   mergeVersionsNotifier.value = prefs.getBool('ls_merge_versions') ?? false;

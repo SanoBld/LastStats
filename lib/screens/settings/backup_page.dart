@@ -10,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/app_share.dart';
 import '../../l10n/l10n.dart';
 import '../../services/backup_service.dart';
+import '../../services/data_source.dart';
+import '../home_screen.dart';
 import '../../services/crash_log_service.dart';
 import '../../services/auto_backup_service.dart';
 import '../../services/notification_worker.dart';
@@ -263,7 +265,7 @@ class _BackupPageState extends State<BackupPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(L.backupRestoreKeysDesc),
+                Text(preview.isListenBrainz ? tx('bk_keys_desc_lb') : L.backupRestoreKeysDesc),
                 // Backup date: always shown to the user before restoring.
                 if (preview.exportedAt != null) ...[
                   const SizedBox(height: 6),
@@ -358,6 +360,9 @@ class _BackupPageState extends State<BackupPage> {
       }
     }
 
+    final prefsBefore = await SharedPreferences.getInstance();
+    final userBefore = prefsBefore.getString('ls_username') ?? '';
+    final lbBefore = DataSource.lb;
     final result = await BackupService.applyBackupJson(
       preview.raw,
       restoreApiKey:    restoreApiKey,
@@ -371,6 +376,17 @@ class _BackupPageState extends State<BackupPage> {
       content: Text(result.success ? L.importSuccess : L.importInvalidFormat),
       behavior: SnackBarBehavior.floating,
     ));
+    // Another account / service restored: reopen the app on it.
+    if (result.success &&
+        (result.username ?? '').isNotEmpty &&
+        (result.apiKey ?? '').isNotEmpty &&
+        (result.username != userBefore || DataSource.lb != lbBefore)) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+            builder: (_) => HomeScreen(username: result.username!, apiKey: result.apiKey!)),
+        (_) => false,
+      );
+    }
   }
 
   @override

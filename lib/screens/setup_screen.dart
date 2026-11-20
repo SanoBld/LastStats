@@ -23,6 +23,8 @@ import '../services/api_http.dart';
 import '../services/data_source.dart';
 import '../services/source_switch.dart';
 import '../services/account_manager.dart';
+import '../services/lb_auth.dart';
+import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 
 // ══════════════════════════════════════════════════════════════════════════
 //  SetupScreen — credentials entry (animated redesign)
@@ -43,7 +45,7 @@ class SetupScreen extends StatefulWidget {
 }
 
 class _SetupScreenState extends State<SetupScreen>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, WidgetsBindingObserver {
 
   final _usernameCtrl = TextEditingController();
   final _apikeyCtrl   = TextEditingController();
@@ -63,6 +65,8 @@ class _SetupScreenState extends State<SetupScreen>
   final _lbTokenCtrl = TextEditingController();
   bool _lbObscure = true;
   String? _lbInfo;
+  String _clipToken = '';      // a token found in the clipboard
+  bool _lbShowOptions = false; // display-name field
 
   // ── Animation controllers ──────────────────────────────────────────────
   late final AnimationController _entryCtrl; // staggered page entry (once)
@@ -83,6 +87,7 @@ class _SetupScreenState extends State<SetupScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     localeNotifier.addListener(_onLocale);
 
     // Entry animation — runs once on open
@@ -130,6 +135,7 @@ class _SetupScreenState extends State<SetupScreen>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     localeNotifier.removeListener(_onLocale);
     _usernameCtrl.dispose();
     _lbTokenCtrl.dispose();
@@ -228,18 +234,36 @@ class _SetupScreenState extends State<SetupScreen>
     setState(() => _restoring = false);
 
     if (result == null) return; // picker cancelled
-    if (!result.success || (result.username ?? '').isEmpty || (result.apiKey ?? '').isEmpty) {
+    if (!result.success) {
       setState(() => _errorMessage = L.importInvalidFormat);
       return;
     }
+    // A ListenBrainz backup: fill the token and connect, never the Last.fm form.
+    if (result.isListenBrainz) {
+      final tok = result.apiKey ?? '';
+      if (!LbAuth.looksLikeToken(tok)) {
+        setState(() { _service = 'lb'; _errorMessage = tx('lbl_restore_bad'); });
+        return;
+      }
+      setState(() {
+        _service = 'lb';
+        _lbTokenCtrl.text = LbAuth.clean(tok);
+        _errorMessage = null;
+      });
+      await _lbConnect();
+      return;
+    }
+    if ((result.username ?? '').isEmpty || (result.apiKey ?? '').isEmpty) {
+      setState(() => _errorMessage = tx('lbl_restore_bad'));
+      return;
+    }
     setState(() {
+      _service           = 'lfm';
       _usernameCtrl.text = result.username!;
       _apikeyCtrl.text   = result.apiKey!;
       _useInternalKey    = false;
       _method            = 0;
       _errorMessage      = null;
-      // Reflect a restored secret key in the UI too, not just prefs,
-      // so the user can see/verify it before launching.
       if (secretKeyNotifier.value.isNotEmpty) {
         _secretCtrl.text   = secretKeyNotifier.value;
         _enableFavorites   = true;
@@ -272,62 +296,118 @@ class _SetupScreenState extends State<SetupScreen>
     }
   }
 
-  // ListenBrainz: check the user token. GET /1/validate-token with the header
-  // "Authorization: Token <token>" answers {"valid": true, "user_name": ...}.
-  // Docs: https://listenbrainz.readthedocs.io/en/latest/users/api/core.html
-  Future<void> _lbConnect() async {
-    final token = _lbTokenCtrl.text.trim();
-    if (token.isEmpty) {
-      setState(() { _errorMessage = tx('lb_empty'); _lbInfo = null; });
-      return;
-    }
-    setState(() { _isLoading = true; _errorMessage = null; _lbInfo = null; });
+  // ── ListenBrainz login ─────────────────────────────────────────────────
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Back from the ListenBrainz website: offer the token that was copied.
+    if (state == AppLifecycleState.resumed && _service == 'lb') _checkClipboard();
+  }
+
+  Future<void> _checkClipboard() async {
     try {
-      final res = await ApiHttp.get(
-        Uri.https('api.listenbrainz.org', '/1/validate-token'),
-        headers: {'Authorization': 'Token $token'},
-      ).timeout(const Duration(seconds: 15));
-      final body = jsonDecode(utf8.decode(res.bodyBytes));
-      final valid = body is Map && body['valid'] == true;
-      final name  = body is Map ? '${body['user_name'] ?? ''}' : '';
-      if (!valid || name.isEmpty) {
-        if (mounted) setState(() => _errorMessage = tx('lb_invalid'));
+      final d = await Clipboard.getData(Clipboard.kTextPlain);
+      final t = d?.text ?? '';
+      if (!mounted) return;
+      if (t.isEmpty || t.length > 400 || !LbAuth.looksLikeToken(t)) {
+        if (_clipToken.isNotEmpty) setState(() => _clipToken = '');
         return;
       }
-      // ListenBrainz mode: the app reads everything from ListenBrainz
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('ls_username', name);
-      await prefs.setString('ls_apikey', token);
-      await prefs.remove('ls_secret_key');
-      await prefs.remove('ls_session_key');
-      await prefs.setString('ls_lb_username', name);
-      await prefs.setString('ls_lb_token', token);
-      // The saved account list must only hold this ListenBrainz account
-      // (an old Last.fm name there made every request answer "User not found").
-      await AccountManager.setSingle(AccountEntry(username: name, apiKey: token));
-      final fromLb = DataSource.lb;
-      await DataSource.set(listenbrainz: true);
+      final tok = LbAuth.clean(t);
+      if (tok == LbAuth.clean(_lbTokenCtrl.text)) return;
+      setState(() => _clipToken = tok);
+    } catch (_) {}
+  }
 
-      final customName = _displayNameCtrl.text.trim();
-      if (customName.isNotEmpty) {
-        displayNameNotifier.value = customName;
-        await prefs.setString('ls_display_name', customName);
+  Future<void> _pasteToken() async {
+    try {
+      final d = await Clipboard.getData(Clipboard.kTextPlain);
+      final t = d?.text ?? '';
+      if (t.trim().isEmpty) return;
+      setState(() { _lbTokenCtrl.text = LbAuth.clean(t); _errorMessage = null; _clipToken = ''; });
+      if (LbAuth.looksLikeToken(t)) await _lbConnect();
+    } catch (_) {}
+  }
+
+  String _lbError(LbAuthResult r) {
+    final m = switch (r.status) {
+      LbAuthStatus.empty       => tx('lb_empty'),
+      LbAuthStatus.badFormat   => tx('lbl_err_format'),
+      LbAuthStatus.invalid     => tx('lbl_err_invalid'),
+      LbAuthStatus.rateLimited => tx('lbl_err_rate'),
+      LbAuthStatus.server      => tx('lbl_err_server'),
+      LbAuthStatus.network     => tx('lbl_err_net'),
+      LbAuthStatus.ok          => '',
+    };
+    return r.detail.isEmpty ? m : '$m\n${r.detail}';
+  }
+
+  Future<void> _lbConnect() async {
+    if (_isLoading) return;
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() { _isLoading = true; _errorMessage = null; _clipToken = ''; });
+    try {
+      final r = await LbAuth.validate(_lbTokenCtrl.text);
+      if (!mounted) return;
+      if (!r.ok) {
+        setState(() => _errorMessage = _lbError(r));
+        return;
       }
-      if (!mounted) return;
-      await SourceSwitch.handle(context, fromLb: fromLb, toLb: true, username: name, apiKey: token);
-      if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        M3FadeThroughRoute<void>(
-          builder: (_) => OnboardingFlow(username: name, apiKey: token),
-        ),
-      );
-    } catch (_) {
-      if (mounted) setState(() => _errorMessage = tx('lb_neterr'));
+      // An error after the check is NOT a network error: show it as is.
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final fromLb = DataSource.lb;
+        await LbAuth.save(r.userName, r.token);
+        final customName = _displayNameCtrl.text.trim();
+        if (customName.isNotEmpty) {
+          displayNameNotifier.value = customName;
+          await prefs.setString('ls_display_name', customName);
+        }
+        if (!mounted) return;
+        await SourceSwitch.handle(context,
+            fromLb: fromLb, toLb: true, username: r.userName, apiKey: r.token);
+        if (!mounted) return;
+        Navigator.of(context).pushReplacement(
+          M3FadeThroughRoute<void>(
+            builder: (_) => OnboardingFlow(username: r.userName, apiKey: r.token),
+          ),
+        );
+      } catch (e) {
+        if (mounted) {
+          setState(() => _errorMessage = tx('lbl_err_after',
+              {'e': e.toString().replaceFirst('Exception: ', '')}));
+        }
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
+  Widget _errorBox(ColorScheme scheme, TextTheme text) => AnimatedSize(
+        duration: M3Motion.spatialFastDuration,
+        curve: M3Motion.emphasized,
+        alignment: Alignment.topCenter,
+        child: _errorMessage == null
+            ? const SizedBox(width: double.infinity)
+            : Padding(
+                padding: const EdgeInsets.only(top: 14),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: scheme.errorContainer,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Icon(Icons.warning_amber_rounded,
+                        color: scheme.onErrorContainer, size: 18),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(_errorMessage!,
+                        style: text.bodySmall?.copyWith(color: scheme.onErrorContainer))),
+                  ]),
+                ),
+              ),
+      );
+
+  // First screen: two clear choices, the free one first.
   List<Widget> _choiceWidgets(ColorScheme scheme, TextTheme text) => [
     Text(tx('svc_title'),
         style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
@@ -336,6 +416,15 @@ class _SetupScreenState extends State<SetupScreen>
         style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
     const SizedBox(height: 18),
     _ServiceTile(
+      icon: Icons.favorite_rounded,
+      title: 'ListenBrainz',
+      badge: '${tx('svc_recommended')} · ${tx('svc_free')}',
+      warn: false,
+      subtitle: tx('svc_lb_s'),
+      onTap: () => setState(() { _service = 'lb'; _errorMessage = null; _checkClipboard(); }),
+    ),
+    const SizedBox(height: 10),
+    _ServiceTile(
       icon: Icons.graphic_eq_rounded,
       title: 'Last.fm',
       badge: tx('svc_lfm_paid'),
@@ -343,31 +432,17 @@ class _SetupScreenState extends State<SetupScreen>
       subtitle: tx('svc_lfm_s'),
       onTap: () => setState(() { _service = 'lfm'; _errorMessage = null; }),
     ),
-    const SizedBox(height: 10),
-    _ServiceTile(
-      icon: Icons.favorite_rounded,
-      title: 'ListenBrainz',
-      badge: tx('svc_free'),
-      warn: false,
-      subtitle: tx('svc_lb_s'),
-      onTap: () => setState(() { _service = 'lb'; _errorMessage = null; }),
-    ),
-    const SizedBox(height: 10),
+    const SizedBox(height: 6),
     Wrap(alignment: WrapAlignment.center, spacing: 4, children: [
       M3LabelButton(
         kind: M3ButtonKind.text, height: 44, icon: Icons.open_in_new_rounded,
-        label: tx('svc_lfm_pro'),
-        onTap: () => _open('https://www.last.fm/pro'),
+        label: tx('lb_create'),
+        onTap: () => _open('https://listenbrainz.org/login/musicbrainz/?login_hint=register'),
       ),
       M3LabelButton(
         kind: M3ButtonKind.text, height: 44, icon: Icons.open_in_new_rounded,
         label: tx('lfm_create'),
         onTap: () => _open('https://www.last.fm/join'),
-      ),
-      M3LabelButton(
-        kind: M3ButtonKind.text, height: 44, icon: Icons.open_in_new_rounded,
-        label: tx('lb_create'),
-        onTap: () => _open('https://listenbrainz.org/login/musicbrainz/?login_hint=register'),
       ),
     ]),
   ];
@@ -377,7 +452,9 @@ class _SetupScreenState extends State<SetupScreen>
     child: M3LabelButton(
       kind: M3ButtonKind.text, height: 44, icon: Icons.arrow_back_rounded,
       label: tx('svc_back'),
-      onTap: () => setState(() { _service = null; _errorMessage = null; _lbInfo = null; }),
+      onTap: () => setState(() {
+        _service = null; _errorMessage = null; _lbInfo = null; _clipToken = '';
+      }),
     ),
   );
 
@@ -399,61 +476,156 @@ class _SetupScreenState extends State<SetupScreen>
     const SizedBox(height: 14),
   ];
 
-  List<Widget> _lbWidgets(ColorScheme scheme, TextTheme text) => [
-    _backButton(),
-    Text(tx('lb_title'),
-        style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
-    const SizedBox(height: 6),
-    Text(tx('lb_steps'),
-        style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
-    const SizedBox(height: 14),
-    TextField(
-      controller: _lbTokenCtrl,
-      obscureText: _lbObscure,
-      autocorrect: false,
-      enableSuggestions: false,
-      onSubmitted: (_) => _lbConnect(),
-      decoration: _dec(scheme, tx('lb_token'), Icons.key_rounded,
-          suffix: IconButton(
-            icon: Icon(_lbObscure
-                ? Icons.visibility_outlined : Icons.visibility_off_outlined),
-            onPressed: () => setState(() => _lbObscure = !_lbObscure),
-          )),
-    ),
-    const SizedBox(height: 12),
-    M3LabelButton(
-      kind: M3ButtonKind.filled, expand: true, loading: _isLoading,
-      icon: Icons.arrow_forward_rounded,
-      label: _isLoading ? L.setupConnecting : tx('lb_connect'),
-      onTap: _lbConnect,
-    ),
-    if (_errorMessage != null) ...[
-      const SizedBox(height: 10),
-      Text(_errorMessage!, style: text.bodySmall?.copyWith(color: scheme.error)),
-    ],
-    if (_lbInfo != null) ...[
-      const SizedBox(height: 10),
-      Text(_lbInfo!, style: text.bodySmall?.copyWith(color: scheme.primary)),
-    ],
-    const SizedBox(height: 6),
-    Wrap(alignment: WrapAlignment.center, spacing: 4, children: [
-      M3LabelButton(
-        kind: M3ButtonKind.text, height: 44, icon: Icons.open_in_new_rounded,
-        label: tx('lb_get_token'),
-        onTap: () => _open('https://listenbrainz.org/settings/'),
+  // ListenBrainz: open the page -> paste -> connect.
+  List<Widget> _lbWidgets(ColorScheme scheme, TextTheme text) {
+    final raw = _lbTokenCtrl.text;
+    final typed = raw.trim().isNotEmpty;
+    final fmtOk = LbAuth.looksLikeToken(raw);
+    return [
+      _backButton(),
+      Text(tx('lb_title'),
+          style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
+      const SizedBox(height: 14),
+      _StepBlock(
+        n: 1, title: tx('lbl_step1_t'), subtitle: tx('lbl_step1_s'),
+        done: typed,
+        child: M3LabelButton(
+          kind: M3ButtonKind.tonal, expand: true,
+          icon: Icons.open_in_new_rounded,
+          label: tx('lbl_open'),
+          onTap: () => _open('https://listenbrainz.org/settings/'),
+        ),
       ),
-      M3LabelButton(
-        kind: M3ButtonKind.text, height: 44, icon: Icons.open_in_new_rounded,
-        label: tx('lb_create'),
-        onTap: () => _open('https://listenbrainz.org/login/musicbrainz/?login_hint=register'),
+      const SizedBox(height: 12),
+      _StepBlock(
+        n: 2, title: tx('lbl_step2_t'), subtitle: '',
+        done: fmtOk,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          AnimatedSize(
+            duration: M3Motion.spatialFastDuration,
+            curve: M3Motion.emphasized,
+            alignment: Alignment.topCenter,
+            child: _clipToken.isEmpty
+                ? const SizedBox(width: double.infinity)
+                : Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
+                      decoration: BoxDecoration(
+                        color: scheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(children: [
+                        Icon(Icons.content_paste_go_rounded,
+                            size: 20, color: scheme.onPrimaryContainer),
+                        const SizedBox(width: 10),
+                        Expanded(child: Text(tx('lbl_detected'),
+                            style: text.bodySmall?.copyWith(
+                                color: scheme.onPrimaryContainer,
+                                fontWeight: FontWeight.w600))),
+                        FilledButton(
+                          onPressed: _isLoading ? null : () {
+                            setState(() {
+                              _lbTokenCtrl.text = _clipToken;
+                              _clipToken = '';
+                            });
+                            _lbConnect();
+                          },
+                          child: Text(tx('lbl_use')),
+                        ),
+                      ]),
+                    ),
+                  ),
+          ),
+          TextField(
+            controller: _lbTokenCtrl,
+            obscureText: _lbObscure,
+            autocorrect: false,
+            enableSuggestions: false,
+            textInputAction: TextInputAction.go,
+            onChanged: (_) => setState(() { _errorMessage = null; }),
+            onSubmitted: (_) => _lbConnect(),
+            decoration: _dec(scheme, tx('lb_token'), Icons.key_rounded,
+                suffix: Row(mainAxisSize: MainAxisSize.min, children: [
+                  IconButton(
+                    icon: Icon(_lbObscure
+                        ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+                    onPressed: () => setState(() => _lbObscure = !_lbObscure),
+                  ),
+                  IconButton(
+                    tooltip: tx('lbl_paste'),
+                    icon: const Icon(Icons.content_paste_rounded),
+                    onPressed: _isLoading ? null : _pasteToken,
+                  ),
+                ])),
+          ),
+          AnimatedSize(
+            duration: M3Motion.spatialFastDuration,
+            curve: M3Motion.emphasized,
+            alignment: Alignment.topCenter,
+            child: !typed
+                ? const SizedBox(width: double.infinity)
+                : Padding(
+                    padding: const EdgeInsets.only(top: 8, left: 4),
+                    child: Row(children: [
+                      Icon(fmtOk ? Icons.check_circle_rounded : Icons.info_outline_rounded,
+                          size: 16,
+                          color: fmtOk ? scheme.primary : scheme.onSurfaceVariant),
+                      const SizedBox(width: 6),
+                      Expanded(child: Text(
+                          fmtOk ? tx('lbl_format_ok') : tx('lbl_format_bad'),
+                          style: text.bodySmall?.copyWith(
+                              color: fmtOk ? scheme.primary : scheme.onSurfaceVariant))),
+                    ]),
+                  ),
+          ),
+        ]),
       ),
+      const SizedBox(height: 12),
       M3LabelButton(
-        kind: M3ButtonKind.text, height: 44, icon: Icons.open_in_new_rounded,
-        label: tx('lb_docs'),
-        onTap: () => _open('https://listenbrainz.readthedocs.io/en/latest/users/api/core.html'),
+        kind: M3ButtonKind.filled, expand: true, loading: _isLoading,
+        icon: Icons.arrow_forward_rounded,
+        label: _isLoading ? L.setupConnecting : tx('lb_connect'),
+        onTap: _lbConnect,
       ),
-    ]),
-  ];
+      _errorBox(scheme, text),
+      const SizedBox(height: 6),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: M3LabelButton(
+          kind: M3ButtonKind.text, height: 44,
+          icon: _lbShowOptions ? Icons.expand_less_rounded : Icons.tune_rounded,
+          label: tx('lbl_options'),
+          onTap: () => setState(() => _lbShowOptions = !_lbShowOptions),
+        ),
+      ),
+      AnimatedSize(
+        duration: M3Motion.spatialFastDuration,
+        curve: M3Motion.emphasized,
+        alignment: Alignment.topCenter,
+        child: !_lbShowOptions
+            ? const SizedBox(width: double.infinity)
+            : Padding(
+                padding: const EdgeInsets.only(top: 4, bottom: 6),
+                child: TextField(
+                  controller: _displayNameCtrl,
+                  textInputAction: TextInputAction.done,
+                  decoration: _dec(scheme, L.settingsDisplayNameLabel,
+                      Icons.badge_outlined, hint: L.settingsDisplayNameHint),
+                ),
+              ),
+      ),
+      Padding(
+        padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Icon(Icons.shield_outlined, size: 14, color: scheme.onSurfaceVariant),
+          const SizedBox(width: 6),
+          Expanded(child: Text(tx('lbl_why'),
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant))),
+        ]),
+      ),
+    ];
+  }
 
   // Validate + connect
   Future<void> _launch() async {
@@ -676,38 +848,37 @@ class _SetupScreenState extends State<SetupScreen>
                                         color: scheme.onSurfaceVariant)),
                                 const SizedBox(height: 18),
 
-                                // Connection method tiles
-                                _MethodTile(
-                                  selected: _method == 0,
-                                  icon: Icons.key_rounded,
-                                  title: '${tx('sm_key_t')} (${tx('rec')})',
-                                  subtitle: tx('sm_key_s'),
-                                  onTap: () => setState(() {
-                                    _method = 0; _useInternalKey = false;
+                                // Connection method: one compact selector
+                                SegmentedButton<int>(
+                                  showSelectedIcon: false,
+                                  segments: [
+                                    ButtonSegment(value: 0,
+                                        icon: const Icon(Icons.key_rounded, size: 18),
+                                        label: Text(tx('lfm_seg_key'))),
+                                    ButtonSegment(value: 1,
+                                        icon: const Icon(Icons.bolt_rounded, size: 18),
+                                        label: Text(tx('lfm_seg_builtin'))),
+                                    if (_canWebLogin)
+                                      ButtonSegment(value: 2,
+                                          icon: const Icon(Icons.login_rounded, size: 18),
+                                          label: Text(tx('lfm_seg_web'))),
+                                  ],
+                                  selected: {_method},
+                                  onSelectionChanged: (v) => setState(() {
+                                    _method = v.first;
+                                    _useInternalKey = v.first != 0;
                                   }),
                                 ),
                                 const SizedBox(height: 8),
-                                _MethodTile(
-                                  selected: _method == 1,
-                                  icon: Icons.bolt_rounded,
-                                  title: tx('sm_builtin_t'),
-                                  subtitle: tx('sm_builtin_s'),
-                                  onTap: () => setState(() {
-                                    _method = 1; _useInternalKey = true;
-                                  }),
+                                Text(
+                                  switch (_method) {
+                                    0 => tx('sm_key_s'),
+                                    1 => tx('sm_builtin_s'),
+                                    _ => tx('lfm_web_sub'),
+                                  },
+                                  style: text.bodySmall?.copyWith(
+                                      color: scheme.onSurfaceVariant),
                                 ),
-                                if (_canWebLogin) ...[
-                                  const SizedBox(height: 8),
-                                  _MethodTile(
-                                    selected: _method == 2,
-                                    icon: Icons.login_rounded,
-                                    title: '${tx('conn_lfm_web')} (${tx('not_rec')})',
-                                    subtitle: tx('lfm_web_sub'),
-                                    onTap: () => setState(() {
-                                      _method = 2; _useInternalKey = true;
-                                    }),
-                                  ),
-                                ],
                                 const SizedBox(height: 18),
 
                                 // Fields (they grow / shrink with the method)
@@ -913,7 +1084,7 @@ class _SetupScreenState extends State<SetupScreen>
                                       color: scheme.onSurfaceVariant),
                             ]),
                           ),
-                          if (_method == 0) ...[
+                          if (_service == 'lfm' && _method == 0) ...[
                             const SizedBox(height: 6),
                             Center(
                               child: M3LabelButton(
@@ -1145,6 +1316,62 @@ class _ServiceTile extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Icon(Icons.chevron_right_rounded, color: scheme.onSurfaceVariant),
+      ]),
+    );
+  }
+}
+
+// ── One numbered step of the ListenBrainz login ───────────────────────────
+class _StepBlock extends StatelessWidget {
+  final int n;
+  final String title, subtitle;
+  final bool done;
+  final Widget child;
+  const _StepBlock({
+    required this.n,
+    required this.title,
+    required this.subtitle,
+    required this.done,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Row(children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            width: 28, height: 28,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: done ? scheme.primary : scheme.secondaryContainer,
+            ),
+            child: done
+                ? Icon(Icons.check_rounded, size: 18, color: scheme.onPrimary)
+                : Text('$n', style: text.labelLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: scheme.onSecondaryContainer)),
+          ),
+          const SizedBox(width: 10),
+          Expanded(child: Text(title,
+              style: text.titleSmall?.copyWith(fontWeight: FontWeight.w800))),
+        ]),
+        if (subtitle.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Text(subtitle,
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+        ],
+        const SizedBox(height: 12),
+        child,
       ]),
     );
   }

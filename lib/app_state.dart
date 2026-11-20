@@ -107,7 +107,7 @@ final motionArtworkNotifier = ValueNotifier<bool>(true);
 final dashMotionNotifier = ValueNotifier<bool>(true);
 
 // Text size (x system scale) and font family ('' = Flutter/Android default).
-final textScaleNotifier = ValueNotifier<double>(1.1);
+final textScaleNotifier = ValueNotifier<double>(1.0);
 final appFontNotifier   = ValueNotifier<String>('GoogleSansFlex');
 
 // Library clean-up options (see services/library_merge.dart). Both off by default.
