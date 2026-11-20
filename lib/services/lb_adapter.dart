@@ -62,6 +62,17 @@ class LbAdapter {
   static final Map<String, Future<http.Response>> _inflight = {};
   static const _cacheTtlMs = 60 * 1000;
 
+  // Paths are built with Uri.encodeComponent already. Uri.https would encode
+  // the '%' again ("sano%20bld" -> "sano%2520bld") and the server would answer
+  // 404 "user not found" for any name with a space or a special character.
+  static Uri _uri(String host, String path, Map<String, String>? q) {
+    final u = Uri.parse('https://$host$path');
+    return (q == null || q.isEmpty) ? u : u.replace(queryParameters: q);
+  }
+
+  // Last answer seen, shown with errors so a failure can be traced.
+  static String lastCode = '';
+
   static Future<dynamic> _getRetry(Uri uri) {
     final key = uri.toString();
     final at = _cacheAt[key];
@@ -72,6 +83,7 @@ class LbAdapter {
     return _inflight.putIfAbsent(key, () async {
       try {
         final res = await _fetch(uri);
+        lastCode = 'HTTP ${res.statusCode} ${uri.path}';
         if (res.statusCode == 200) {
           _cache[key] = res;
           _cacheAt[key] = DateTime.now().millisecondsSinceEpoch;
@@ -116,7 +128,7 @@ class LbAdapter {
       // Keep the technical reason visible (blocked TLS, timeout, DNS...)
       var why = last.toString().replaceAll('\n', ' ');
       if (why.length > 110) why = why.substring(0, 110);
-      throw Exception('${tx('lb_neterr')} [$why]');
+      throw Exception('${tx('lb_neterr')}\nCode: $why');
     }
     throw last!;
   }
@@ -125,9 +137,9 @@ class LbAdapter {
   // "popularity" / labs endpoints answer with a bare JSON list).
   static Future<dynamic> _getAny(String path,
       [Map<String, String>? q, String host = _host]) async {
-    final res = await _getRetry(Uri.https(host, path, q));
+    final res = await _getRetry(_uri(host, path, q));
     if (res.statusCode == 204 || res.statusCode == 404 || res.statusCode == 410) return null;
-    if (res.statusCode != 200) throw Exception('HTTP ${res.statusCode}');
+    if (res.statusCode != 200) throw Exception('ListenBrainz error\nCode: HTTP ${res.statusCode} ${res.request?.url.path ?? ''}');
     final body = jsonDecode(utf8.decode(res.bodyBytes));
     if (body is Map && body['payload'] != null) return body['payload'];
     return body;
@@ -136,10 +148,10 @@ class LbAdapter {
   // ── HTTP helper: returns the "payload" map, or null (204 / 404 / error) ──
   static Future<Map<String, dynamic>?> _get(String path,
       [Map<String, String>? q]) async {
-    final res = await _getRetry(Uri.https(_host, path, q));
+    final res = await _getRetry(_uri(_host, path, q));
     if (res.statusCode == 204 || res.statusCode == 404 || res.statusCode == 410) return null;
-    if (res.statusCode == 429) throw Exception('ListenBrainz rate limit reached (HTTP 429)');
-    if (res.statusCode != 200) throw Exception('HTTP ${res.statusCode}');
+    if (res.statusCode == 429) throw Exception('ListenBrainz rate limit reached\nCode: HTTP 429 ${res.headers['x-laststats-skipped'] == '1' ? '(client limiter)' : '(server)'}');
+    if (res.statusCode != 200) throw Exception('ListenBrainz error\nCode: HTTP ${res.statusCode} ${res.request?.url.path ?? ''}');
     final body = jsonDecode(utf8.decode(res.bodyBytes));
     if (body is! Map) return null;
     final p = body['payload'];
@@ -254,7 +266,7 @@ class LbAdapter {
         c = await count();
       }
     }
-    if (c == null) throw Exception('User not found');
+    if (c == null) throw Exception('User not found\nCode: $lastCode');
     // The oldest listen gives a "member since" date
     int since = 0;
     try {
@@ -865,7 +877,7 @@ class LbAdapter {
       headers: {'Authorization': 'Token $token', 'Content-Type': 'application/json'},
       body: jsonEncode({'recording_mbid': mbid, 'score': method == 'track.love' ? 1 : 0}),
     ).timeout(_timeout);
-    if (res.statusCode != 200) throw Exception('HTTP ${res.statusCode}');
+    if (res.statusCode != 200) throw Exception('ListenBrainz error\nCode: HTTP ${res.statusCode} ${res.request?.url.path ?? ''}');
     return {};
   }
 }
