@@ -1,6 +1,24 @@
 {
-  "updated": "2026-11-20T19:41:37Z",
+  "updated": "2026-11-20T20:24:13Z",
   "commits": [
+    {
+      "sha": "78a22c42ebb9c6f8cc35439a7bd88daa664c2faf",
+      "message": "feat: Ajouter la prise en charge de MusicBrainz dans les liens et les informations des artistes",
+      "date": "2026-11-20T20:21:34Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/78a22c42ebb9c6f8cc35439a7bd88daa664c2faf",
+      "tags": []
+    },
+    {
+      "sha": "e7edd64a38b94d82b5a23bcfeb99d88448b83e91",
+      "message": "feat: Update Chinese localization for ListenBrainz support\n\n- Modified strings in `strings_zh.dart` to conditionally display ListenBrainz or Last.fm based on the data source.\n- Updated `_detail_sheet.dart` to reflect the correct source in metadata.\n- Enhanced `all_scrobbles_service.dart` to fetch scrobbles from ListenBrainz when applicable.\n- Implemented a new method in `lb_adapter.dart` for fetching historical data from ListenBrainz.\n- Adjusted `scrobbles_file_cache.dart` to ensure proper year tracking from both sources.",
+      "date": "2026-11-20T20:19:44Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/e7edd64a38b94d82b5a23bcfeb99d88448b83e91",
+      "tags": []
+    },
     {
       "sha": "86af94c5eab9920cd740e0ddc10d0e01baf328e5",
       "message": "feat: Optimiser la récupération des écoutes récentes avec un meilleur contrôle de pagination et des limites ajustées",
@@ -2695,24 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/29fa8beb2131aa28a56692310698449fec01541f",
-      "tags": []
-    },
-    {
-      "sha": "1853eb033a5b655d619348f832b6234a23b5edd2",
-      "message": "feat: ajouter le support des pochettes vidéo animées d'Apple Music et intégrer le service de recherche",
-      "date": "2026-09-24T19:16:39Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/1853eb033a5b655d619348f832b6234a23b5edd2",
-      "tags": []
-    },
-    {
-      "sha": "f6b2a05f24f22bfabe4eac106bbffc06886fb0cf",
-      "message": "feat: mettre à jour expressive.css pour améliorer les formes de boutons et les animations de pression",
-      "date": "2026-09-23T21:45:01Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/f6b2a05f24f22bfabe4eac106bbffc06886fb0cf",
       "tags": []
     }
   ]
