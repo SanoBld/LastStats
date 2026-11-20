@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-20T21:04:53Z",
+  "updated": "2026-11-20T21:34:10Z",
   "commits": [
+    {
+      "sha": "1f001e93a6aaee8fde5b9695ef516aa7cbdbb136",
+      "message": "Add ListenBrainz integration and logo\n\n- Implemented fetching recent tracks from ListenBrainz API in notification_worker.dart.\n- Added logic to retrieve user statistics based on the fetched data.\n- Introduced a new SVG logo for ListenBrainz in assets/icons.",
+      "date": "2026-11-20T21:33:43Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/1f001e93a6aaee8fde5b9695ef516aa7cbdbb136",
+      "tags": []
+    },
     {
       "sha": "e411298826943f24eb05c3326f43c1cc36c93612",
       "message": "Add ListenBrainz support and improve backup functionality\n\n- Implemented localization for Spanish and French languages for ListenBrainz integration.\n- Updated main.dart to set default text scale to 1.0.\n- Enhanced backup_page.dart to handle ListenBrainz tokens and navigate to home screen upon successful restore.\n- Modified setup_screen.dart to include clipboard token detection and improved UI for ListenBrainz login steps.\n- Created lb_auth.dart for handling ListenBrainz token validation and user management.\n- Updated backup_service.dart to support ListenBrainz backup and restore processes.",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/e234bc166785f5259803bffec6db33cabd6cbf5b",
-      "tags": []
-    },
-    {
-      "sha": "b73548cf99c5f5e49d654b2b0dd6dc68d9b1384f",
-      "message": "feat: ajouter un bouton de lecture animé et ajuster les styles de dégradé dans le détail de l'élément",
-      "date": "2026-09-24T19:54:55Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/b73548cf99c5f5e49d654b2b0dd6dc68d9b1384f",
       "tags": []
     }
   ]
