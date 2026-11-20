@@ -23,7 +23,13 @@ import 'api_usage.dart';
 class ApiHttp {
   ApiHttp._();
 
-  static const userAgent = 'LastStats (+https://github.com/SanoBld/LastStats)';
+  // Format required by MetaBrainz: "Application name/<version> ( contact-url )"
+  static const userAgent = 'LastStats/4.3 ( https://github.com/SanoBld/LastStats )';
+
+  // ONE shared client: connections are kept alive and reused. A new client
+  // per call opened a fresh TLS handshake each time, and the ListenBrainz
+  // firewall drops bursts of new connections ("terminated during handshake").
+  static final http.Client _client = http.Client();
 
   static final _lastfmRate = RegExp(r'"error"\s*:\s*"?29"?\b');
   static final _deezerQuota = RegExp(r'"code"\s*:\s*4\b');
@@ -35,8 +41,9 @@ class ApiHttp {
     Map<String, String>? headers,
     String? api,
     String? keyLabel,
+    Duration? timeout,
   }) =>
-      _run(url, api, keyLabel, headers, (h) => http.get(url, headers: h));
+      _run(url, api, keyLabel, headers, timeout, (h) => _client.get(url, headers: h));
 
   static Future<http.Response> post(
     Uri url, {
@@ -45,15 +52,17 @@ class ApiHttp {
     Encoding? encoding,
     String? api,
     String? keyLabel,
+    Duration? timeout,
   }) =>
-      _run(url, api, keyLabel, headers,
-          (h) => http.post(url, headers: h, body: body, encoding: encoding));
+      _run(url, api, keyLabel, headers, timeout,
+          (h) => _client.post(url, headers: h, body: body, encoding: encoding));
 
   static Future<http.Response> _run(
     Uri url,
     String? api,
     String? keyLabel,
     Map<String, String>? headers,
+    Duration? timeout,
     Future<http.Response> Function(Map<String, String>? headers) send,
   ) async {
     final def =
@@ -74,7 +83,8 @@ class ApiHttp {
 
     http.Response res;
     try {
-      res = await send(h);
+      // timeout covers only the network round trip, not the limiter wait
+      res = timeout == null ? await send(h) : await send(h).timeout(timeout);
     } catch (e) {
       ApiUsage.recordCall(def.id, status: 0, error: true, keyLabel: keyLabel);
       rethrow;

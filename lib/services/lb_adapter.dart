@@ -14,6 +14,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n/extra_strings.dart';
 import 'account_manager.dart';
@@ -54,12 +55,44 @@ class LbAdapter {
     }
   }
 
-  static Future<dynamic> _getRetry(Uri uri) async {
+  // Short cache + de-duplication of identical in-flight calls: ListenBrainz
+  // allows ~1 call per second, so every avoided call matters.
+  static final Map<String, http.Response> _cache = {};
+  static final Map<String, int> _cacheAt = {};
+  static final Map<String, Future<http.Response>> _inflight = {};
+  static const _cacheTtlMs = 60 * 1000;
+
+  static Future<dynamic> _getRetry(Uri uri) {
+    final key = uri.toString();
+    final at = _cacheAt[key];
+    final now = DateTime.now().millisecondsSinceEpoch;
+    if (at != null && now - at < _cacheTtlMs && _cache[key] != null) {
+      return Future.value(_cache[key]);
+    }
+    return _inflight.putIfAbsent(key, () async {
+      try {
+        final res = await _fetch(uri);
+        if (res.statusCode == 200) {
+          _cache[key] = res;
+          _cacheAt[key] = DateTime.now().millisecondsSinceEpoch;
+          if (_cache.length > 150) {
+            _cache.clear();
+            _cacheAt.clear();
+          }
+        }
+        return res;
+      } finally {
+        _inflight.remove(key);
+      }
+    });
+  }
+
+  static Future<http.Response> _fetch(Uri uri) async {
     Object? last;
     final headers = await _authHeaders(uri);
     for (var i = 0; i < 4; i++) {
       try {
-        final res = await ApiHttp.get(uri, headers: headers).timeout(_timeout);
+        final res = await ApiHttp.get(uri, headers: headers, timeout: _timeout);
         // 429: wait for the window the server announces, then try again
         if (res.statusCode == 429 && i < 3) {
           final secs = int.tryParse(res.headers['x-ratelimit-reset-in'] ??
@@ -79,7 +112,12 @@ class LbAdapter {
         await Future.delayed(Duration(milliseconds: 700 * (i + 1)));
       }
     }
-    if (last != null && _isNet(last)) throw Exception(tx('lb_neterr'));
+    if (last != null && _isNet(last)) {
+      // Keep the technical reason visible (blocked TLS, timeout, DNS...)
+      var why = last.toString().replaceAll('\n', ' ');
+      if (why.length > 110) why = why.substring(0, 110);
+      throw Exception('${tx('lb_neterr')} [$why]');
+    }
     throw last!;
   }
 
@@ -88,7 +126,7 @@ class LbAdapter {
   static Future<dynamic> _getAny(String path,
       [Map<String, String>? q, String host = _host]) async {
     final res = await _getRetry(Uri.https(host, path, q));
-    if (res.statusCode == 204 || res.statusCode == 404) return null;
+    if (res.statusCode == 204 || res.statusCode == 404 || res.statusCode == 410) return null;
     if (res.statusCode != 200) throw Exception('HTTP ${res.statusCode}');
     final body = jsonDecode(utf8.decode(res.bodyBytes));
     if (body is Map && body['payload'] != null) return body['payload'];
@@ -99,7 +137,7 @@ class LbAdapter {
   static Future<Map<String, dynamic>?> _get(String path,
       [Map<String, String>? q]) async {
     final res = await _getRetry(Uri.https(_host, path, q));
-    if (res.statusCode == 204 || res.statusCode == 404) return null;
+    if (res.statusCode == 204 || res.statusCode == 404 || res.statusCode == 410) return null;
     if (res.statusCode == 429) throw Exception('ListenBrainz rate limit reached (HTTP 429)');
     if (res.statusCode != 200) throw Exception('HTTP ${res.statusCode}');
     final body = jsonDecode(utf8.decode(res.bodyBytes));
@@ -521,7 +559,7 @@ class LbAdapter {
             final res = await ApiHttp.get(
               Uri.https('musicbrainz.org', '/ws/2/$path', {...q, 'fmt': 'json'}),
               headers: const {
-                'User-Agent': 'LastStats/4 (https://github.com/SanoBld/LastStats)',
+                'User-Agent': ApiHttp.userAgent,
                 'Accept': 'application/json',
               },
             ).timeout(_timeout);
