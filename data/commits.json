@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-21T09:31:15Z",
+  "updated": "2026-11-21T09:55:21Z",
   "commits": [
+    {
+      "sha": "b906e9bababc7d7efcf13174ea9b6195bc650d14",
+      "message": "feat: ajouter la prise en charge de la notification Discord pour les annonces et les versions",
+      "date": "2026-11-21T09:53:23Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/b906e9bababc7d7efcf13174ea9b6195bc650d14",
+      "tags": []
+    },
     {
       "sha": "690f24f29fa61bbe52ad8b67714d847b47632b6e",
       "message": "feat: add localized help and error messages for API responses\n\n- Added localized strings for help and error messages in Italian, Japanese, Portuguese, Russian, and Chinese.\n- Implemented user-friendly error handling in the dashboard page to display cached data when offline.\n- Enhanced the API service to decode JSON responses safely, throwing a readable error for invalid responses.\n- Updated the dashboard and detail sheet to include MusicBrainz branding and icons.\n- Improved the notification service to render markdown in notifications.\n- Introduced a new GitHub workflow for deleting news entries from the news.json file.\n- Added a MusicBrainz SVG icon asset for branding purposes.",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/82e7bcef9e8a529da9e7423d05c755317a0b8ce8",
-      "tags": []
-    },
-    {
-      "sha": "b855743b96d39775c4b79c9865d2afe8af42fb9d",
-      "message": "test",
-      "date": "2026-09-25T13:01:18Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/b855743b96d39775c4b79c9865d2afe8af42fb9d",
       "tags": []
     }
   ]
