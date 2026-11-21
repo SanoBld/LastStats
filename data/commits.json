@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-21T08:36:29Z",
+  "updated": "2026-11-21T09:20:53Z",
   "commits": [
+    {
+      "sha": "690f24f29fa61bbe52ad8b67714d847b47632b6e",
+      "message": "feat: add localized help and error messages for API responses\n\n- Added localized strings for help and error messages in Italian, Japanese, Portuguese, Russian, and Chinese.\n- Implemented user-friendly error handling in the dashboard page to display cached data when offline.\n- Enhanced the API service to decode JSON responses safely, throwing a readable error for invalid responses.\n- Updated the dashboard and detail sheet to include MusicBrainz branding and icons.\n- Improved the notification service to render markdown in notifications.\n- Introduced a new GitHub workflow for deleting news entries from the news.json file.\n- Added a MusicBrainz SVG icon asset for branding purposes.",
+      "date": "2026-11-21T09:20:31Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/690f24f29fa61bbe52ad8b67714d847b47632b6e",
+      "tags": []
+    },
     {
       "sha": "4e6ee3dcec503adddc54b89b26f72677019bdfa9",
       "message": "Merge branch 'master' of https://github.com/SanoBld/LastStats",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/b855743b96d39775c4b79c9865d2afe8af42fb9d",
-      "tags": []
-    },
-    {
-      "sha": "fd874b85ad214059b8d673a21676a9122fd05cac",
-      "message": "feat: ajouter des chaînes pour le nombre total de lectures et ajuster les chaînes existantes pour les lectures utilisateur",
-      "date": "2026-09-25T10:40:13Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/fd874b85ad214059b8d673a21676a9122fd05cac",
       "tags": []
     }
   ]

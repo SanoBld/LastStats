@@ -20,8 +20,59 @@
   };
   const ICON = { feature: '✨', fix: '🔧', update: '⬆️', alert: '⚠️', info: 'ℹ️' };
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  // make links in the body clickable (after escaping)
-  const linkify = (s) => esc(s).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+  // ---- mini markdown (same syntax as the app) --------------------------------------------
+  // **bold**  *italic*  __underline__  ~~strike~~  ==highlight==  `code`  # titles  - lists
+  // | tables |  ![alt](https://image)  and links. In the workflow field a line break is written \n
+  const inline = (raw) => {
+    const keep = [];
+    const stash = (h) => '\u0000' + (keep.push(h) - 1) + '\u0000';
+    let t = esc(raw);
+    t = t.replace(/`([^`]+)`/g, (m, a) => stash('<code>' + a + '</code>'));
+    t = t.replace(/(https?:\/\/[^\s<]+?)([)\].,;!?]*)(?=\s|$|\u0000)/g,
+      (m, u, tail) => stash('<a href="' + u + '" target="_blank" rel="noopener">' + u + '</a>') + tail);
+    t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+         .replace(/__(.+?)__/g, '<u>$1</u>')
+         .replace(/~~(.+?)~~/g, '<s>$1</s>')
+         .replace(/==(.+?)==/g, '<mark>$1</mark>')
+         .replace(/(?<!\*)\*(?!\*)(.+?)\*(?!\*)/g, '<em>$1</em>')
+         .replace(/(^|[\s(])_(.+?)_(?=[\s).,;!?]|$)/g, '$1<em>$2</em>');
+    return t.replace(/\u0000(\d+)\u0000/g, (m, i) => keep[+i]);
+  };
+  const isRow = (l) => l.trim() !== '' && l.includes('|');
+  const isSep = (l) => /^\s*\|?[\s:\-|]+\|?\s*$/.test(l) && l.includes('-');
+  const cells = (l) => { l = l.trim(); if (l[0] === '|') l = l.slice(1); if (l.endsWith('|')) l = l.slice(0, -1); return l.split('|').map((c) => c.trim()); };
+  function md(src) {
+    // a one-line field can't hold a real line break: "\n" typed as two characters is one
+    let text = String(src || '');
+    if (!text.includes('\n')) text = text.replace(/\\n/g, '\n');
+    const lines = text.replace(/\r\n?/g, '\n').split('\n');
+    const out = [];
+    let para = [], list = [];
+    const flush = () => {
+      if (para.length) { out.push('<p>' + para.join('<br>') + '</p>'); para = []; }
+      if (list.length) { out.push('<ul>' + list.join('') + '</ul>'); list = []; }
+    };
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trimEnd(), tr = line.trim();
+      if (!tr) { flush(); continue; }
+      let m;
+      if ((m = /^!\[([^\]]*)\]\((https?:\/\/\S+)\)$/.exec(tr))) { flush(); out.push('<img class="nw-img" loading="lazy" alt="' + esc(m[1]) + '" src="' + esc(m[2]) + '">'); continue; }
+      if (i + 1 < lines.length && isRow(line) && isSep(lines[i + 1])) {
+        flush();
+        const head = cells(line); let j = i + 2; const rows = [];
+        while (j < lines.length && isRow(lines[j])) { rows.push(cells(lines[j])); j++; }
+        out.push('<div class="nw-table"><table><thead><tr>' + head.map((h) => '<th>' + inline(h) + '</th>').join('') + '</tr></thead><tbody>' +
+          rows.map((r) => '<tr>' + head.map((_, k) => '<td>' + inline(r[k] || '') + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>');
+        i = j - 1; continue;
+      }
+      if ((m = /^(#{1,3})\s+(.*)/.exec(tr))) { flush(); out.push('<h3 class="nw-h nw-h' + m[1].length + '">' + inline(m[2]) + '</h3>'); continue; }
+      if ((m = /^[-*]\s+(.*)/.exec(tr))) { if (para.length) flush(); list.push('<li>' + inline(m[1]) + '</li>'); continue; }
+      if (list.length) flush();
+      para.push(inline(tr));
+    }
+    flush();
+    return out.join('');
+  }
 
   // translation button: on by default, into the site language (same as the pushes page)
   let trOn = true;
@@ -38,17 +89,26 @@
     trBtn.title = lbl;
     trBtn.setAttribute('aria-label', lbl);
   }
+  // body: render the markdown first, then translate only the text nodes (links and code stay as they are)
+  function translateBody(el, orig, to) {
+    const tk = (el._tk = (el._tk || 0) + 1);
+    el.innerHTML = md(orig);
+    if (!trOn || !window.i18n) return;
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => (n.nodeValue.trim() && !n.parentNode.closest('a,code') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT),
+    });
+    const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach((n) => {
+      i18n.translate(n.nodeValue, to).then((out) => { if (trOn && lang() === to && el._tk === tk && out) n.nodeValue = out; }).catch(() => {});
+    });
+  }
   function applyTr() {
     const to = lang();
     document.querySelectorAll('#nw-list .nw-txt').forEach((el) => {
       const orig = el.getAttribute('data-orig');
-      const link = el.hasAttribute('data-link');
-      const show = (txt) => { if (link) el.innerHTML = linkify(txt); else el.textContent = txt; };
-      if (!trOn || !window.i18n) { show(orig); return; }
-      // translate only the text between links, so the links stay exact and clickable
-      const parts = orig.split(/(https?:\/\/[^\s<]+)/);
-      Promise.all(parts.map((p, i) => (i % 2 || !p.trim() ? p : i18n.translate(p, to).catch(() => p))))
-        .then((out) => { if (trOn && lang() === to) show(out.join('')); });
+      if (el.hasAttribute('data-md')) { translateBody(el, orig, to); return; }
+      if (!trOn || !window.i18n) { el.textContent = orig; return; }
+      i18n.translate(orig, to).then((out) => { if (trOn && lang() === to) el.textContent = out; }).catch(() => {});
     });
   }
   trBtn.addEventListener('click', () => {
@@ -94,7 +154,7 @@
           <span class="rel-badge">${esc(t('news.' + type))}</span>
         </div>
         <p class="nw-date">${esc(fullDate(n))}</p>
-        ${n.body ? `<p class="nw-body nw-txt" data-orig="${esc(n.body)}" data-link="1">${linkify(n.body)}</p>` : ''}`;
+        ${n.body ? `<div class="nw-body nw-txt" data-orig="${esc(n.body)}" data-md="1">${md(n.body)}</div>` : ''}`;
       wrap.appendChild(row);
     });
     listEl.appendChild(wrap);
