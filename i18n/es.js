@@ -60,7 +60,7 @@ window.I18N.es = {
   "index.android_widgets": "Widgets de Android",
   "index.multi_language": "Multilingüe",
   "index.chip_phone_colors": "Colores de tu móvil",
-  "index.chip_lastfm": "Compatible con Last.fm",
+  "index.chip_lastfm": "Compatible con Last.fm & ListenBrainz",
   "index.chip_mobile_desktop": "Móvil y ordenador",
   "index.view_on_github": "Ver en GitHub",
   "index.connect_your_last_fm_account": "Conecta tu cuenta de Last.fm y LastStats hace el resto: tus artistas, álbumes y canciones del momento, todo en un solo lugar, claro y agradable de ver. Tus datos siguen siendo tuyos.",

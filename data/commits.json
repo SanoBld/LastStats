@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-21T09:55:21Z",
+  "updated": "2026-11-21T10:15:22Z",
   "commits": [
+    {
+      "sha": "2a48003f21558bb45d976a11279a7ab4b5a34582",
+      "message": "feat: ajouter la prise en charge de ListenBrainz dans les traductions et les messages d'interface",
+      "date": "2026-11-21T10:04:21Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/2a48003f21558bb45d976a11279a7ab4b5a34582",
+      "tags": []
+    },
     {
       "sha": "b906e9bababc7d7efcf13174ea9b6195bc650d14",
       "message": "feat: ajouter la prise en charge de la notification Discord pour les annonces et les versions",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/4e8fb6357b4ae0ccacccb433754c8bbcc5f6b152",
-      "tags": []
-    },
-    {
-      "sha": "82e7bcef9e8a529da9e7423d05c755317a0b8ce8",
-      "message": "teste",
-      "date": "2026-09-25T13:01:49Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/82e7bcef9e8a529da9e7423d05c755317a0b8ce8",
       "tags": []
     }
   ]

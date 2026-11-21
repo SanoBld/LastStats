@@ -60,7 +60,7 @@ window.I18N.ru = {
   "index.android_widgets": "Виджеты Android",
   "index.multi_language": "Много языков",
   "index.chip_phone_colors": "Цвета вашего телефона",
-  "index.chip_lastfm": "Работает с Last.fm",
+  "index.chip_lastfm": "Работает с Last.fm & ListenBrainz",
   "index.chip_mobile_desktop": "Телефон и компьютер",
   "index.view_on_github": "Смотреть на GitHub",
   "index.connect_your_last_fm_account": "Подключите аккаунт Last.fm, и LastStats сделает остальное: ваши исполнители, альбомы и текущие треки в одном месте, понятно и красиво. Ваши данные остаются вашими.",

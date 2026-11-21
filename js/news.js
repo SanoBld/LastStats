@@ -28,6 +28,8 @@
     const stash = (h) => '\u0000' + (keep.push(h) - 1) + '\u0000';
     let t = esc(raw);
     t = t.replace(/`([^`]+)`/g, (m, a) => stash('<code>' + a + '</code>'));
+    t = t.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
+      (m, a, u) => stash('<a href="' + u + '" target="_blank" rel="noopener">' + a + '</a>'));
     t = t.replace(/(https?:\/\/[^\s<]+?)([)\].,;!?]*)(?=\s|$|\u0000)/g,
       (m, u, tail) => stash('<a href="' + u + '" target="_blank" rel="noopener">' + u + '</a>') + tail);
     t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
@@ -47,10 +49,11 @@
     if (!text.includes('\n')) text = text.replace(/\\n/g, '\n');
     const lines = text.replace(/\r\n?/g, '\n').split('\n');
     const out = [];
-    let para = [], list = [];
+    let para = [], list = [], quote = [], listTag = 'ul';
     const flush = () => {
       if (para.length) { out.push('<p>' + para.join('<br>') + '</p>'); para = []; }
-      if (list.length) { out.push('<ul>' + list.join('') + '</ul>'); list = []; }
+      if (list.length) { out.push('<' + listTag + '>' + list.join('') + '</' + listTag + '>'); list = []; }
+      if (quote.length) { out.push('<blockquote>' + quote.join('<br>') + '</blockquote>'); quote = []; }
     };
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trimEnd(), tr = line.trim();
@@ -66,8 +69,10 @@
         i = j - 1; continue;
       }
       if ((m = /^(#{1,3})\s+(.*)/.exec(tr))) { flush(); out.push('<h3 class="nw-h nw-h' + m[1].length + '">' + inline(m[2]) + '</h3>'); continue; }
-      if ((m = /^[-*]\s+(.*)/.exec(tr))) { if (para.length) flush(); list.push('<li>' + inline(m[1]) + '</li>'); continue; }
-      if (list.length) flush();
+      if ((m = /^>\s?(.*)/.exec(tr))) { if (para.length || list.length) flush(); quote.push(inline(m[1])); continue; }
+      if ((m = /^[-*]\s+(.*)/.exec(tr))) { if (para.length || quote.length || listTag !== 'ul') flush(); listTag = 'ul'; list.push('<li>' + inline(m[1]) + '</li>'); continue; }
+      if ((m = /^\d+[.)]\s+(.*)/.exec(tr))) { if (para.length || quote.length || listTag !== 'ol') flush(); listTag = 'ol'; list.push('<li>' + inline(m[1]) + '</li>'); continue; }
+      if (list.length || quote.length) flush();
       para.push(inline(tr));
     }
     flush();
@@ -99,7 +104,8 @@
     });
     const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
     nodes.forEach((n) => {
-      i18n.translate(n.nodeValue, to).then((out) => { if (trOn && lang() === to && el._tk === tk && out) n.nodeValue = out; }).catch(() => {});
+      n._lead = (/^\s*/.exec(n.nodeValue) || [''])[0]; n._trail = (/\s*$/.exec(n.nodeValue) || [''])[0];
+      i18n.translate(n.nodeValue, to).then((out) => { if (trOn && lang() === to && el._tk === tk && out) n.nodeValue = (n._lead || '') + out.trim() + (n._trail || ''); }).catch(() => {});
     });
   }
   function applyTr() {

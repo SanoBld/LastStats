@@ -60,7 +60,7 @@ window.I18N.zh = {
   "index.android_widgets": "Android 小组件",
   "index.multi_language": "多语言",
   "index.chip_phone_colors": "跟随手机配色",
-  "index.chip_lastfm": "支持 Last.fm",
+  "index.chip_lastfm": "支持 Last.fm & ListenBrainz",
   "index.chip_mobile_desktop": "手机和电脑",
   "index.view_on_github": "在 GitHub 上查看",
   "index.connect_your_last_fm_account": "连接你的 Last.fm 账号，剩下的交给 LastStats：你的歌手、专辑和当前歌曲集中在一处，清晰又好看。你的数据始终属于你。",

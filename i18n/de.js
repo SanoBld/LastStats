@@ -60,7 +60,7 @@ window.I18N.de = {
   "index.android_widgets": "Android-Widgets",
   "index.multi_language": "Mehrsprachig",
   "index.chip_phone_colors": "Farben deines Handys",
-  "index.chip_lastfm": "Mit Last.fm kompatibel",
+  "index.chip_lastfm": "Mit Last.fm & ListenBrainz kompatibel",
   "index.chip_mobile_desktop": "Handy und Computer",
   "index.view_on_github": "Auf GitHub ansehen",
   "index.connect_your_last_fm_account": "Verbinde dein Last.fm-Konto und LastStats macht den Rest: deine Künstler, Alben und aktuellen Titel an einem Ort, übersichtlich und schön anzusehen. Deine Daten bleiben bei dir.",

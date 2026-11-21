@@ -47,3 +47,5 @@
   .nav-toggles { gap: .25rem; }
   .nav-toggles .nav-logo { width: 40px; height: 40px; }
 }
+.nw-body ol { margin: 0 0 .5rem; padding-left: 1.5rem; }
+.nw-body blockquote { margin: 0 0 .5rem; padding: .2rem .9rem; border-left: 3px solid currentColor; opacity: .8; }

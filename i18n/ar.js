@@ -60,7 +60,7 @@ window.I18N.ar = {
   "index.android_widgets": "أدوات Android المصغّرة",
   "index.multi_language": "متعدد اللغات",
   "index.chip_phone_colors": "ألوان هاتفك",
-  "index.chip_lastfm": "متوافق مع Last.fm",
+  "index.chip_lastfm": "متوافق مع Last.fm & ListenBrainz",
   "index.chip_mobile_desktop": "الهاتف والكمبيوتر",
   "index.view_on_github": "عرض على GitHub",
   "index.connect_your_last_fm_account": "اربط حسابك على Last.fm وسيتولى LastStats الباقي: فنانوك وألبوماتك وأغانيك الحالية في مكان واحد، بشكل واضح وجميل. بياناتك تبقى لك.",
