@@ -7,8 +7,8 @@
 class QrLinkService {
   QrLinkService._();
 
-  static String appLink(String username) => 'laststats://profile/$username';
-  static String webLink(String username) => 'https://www.last.fm/user/$username';
+  static String appLink(String username) => 'laststats://profile/${Uri.encodeComponent(username)}';
+  static String webLink(String username) => 'https://www.last.fm/user/${Uri.encodeComponent(username)}';
 
   /// Returns the username encoded in [raw] if it matches either format,
   /// or null if the scanned text isn't a recognized profile link.
