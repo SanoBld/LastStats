@@ -136,8 +136,8 @@ Widget build(BuildContext context) {
                     color: scheme.onSecondaryContainer, size: 20),
               );
             }
-            return Image.network(url, fit: BoxFit.cover, cacheWidth: 160, cacheHeight: 160,
-                errorBuilder: (_, _, _) =&gt; Container(
+            return ImageService.widgetImage(url: url, fit: BoxFit.cover,
+                errorWidget: Container(
                   color: scheme.secondaryContainer,
                   child: Icon(Icons.music_note_rounded,
                       color: scheme.onSecondaryContainer, size: 20),
@@ -179,7 +179,7 @@ Widget build(BuildContext context) {
 <footer>
   <span class="no-break">
     laststats_mobile
-      4.4.0+31
+      4.5.0+31
   </span>
   
 </footer>
