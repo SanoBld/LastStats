@@ -1,6 +1,24 @@
 {
-  "updated": "2026-11-21T21:33:29Z",
+  "updated": "2026-11-21T21:43:54Z",
   "commits": [
+    {
+      "sha": "f453e7e22d00c3c98509e30f3c785bf9a2f15884",
+      "message": "feat: mise à jour des liens QR pour prendre en charge ListenBrainz",
+      "date": "2026-11-21T21:42:38Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/f453e7e22d00c3c98509e30f3c785bf9a2f15884",
+      "tags": []
+    },
+    {
+      "sha": "6dc4851d2bbd5aab4f0490a7ad107de077800919",
+      "message": "feat: encodage des noms d'utilisateur dans les liens QR pour une meilleure sécurité",
+      "date": "2026-11-21T21:39:49Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/6dc4851d2bbd5aab4f0490a7ad107de077800919",
+      "tags": []
+    },
     {
       "sha": "38371cc4efa9ed8cfd54567453318d67b0a6319e",
       "message": "feat: ajout d'un mécanisme de circuit breaker pour gérer les erreurs de connexion réseau",
@@ -2695,24 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/19a44f2fce94fed1679ee81c90855bab2f605994",
-      "tags": []
-    },
-    {
-      "sha": "a283935c60e7f18cf42e2b4a2db9ab481c2206e6",
-      "message": "feat: migrer la gestion des plateformes musicales vers une sélection multiple et ajuster l'affichage des liens",
-      "date": "2026-09-26T18:12:41Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/a283935c60e7f18cf42e2b4a2db9ab481c2206e6",
-      "tags": []
-    },
-    {
-      "sha": "1fdccbe79a70d01645f54c93fd516f31e3d42b94",
-      "message": "feat: ajouter la gestion des gestes pour le composant _TitleBubble afin d'ouvrir le poster de l'artiste",
-      "date": "2026-09-26T12:57:11Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/1fdccbe79a70d01645f54c93fd516f31e3d42b94",
       "tags": []
     }
   ]
