@@ -1,6 +1,24 @@
 {
-  "updated": "2026-11-21T10:22:47Z",
+  "updated": "2026-11-21T10:25:22Z",
   "commits": [
+    {
+      "sha": "207e6fdf8dd2eab00941b135e2bd980f6eb60113",
+      "message": "Merge branch 'master' of https://github.com/SanoBld/LastStats",
+      "date": "2026-11-21T10:25:00Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/207e6fdf8dd2eab00941b135e2bd980f6eb60113",
+      "tags": []
+    },
+    {
+      "sha": "260313819d4254ce8cca95a05eb34f83fc379e0c",
+      "message": "Refactor code structure for improved readability and maintainability",
+      "date": "2026-11-21T10:24:53Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/260313819d4254ce8cca95a05eb34f83fc379e0c",
+      "tags": []
+    },
     {
       "sha": "7fd7d24ec2af0a0853099de60f551d9ace9d78b3",
       "message": "chore: sync pubspec version with changelog [skip ci]",
@@ -2695,24 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/830b5f2060d9f6bb7cbec9648fefd46ec144ad35",
-      "tags": []
-    },
-    {
-      "sha": "a6de46fddcb9f4fc58e3f0f69fba1e9e0073fc6d",
-      "message": "feat: améliorer la gestion de l'affichage des titres et des artistes dans la feuille de détails",
-      "date": "2026-09-25T20:16:25Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/a6de46fddcb9f4fc58e3f0f69fba1e9e0073fc6d",
-      "tags": []
-    },
-    {
-      "sha": "50fbc8a8cee2dc3bd4f297671c2e8ab4cbfda504",
-      "message": "feat: améliorer l'affichage de l'image dans la feuille de détails et ajouter un composant de bulle de titre",
-      "date": "2026-09-25T19:50:21Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/50fbc8a8cee2dc3bd4f297671c2e8ab4cbfda504",
       "tags": []
     }
   ]
