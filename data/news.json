@@ -71,14 +71,6 @@
       "type": "alert",
       "emoji": "🚨",
       "date": "30/06"
-    },
-    {
-      "id": "news_1782814199",
-      "title": "Test Cedric",
-      "body": "Test 1",
-      "type": "info",
-      "emoji": "x) 🫠",
-      "date": "30/06"
     }
   ]
 }
