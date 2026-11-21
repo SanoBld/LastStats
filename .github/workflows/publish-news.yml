@@ -28,6 +28,11 @@ on:
         description: 'Emoji (optional, overrides type icon)'
         required: false
         default: ''
+      discord:
+        description: 'Also post on Discord (secret DISCORD_NEWS_WEBHOOK)'
+        required: false
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -92,3 +97,16 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
           keep_files: true
+
+      - name: Post on Discord
+        if: ${{ inputs.discord }}
+        continue-on-error: true
+        env:
+          WEBHOOK:   ${{ secrets.DISCORD_NEWS_WEBHOOK }}
+          KIND:      news
+          NEWS_TYPE: ${{ inputs.type }}
+          TITLE:     ${{ inputs.title }}
+          BODY:      ${{ inputs.body }}
+          EMOJI:     ${{ inputs.emoji }}
+          URL:       https://sanobld.github.io/LastStats/news.html
+        run: python3 .github/scripts/discord_notify.py
