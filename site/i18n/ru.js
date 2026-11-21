@@ -205,7 +205,6 @@ window.I18N.ru = {
   "langAuto": "Авто",
   "color.pick": "Цвет",
   "color.save": "Запомнить в этом браузере",
-  "color.music": "Цвета играющей музыки",
   "color.random": "Случайный при каждом обновлении",
   "color.mono": "Один цвет",
   "color.multi": "Несколько цветов",

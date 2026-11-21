@@ -27,3 +27,16 @@ html.show-loader.loader-out::before, html.show-loader.loader-out::after { opacit
   100% { border-radius: 50%; transform: rotate(360deg) scale(.9); }
 }
 @media (prefers-reduced-motion: reduce) { html.show-loader::after { animation: none; } }
+
+/* Performance: sections below the fold are rendered only when they get close to the screen */
+@supports (content-visibility: auto) {
+  .footer, .gallery-section, .project-card, section:not(:first-of-type) {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 600px;
+  }
+}
+/* Smoother scrolling: the browser may use the GPU for animated layers only while they animate */
+.reveal { will-change: auto; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}

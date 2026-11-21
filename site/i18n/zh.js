@@ -205,7 +205,6 @@ window.I18N.zh = {
   "langAuto": "自动",
   "color.pick": "颜色",
   "color.save": "在此浏览器中记住",
-  "color.music": "跟随正在播放的音乐配色",
   "color.random": "每次刷新随机",
   "color.mono": "单色",
   "color.multi": "多彩",
