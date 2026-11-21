@@ -31,6 +31,8 @@ class MarkdownLite extends StatelessWidget {
       if (RegExp(r'^!\[[^\]]*\]\(\S+\)$').hasMatch(t)) continue; // image
       line = t
           .replaceFirst(RegExp(r'^#{1,3}\s+'), '')
+          .replaceFirst(RegExp(r'^>\s?'), '')
+          .replaceAllMapped(RegExp(r'\[([^\]]+)\]\(https?:\/\/[^)\s]+\)'), (m) => m.group(1)!)
           .replaceFirst(RegExp(r'^[-*]\s+'), '• ');
       if (line.contains('|')) {
         line = line.split('|').map((c) => c.trim()).where((c) => c.isNotEmpty).join(' · ');
@@ -56,6 +58,7 @@ class MarkdownLite extends StatelessWidget {
   static final RegExp _underRegex  = RegExp(r'__(.+?)__');
   static final RegExp _strikeRegex = RegExp(r'~~(.+?)~~');
   static final RegExp _markRegex   = RegExp(r'==(.+?)==');
+  static final RegExp _linkRegex   = RegExp(r'\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)');
 
   Future<void> _openUrl(String rawUrl) async {
     final cleaned = rawUrl.replaceAll(RegExp(r'[)\].,;!?]+$'), '');
@@ -69,6 +72,7 @@ class MarkdownLite extends StatelessWidget {
   // Parses one line into inline spans (bold / italic / code / links).
   InlineSpan _parseInline(String line) {
     final tokens = <_Token>[
+      ..._linkRegex.allMatches(line).map((m) => _Token(m.start, m.end, _TokType.url, m.group(1)!, url: m.group(2))),
       ..._urlRegex.allMatches(line).map((m) => _Token(m.start, m.end, _TokType.url, m.group(0)!)),
       ..._boldRegex.allMatches(line).map((m) => _Token(m.start, m.end, _TokType.bold, m.group(1)!)),
       ..._underRegex.allMatches(line).map((m) => _Token(m.start, m.end, _TokType.underline, m.group(1)!)),
@@ -99,7 +103,7 @@ class MarkdownLite extends StatelessWidget {
             alignment: PlaceholderAlignment.baseline,
             baseline:  TextBaseline.alphabetic,
             child: GestureDetector(
-              onTap: () => _openUrl(t.text),
+              onTap: () => _openUrl(t.url ?? t.text),
               child: Text(t.text, style: style?.copyWith(
                 color: linkColor, fontWeight: FontWeight.w600,
                 decoration: TextDecoration.underline, decorationColor: linkColor,
@@ -247,6 +251,33 @@ class MarkdownLite extends StatelessWidget {
         continue;
       }
 
+      // Quote: "> text"
+      final quoteMatch = RegExp(r'^>\s?(.*)').firstMatch(line);
+      if (quoteMatch != null) {
+        widgets.add(Container(
+          margin: const EdgeInsets.only(bottom: 4),
+          padding: const EdgeInsets.only(left: 10),
+          decoration: BoxDecoration(border: Border(left: BorderSide(color: linkColor, width: 3))),
+          child: Text.rich(_parseInline(quoteMatch.group(1)!), style: style),
+        ));
+        i++;
+        continue;
+      }
+
+      // Numbered list: "1. item"
+      final numMatch = RegExp(r'^(\d+)[.)]\s+(.*)').firstMatch(line);
+      if (numMatch != null) {
+        widgets.add(Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 4),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('${numMatch.group(1)}.  ', style: style),
+            Expanded(child: Text.rich(_parseInline(numMatch.group(2)!), style: style)),
+          ]),
+        ));
+        i++;
+        continue;
+      }
+
       // Bullet lists: "- item" or "* item"
       final bulletMatch = RegExp(r'^[-*]\s+(.*)').firstMatch(line);
       if (bulletMatch != null) {
@@ -278,7 +309,8 @@ class _Token {
   final int start, end;
   final _TokType type;
   final String text;
-  _Token(this.start, this.end, this.type, this.text);
+  final String? url;
+  _Token(this.start, this.end, this.type, this.text, {this.url});
 }
 
 // Real photo inline in the changelog — tap to open full screen, pinch to zoom.

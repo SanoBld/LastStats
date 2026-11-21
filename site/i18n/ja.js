@@ -60,7 +60,7 @@ window.I18N.ja = {
   "index.android_widgets": "Androidウィジェット",
   "index.multi_language": "多言語対応",
   "index.chip_phone_colors": "スマホの色に対応",
-  "index.chip_lastfm": "Last.fm 対応",
+  "index.chip_lastfm": "Last.fm & ListenBrainz 対応",
   "index.chip_mobile_desktop": "スマホとパソコン",
   "index.view_on_github": "GitHubで見る",
   "index.connect_your_last_fm_account": "Last.fm アカウントをつなぐだけで、あとは LastStats におまかせ。お気に入りのアーティスト、アルバム、今聴いている曲が一か所にまとまり、見やすく美しく表示されます。データはあなたのものです。",
