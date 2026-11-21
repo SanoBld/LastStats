@@ -30,7 +30,7 @@
 -->
 
 
-## v4.4.0
+## v4.5.0
 
 ### ListenBrainz
 - New: choose between Last.fm and ListenBrainz on the login screen, with help links. Last.fm is marked as a paid API (an API key requires Last.fm Pro from December 1); ListenBrainz is free and only needs your user token
