@@ -1170,14 +1170,18 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
   // Heart (round, accent) + play (wide pill). Tracks only.
   bool get _hasPlay => _previewUrl != null || _previewLoading;
 
-  Widget _buildLoveButton(ColorScheme scheme) => M3CircleButton(
-        icon: _isLoved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-        busy: _loveBusy,
-        active: _isLoved,
-        onTap: _toggleLove,
-        onLongPress: () => showFolderAssignSheet(
-            context, name: _name, artist: _artist, image: _resolvedImage),
-        tooltip: tx('tip_love'),
+  Widget _buildLoveButton(ColorScheme scheme) => Builder(
+        builder: (btnCtx) => M3CircleButton(
+          icon: _isLoved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+          busy: _loveBusy,
+          active: _isLoved,
+          onTap: _toggleLove,
+          // btnCtx = the button itself, so the bubble opens next to it
+          onLongPress: () => showTrackMenu(btnCtx, name: _name, artist: _artist,
+              onAddToFolder: () => showFolderAssignSheet(
+                  context, name: _name, artist: _artist, image: _resolvedImage)),
+          tooltip: tx('tip_love'),
+        ),
       );
 
   // Heart + play, only shown together when there IS a preview to play;

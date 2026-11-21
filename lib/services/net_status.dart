@@ -1,8 +1,8 @@
 // lib/services/net_status.dart
 // Holds the last network error. Pages keep showing cached data;
 // the error icon reads this to show the details.
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../widgets/skeleton.dart';
 
 class NetStatus {
   NetStatus._();
@@ -45,14 +45,10 @@ class NetErrorButton extends StatelessWidget {
               );
             }
             if (busy > 0) {
+              // The app's own loader (same one as the skeletons / pull to refresh)
               return const SizedBox(
                 width: 48, height: 48,
-                child: Center(
-                  child: SizedBox(
-                    width: 22, height: 22,
-                    child: CircularProgressIndicator(strokeWidth: 2.5),
-                  ),
-                ),
+                child: Center(child: M3LoadingIndicator(size: 28)),
               );
             }
             return const SizedBox.shrink();

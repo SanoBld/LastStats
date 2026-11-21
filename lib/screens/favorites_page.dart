@@ -14,6 +14,7 @@ import '../app_state.dart';
 import '../l10n/l10n.dart';
 import '../l10n/extra_strings.dart';
 import '../services/data_cache.dart';
+import '../services/net_status.dart';
 import '../services/lastfm_service.dart';
 import '../services/favorites_folders_service.dart' show FavoritesFoldersService;
 import 'home_screen.dart' show showDetailSheet, showFolderAssignSheet;
@@ -62,12 +63,31 @@ class _FavoritesPageState extends State<FavoritesPage> {
     _load();
   }
 
+  String _sig(List<dynamic> l) =>
+      '${l.length}|${l.isEmpty ? '' : (l.first as Map)['name']}|${l.isEmpty ? '' : (l.last as Map)['name']}';
+
   Future<void> _load() async {
+    // Saved list first (no skeleton), then refresh behind.
+    final saved = DataCache.getStale(DataCache.keyLovedTracks());
+    var bg = false;
+    if (saved is List && saved.isNotEmpty) {
+      bg = true;
+      setState(() { _tracks = List<dynamic>.of(saved); _loading = false; });
+      NetStatus.begin();
+    }
     try {
       final t = await widget.service.getLovedTracks(limit: 300);
-      if (mounted) setState(() { _tracks = t; _loading = false; });
-    } catch (_) {
-      if (mounted) setState(() => _loading = false);
+      if (!mounted) return;
+      DataCache.set(DataCache.keyLovedTracks(), t).ignore();
+      NetStatus.error.value = null;
+      if (!bg || _sig(t) != _sig(_tracks)) {
+        setState(() { _tracks = t; _loading = false; });
+      }
+    } catch (e) {
+      NetStatus.error.value = e.toString().replaceFirst('Exception: ', '');
+      if (mounted && !bg) setState(() => _loading = false);
+    } finally {
+      if (bg) NetStatus.end();
     }
   }
 
@@ -76,64 +96,56 @@ class _FavoritesPageState extends State<FavoritesPage> {
     final artist = (track['artist']?['name'] ?? '').toString();
 
     setState(() => _tracks.remove(track));
-    final newSet = Set<String>.from(lovedTrackKeysNotifier.value)
-      ..remove(lovedKey(artist, name));
+    final key    = lovedKey(artist, name);
+    final newSet = Set<String>.from(lovedTrackKeysNotifier.value)..remove(key);
     lovedTrackKeysNotifier.value = newSet;
-    // Also drop it from any folder it was saved in.
-    FavoritesFoldersService.clearItem(
-        FavoritesFoldersService.itemKey(name, artist));
 
-    final svc = LastFmService(
-      apiKey:     widget.service.apiKey,
-      username:   widget.service.username,
-      secret:     secretKeyNotifier.value,
-      sessionKey: sessionKeyNotifier.value,
-    );
     try {
+      final svc = LastFmService(
+        apiKey:     widget.service.apiKey,
+        username:   widget.service.username,
+        secret:     secretKeyNotifier.value,
+        sessionKey: sessionKeyNotifier.value,
+      );
       await svc.unloveTrack(name, artist);
       await DataCache.invalidate(DataCache.keyLovedTracks());
     } catch (_) {
-      // Re-add on failure
-      if (mounted) setState(() => _tracks.add(track));
-      lovedTrackKeysNotifier.value = {...lovedTrackKeysNotifier.value, lovedKey(artist, name)};
+      // Network/auth failure: put the track back.
+      if (!mounted) return;
+      setState(() => _tracks.add(track));
+      lovedTrackKeysNotifier.value = Set<String>.from(lovedTrackKeysNotifier.value)..add(key);
     }
   }
 
   List<dynamic> get _filtered {
-    var list = _tracks;
-    if (_query.isNotEmpty) {
-      final q = _query.toLowerCase();
-      list = list.where((t) {
-        final name   = (t['name'] ?? '').toString().toLowerCase();
-        final artist = (t['artist']?['name'] ?? '').toString().toLowerCase();
-        return name.contains(q) || artist.contains(q);
-      }).toList();
-    }
-
-    final sorted = List<dynamic>.from(list);
+    final q = _query.trim().toLowerCase();
+    var list = _tracks.where((t) {
+      if (q.isEmpty) return true;
+      final n = (t['name'] ?? '').toString().toLowerCase();
+      final a = (t['artist']?['name'] ?? '').toString().toLowerCase();
+      return n.contains(q) || a.contains(q);
+    }).toList();
     switch (_sort) {
-      case _SortMode.recent:
-        sorted.sort((a, b) => _uts(b).compareTo(_uts(a)));
-      case _SortMode.oldest:
-        sorted.sort((a, b) => _uts(a).compareTo(_uts(b)));
+      case _SortMode.recent:   break;
+      case _SortMode.oldest:   list = list.reversed.toList(); break;
       case _SortMode.artistAz:
-        sorted.sort((a, b) => (a['artist']?['name'] ?? '').toString()
-            .toLowerCase().compareTo((b['artist']?['name'] ?? '').toString().toLowerCase()));
+        list.sort((a, b) => (a['artist']?['name'] ?? '').toString().toLowerCase()
+            .compareTo((b['artist']?['name'] ?? '').toString().toLowerCase()));
+        break;
       case _SortMode.titleAz:
-        sorted.sort((a, b) => (a['name'] ?? '').toString()
-            .toLowerCase().compareTo((b['name'] ?? '').toString().toLowerCase()));
+        list.sort((a, b) => (a['name'] ?? '').toString().toLowerCase()
+            .compareTo((b['name'] ?? '').toString().toLowerCase()));
+        break;
     }
-    return sorted;
+    return list;
   }
-
-  int _uts(dynamic t) => int.tryParse(t['date']?['uts']?.toString() ?? '0') ?? 0;
 
   @override
   Widget build(BuildContext context) {
     final items  = _filtered;
 
     return Scaffold(
-      appBar: M3AppBar(title: L.favPageTitle),
+      appBar: M3AppBar(title: L.favPageTitle, actions: const [NetErrorButton()]),
       body: SafeArea(top: false, child: Align(alignment: Alignment.topCenter, child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 820), child: Column(children: [
 Expanded(child: M3Switcher(
         duration: const Duration(milliseconds: 250),
@@ -271,7 +283,8 @@ class _FavoriteListTile extends StatelessWidget {
       trailing: selecting
           ? Checkbox(value: selected, onChanged: (_) => onTap())
           : GestureDetector(
-        onLongPress: () => showFolderAssignSheet(context, name: name, artist: artist, image: rawUrl),
+        onLongPress: () => showTrackMenu(context, name: name, artist: artist,
+            onAddToFolder: () => showFolderAssignSheet(context, name: name, artist: artist, image: rawUrl)),
         child: IconButton.filledTonal(
           icon: Icon(Icons.favorite_rounded,
               color: Theme.of(context).colorScheme.primary, size: 20),

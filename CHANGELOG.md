@@ -106,4 +106,7 @@
 - New error icon (top-left on the dashboard, top-right on other tabs, in the header): tap it to see the error details. It disappears when the connection is back
 - Loading: once your scrobbles have been synced, the dashboard and rankings show your saved data at once (no skeleton) and refresh in the background. A small spinner shows in the error icon spot while it loads; if it fails the error icon shows instead, and if it works the screen only changes when the data really changed
 - Same instant loading for History (the day is read from your device) and Charts (top artists / albums from your device), with the background refresh spinner and error icon
+- The loading spinner next to the error icon now uses the app's own loader
+- Long press / right click: the folder cards, the heart buttons (favorites and detail page) and the rankings rows (right click on PC) now open the same bubble menu as the History tracks
+- Favorites page: your saved list shows at once and refreshes behind (spinner / error icon in the top bar)
 - Tab titles (Rankings, Charts, History) now use the accent color, like the dashboard

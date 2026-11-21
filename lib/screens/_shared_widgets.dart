@@ -248,7 +248,6 @@ class _SmartImageState extends State<_SmartImage> {
     // Decode at display resolution (x devicePixelRatio) instead of the
     // source's full size — big RAM saving for lists of small avatars,
     // no visible quality loss since it still matches screen pixels.
-    final px = (widget.size * MediaQuery.of(context).devicePixelRatio).round();
     return _shaped(ImageService.widgetImage(
         url: url, width: widget.size, height: widget.size, fit: BoxFit.cover,
         placeholder: _loadingBox(s), errorWidget: _fallbackBox(s)));
@@ -731,12 +730,28 @@ Expanded(
                   childAspectRatio: 1.05,
                 ),
                 itemCount: folders.length,
-                itemBuilder: (ctx, i) => _FolderCard(
-                  folder: folders[i],
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => _FolderDetailPage(service: service, folder: folders[i]))),
-                  onLongPress: () => showFolderEditorSheet(context, existing: folders[i]),
-                ),
+                itemBuilder: (ctx, i) => Builder(builder: (cardCtx) {
+                  // Long press / right click: same bubble menu as the track lists.
+                  void menu([Offset? at]) => showM3Menu(cardCtx, at: at, groups: [
+                        [
+                          M3MenuItem(
+                            label: L.settingsCustomColorEdit,
+                            icon: Icons.edit_rounded,
+                            onTap: () => showFolderEditorSheet(context, existing: folders[i]),
+                          ),
+                        ],
+                      ]);
+                  return GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onSecondaryTapUp: (d) => menu(d.globalPosition),
+                    child: _FolderCard(
+                      folder: folders[i],
+                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => _FolderDetailPage(service: service, folder: folders[i]))),
+                      onLongPress: menu,
+                    ),
+                  );
+                }),
               );
             },
           ),

@@ -417,10 +417,14 @@ class _TopListBodyState extends State<_TopListBody>
               case 'albums':  imgF = ImageService.resolveAlbum(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null); break;
               default:        imgF = ImageService.resolveTrack(name, artist, lastfmUrl: raw.isNotEmpty ? raw : null);
             }
-            return M3InkWell(
+            return Builder(builder: (rowCtx) => GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onSecondaryTapUp: (d) => showTrackMenu(rowCtx,
+                  name: name, artist: artist, type: widget.type, at: d.globalPosition),
+              child: M3InkWell(
               key: ValueKey('rank_row_${widget.type}_${idx}_$name'),
               onTap: () { _haptic(_HapticImpact.light); _showDetail(ctx, item); },
-              onLongPress: () => showTrackMenu(ctx, name: name, artist: artist, type: widget.type),
+              onLongPress: () => showTrackMenu(rowCtx, name: name, artist: artist, type: widget.type),
               borderRadius: AppRadius.smR,
               child: _FadeSlideIn(
                 // Stagger each item slightly for a cascade effect
@@ -431,7 +435,7 @@ class _TopListBodyState extends State<_TopListBody>
                 plays: null,
               ),
               ), // _FadeSlideIn
-            );
+            )));
           },
           childCount: (_items.length >= 3 ? _items.length - 3 : _items.length) + 1,
         )),
