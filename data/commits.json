@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-21T10:15:22Z",
+  "updated": "2026-11-21T10:19:50Z",
   "commits": [
+    {
+      "sha": "141a5d48e4daf0ddc04848c0c455de5ac8c94449",
+      "message": "feat: mise à jour des messages d'interface pour ListenBrainz dans plusieurs langues",
+      "date": "2026-11-21T10:19:25Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/141a5d48e4daf0ddc04848c0c455de5ac8c94449",
+      "tags": []
+    },
     {
       "sha": "2a48003f21558bb45d976a11279a7ab4b5a34582",
       "message": "feat: ajouter la prise en charge de ListenBrainz dans les traductions et les messages d'interface",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/7f41f05e3015f02c6bda2e25a341440afc3f6222",
-      "tags": []
-    },
-    {
-      "sha": "4e8fb6357b4ae0ccacccb433754c8bbcc5f6b152",
-      "message": "feat: ajouter un effet de rotation pour l'art en cours de lecture et améliorer l'affichage des statistiques utilisateur",
-      "date": "2026-09-25T18:46:15Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/4e8fb6357b4ae0ccacccb433754c8bbcc5f6b152",
       "tags": []
     }
   ]
