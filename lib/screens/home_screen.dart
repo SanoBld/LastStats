@@ -209,12 +209,18 @@ class _HomeScreenState extends State<HomeScreen> {
     // Caches are not per-account: wipe them first if the account changed,
     // otherwise the incremental sync would merge two users' histories.
     CacheOwner.ensure(widget.username).then((_) => DataCache.init()).then((_) {
-      PrefetchService.prefetchAll(_service);
-      if (AllScrobblesService.isFirstLoad) {
-        AllScrobblesService.loadAll(_service);
-      } else {
-        AllScrobblesService.syncNew(_service);
-      }
+      // One thing at a time: running the prefetch (dozens of calls) and the
+      // full-history download together flooded ListenBrainz at startup.
+      () async {
+        try {
+          if (AllScrobblesService.isFirstLoad) {
+            await AllScrobblesService.loadAll(_service);
+          } else {
+            await AllScrobblesService.syncNew(_service);
+          }
+        } catch (_) {}
+        PrefetchService.prefetchAll(_service);
+      }();
     });
   }
 

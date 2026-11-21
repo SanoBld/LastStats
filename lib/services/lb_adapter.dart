@@ -140,10 +140,20 @@ class LbAdapter {
     } catch (_) { return null; }
   }
 
+  // Circuit breaker: once the server cut the connection (block, firewall,
+  // no network), stop sending requests for a while. Dozens of queued calls
+  // retried 4 times each keep the block alive and make it worse.
+  static int _downUntil = 0;
+  static void resetCooldown() => _downUntil = 0;
+
   static Future<http.Response> _fetch(Uri uri) async {
     Object? last;
     final headers = await _authHeaders(uri);
     final stale = await _loadStale(uri);
+    if (DateTime.now().millisecondsSinceEpoch < _downUntil) {
+      if (stale != null) return stale;
+      throw Exception('${tx('lb_neterr')}\nCode: pause');
+    }
     for (var i = 0; i < 4; i++) {
       try {
         final res = await ApiHttp.get(uri, headers: headers, timeout: _timeout);
@@ -161,6 +171,7 @@ class LbAdapter {
           continue;
         }
         if (res.statusCode == 200) {
+          _downUntil = 0;
           NetStatus.error.value = null;
           _saveStale(uri, res).ignore();
         }
@@ -173,6 +184,7 @@ class LbAdapter {
       }
     }
     if (last != null && _isNet(last)) {
+      _downUntil = DateTime.now().millisecondsSinceEpoch + 60000;
       var w = last.toString().replaceAll('\n', ' ');
       if (w.length > 200) w = w.substring(0, 200);
       NetStatus.error.value = '${tx('lb_neterr')}\nCode: $w';
