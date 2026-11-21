@@ -247,7 +247,11 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
   Future<void> _initWithCache() async {
     await _loadPrefs();
     if (!mounted) return;
+    // Synced once already: show saved data even if it is old (no skeleton).
+    final wasOffline = DataCache.offlineMode;
+    if (!AllScrobblesService.isFirstLoad) DataCache.offlineMode = true;
     final gotCache = _loadFromCache();
+    DataCache.offlineMode = wasOffline;
     if (gotCache) {
       _resolveHeaderImage();
       if (_showFriends) _loadFriends();
@@ -648,7 +652,18 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     ]);
   }
 
+  String? _lastSig;
+
   Future<void> _load({bool silent = false}) async {
+    NetStatus.begin();
+    try {
+      await _loadInner(silent: silent);
+    } finally {
+      NetStatus.end();
+    }
+  }
+
+  Future<void> _loadInner({bool silent = false}) async {
     if (!silent) setState(() { _loading = true; _error = null; });
     try {
       final res = await Future.wait([
@@ -692,6 +707,12 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
       }
 
       if (!mounted) return;
+      NetStatus.error.value = null; // load worked: clear the error icon
+      // Background refresh with identical data: change nothing on screen.
+      String? sig;
+      try { sig = jsonEncode(res); } catch (_) {}
+      if (silent && sig != null && sig == _lastSig) return;
+      _lastSig = sig;
       setState(() {
         _userInfo        = res[0] as Map<String, dynamic>?;
         _topArtists      = res[1] as List<dynamic>;
@@ -737,6 +758,9 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         }
         // 2) Nothing saved: show a short readable error (never raw HTML).
         setState(() { _error = _friendlyError(e); _loading = false; });
+      } else {
+        // Background refresh failed: keep the data, show the error icon.
+        NetStatus.error.value = _friendlyError(e);
       }
     }
   }

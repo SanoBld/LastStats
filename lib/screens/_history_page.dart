@@ -30,8 +30,41 @@ class _HistoryPageState extends State<_HistoryPage>
   @override
   void dispose() { _tabController.dispose(); super.dispose(); }
 
+  // Tracks of the selected day from the scrobbles stored on the device.
+  List<dynamic> _localDay() {
+    final from = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+    final a = from.millisecondsSinceEpoch ~/ 1000;
+    final b = from.add(const Duration(days: 1)).millisecondsSinceEpoch ~/ 1000;
+    final recs = (ScrobblesFileCache.getRecords(from.year) ?? [])
+        .where((r) => r.ts >= a && r.ts < b).toList()
+      ..sort((x, y) => y.ts.compareTo(x.ts));
+    return [
+      for (final r in recs)
+        {
+          'name': r.track,
+          'artist': {'#text': r.artist},
+          'album': {'#text': r.album},
+          'date': {'uts': '${r.ts}'},
+          'image': <dynamic>[],
+        }
+    ];
+  }
+
+  String _daySig(List<dynamic> l) =>
+      '${l.length}|${l.isEmpty ? '' : (l.first as Map)['date']?['uts']}|${l.isEmpty ? '' : (l.last as Map)['date']?['uts']}';
+
   Future<void> _load() async {
-    setState(() { _loading = true; _error = null; _tracks = []; });
+    // Synced once: show the day from the device at once, refresh behind.
+    var bg = false;
+    if (!AllScrobblesService.isFirstLoad) {
+      final loc = _localDay();
+      if (loc.isNotEmpty) {
+        bg = true;
+        setState(() { _tracks = loc; _loading = false; _error = null; _navDirection = 0; });
+        NetStatus.begin();
+      }
+    }
+    if (!bg) setState(() { _loading = true; _error = null; _tracks = []; });
     try {
       final from = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
       final to   = from.add(const Duration(days: 1));
@@ -50,9 +83,23 @@ class _HistoryPageState extends State<_HistoryPage>
         if (page >= totalP) break;
         page++;
       }
-      setState(() { _tracks = all; _loading = false; _navDirection = 0; });
+      if (!mounted) return;
+      if (bg) {
+        // Day changed while loading: this answer is not for the screen anymore.
+        if (_daySig(all) != _daySig(_tracks)) setState(() { _tracks = all; });
+      } else {
+        setState(() { _tracks = all; _loading = false; _navDirection = 0; });
+      }
     } catch (e) {
-      setState(() { _error = e.toString().replaceFirst('Exception: ', ''); _loading = false; _navDirection = 0; });
+      if (!mounted) return;
+      final msg = e.toString().replaceFirst('Exception: ', '');
+      if (bg) {
+        NetStatus.error.value = msg;
+      } else {
+        setState(() { _error = msg; _loading = false; _navDirection = 0; });
+      }
+    } finally {
+      if (bg) NetStatus.end();
     }
   }
 

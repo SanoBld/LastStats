@@ -247,15 +247,52 @@ class _TopListBodyState extends State<_TopListBody>
     }).toList();
   }
 
+  int _periodCutoff() {
+    const days = {'7day': 7, '1month': 30, '3month': 90, '6month': 180, '12month': 365};
+    final d = days[widget.period];
+    return d == null ? 0 : DateTime.now().millisecondsSinceEpoch ~/ 1000 - d * 86400;
+  }
+
+  String _sig(List<dynamic> l) =>
+      l.map((e) => '${(e as Map)['name']}|${e['playcount']}').join(';');
+
+  Future<List<dynamic>> _fetchTop() {
+    switch (widget.type) {
+      case 'artists':
+        return widget.service.getTopArtists(period: widget.period, limit: 50, page: _page);
+      case 'albums':
+        return widget.service.getTopAlbums(period: widget.period, limit: 50, page: _page);
+      default:
+        return widget.service.getTopTracks(period: widget.period, limit: 50, page: _page);
+    }
+  }
+
   Future<void> _load({bool reset = false}) async {
-    if (reset) {
-      setState(() {
-        _loading = true; _error = null;
-        _page = 1; _exhausted = false; _items = [];
-      });
+    // Already synced once: show the ranking from the device at once (no
+    // skeleton), then refresh from the API in the background.
+    var bg = false;
+    if (reset && widget.year == null && !AllScrobblesService.isFirstLoad) {
+      final loc = await _computeLocalTop(null, cutoff: _periodCutoff());
+      if (loc.isNotEmpty && mounted) {
+        bg = true;
+        setState(() {
+          _items = loc; _loading = false; _error = null;
+          _page = 1; _exhausted = true; // no paging until the API answers
+        });
+      }
+    }
+    if (!bg) {
+      if (reset) {
+        setState(() {
+          _loading = true; _error = null;
+          _page = 1; _exhausted = false; _items = [];
+        });
+      } else {
+        if (_loadingMore || _exhausted) return;
+        setState(() => _loadingMore = true);
+      }
     } else {
-      if (_loadingMore || _exhausted) return;
-      setState(() => _loadingMore = true);
+      NetStatus.begin();
     }
     try {
       List<dynamic> fresh;
@@ -264,19 +301,16 @@ class _TopListBodyState extends State<_TopListBody>
         fresh      = await _computeLocalTop(widget.year!);
         _exhausted = true;
       } else {
-        switch (widget.type) {
-          case 'artists':
-            fresh = await widget.service.getTopArtists(
-                period: widget.period, limit: 50, page: _page); break;
-          case 'albums':
-            fresh = await widget.service.getTopAlbums(
-                period: widget.period, limit: 50, page: _page); break;
-          default:
-            fresh = await widget.service.getTopTracks(
-                period: widget.period, limit: 50, page: _page);
-        }
+        fresh = await _fetchTop();
       }
-      if (mounted) {
+      if (!mounted) return;
+      if (bg) {
+        // Replace only when something really changed: no useless refresh.
+        if (_sig(fresh) != _sig(_items)) {
+          setState(() { _items = List<dynamic>.of(fresh); });
+        }
+        _exhausted = fresh.length < 50;
+      } else {
         setState(() {
           _items.addAll(fresh);
           if (widget.year == null) _exhausted = fresh.length < 50;
@@ -284,14 +318,16 @@ class _TopListBodyState extends State<_TopListBody>
         });
       }
     } catch (e) {
+      final msg = e.toString().replaceFirst('Exception: ', '');
+      if (bg) {
+        NetStatus.error.value = msg;
+        return;
+      }
       // Network down: use the scrobbles stored on the device instead.
       if (widget.year == null) {
-        const days = {'7day': 7, '1month': 30, '3month': 90, '6month': 180, '12month': 365};
-        final d = days[widget.period];
-        final cutoff = d == null ? 0 : DateTime.now().millisecondsSinceEpoch ~/ 1000 - d * 86400;
-        final local = await _computeLocalTop(null, cutoff: cutoff);
+        final local = await _computeLocalTop(null, cutoff: _periodCutoff());
         if (local.isNotEmpty && mounted) {
-          NetStatus.error.value ??= e.toString().replaceFirst('Exception: ', '');
+          NetStatus.error.value ??= msg;
           setState(() {
             _items = local; _exhausted = true;
             _loading = false; _loadingMore = false;
@@ -301,10 +337,12 @@ class _TopListBodyState extends State<_TopListBody>
       }
       if (mounted) {
         setState(() {
-          _error = e.toString().replaceFirst('Exception: ', '');
+          _error = msg;
           _loading = false; _loadingMore = false;
         });
       }
+    } finally {
+      if (bg) NetStatus.end();
     }
   }
 

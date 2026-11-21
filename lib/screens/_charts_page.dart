@@ -143,33 +143,90 @@ class _ChartsPageState extends State<_ChartsPage>
     }
   }
 
+  // Top 10 from every scrobble stored on the device.
+  Future<List<dynamic>> _localTop(String type) async {
+    final records = <ScrobbleRecord>[];
+    for (final y in ScrobblesFileCache.getCachedYears()) {
+      records.addAll(ScrobblesFileCache.getRecords(y) ?? []);
+    }
+    if (records.isEmpty) return [];
+    if (LibraryMerge.active) await LibraryMerge.ensureKnown(widget.service, null);
+    final tally = LocalTally(LibraryMerge.knownSync(widget.service.username));
+    for (final r in records) {
+      if (type == 'artists') {
+        if (r.artist.isEmpty) continue;
+        tally.addScrobble('artists', name: r.artist, artist: '');
+      } else {
+        if (r.album.isEmpty) continue;
+        tally.addScrobble('albums', name: r.album, artist: r.artist);
+      }
+    }
+    return tally.sorted().take(10).map((e) => <String, dynamic>{
+          'name': e.name,
+          'playcount': e.plays.toString(),
+          'image': <dynamic>[],
+          if (type != 'artists') 'artist': {'name': e.artist},
+        }).toList();
+  }
+
+  String _topSig(List<dynamic> l) =>
+      l.map((e) => '${(e as Map)['name']}|${e['playcount']}').join(';');
+
+  Future<void> _afterTops() async {
+    _refreshAvailableYears();
+    _loadTags();
+    _hasFullYearData = AllScrobblesService.isYearCached(_selectedYear);
+    await _loadYearData(_selectedYear);
+    if (!AllScrobblesService.isRunning) {
+      AllScrobblesService.loadAll(widget.service);
+    }
+  }
+
   Future<void> _load() async {
     _yearCache.clear();
-    setState(() { _loading = true; _error = null; });
+    // Synced once: show the device data at once, refresh behind.
+    var bg = false;
+    if (!AllScrobblesService.isFirstLoad) {
+      final a = await _localTop('artists');
+      final b = await _localTop('albums');
+      if (a.isNotEmpty && mounted) {
+        bg = true;
+        setState(() { _topArtists = a; _topAlbums = b; _loading = false; _error = null; });
+        NetStatus.begin();
+      }
+    }
+    if (!bg) setState(() { _loading = true; _error = null; });
     try {
+      if (bg) {
+        _afterTops().ignore(); // local data, does not wait for the network
+      }
       final res = await Future.wait([
         widget.service.getTopArtists(period: 'overall', limit: 10),
         widget.service.getTopAlbums(period: 'overall',  limit: 10),
       ]);
       if (!mounted) return;
-      setState(() {
-        _topArtists = res[0];
-        _topAlbums  = res[1];
-        _loading    = false;
-      });
-      _refreshAvailableYears();
-      _loadTags();
-      _hasFullYearData = AllScrobblesService.isYearCached(_selectedYear);
-      await _loadYearData(_selectedYear);
-      if (!AllScrobblesService.isRunning) {
-        AllScrobblesService.loadAll(widget.service);
+      if (bg) {
+        if (_topSig(res[0]) != _topSig(_topArtists) || _topSig(res[1]) != _topSig(_topAlbums)) {
+          setState(() { _topArtists = res[0]; _topAlbums = res[1]; });
+        }
+      } else {
+        setState(() {
+          _topArtists = res[0];
+          _topAlbums  = res[1];
+          _loading    = false;
+        });
+        await _afterTops();
       }
     } catch (e) {
       if (!mounted) return;
-      setState(() {
-        _error   = e.toString().replaceFirst('Exception: ', '');
-        _loading = false;
-      });
+      final msg = e.toString().replaceFirst('Exception: ', '');
+      if (bg) {
+        NetStatus.error.value = msg;
+      } else {
+        setState(() { _error = msg; _loading = false; });
+      }
+    } finally {
+      if (bg) NetStatus.end();
     }
   }
 

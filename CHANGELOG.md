@@ -104,4 +104,6 @@
 - Images: artwork and avatars shown in lists now use the on-device image cache, so they no longer reload at every launch. The cache is read at startup, so cached images show in the first frame
 - Network errors: the last good ListenBrainz answer is kept on the device and shown when the network fails (DNS / timeout). Rankings fall back to the scrobbles stored on the device. The page keeps its data instead of an error screen
 - New error icon (top-left on the dashboard, top-right on other tabs, in the header): tap it to see the error details. It disappears when the connection is back
+- Loading: once your scrobbles have been synced, the dashboard and rankings show your saved data at once (no skeleton) and refresh in the background. A small spinner shows in the error icon spot while it loads; if it fails the error icon shows instead, and if it works the screen only changes when the data really changed
+- Same instant loading for History (the day is read from your device) and Charts (top artists / albums from your device), with the background refresh spinner and error icon
 - Tab titles (Rankings, Charts, History) now use the accent color, like the dashboard
