@@ -43,6 +43,16 @@ class ImageCacheBackend {
     } catch (_) { return null; }
   }
 
+  // Sync read, only valid once the folder is known (after first read/meta).
+  static Uint8List? readSync(String key) {
+    try {
+      final d = _dir;
+      if (d == null) return null;
+      final f = File('${d.path}/$key.bin');
+      return f.existsSync() ? f.readAsBytesSync() : null;
+    } catch (_) { return null; }
+  }
+
   static Future<void> write(String key, Uint8List bytes) async {
     try {
       final dir = await _ensureDir();

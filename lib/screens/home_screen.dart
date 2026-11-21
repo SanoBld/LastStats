@@ -14,6 +14,7 @@
 // ══════════════════════════════════════════════════════════════════════════
 
 import '../services/data_source.dart';
+import '../services/net_status.dart';
 import 'dart:async';
 import 'dart:math' show sqrt;
 import 'dart:math' as math;
@@ -243,7 +244,21 @@ class _HomeScreenState extends State<HomeScreen> {
     _SettingsPage(username: widget.username), // index 5 – wide only
   ];
 
+  // Error icon on the dashboard (top-left). Other tabs show it in their
+  // own header row (NetErrorButton), so it never covers their buttons.
   Widget _pageStack(List<Widget> pages, int count) {
+    return Stack(children: [
+      _pageStackRaw(pages, count),
+      if (_idx == 0)
+        Positioned(
+          top: MediaQuery.of(context).padding.top + 4,
+          left: 8,
+          child: const NetErrorButton(),
+        ),
+    ]);
+  }
+
+  Widget _pageStackRaw(List<Widget> pages, int count) {
     // Top level tabs: the old page fades out first, then the new page
     // fades in (Material 3 "fade through"). Pages stay alive for state.
     // Solid status bar slides in once a tab's content is scrolled.

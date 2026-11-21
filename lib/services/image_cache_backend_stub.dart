@@ -2,6 +2,7 @@
 import 'dart:typed_data';
 
 class ImageCacheBackend {
+  static Uint8List?        readSync(String key) => null;
   static Future<String?>   readMeta()                     async => null;
   static Future<void>      writeMeta(String _)            async {}
   static Future<Uint8List?> read(String _)                async => null;

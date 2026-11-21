@@ -22,6 +22,7 @@ import 'api_http.dart';
 import 'all_scrobbles_service.dart';
 import 'scrobbles_file_cache.dart' show ScrobbleRecord;
 import 'listenbrainz_service.dart';
+import 'net_status.dart';
 
 class LbAdapter {
   static const _host    = 'api.listenbrainz.org';
@@ -101,9 +102,48 @@ class LbAdapter {
     });
   }
 
+  // ── Offline copy of every successful answer (read when network fails) ──
+  static const _stalePrefix = 'lbhttp_';
+  static int _staleWrites = 0;
+
+  static Future<void> _saveStale(Uri uri, http.Response res) async {
+    try {
+      if (res.bodyBytes.length > 300 * 1024) return; // too big
+      final p = await SharedPreferences.getInstance();
+      await p.setString('$_stalePrefix$uri', jsonEncode({
+        't': DateTime.now().millisecondsSinceEpoch,
+        'b': utf8.decode(res.bodyBytes, allowMalformed: true),
+      }));
+      if (++_staleWrites % 20 == 0) {
+        final keys = p.getKeys().where((k) => k.startsWith(_stalePrefix)).toList();
+        if (keys.length > 80) {
+          final ts = <String, int>{};
+          for (final k in keys) {
+            try { ts[k] = (jsonDecode(p.getString(k)!) as Map)['t'] as int; }
+            catch (_) { ts[k] = 0; }
+          }
+          keys.sort((a, b) => ts[a]!.compareTo(ts[b]!));
+          for (final k in keys.take(keys.length - 60)) { await p.remove(k); }
+        }
+      }
+    } catch (_) {}
+  }
+
+  static Future<http.Response?> _loadStale(Uri uri) async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      final raw = p.getString('$_stalePrefix$uri');
+      if (raw == null) return null;
+      final body = (jsonDecode(raw) as Map)['b'] as String;
+      return http.Response.bytes(utf8.encode(body), 200,
+          headers: const {'content-type': 'application/json', 'x-laststats-stale': '1'});
+    } catch (_) { return null; }
+  }
+
   static Future<http.Response> _fetch(Uri uri) async {
     Object? last;
     final headers = await _authHeaders(uri);
+    final stale = await _loadStale(uri);
     for (var i = 0; i < 4; i++) {
       try {
         final res = await ApiHttp.get(uri, headers: headers, timeout: _timeout);
@@ -120,13 +160,23 @@ class LbAdapter {
           await Future.delayed(Duration(milliseconds: 700 * (i + 1)));
           continue;
         }
+        if (res.statusCode == 200) {
+          NetStatus.error.value = null;
+          _saveStale(uri, res).ignore();
+        }
         return res;
       } catch (e) {
         last = e;
+        // Saved copy exists: stop retrying early, no long wait for the user.
+        if (stale != null && _isNet(e) && i >= 1) break;
         await Future.delayed(Duration(milliseconds: 700 * (i + 1)));
       }
     }
     if (last != null && _isNet(last)) {
+      var w = last.toString().replaceAll('\n', ' ');
+      if (w.length > 200) w = w.substring(0, 200);
+      NetStatus.error.value = '${tx('lb_neterr')}\nCode: $w';
+      if (stale != null) return stale; // show saved data, keep the error icon
       // Keep the technical reason visible (blocked TLS, timeout, DNS...)
       var why = last.toString().replaceAll('\n', ' ');
       if (why.length > 110) why = why.substring(0, 110);

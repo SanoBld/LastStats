@@ -100,3 +100,8 @@
 ### License
 - LastStats is now released under the GNU GPL v3 (was MIT), copyright Sano Bld. New LICENSE and NOTICE.md; README, website legal page, About page, RPM package and the 10 translations updated. Versions released before this stay under MIT
 
+### Offline and images
+- Images: artwork and avatars shown in lists now use the on-device image cache, so they no longer reload at every launch. The cache is read at startup, so cached images show in the first frame
+- Network errors: the last good ListenBrainz answer is kept on the device and shown when the network fails (DNS / timeout). Rankings fall back to the scrobbles stored on the device. The page keeps its data instead of an error screen
+- New error icon (top-left on the dashboard, top-right on other tabs, in the header): tap it to see the error details. It disappears when the connection is back
+- Tab titles (Rankings, Charts, History) now use the accent color, like the dashboard

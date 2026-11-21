@@ -365,6 +365,7 @@ class _SearchPageState extends State<_SearchPage> {
                   },
                 ),
         ),
+        const NetErrorButton(),
       ]),
     );
   }

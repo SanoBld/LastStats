@@ -249,18 +249,9 @@ class _SmartImageState extends State<_SmartImage> {
     // source's full size — big RAM saving for lists of small avatars,
     // no visible quality loss since it still matches screen pixels.
     final px = (widget.size * MediaQuery.of(context).devicePixelRatio).round();
-    return _shaped(Image.network(url, width: widget.size, height: widget.size, fit: BoxFit.cover,
-        cacheWidth: px, cacheHeight: px,
-        // Smooth fade-in when the artwork appears or changes.
-        frameBuilder: (_, child, frame, sync) => sync
-            ? child
-            : AnimatedOpacity(
-                opacity: frame == null ? 0 : 1,
-                duration: const Duration(milliseconds: 250),
-                curve: Curves.easeOut,
-                child: child),
-        loadingBuilder: (_, child, p) => p == null ? child : _loadingBox(s),
-        errorBuilder: (_, _, _) => _fallbackBox(s)));
+    return _shaped(ImageService.widgetImage(
+        url: url, width: widget.size, height: widget.size, fit: BoxFit.cover,
+        placeholder: _loadingBox(s), errorWidget: _fallbackBox(s)));
   }
 
   // Every image gets a Material You shape (cookie, circle, clover…),

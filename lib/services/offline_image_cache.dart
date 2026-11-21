@@ -52,6 +52,19 @@ class OfflineImageCache {
   static int  _totalBytes = 0;
   static int  _nextId     = 0;
   static bool _loaded     = false;
+  static bool _ready      = false;
+
+  /// Call once at startup so cached images show in the first frame.
+  static Future<void> init() => _ensureMeta();
+
+  static Uint8List? _syncLoad(String url) {
+    if (!_ready) return null;
+    final e = _meta[url];
+    if (e == null) return null;
+    final b = ImageCacheBackend.readSync(e.fileKey);
+    if (b != null) _memPut(url, b);
+    return b;
+  }
 
   static const _timeout = Duration(seconds: 8);
 
@@ -88,7 +101,7 @@ class OfflineImageCache {
     _loaded = true;
     try {
       final raw = await ImageCacheBackend.readMeta();
-      if (raw == null) return;
+      if (raw == null) { _ready = true; return; }
       final json = jsonDecode(raw) as Map<String, dynamic>;
       _nextId = (json['id'] as num?)?.toInt() ?? 0;
       final entries = (json['e'] as Map<String, dynamic>?) ?? {};
@@ -100,6 +113,7 @@ class OfflineImageCache {
         _totalBytes += e.size;
       }
     } catch (_) {}
+    _ready = true;
   }
 
   static Future<void> _saveMeta() async {
@@ -259,6 +273,7 @@ class OfflineImageCache {
     _totalBytes = 0;
     _nextId     = 0;
     _loaded     = false;
+    _ready      = false;
     await ImageCacheBackend.clearAll();
   }
 
@@ -289,7 +304,7 @@ class OfflineImageCache {
 
     // Fast path: already in memory → show it in the same frame, no
     // placeholder flash and no disk read.
-    final hot = _mem[url];
+    final hot = _mem[url] ?? _syncLoad(url);
     if (hot != null && _meta.containsKey(url)) {
       return Builder(builder: (context) {
         final dpr = MediaQuery.of(context).devicePixelRatio;

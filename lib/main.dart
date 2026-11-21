@@ -18,6 +18,7 @@ import 'screens/notification_detail_page.dart';
 import 'services/data_cache.dart';
 import 'services/api_usage.dart';
 import 'services/image_service.dart';
+import 'services/offline_image_cache.dart';
 import 'services/scrobbles_file_cache.dart';
 import 'services/friends_library_service.dart';
 import 'services/achievements.dart';
@@ -217,6 +218,8 @@ Future<void> _mainImpl() async {
   // on disk I/O anyway.
   await Future.wait([
     DataCache.init(),
+    OfflineImageCache.init(),
+    ImageService.init(),
     ApiUsage.loadSettings(),
     UpdateService.init(),
     ScrobblesFileCache.init(),

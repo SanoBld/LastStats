@@ -124,8 +124,11 @@ class _RankingsPageState extends State<_RankingsPage>
             child: Row(children: [
               Expanded(
                 child: Text(L.rankingsTitle,
-                    style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
+                    style: text.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: Theme.of(context).colorScheme.primary)),
               ),
+              const NetErrorButton(),
               // Opens a Material You sheet to pick the date
               M3Chip(
                 avatar: const Icon(Icons.calendar_month_rounded),
@@ -195,8 +198,16 @@ class _TopListBodyState extends State<_TopListBody>
   }
 
   // Compute top items from locally-cached scrobbles for a given year.
-  Future<List<Map<String, dynamic>>> _computeLocalTop(int year) async {
-    var records = AllScrobblesService.getRecordsForYear(year) ?? [];
+  Future<List<Map<String, dynamic>>> _computeLocalTop(int? year, {int cutoff = 0}) async {
+    var records = <ScrobbleRecord>[];
+    if (year != null) {
+      records = AllScrobblesService.getRecordsForYear(year) ?? [];
+    } else {
+      // No year: every scrobble stored on the device, filtered by period.
+      for (final y in ScrobblesFileCache.getCachedYears()) {
+        records.addAll((ScrobblesFileCache.getRecords(y) ?? []).where((r) => r.ts >= cutoff));
+      }
+    }
     if (widget.month != 0) {
       records = records.where((r) =>
           DateTime.fromMillisecondsSinceEpoch(r.ts * 1000).month == widget.month).toList();
@@ -273,6 +284,21 @@ class _TopListBodyState extends State<_TopListBody>
         });
       }
     } catch (e) {
+      // Network down: use the scrobbles stored on the device instead.
+      if (widget.year == null) {
+        const days = {'7day': 7, '1month': 30, '3month': 90, '6month': 180, '12month': 365};
+        final d = days[widget.period];
+        final cutoff = d == null ? 0 : DateTime.now().millisecondsSinceEpoch ~/ 1000 - d * 86400;
+        final local = await _computeLocalTop(null, cutoff: cutoff);
+        if (local.isNotEmpty && mounted) {
+          NetStatus.error.value ??= e.toString().replaceFirst('Exception: ', '');
+          setState(() {
+            _items = local; _exhausted = true;
+            _loading = false; _loadingMore = false;
+          });
+          return;
+        }
+      }
       if (mounted) {
         setState(() {
           _error = e.toString().replaceFirst('Exception: ', '');

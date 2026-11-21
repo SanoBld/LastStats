@@ -1257,8 +1257,11 @@ class _ChartsPageState extends State<_ChartsPage>
                     child: Row(children: [
                       Expanded(
                         child: Text(L.chartsTitle,
-                            style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
+                            style: text.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: Theme.of(context).colorScheme.primary)),
                       ),
+                      const NetErrorButton(),
                       IconButton.filledTonal(
                         icon: const Icon(Icons.ios_share_rounded),
                         tooltip: tx('ui_export_a_chart'),

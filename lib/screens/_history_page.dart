@@ -128,8 +128,10 @@ class _HistoryPageState extends State<_HistoryPage>
             padding: const EdgeInsets.fromLTRB(20, 12, 16, 2),
             child: Row(children: [
               Expanded(child:
-                Text(L.historyTitle, style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
+                Text(L.historyTitle, style: text.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w800, color: scheme.primary)),
               ),
+              const NetErrorButton(),
               IconButton.filledTonal(icon: const Icon(Icons.refresh_rounded), onPressed: _load),
             ]),
           ),

@@ -63,6 +63,8 @@ class ImageService {
 
   // ── URL cache (metadata only, not bytes) ──────────────────────────────────
 
+  static Future<void> init() => _ensureDiskCache();
+
   static Future<void> _ensureDiskCache() async {
     if (_diskLoaded) return;
     _diskLoaded = true;

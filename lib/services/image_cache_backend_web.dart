@@ -55,6 +55,7 @@ class ImageCacheBackend {
     return c.future;
   }
 
+  static Uint8List? readSync(String key) => null;
   static Future<String?> readMeta() async {
     try {
       final db     = await _open();
