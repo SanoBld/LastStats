@@ -1573,4 +1573,9 @@ const Map<String, String> kTxJa = {
   'lbl_step3_t': 'ログイン',
   'lbl_api_lb': 'ListenBrainz のトークンを使用します。制限は 1 秒あたり 1 リクエストで、自動で管理されます。',
   'lbl_key_needed': '公開キーは無効です。設定 › 接続 で自分の Last.fm API キーを追加してください。',
+  'api_img_sec': '画像ソース',
+  'api_img_sub': 'ドラッグして並べ替えます。画像が見つかった最初の有効なソースが使われます。',
+  'api_vid_sec': '動画ソース',
+  'api_img_clear': '画像キャッシュを消去（新しい順序を適用）',
+  'api_img_cleared': '画像キャッシュを消去しました',
 };

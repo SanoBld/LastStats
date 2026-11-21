@@ -92,4 +92,17 @@
 - Settings adapt to the service: ListenBrainz card and token section in Connections / Account, profile link to listenbrainz.org, no API key info or extra accounts in ListenBrainz mode
 - Login screen: smooth transition between the service choice and the forms, formal address in all texts, 10 languages
 - Fixed: ListenBrainz requests are retried on temporary network errors ("Connection terminated during handshake")
+- ListenBrainz storage: scrobbles are stored on the device like with Last.fm (same yearly files, same incremental sync, timestamp-based loading, duplicates removed). A failed sync no longer leaves a gap in the history, and years are found again after a crash
+- ListenBrainz: history, music calendar and recap work again (listens of a period are downloaded once and shared by all pages); notification stats use ListenBrainz too
+- ListenBrainz: listener and play counts on artist / album / track pages come from ListenBrainz popularity data; texts, dialogs and links follow the service in all 10 languages; the official ListenBrainz icon is used everywhere
+- New login screen: ListenBrainz in 3 steps (open your token page, paste, connect), a copied token is detected and offered automatically, clear error messages for each failure, optional display name. Last.fm login now only asks for your own API key
+- Backup: export / import now keep the service and the ListenBrainz token; restoring a ListenBrainz backup connects to ListenBrainz and reopens the app on that account
+- Last.fm is never contacted in ListenBrainz mode, whatever the key
+- Public (built-in) API keys are turned off, because Last.fm requires a paid subscription for API keys from December 1. Your own key is always the one used; the code is kept and can be switched back on. The built-in key and Last.fm website login choices are removed
+- Default text size is now 100 % (was 110 %)
+
+**Settings > API**
+- New: sort your favourite image sources (Apple Music, YouTube Music, Deezer, TheAudioDB, MusicBrainz, Wikipedia, Last.fm) by dragging, and turn each one on or off. Apple Music is now first by default (artists keep YouTube Music lower). Video sources are sorted the same way on the same page
+- Last.fm source is hidden in ListenBrainz mode; ListenBrainz appears with your token and its 1 request / second limit
+- The image source shown for a cover now says "Apple Music" instead of "iTunes"
 

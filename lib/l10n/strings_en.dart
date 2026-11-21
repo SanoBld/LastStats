@@ -1603,4 +1603,9 @@ const Map<String, String> kTxEn = {
   'lbl_step3_t': 'Sign in',
   'lbl_api_lb': 'Uses your ListenBrainz token. Limit: 1 request per second, handled automatically.',
   'lbl_key_needed': 'Public keys are turned off: add your own Last.fm API key in Settings › Connections.',
+  'api_img_sec': 'Image sources',
+  'api_img_sub': 'Drag to sort. The first enabled source that finds an image is used.',
+  'api_vid_sec': 'Video sources',
+  'api_img_clear': 'Clear image cache (apply the new order)',
+  'api_img_cleared': 'Image cache cleared',
 };

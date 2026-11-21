@@ -1574,4 +1574,9 @@ const Map<String, String> kTxDe = {
   'lbl_step3_t': 'Anmelden',
   'lbl_api_lb': 'Verwendet dein ListenBrainz-Token. Limit: 1 Anfrage pro Sekunde, automatisch gesteuert.',
   'lbl_key_needed': 'Öffentliche Schlüssel sind deaktiviert: Füge deinen eigenen Last.fm-API-Schlüssel unter Einstellungen › Verbindungen hinzu.',
+  'api_img_sec': 'Bildquellen',
+  'api_img_sub': 'Zum Sortieren ziehen. Die erste aktive Quelle mit einem Bild wird verwendet.',
+  'api_vid_sec': 'Videoquellen',
+  'api_img_clear': 'Bild-Cache leeren (neue Reihenfolge anwenden)',
+  'api_img_cleared': 'Bild-Cache geleert',
 };

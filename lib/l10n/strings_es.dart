@@ -1603,4 +1603,9 @@ const Map<String, String> kTxEs = {
   'lbl_step3_t': 'Inicia sesión',
   'lbl_api_lb': 'Usa tu token de ListenBrainz. Límite: 1 solicitud por segundo, gestionada automáticamente.',
   'lbl_key_needed': 'Las claves públicas están desactivadas: añade tu propia clave API de Last.fm en Ajustes › Conexiones.',
+  'api_img_sec': 'Fuentes de imágenes',
+  'api_img_sub': 'Arrastra para ordenar. Se usa la primera fuente activada que encuentre una imagen.',
+  'api_vid_sec': 'Fuentes de vídeo',
+  'api_img_clear': 'Vaciar la caché de imágenes (aplicar el nuevo orden)',
+  'api_img_cleared': 'Caché de imágenes vaciada',
 };

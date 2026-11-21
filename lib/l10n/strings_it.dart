@@ -1574,4 +1574,9 @@ const Map<String, String> kTxIt = {
   'lbl_step3_t': 'Accedi',
   'lbl_api_lb': 'Usa il tuo token ListenBrainz. Limite: 1 richiesta al secondo, gestita automaticamente.',
   'lbl_key_needed': 'Le chiavi pubbliche sono disattivate: aggiungi la tua chiave API di Last.fm in Impostazioni › Connessioni.',
+  'api_img_sec': 'Fonti delle immagini',
+  'api_img_sub': 'Trascina per ordinare. Viene usata la prima fonte attiva che trova un\'immagine.',
+  'api_vid_sec': 'Fonti video',
+  'api_img_clear': 'Svuota la cache delle immagini (applica il nuovo ordine)',
+  'api_img_cleared': 'Cache delle immagini svuotata',
 };

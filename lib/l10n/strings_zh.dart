@@ -1600,4 +1600,9 @@ const Map<String, String> kTxZh = {
   'lbl_step3_t': '登录',
   'lbl_api_lb': '使用你的 ListenBrainz 令牌。限制：每秒 1 次请求，自动管理。',
   'lbl_key_needed': '公共密钥已停用：请在 设置 › 连接 中添加你自己的 Last.fm API 密钥。',
+  'api_img_sec': '图片来源',
+  'api_img_sub': '拖动排序。将使用第一个找到图片的已启用来源。',
+  'api_vid_sec': '视频来源',
+  'api_img_clear': '清除图片缓存（应用新顺序）',
+  'api_img_cleared': '图片缓存已清除',
 };

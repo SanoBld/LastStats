@@ -16,6 +16,9 @@ import '../../widgets/m3_components.dart';
 import '../../widgets/skeleton.dart';
 import 'settings_helpers.dart';
 import 'settings_rows.dart';
+import 'source_ranker.dart';
+import '../../services/image_service.dart';
+import '../../services/motion_artwork_service.dart';
 
 class ApiPage extends StatefulWidget {
   const ApiPage({super.key});
@@ -33,11 +36,42 @@ class _ApiPageState extends State<ApiPage> {
   int _lastfmStored = 0;
   String _userKey = '';
   bool _backupOn = false;
+  List<String> _imgOn = [];
+  List<String> _vidOn = [];
+  bool _srcLoaded = false;
+
+  Future<void> _loadSources() async {
+    final p = await SharedPreferences.getInstance();
+    final raw = p.getString('ls_img_order');
+    var img = raw == null
+        ? List<String>.of(ImageService.defaultOrder)
+        : raw.split(',').where(ImageService.defaultOrder.contains).toList();
+    if (img.isEmpty) img = List.of(ImageService.defaultOrder);
+    if (!mounted) return;
+    setState(() {
+      _imgOn = img;
+      _vidOn = MotionPrefs.readOrder(p);
+      _srcLoaded = true;
+    });
+  }
+
+  Future<void> _saveImg(List<String> l) async {
+    final p = await SharedPreferences.getInstance();
+    await p.setString('ls_img_order', l.join(','));
+    _imgOn = l;
+  }
+
+  Future<void> _saveVid(List<String> l) async {
+    final p = await SharedPreferences.getInstance();
+    await p.setString('ls_motion_order', l.join(','));
+    _vidOn = l;
+  }
 
   @override
   void initState() {
     super.initState();
     ApiUsage.loadSettings().then((_) { if (mounted) setState(() {}); });
+    _loadSources();
     _refresh();
     _timer = Timer.periodic(const Duration(seconds: 3), (_) => _refresh());
   }
@@ -173,7 +207,59 @@ class _ApiPageState extends State<ApiPage> {
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
               children: [
                 _summary(scheme, text, today, errors, limited),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
+                if (_srcLoaded) ...[
+                  SourceRanker(
+                    title: tx('api_img_sec'),
+                    subtitle: tx('api_img_sub'),
+                    items: [
+                      const RankItem('apple', 'Apple Music', Icons.music_note_rounded,
+                          asset: 'assets/icons/applemusic.svg'),
+                      const RankItem('ytmusic', 'YouTube Music', Icons.music_video_rounded,
+                          asset: 'assets/icons/ytmusic.svg'),
+                      const RankItem('deezer', 'Deezer', Icons.graphic_eq_rounded,
+                          asset: 'assets/icons/deezer.svg'),
+                      const RankItem('audiodb', 'TheAudioDB', Icons.album_rounded),
+                      const RankItem('musicbrainz', 'MusicBrainz', Icons.library_music_rounded),
+                      const RankItem('wikipedia', 'Wikipedia', Icons.public_rounded),
+                      if (!DataSource.lb)
+                        const RankItem('lastfm', 'Last.fm', Icons.bar_chart_rounded,
+                            asset: 'assets/icons/lastfm.svg'),
+                    ],
+                    enabled: _imgOn,
+                    onChanged: _saveImg,
+                  ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: M3LabelButton(
+                      kind: M3ButtonKind.text, height: 44,
+                      icon: Icons.refresh_rounded,
+                      label: tx('api_img_clear'),
+                      onTap: () async {
+                        await ImageService.clearAllCache();
+                        if (!mounted) return;
+                        showAppSnackBar(context,
+                            SnackBar(content: Text(tx('api_img_cleared'))));
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SourceRanker(
+                    title: tx('api_vid_sec'),
+                    subtitle: tx('api_img_sub'),
+                    items: const [
+                      RankItem('apple', 'Apple Music', Icons.music_note_rounded,
+                          asset: 'assets/icons/applemusic.svg'),
+                      RankItem('spotify', 'Spotify', Icons.graphic_eq_rounded,
+                          asset: 'assets/icons/spotify.svg'),
+                      RankItem('youtube', 'YouTube Music', Icons.music_video_rounded,
+                          asset: 'assets/icons/ytmusic.svg'),
+                    ],
+                    enabled: _vidOn,
+                    onChanged: _saveVid,
+                  ),
+                  const SizedBox(height: 20),
+                ],
                 SettingsSection(
                   label: L.apiTitle,
                   children: [
