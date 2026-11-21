@@ -4,11 +4,16 @@
 //   - https://www.last.fm/user/<username>  (opens the Last.fm website)
 // No network calls — just string building/parsing.
 
+import 'data_source.dart';
+
 class QrLinkService {
   QrLinkService._();
 
   static String appLink(String username) => 'laststats://profile/${Uri.encodeComponent(username)}';
-  static String webLink(String username) => 'https://www.last.fm/user/${Uri.encodeComponent(username)}';
+  /// Web profile of the active source: ListenBrainz when it is in use.
+  static String webLink(String username) => DataSource.lb
+      ? 'https://listenbrainz.org/user/${Uri.encodeComponent(username)}/'
+      : 'https://www.last.fm/user/${Uri.encodeComponent(username)}';
 
   /// Returns the username encoded in [raw] if it matches either format,
   /// or null if the scanned text isn't a recognized profile link.
@@ -23,6 +28,10 @@ class QrLinkService {
     // https://www.last.fm/user/<username> (with or without www, http/https)
     final webMatch = RegExp(r'^https?://(?:www\.)?last\.fm/user/([^/?#]+)').firstMatch(text);
     if (webMatch != null) return Uri.decodeComponent(webMatch.group(1)!);
+
+    // https://listenbrainz.org/user/<username>/ (also the api. / www. hosts)
+    final lbMatch = RegExp(r'^https?://(?:www\.|api\.)?listenbrainz\.org/user/([^/?#]+)').firstMatch(text);
+    if (lbMatch != null) return Uri.decodeComponent(lbMatch.group(1)!);
 
     return null;
   }

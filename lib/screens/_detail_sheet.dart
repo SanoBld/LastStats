@@ -2648,7 +2648,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
             TextButton(onPressed: () => Navigator.pop(ctx, 'app'),
                 child: Text(tx('ui_to_the_app'))),
             TextButton(onPressed: () => Navigator.pop(ctx, 'web'),
-                child: Text(tx('ui_to_last_fm'))),
+                child: Text(DataSource.lb ? tx('ui_to_last_fm').replaceAll('Last.fm', 'ListenBrainz') : tx('ui_to_last_fm'))),
           ],
         ),
       );
@@ -3686,7 +3686,7 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
                         extra: [(Icons.headphones_rounded, '${_total()} scrobbles')],
                         qrData: QrLinkService.appLink(widget.username),
                         profileUsername: widget.username,
-                        source: 'Last.fm');
+                        source: DataSource.lb ? 'ListenBrainz' : 'Last.fm');
                   } : null,
                   child: SizedBox(height: imgH + 66, width: double.infinity),
                 ),
