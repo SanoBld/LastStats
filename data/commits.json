@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-21T14:31:31Z",
+  "updated": "2026-11-21T20:24:31Z",
   "commits": [
+    {
+      "sha": "cea4584a55de5761539d13f27e3f5d0ffbb4d7e5",
+      "message": "feat: ajout de la gestion des erreurs réseau et du cache d'images hors ligne",
+      "date": "2026-11-21T20:13:49Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/cea4584a55de5761539d13f27e3f5d0ffbb4d7e5",
+      "tags": []
+    },
     {
       "sha": "207e6fdf8dd2eab00941b135e2bd980f6eb60113",
       "message": "Merge branch 'master' of https://github.com/SanoBld/LastStats",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/1ae31d3de81701fe693e1d1082115d058db3fb77",
-      "tags": []
-    },
-    {
-      "sha": "830b5f2060d9f6bb7cbec9648fefd46ec144ad35",
-      "message": "feat: refactor le composant _TitleBubble en StatelessWidget et améliorer l'affichage des titres",
-      "date": "2026-09-25T20:38:03Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/830b5f2060d9f6bb7cbec9648fefd46ec144ad35",
       "tags": []
     }
   ]
