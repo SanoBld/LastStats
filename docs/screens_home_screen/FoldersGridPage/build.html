@@ -131,12 +131,28 @@ Expanded(
                 childAspectRatio: 1.05,
               ),
               itemCount: folders.length,
-              itemBuilder: (ctx, i) =&gt; _FolderCard(
-                folder: folders[i],
-                onTap: () =&gt; Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) =&gt; _FolderDetailPage(service: service, folder: folders[i]))),
-                onLongPress: () =&gt; showFolderEditorSheet(context, existing: folders[i]),
-              ),
+              itemBuilder: (ctx, i) =&gt; Builder(builder: (cardCtx) {
+                &#47;&#47; Long press &#47; right click: same bubble menu as the track lists.
+                void menu([Offset? at]) =&gt; showM3Menu(cardCtx, at: at, groups: [
+                      [
+                        M3MenuItem(
+                          label: L.settingsCustomColorEdit,
+                          icon: Icons.edit_rounded,
+                          onTap: () =&gt; showFolderEditorSheet(context, existing: folders[i]),
+                        ),
+                      ],
+                    ]);
+                return GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onSecondaryTapUp: (d) =&gt; menu(d.globalPosition),
+                  child: _FolderCard(
+                    folder: folders[i],
+                    onTap: () =&gt; Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) =&gt; _FolderDetailPage(service: service, folder: folders[i]))),
+                    onLongPress: menu,
+                  ),
+                );
+              }),
             );
           },
         ),

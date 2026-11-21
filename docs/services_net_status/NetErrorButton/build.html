@@ -110,13 +110,26 @@ and</li>
   <pre class="language-dart"><code class="language-dart">@override
 Widget build(BuildContext context) =&gt; ValueListenableBuilder&lt;String?&gt;(
       valueListenable: NetStatus.error,
-      builder: (ctx, err, _) =&gt; err == null
-          ? const SizedBox.shrink()
-          : IconButton.filledTonal(
+      builder: (ctx, err, _) =&gt; ValueListenableBuilder&lt;int&gt;(
+        valueListenable: NetStatus.loading,
+        builder: (ctx, busy, _) {
+          if (err != null) {
+            return IconButton.filledTonal(
               icon: Icon(Icons.error_outline_rounded,
                   color: Theme.of(ctx).colorScheme.error),
               onPressed: () =&gt; showDetails(ctx, err),
-            ),
+            );
+          }
+          if (busy &gt; 0) {
+            &#47;&#47; The app&#39;s own loader (same one as the skeletons &#47; pull to refresh)
+            return const SizedBox(
+              width: 48, height: 48,
+              child: Center(child: M3LoadingIndicator(size: 28)),
+            );
+          }
+          return const SizedBox.shrink();
+        },
+      ),
     );</code></pre>
 </section>
 
