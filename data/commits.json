@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-21T21:02:06Z",
+  "updated": "2026-11-21T21:24:42Z",
   "commits": [
+    {
+      "sha": "38371cc4efa9ed8cfd54567453318d67b0a6319e",
+      "message": "feat: ajout d'un mécanisme de circuit breaker pour gérer les erreurs de connexion réseau",
+      "date": "2026-11-21T21:22:35Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/38371cc4efa9ed8cfd54567453318d67b0a6319e",
+      "tags": []
+    },
     {
       "sha": "0db4d8f974ad606daa320b070f38e8c200a24b9a",
       "message": "feat: amélioration de l'interface utilisateur avec des menus contextuels et un indicateur de chargement personnalisé",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/1fdccbe79a70d01645f54c93fd516f31e3d42b94",
-      "tags": []
-    },
-    {
-      "sha": "edc7b2482a03d8e12fa94c7a2845c4aeb9132327",
-      "message": "feat: refactor le composant _TitleBubble pour inclure un sous-titre et améliorer l'affichage, et renommer _CompatibilityRing en _CompatibilityBadge pour un design cohérent",
-      "date": "2026-09-26T12:25:16Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/edc7b2482a03d8e12fa94c7a2845c4aeb9132327",
       "tags": []
     }
   ]
