@@ -239,7 +239,7 @@ a:hover .arrow-icon, .md-ripple:hover .arrow-icon { transform: translateX(3px); 
   white-space: nowrap;
 }
 
-/* wrapper that holds the music widget + the "Decouvrir" button.
+/* wrapper that holds the "Decouvrir" button.
    on desktop the widget sits pinned to the left (a bit tilted) and the button
    stays perfectly centered no matter the widget width */
 .hero-actions {
@@ -249,58 +249,7 @@ a:hover .arrow-icon, .md-ripple:hover .arrow-icon { transform: translateX(3px); 
   margin-top: 2rem;
 }
 
-/* Now-playing widget — M3 filled card (pill) */
-.music-widget {
-  display: inline-flex;
-  align-items: center;
-  gap: .9rem;
-  max-width: 280px;
-  padding: .5rem 1.3rem .5rem .5rem;
-  border-radius: var(--shape-full);
-  background: var(--md-surface-container-high);
-  text-align: left;
-  box-shadow: 0 1px 2px rgba(var(--md-shadow), .2);
-}
-.music-widget.hidden { display: none; }
-.music-art {
-  position: relative;
-  display: block;
-  width: 40px; height: 40px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: var(--md-primary-container);
-  flex-shrink: 0;
-}
-.music-art img { width: 100%; height: 100%; object-fit: cover; display: none; }
-.music-art.has-art img { display: block; }
-.music-art-fallback {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  padding: 10px;
-  box-sizing: border-box;
-  color: var(--md-on-primary-container);
-}
-/* js toggles this once real cover art has loaded, so the note icon disappears */
-.music-art.has-art .music-art-fallback { display: none; }
-.music-widget.is-playing .music-art img,
-.music-widget.is-playing .music-art-fallback { animation: spin 6s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.music-text { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
-.music-label { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: var(--md-primary); font-weight: 600; }
-.music-track,
-.music-artist { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.music-track { font-size: .88rem; font-family: var(--font-display); color: var(--md-on-surface); }
-.music-artist { font-size: .78rem; color: var(--md-on-surface-variant); }
-
 @media (min-width: 641px) {
-  .hero-actions .music-widget {
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%) rotate(-4deg);
-    transition: transform .3s var(--m3-standard);
-  }
-  .hero-actions .music-widget:hover { transform: translateY(-50%) rotate(0deg) scale(1.02); }
   .hero-actions .hero-scroll {
     position: absolute;
     left: 50%;
@@ -312,7 +261,6 @@ a:hover .arrow-icon, .md-ripple:hover .arrow-icon { transform: translateX(3px); 
 @media (max-width: 640px) {
   /* not enough room to pin things left/center, just stack them normally */
   .hero-actions { display: flex; flex-direction: column; align-items: center; gap: 1.2rem; min-height: 0; }
-  .hero-actions .music-widget { margin: 0 auto; }
   .hero-actions .hero-scroll { margin-top: 0; }
 }
 

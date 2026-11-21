@@ -1,6 +1,42 @@
 {
-  "updated": "2026-11-21T05:57:59Z",
+  "updated": "2026-11-21T08:36:29Z",
   "commits": [
+    {
+      "sha": "4e6ee3dcec503adddc54b89b26f72677019bdfa9",
+      "message": "Merge branch 'master' of https://github.com/SanoBld/LastStats",
+      "date": "2026-11-21T08:28:12Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/4e6ee3dcec503adddc54b89b26f72677019bdfa9",
+      "tags": []
+    },
+    {
+      "sha": "bd5e8dd733ebd9247efe9447256702910176966e",
+      "message": "Refactor code structure for improved readability and maintainability",
+      "date": "2026-11-21T08:28:04Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/bd5e8dd733ebd9247efe9447256702910176966e",
+      "tags": []
+    },
+    {
+      "sha": "e0c2148309a82cb7ec7dc9a44c852d9ecdd96030",
+      "message": "chore: sync pubspec version with changelog [skip ci]",
+      "date": "2026-11-21T08:25:02Z",
+      "author": "github-actions[bot]",
+      "avatar": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/e0c2148309a82cb7ec7dc9a44c852d9ecdd96030",
+      "tags": []
+    },
+    {
+      "sha": "0a3bdd8eb1d39bfa418cd301bdefd14cc3824cec",
+      "message": "feat: Ajouter la prise en charge du classement des sources d'images et de vidéos dans les paramètres",
+      "date": "2026-11-21T08:24:46Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/0a3bdd8eb1d39bfa418cd301bdefd14cc3824cec",
+      "tags": []
+    },
     {
       "sha": "1f001e93a6aaee8fde5b9695ef516aa7cbdbb136",
       "message": "Add ListenBrainz integration and logo\n\n- Implemented fetching recent tracks from ListenBrainz API in notification_worker.dart.\n- Added logic to retrieve user statistics based on the fetched data.\n- Introduced a new SVG logo for ListenBrainz in assets/icons.",
@@ -2677,42 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/fd874b85ad214059b8d673a21676a9122fd05cac",
-      "tags": []
-    },
-    {
-      "sha": "1fd3cca5121d9a01ca47b681f2c8b98150176584",
-      "message": "feat: réorganiser l'affichage des actions dans la feuille de détail des éléments",
-      "date": "2026-09-25T06:13:12Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/1fd3cca5121d9a01ca47b681f2c8b98150176584",
-      "tags": []
-    },
-    {
-      "sha": "caea0b8c98413fb4e3f4229624d5f6369998c628",
-      "message": "feat: ajuster la logique de mise en page et améliorer le groupe de contrôles dans l'affichage des détails",
-      "date": "2026-09-24T20:58:51Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/caea0b8c98413fb4e3f4229624d5f6369998c628",
-      "tags": []
-    },
-    {
-      "sha": "bb884ade01fa1d13b311e68e17ec0ab2bd7ccd6d",
-      "message": "feat: ajuster la hauteur de l'image et améliorer la logique de visibilité des boutons dans l'écran de détail",
-      "date": "2026-09-24T20:40:36Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/bb884ade01fa1d13b311e68e17ec0ab2bd7ccd6d",
-      "tags": []
-    },
-    {
-      "sha": "e234bc166785f5259803bffec6db33cabd6cbf5b",
-      "message": "feat: ajouter une barre de statut animée qui apparaît lors du défilement du contenu",
-      "date": "2026-09-24T20:15:54Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/e234bc166785f5259803bffec6db33cabd6cbf5b",
       "tags": []
     }
   ]

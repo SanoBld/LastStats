@@ -71,30 +71,6 @@
   if (meta) meta.setAttribute('content', light.primary);
   }
   apply(hue);
-  // ---------- optional: theme colors follow the music (OFF by default) ----------
-  let musicOn = false;
-  try { musicOn = localStorage.getItem('accent-music') === '1'; } catch (e) {}
-  let shown = hue, anim;
-  const SH = 'accent-music-hue';
-  // Navigating: reuse the stored music hue at once, no animation
-  if (musicOn) { try { const v = parseFloat(sessionStorage.getItem(SH)); if (v >= 0) { shown = v; apply(v); window.__musicHue = v; } } catch (e) {} }
-  function tween(to) {
-    cancelAnimationFrame(anim);
-    const from = shown, d = ((to - from + 540) % 360) - 180, t0 = performance.now();
-    (function step(n) {
-      const k = Math.min(1, (n - t0) / 900), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-      shown = (from + d * e + 360) % 360; apply(shown);
-      if (k < 1) anim = requestAnimationFrame(step);
-    })(t0);
-  }
-  window.accentMusic = {
-    last: null,
-    enabled: () => musicOn,
-    setEnabled(v) { musicOn = v; try { localStorage.setItem('accent-music', v ? '1' : '0'); } catch (e) {} window.dispatchEvent(new CustomEvent('accent-music-change', { detail: v })); tween(v && this.last !== null ? this.last : hue); },
-    show(h, same) { this.last = h; if (!musicOn) return; try { sessionStorage.setItem(SH, h); } catch (e) {} if (!same) tween(h); },
-    clear() { this.last = null; try { sessionStorage.removeItem(SH); } catch (e) {} if (musicOn) tween(hue); },
-  };
-
   // ---------- color picker (built once the nav exists) ----------
   const T = {};
   const t = (k, fb) => (window.i18n && window.i18n.t(k) !== k ? window.i18n.t(k) : fb);
@@ -117,7 +93,6 @@
         '<div class="color-swatches"></div>' +
         '<div class="color-modes"><button type="button" data-m="mono" class="md-ripple"></button><button type="button" data-m="multi" class="md-ripple"></button></div>' +
         '<label class="color-save"><input type="checkbox"><span class="color-save-label"></span></label>' +
-        '<label class="color-save"><input type="checkbox" class="color-music"><span class="color-music-label"></span></label>' +
         '<button type="button" class="color-random md-ripple"></button>' +
       '</div>';
     toggles.insertBefore(wrap, toggles.querySelector('.lang-wrap, .lang-toggle'));
@@ -161,7 +136,6 @@
       btn.setAttribute('aria-label', t('color.pick', 'Color')); btn.title = t('color.pick', 'Color');
       wrap.querySelector('.color-save-label').textContent = t('color.save', 'Remember on this browser');
       rand.textContent = t('color.random', 'Random');
-      wrap.querySelector('.color-music-label').textContent = t('color.music', 'Colors from the music');
       wrap.querySelector('[data-m=mono]').textContent = t('color.mono', 'One color');
       wrap.querySelector('[data-m=multi]').textContent = t('color.multi', 'Multicolor');
     }
@@ -169,8 +143,6 @@
     wrap.querySelectorAll('.color-modes button').forEach((b) => b.addEventListener('click', () => { mode = b.dataset.m; apply(hue); persist(); marks(); }));
     range.addEventListener('input', () => set(range.value));
     chk.addEventListener('change', persist);
-    const mchk = wrap.querySelector('.color-music'); mchk.checked = musicOn;
-    mchk.addEventListener('change', () => window.accentMusic.setEnabled(mchk.checked));
     rand.addEventListener('click', () => {
       randomOn = !randomOn;
       if (randomOn) set(rnd(), true); else { persist(); marks(); }
