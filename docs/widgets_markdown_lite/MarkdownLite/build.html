@@ -109,7 +109,10 @@ and</li>
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 Widget build(BuildContext context) {
-  final lines = text.split(&#39;\n&#39;);
+  &#47;&#47; The publish-news workflow field is a single line: a &quot;\n&quot; typed as two
+  &#47;&#47; characters means a line break (only when the text has no real one).
+  final src = text.contains(&#39;\n&#39;) ? text : text.replaceAll(r&#39;\n&#39;, &#39;\n&#39;);
+  final lines = src.split(&#39;\n&#39;);
   final widgets = &lt;Widget&gt;[];
   int i = 0;
 
@@ -159,6 +162,33 @@ Widget build(BuildContext context) {
               fontWeight: FontWeight.w800,
               fontSize: (style?.fontSize ?? 14) + (level == 1 ? 4 : level == 2 ? 2 : 1),
             )),
+      ));
+      i++;
+      continue;
+    }
+
+    &#47;&#47; Quote: &quot;&gt; text&quot;
+    final quoteMatch = RegExp(r&#39;^&gt;\s?(.*)&#39;).firstMatch(line);
+    if (quoteMatch != null) {
+      widgets.add(Container(
+        margin: const EdgeInsets.only(bottom: 4),
+        padding: const EdgeInsets.only(left: 10),
+        decoration: BoxDecoration(border: Border(left: BorderSide(color: linkColor, width: 3))),
+        child: Text.rich(_parseInline(quoteMatch.group(1)!), style: style),
+      ));
+      i++;
+      continue;
+    }
+
+    &#47;&#47; Numbered list: &quot;1. item&quot;
+    final numMatch = RegExp(r&#39;^(\d+)[.)]\s+(.*)&#39;).firstMatch(line);
+    if (numMatch != null) {
+      widgets.add(Padding(
+        padding: const EdgeInsets.only(left: 4, bottom: 4),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(&#39;${numMatch.group(1)}.  &#39;, style: style),
+          Expanded(child: Text.rich(_parseInline(numMatch.group(2)!), style: style)),
+        ]),
       ));
       i++;
       continue;
@@ -214,7 +244,7 @@ Widget build(BuildContext context) {
 <footer>
   <span class="no-break">
     laststats_mobile
-      4.3.0+31
+      4.4.0+31
   </span>
   
 </footer>
