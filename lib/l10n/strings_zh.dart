@@ -299,11 +299,11 @@ class AppStringsZh implements AppStrings {
   @override String get onboardFavNoFriends     => '该账号没有好友';
   @override String get onboardFavSelected      => '已选收藏';
   @override String get onboardDashTitle        => '您的仪表盘';
-  @override String get onboardDashSub          => '选择要在主屏幕上显示的板块。你之后可以在设置中更改。';
+  @override String get onboardDashSub          => '选择要在主屏幕上显示的板块。您之后可以在设置中更改。';
   @override String get onboardStartupTitle     => '启动界面';
   @override String get onboardStartupSub       => '选择启动应用时首先打开的标签页。';
   @override String get onboardPlatformTitle    => '您在哪里听音乐？';
-  @override String get onboardPlatformSub      => '告诉我们你在哪里听音乐。应用只会在曲目、艺术家和专辑页面中显示有用的链接。';
+  @override String get onboardPlatformSub      => '告诉我们您在哪里听音乐。应用只会在曲目、艺术家和专辑页面中显示有用的链接。';
   @override String get platformLastfm          => 'Last.fm';
   @override String get platformSpotify         => 'Spotify';
   @override String get platformYtMusic         => 'YouTube Music';
@@ -325,22 +325,22 @@ class AppStringsZh implements AppStrings {
   @override String get onboardArtworkColorTitle   => '取色自封面';
   @override String get onboardArtworkColorSub     => '应用的强调色会自动匹配当前正在播放的曲目的封面。';
   @override String get onboardNewsTitle           => '资讯通知';
-  @override String get onboardNewsSub             => '添加新功能或修复问题时,你会收到通知。';
+  @override String get onboardNewsSub             => '添加新功能或修复问题时,您会收到通知。';
   @override String get onboardNewsBadgeTitle      => '资讯红点';
   @override String get onboardNewsBadgeSub        => '有新内容可读时，主屏幕的铃铛图标上会显示提示点。';
   @override String get onboardHapticTitle         => '触感反馈';
   @override String get onboardHapticSub           => '点按按钮和重要元素时,手机会轻轻振动。';
   @override String get onboardRecaps              => '汇总';
   @override String get onboardDailyRecapTitle     => '每日汇总';
-  @override String get onboardDailyRecapSub       => '每天收到一份你所听内容的摘要。';
+  @override String get onboardDailyRecapSub       => '每天收到一份您所听内容的摘要。';
   @override String get onboardWeeklyRecapTitle    => '每周汇总';
-  @override String get onboardWeeklyRecapSub      => '每周收到你听得最多的艺术家、专辑和曲目列表。';
+  @override String get onboardWeeklyRecapSub      => '每周收到您听得最多的艺术家、专辑和曲目列表。';
   @override String get onboardMilestonesSection   => 'Scrobble 里程碑';
   @override String get onboardMilestonesTitle     => '里程碑';
-  @override String get onboardMilestonesSub       => '当播放次数达到整数里程碑时,你会收到一条祝贺通知。';
+  @override String get onboardMilestonesSub       => '当播放次数达到整数里程碑时,您会收到一条祝贺通知。';
   @override String get onboardGrandMilestonesTitle => '重大里程碑';
   @override String get onboardGrandMilestonesSub   => '当播放次数达到很大的数字时,会显示特别的庆祝效果。';
-  @override String get onboardDynamicColorSub      => '应用会使用你壁纸中的颜色。此选项需要 Android 12 或更高版本。';
+  @override String get onboardDynamicColorSub      => '应用会使用您壁纸中的颜色。此选项需要 Android 12 或更高版本。';
   @override String get onboardBetaTitle            => '测试版更新';
   @override String get onboardBetaSub              => '比其他人更早收到测试版本。这些版本可能包含错误。';
 
@@ -362,7 +362,7 @@ class AppStringsZh implements AppStrings {
   @override String get setupUsernameLabel          => 'Last.fm 用户名';
   @override String get setupApiKeyLabel            => 'Last.fm API 密钥';
   @override String get setupApiKeyHint             => '32 位十六进制密钥';
-  @override String get setupApiKeyPrivacyNote      => '你的密钥只保存在此设备上,绝不会发送给第三方。';
+  @override String get setupApiKeyPrivacyNote      => '您的密钥只保存在此设备上,绝不会发送给第三方。';
   @override String get setupRememberMe             => '记住我';
   @override String get setupGetApiKey              => '免费获取 API 密钥';
   @override String setupScrobblesToImport(String c) => '待导入 $c 条 scrobble';
@@ -446,7 +446,7 @@ class AppStringsZh implements AppStrings {
   @override String get backupFileSaved             => '备份已保存';
   @override String get backupFileSaveFailed        => '无法保存备份文件。请确认存储空间充足且应用有权写入该文件夹，然后重试。';
   @override String get setupRestoreBackup          => '恢复备份';
-  @override String get setupRestoreBackupSub       => '从 .json 格式的备份文件中恢复你的账号和设置。';
+  @override String get setupRestoreBackupSub       => '从 .json 格式的备份文件中恢复您的账号和设置。';
   @override String get backupRestoreKeysTitle => '恢复 API 密钥';
   @override String get backupRestoreKeysDesc => '选择要从此备份恢复的 Last.fm 密钥。';
   @override String get backupRestoreApiKeyLabel => 'API 密钥';
@@ -533,7 +533,7 @@ class AppStringsZh implements AppStrings {
   @override String get aboutAiDevNote => '本应用的开发也使用了 AI。';
   @override String get notifWorkManagerInfo => '通知通过 WorkManager 在后台运行，应用无需保持打开状态，但需要网络连接。';
   @override String get notifIntervalTitle       => '每 X 次 scrobble';
-  @override String get notifIntervalSubtitle    => '每新增指定数量的 scrobble 就通知你一次';
+  @override String get notifIntervalSubtitle    => '每新增指定数量的 scrobble 就通知您一次';
   @override String get notifRecapsSection       => '收听汇总';
   @override String get notifDailyRecapSubtitle  => '当天 scrobble 数 + 最喜爱的艺术家';
   @override String get notifWeeklyRecapSubtitle => '本周 scrobble 数 + 最喜爱的艺术家';
@@ -548,7 +548,7 @@ class AppStringsZh implements AppStrings {
   @override String get notifBadgeSubtitle       => '有未读公告时，在资讯铃铛图标上显示提示点';
   @override String get notifTestLabel           => '测试';
   @override String get notifPermissionDisabledTitle => '通知已禁用';
-  @override String get notifPermissionDisabledBody  => '请在系统设置中允许通知，这样 LastStats 才能向你发送回顾、里程碑和资讯。';
+  @override String get notifPermissionDisabledBody  => '请在系统设置中允许通知，这样 LastStats 才能向您发送回顾、里程碑和资讯。';
   @override String get notifGrantPermission     => '授予权限';
   @override String get notifThresholdIntro      => '达到以下每个节点时，您都会收到一条特别通知：';
   @override List<String> get notifThresholdMessages => const [
@@ -557,7 +557,7 @@ class AppStringsZh implements AppStrings {
     '您是真正的音乐狂热者。🔥',
     '一百万次 scrobble。这是传奇。🎸',
   ];
-  @override String get notifIntervalDescription => '每新增 X 个 scrobble 就会通知你';
+  @override String get notifIntervalDescription => '每新增 X 个 scrobble 就会通知您';
   @override String get notifCustomValueLabel    => '自定义数值';
   @override String get notifTimeNotifyAt        => '通知时间';
   @override String get notifDayOfWeek           => '星期几';
@@ -566,7 +566,7 @@ class AppStringsZh implements AppStrings {
   @override String get weekAbbrev => '周';
   @override String get notifSendTest            => '发送测试通知';
   @override String get notifSentCheckBar        => '看看您的通知栏！';
-  @override String get notifMakeSureWorks       => '检查通知能否在你的手机上正常显示。';
+  @override String get notifMakeSureWorks       => '检查通知能否在您的手机上正常显示。';
   @override String get notifSentBang            => '已发送！';
   @override String get notifSendButton          => '发送';
   @override String get apVisualStyle             => '视觉风格';
@@ -632,7 +632,7 @@ class AppStringsZh implements AppStrings {
   @override String get dashThisWeekLabel        => '本周';
   @override String get dashDayUnitShort         => '天';
   @override String get setupEnableFavorites      => '启用收藏（可选）';
-  @override String get setupFavoritesExplain     => '你的密钥可让应用直接在你的 Last.fm 账号上将曲目添加到收藏或移除。';
+  @override String get setupFavoritesExplain     => '您的密钥可让应用直接在您的 Last.fm 账号上将曲目添加到收藏或移除。';
   @override String get setupSecretKeyLabel       => 'Last.fm 密钥';
   @override String get favConnectInvalidSecret   => '密钥长度必须为 32 个字符。';
   @override String get favConnectDialogTitle     => '授权收藏功能';
@@ -694,7 +694,7 @@ class AppStringsZh implements AppStrings {
   @override String get faqQ8 => '\u7b49\u7ea7\u4e0e\u6210\u5c31\u7cfb\u7edf\u662f\u600e\u4e48\u8fd0\u4f5c\u7684\uff1f';
   @override String get faqA8 => '\u4f60\u7684\u8d26\u6237\u7b49\u7ea7\u968f\u603b scrobble \u6570\u589e\u957f\uff08\u6ca1\u6709\u4e0a\u9650\uff09\u3002\u5361\u7247\u4e5f\u4f1a\u6839\u636e\u8be5\u827a\u672f\u5bb6/\u6b4c\u66f2/\u4e13\u8f91\u7684\u64ad\u653e\u6b21\u6570\u663e\u793a\u8fb9\u6846\u989c\u8272\uff08\u9752\u94dc\u2192\u4e94\u5f69\uff09\u3002\u8fd9\u4e9b\u90fd\u57fa\u4e8e\u672c\u5730\u5df2\u7f13\u5b58\u7684\u7edf\u8ba1\u6570\u636e\u81ea\u52a8\u8ba1\u7b97\uff0c\u4e0d\u4f1a\u989d\u5916\u8bf7\u6c42\u7f51\u7edc\u3002';
   @override String get faqQ9 => '省电模式是如何工作的？';
-  @override String get faqA9 => '省电模式会减少应用的活动以节省电量：关闭倾斜视差效果，将屏幕刷新率限制在约 60 Hz，降低后台更新频率，并暂停动态封面和徽章光泽。图片、导出内容和分享卡片仍保持完整画质。\n\n你可以让它始终开启，也可以跟随手机自带的省电模式，或在电量低于你设定的值时自动开启。可在“设置”>“省电模式”中找到。';
+  @override String get faqA9 => '省电模式会减少应用的活动以节省电量：关闭倾斜视差效果，将屏幕刷新率限制在约 60 Hz，降低后台更新频率，并暂停动态封面和徽章光泽。图片、导出内容和分享卡片仍保持完整画质。\n\n您可以让它始终开启，也可以跟随手机自带的省电模式，或在电量低于您设定的值时自动开启。可在“设置”>“省电模式”中找到。';
   @override String get faqQ10 => '如何备份或恢复我的数据？';
   @override String get faqA10 => DataSource.lb ? '前往设置 > 备份，您可以导出备份文件，并自行选择是否包含 ListenBrainz 密钥。之后可以在本机或其他设备上重新导入，找回您的设置。' : '前往设置 > 备份，您可以导出备份文件，并自行选择是否包含 Last.fm 密钥。之后可以在本机或其他设备上重新导入，找回您的设置。';
   @override String get faqQ11 => '应用可以离线使用吗？';
@@ -848,7 +848,7 @@ class AppStringsZh implements AppStrings {
   @override String get apiSharedKey => '共享的公开测试密钥(免费档)';
   @override String get apiUnofficial => '非官方接口:不保证配额,可能随时变更或被封锁。';
   @override String get apiKeyInUse => '使用中的密钥';
-  @override String get apiOwnKey => '你自己的 Last.fm 密钥';
+  @override String get apiOwnKey => '您自己的 Last.fm 密钥';
   @override String apiBuiltinKey(int n, int total) => '内置密钥 $n / $total';
   @override String get apiBackupOn => '备用密钥:开';
   @override String get apiBackupOff => '备用密钥:关';
@@ -911,7 +911,7 @@ const Map<String, String> kTxZh = {
   'lib_split_t': '拆分合作艺人',
   'lib_split_s': '“Gims & Damso”会分别计入 Gims 和 Damso,而不是单独的艺人。像“Simon & Garfunkel”这样的乐队保持完整。',
   'lib_step_t': '您的资料库',
-  'lib_step_s': '选择应用如何归并你的播放记录。你可以随时在设置中更改。',
+  'lib_step_s': '选择应用如何归并您的播放记录。您可以随时在设置中更改。',
   'bk_dash_t': '仪表盘与启动',
   'bk_dash_s': '板块、头图、统计卡片、发现、启动标签页',
   'bk_notif_t': '通知',
@@ -922,11 +922,11 @@ const Map<String, String> kTxZh = {
   'bk_prof_s': '您加星标的 Last.fm 用户',
   'about_legal_t': '法律信息',
   'about_legal_site_t': '法律声明与隐私',
-  'about_legal_site_s': '发布者、处理的数据、第三方服务、你的权利',
+  'about_legal_site_s': '发布者、处理的数据、第三方服务、您的权利',
   'about_licenses_t': '开源许可证',
   'about_licenses_s': 'Flutter 及所有使用的软件包',
   'about_legal_editor': '由独立开发者 Sano Bld 发布。欢迎通过 Discord 或 GitHub issues 联系我们。',
-  'about_legal_privacy': '你的数据保存在你的设备上，我们不保留任何副本。应用会直接连接此处列出的服务，每个服务至少会收到你的 IP 地址和请求内容（例如艺术家名称）。相机仅用于扫描二维码。未经父母同意，本应用不面向 15 岁以下儿童。',
+  'about_legal_privacy': '您的数据保存在您的设备上，我们不保留任何副本。应用会直接连接此处列出的服务，每个服务至少会收到您的 IP 地址和请求内容（例如艺术家名称）。相机仅用于扫描二维码。未经父母同意，本应用不面向 15 岁以下儿童。',
   'about_legal_marks': 'LastStats 是独立项目，与 Last.fm、Spotify、YouTube、Apple、Deezer、TheAudioDB、MusicBrainz、Wikipedia 和 GitHub 均无关联，也未获其认可。名称和标志归其各自所有者所有，封面和元数据亦然。Wikipedia 文本采用 CC BY-SA 许可。',
   'about_readme_t': 'README 与项目动态',
   'about_readme_s': '阅读 README、最新提交、工作流、版本、下载量',
@@ -969,7 +969,7 @@ const Map<String, String> kTxZh = {
   'onb_sync_t': '同步与电池',
   'onb_sync_s': '让统计数据保持最新,同时不过多消耗手机电量。',
   'onb_autosync_t': '自动同步',
-  'onb_autosync_s': '应用会定期在后台检查你是否有新的播放记录。',
+  'onb_autosync_s': '应用会定期在后台检查您是否有新的播放记录。',
   'onb_freq': '检查频率',
   'onb_every_h': '每 {h} 小时',
   'onb_every_1h': '每小时',
@@ -1016,7 +1016,7 @@ const Map<String, String> kTxZh = {
   'set_motion_t': '视频封面',
   'set_motion_s': '当曲目有动态视频封面时自动播放。',
   'set_achv_t': '成就与等级',
-  'set_achv_s': '查看你的目标、徽章和账号等级。',
+  'set_achv_s': '查看您的目标、徽章和账号等级。',
   'cache_img_limit_t': '照片缓存上限',
   'cache_img_limit_s': '封面、艺术家照片和头像。优先删除最旧的。',
   'cache_vid_limit_t': '视频缓存上限',
@@ -1042,11 +1042,11 @@ const Map<String, String> kTxZh = {
   'gr_morning2': '睡得好吗，{name}？',
   'gr_morning3': '美好一天的开始，{name}',
   'gr_afternoon1': '下午好，{name}',
-  'gr_afternoon2': '很高兴再见到你，{name}',
-  'gr_afternoon3': '你回来了，{name}',
+  'gr_afternoon2': '很高兴再见到您，{name}',
+  'gr_afternoon3': '您回来了，{name}',
   'gr_evening1': '晚上好，{name}',
-  'gr_evening2': '祝你有个美好的夜晚，{name}',
-  'gr_evening3': '你回来了，{name}',
+  'gr_evening2': '祝您有个美好的夜晚，{name}',
+  'gr_evening3': '您回来了，{name}',
   'gr_weekend1': '周末愉快，{name}',
   'gr_weekend2': '享受周末吧，{name}',
   'gr_playing1': '正听得起劲，{name}',
@@ -1056,14 +1056,14 @@ const Map<String, String> kTxZh = {
   'gr_heavy2': 'Scrobble 一首接一首，{name}',
   'gr_birthday1': '账号周年快乐，{name}！',
   'gr_birthday2': '已经一起走过 {years} 年了，{name}！',
-  'gr_catchup1': '{friend}快追上你了，{name}！',
-  'gr_catchup2': '当心，{friend}就在你身后，{name}',
+  'gr_catchup1': '{friend}快追上您了，{name}！',
+  'gr_catchup2': '当心，{friend}就在您身后，{name}',
   'gr_christmas1': '圣诞快乐，{name}！',
   'gr_christmas2': '节日快乐，{name}',
   'gr_newyear1': '新年快乐，{name}！',
   'gr_newyear2': '愿新的一年满是音乐，{name}！',
   'gr_easter1': '复活节快乐，{name}！',
-  'gr_easter2': '祝你复活节愉快，{name}',
+  'gr_easter2': '祝您复活节愉快，{name}',
   'gr_spring1': '春天来了，{name}',
   'gr_spring2': '来个春日歌单吧，{name}？',
   'gr_summer1': '夏日气息，{name}',
@@ -1228,7 +1228,7 @@ const Map<String, String> kTxZh = {
   'ui_force_eco_mode_on_rega': '无论电量多少都强制开启省电模式。',
   'ui_auto_activate': '自动启用',
   'ui_turn_on_below_a_batter': '电量低时开启省电模式',
-  'ui_switches_on_by_itself_': '当电量变低时,省电模式会自动开启。你之后可以在设置中选择具体的电量。',
+  'ui_switches_on_by_itself_': '当电量变低时,省电模式会自动开启。您之后可以在设置中选择具体的电量。',
   'ui_threshold': '阈值',
   'ui_choose_the_tab_display': '选择应用启动时显示的标签页。',
   'ui_the_selected_tab_will_': '所选标签页将在下次启动应用时显示。',
@@ -1314,7 +1314,7 @@ const Map<String, String> kTxZh = {
   'qs_t4_t': '触觉反馈',
   'qs_t4_s': '点按、选择或滑动时轻微震动',
   'qs_t5_t': '成就',
-  'qs_t5_s': '显示已解锁的成就和你的等级',
+  'qs_t5_s': '显示已解锁的成就和您的等级',
   'qs_l1_t': '强调色',
   'qs_l2_t': '主题',
   'qs_l3_t': '语言',
@@ -1386,29 +1386,29 @@ const Map<String, String> kTxZh = {
   'bk_pick_folder': '选择自动备份文件夹',
   'bk_save_title': '保存 LastStats 备份',
   'bk_pick_file': '选择 LastStats 备份文件',
-  'nch_milestone_d': '达到 scrobble 里程碑时通知你',
+  'nch_milestone_d': '达到 scrobble 里程碑时通知您',
   'nch_grand_d': '重大里程碑的特别提醒（1K、10K、100K、1M…）',
   'nch_recap_d': '每日和每周收听摘要',
-  'nch_update_d': 'LastStats 有新版本时通知你',
+  'nch_update_d': 'LastStats 有新版本时通知您',
   'nch_news_d': 'LastStats 的新功能、修复和公告',
   'nch_sync_d': '同步完整 scrobble 历史时的进度',
   'ntf_grand_1000000': '一百万次 scrobble，太传奇了。🎸',
-  'ntf_grand_500000': '五十万次 scrobble，你从不停歇。🎧',
+  'ntf_grand_500000': '五十万次 scrobble，您从不停歇。🎧',
   'ntf_grand_250000': '{n} 次 scrobble，音乐永不停歇。🎶',
-  'ntf_grand_100000': '{n} 次 scrobble！你是真正的音乐迷。🔥',
+  'ntf_grand_100000': '{n} 次 scrobble！您是真正的音乐迷。🔥',
   'ntf_grand_50000': '{n} 次 scrobble，令人印象深刻。🎵',
   'ntf_grand_25000': '{n} 次 scrobble，依然势头强劲！',
-  'ntf_grand_10000': '{n} 次 scrobble，你突破了五位数！🎉',
+  'ntf_grand_10000': '{n} 次 scrobble，您突破了五位数！🎉',
   'ntf_grand_5000': '{n} 次 scrobble，还在继续！',
-  'ntf_grand_1000': '你的前 {n} 次 scrobble，旅程开始了。🎵',
+  'ntf_grand_1000': '您的前 {n} 次 scrobble，旅程开始了。🎵',
   'ntf_update_title': 'LastStats {v} 现已推出',
   'ntf_update_body': '新版本已可下载。',
   'ntf_milestone_title': '🎵 里程碑：{n} 次 scrobble',
-  'ntf_milestone_body': '你刚刚在 Last.fm 上达到了 {n} 次 scrobble 🎶',
+  'ntf_milestone_body': '您刚刚在 Last.fm 上达到了 {n} 次 scrobble 🎶',
   'ntf_daily_title': '📊 每日回顾 · {d}',
   'ntf_weekly_title': '📅 每周回顾 · {w}',
-  'ntf_year_title': '👀 你的 {y} 年度回顾已就绪',
-  'ntf_year_body': '回顾你的 {y} 年音乐：艺术家、歌曲、专辑等更多内容。',
+  'ntf_year_title': '👀 您的 {y} 年度回顾已就绪',
+  'ntf_year_body': '回顾您的 {y} 年音乐：艺术家、歌曲、专辑等更多内容。',
   'ntf_recap_body': '{n} 次 scrobble · 最多：{a}',
   'ntf_n_today': '今天 {n} 次 scrobble',
   'ntf_n_week': '本周 {n} 次 scrobble',
@@ -1424,58 +1424,58 @@ const Map<String, String> kTxZh = {
   'reorder': '调整顺序',
   'sp_login_t': '登录 Spotify',
   'sp_login_hint': '请使用您的 Spotify 邮箱和密码登录。登录成功后此窗口会自动关闭。',
-  'sp_risk_note': '注意：此功能依赖 Spotify 的非官方调用，而非官方 API。Spotify 可能随时更改或封锁它，它可能停止工作，使用它也可能违反 Spotify 的使用条款，从而可能导致你的 Spotify 账号受到限制。使用风险自负。',
-  'sp_perf_note': '性能:查找 Canvas 时会在后台运行一个隐藏的网页播放器,并产生额外的网络请求。这可能会增加电量、流量和内存消耗,并让应用稍微变慢。如果你有所察觉,请把 Spotify 从此列表中移除。',
+  'sp_risk_note': '注意：此功能依赖 Spotify 的非官方调用，而非官方 API。Spotify 可能随时更改或封锁它，它可能停止工作，使用它也可能违反 Spotify 的使用条款，从而可能导致您的 Spotify 账号受到限制。使用风险自负。',
+  'sp_perf_note': '性能:查找 Canvas 时会在后台运行一个隐藏的网页播放器,并产生额外的网络请求。这可能会增加电量、流量和内存消耗,并让应用稍微变慢。如果您有所察觉,请把 Spotify 从此列表中移除。',
   'sp_t': 'Spotify (Canvas)',
   'sp_on': '已连接',
   'sp_off': '未连接',
-  'sp_off_s': '你已退出 Spotify。重新登录后才能获取 Canvas 动态封面。',
+  'sp_off_s': '您已退出 Spotify。重新登录后才能获取 Canvas 动态封面。',
   'mv_ytdash_t': '也用于仪表盘',
   'mv_ytdash_s': '在仪表盘的个人资料背景动画封面中也使用 YouTube（默认关闭）',
   'yr_title': '年度回顾',
-  'yr_loading': '你的年度回顾马上就好，稍等片刻…',
-  'yr_error': '哎呀，无法加载你的 scrobble，请检查网络连接。',
+  'yr_loading': '您的年度回顾马上就好，稍等片刻…',
+  'yr_error': '哎呀，无法加载您的 scrobble，请检查网络连接。',
   'yr_retry': '重试',
   'yr_empty': '{year} 年没有 scrobble……难道是休假年？',
-  'yr_intro_h': '你的 {year} 音乐年',
+  'yr_intro_h': '您的 {year} 音乐年',
   'yr_scrobbles': '次 scrobble',
-  'yr_total_intro': '今年你一共听了足足：',
-  'yr_hours': '大约相当于 {h} 小时的音乐。你的耳朵值得一枚奖牌！（估算）',
-  'yr_top_artist': '你的本命艺人',
+  'yr_total_intro': '今年您一共听了足足：',
+  'yr_hours': '大约相当于 {h} 小时的音乐。您的耳朵值得一枚奖牌！（估算）',
+  'yr_top_artist': '您的本命艺人',
   'yr_top_artists': '热门艺人',
   'yr_top_tracks': '热门歌曲',
   'yr_top_albums': '热门专辑',
   'yr_plays': '{n} 次播放',
-  'yr_months_h': '按月回顾你的一年',
+  'yr_months_h': '按月回顾您的一年',
   'yr_months': '1月,2月,3月,4月,5月,6月,7月,8月,9月,10月,11月,12月',
-  'yr_best_month': '你最活跃的月份是{m}，共 {n} 次 scrobble。那个月热度爆表！',
-  'yr_best_day': '你最疯狂的一天是{d}，共 {n} 次 scrobble。耳机都冒烟了！',
-  'yr_when_h': '你的收听时间',
-  'yr_p_night': '你主要在深夜听歌：妥妥的夜猫子',
-  'yr_p_morning': '你主要在早上听歌：咖啡配歌单，黄金搭档',
-  'yr_p_day': '你主要在白天听歌：为日常配上原声',
-  'yr_p_evening': '你主要在晚上听歌：氛围感才是你的菜',
-  'yr_peak': '你的收听高峰在 {h} 点左右，最喜欢的日子是{d}。',
-  'yr_streak_h': '你的坚持，堪比节拍器',
+  'yr_best_month': '您最活跃的月份是{m}，共 {n} 次 scrobble。那个月热度爆表！',
+  'yr_best_day': '您最疯狂的一天是{d}，共 {n} 次 scrobble。耳机都冒烟了！',
+  'yr_when_h': '您的收听时间',
+  'yr_p_night': '您主要在深夜听歌：妥妥的夜猫子',
+  'yr_p_morning': '您主要在早上听歌：咖啡配歌单，黄金搭档',
+  'yr_p_day': '您主要在白天听歌：为日常配上原声',
+  'yr_p_evening': '您主要在晚上听歌：氛围感才是您的菜',
+  'yr_peak': '您的收听高峰在 {h} 点左右，最喜欢的日子是{d}。',
+  'yr_streak_h': '您的坚持，堪比节拍器',
   'yr_streak': '天',
   'yr_style': '自定义',
   'yr_flame_h': '连续收听的歌曲',
-  'yr_flame_s': '在你连续{n}天期间的播放次数',
+  'yr_flame_s': '在您连续{n}天期间的播放次数',
   'yr_day_h': '单曲单日纪录',
   'yr_day_s': '一天之内，在{d}。真是热爱！',
-  'yr_active': '在 {t} 天中，你有 {n} 天在听音乐。其余的日子呢？静得有点可疑……',
+  'yr_active': '在 {t} 天中，您有 {n} 天在听音乐。其余的日子呢？静得有点可疑……',
   'yr_disc_h': '新发现',
   'yr_new': '位艺人是今年的新发现。好奇宝宝！',
-  'yr_unique': '你一共听了 {a} 位不同的艺人和 {t} 首不同的歌曲。口味真丰富！',
+  'yr_unique': '您一共听了 {a} 位不同的艺人和 {t} 首不同的歌曲。口味真丰富！',
   'yr_card_hours': '小时（估算）',
   'yr_card_streak': '天连续',
-  'yr_friends_h': '你和好友对比',
-  'yr_rank': '你在 {n} 人中排名第 {r}',
-  'yr_you': '你',
-  'yr_twin_h': '你的音乐知己',
+  'yr_friends_h': '您和好友对比',
+  'yr_rank': '您在 {n} 人中排名第 {r}',
+  'yr_you': '您',
+  'yr_twin_h': '您的音乐知己',
   'yr_twin_s': '你们有 {n} 位共同喜爱的艺人。英雄所见略同！',
-  'yr_top_track': '你的年度单曲',
-  'yr_top_album': '你的心头好专辑',
+  'yr_top_track': '您的年度单曲',
+  'yr_top_album': '您的心头好专辑',
   'yr_line_h': '累计的一年',
   'yr_cal_h': '日历中的一年',
   'yr_share_h': '播放都去哪了',
@@ -1508,12 +1508,12 @@ const Map<String, String> kTxZh = {
   'not_rec': '不推荐',
   'sm_title': '连接方式',
   'sm_key_t': '我的 API 密钥',
-  'sm_key_s': '你拥有独立的使用额度,并且可以使用收藏功能。',
+  'sm_key_s': '您拥有独立的使用额度,并且可以使用收藏功能。',
   'sm_builtin_t': '内置密钥',
-  'sm_builtin_s': '只需要你的用户名。使用额度与其他用户共享。',
+  'sm_builtin_s': '只需要您的用户名。使用额度与其他用户共享。',
   'wl_title': '欢迎',
   'wl_sub': '请选择连接 Last.fm 的方式。',
-  'sr_from_recent': '来自你最近的搜索',
+  'sr_from_recent': '来自您最近的搜索',
   'sr_recent': '最近搜索',
   'sr_suggestions': '搜索建议',
   'sr_recommended': '推荐',
@@ -1569,7 +1569,7 @@ const Map<String, String> kTxZh = {
   'ic_blue': '蓝色',
   'ic_red': '红色',
   'ic_pin': '添加到主屏幕',
-  'lbl_step1_t': '打开你的令牌页面',
+  'lbl_step1_t': '打开您的令牌页面',
   'lbl_step1_s': '登录 ListenBrainz，然后复制“用户令牌”。',
   'lbl_open': '打开 ListenBrainz',
   'lbl_step2_t': '粘贴令牌',
@@ -1598,8 +1598,8 @@ const Map<String, String> kTxZh = {
   'lbl_restore_bad': '此备份不包含可用的登录信息。',
   'lbl_restored': '备份已恢复',
   'lbl_step3_t': '登录',
-  'lbl_api_lb': '使用你的 ListenBrainz 令牌。限制：每秒 1 次请求，自动管理。',
-  'lbl_key_needed': '公共密钥已停用：请在 设置 › 连接 中添加你自己的 Last.fm API 密钥。',
+  'lbl_api_lb': '使用您的 ListenBrainz 令牌。限制：每秒 1 次请求，自动管理。',
+  'lbl_key_needed': '公共密钥已停用：请在 设置 › 连接 中添加您自己的 Last.fm API 密钥。',
   'api_img_sec': '图片来源',
   'api_img_sub': '拖动排序。将使用第一个找到图片的已启用来源。',
   'api_vid_sec': '视频来源',

@@ -81,9 +81,9 @@ class AppStringsIt implements AppStrings {
   @override String get searchProfiles => 'Profili';
   @override String get searchHintBar => 'Artista, album, brano o profilo…';
   @override String get searchHintProfiles => DataSource.lb ? 'Trova un utente ListenBrainz' : 'Trova un utente Last.fm';
-  @override String get searchHintArtists => 'Trova un artista';
-  @override String get searchHintAlbums => 'Trova un album';
-  @override String get searchHintTracks => 'Trova un brano';
+  @override String get searchHintArtists => 'Trovi un artista';
+  @override String get searchHintAlbums => 'Trovi un album';
+  @override String get searchHintTracks => 'Trovi un brano';
   @override String get searchTypePrompt => 'Digiti nella barra di ricerca sopra';
   @override String get searchAll => 'Tutti';
   @override String get searchFolders => 'Cartelle';
@@ -164,16 +164,16 @@ class AppStringsIt implements AppStrings {
   @override String get settingsLogoutConfirm => 'Disconnetti';
   @override String get settingsBackup => 'Backup e ripristino';
   @override String get settingsExport => 'Esporta impostazioni';
-  @override String get settingsExportSub => 'Copia le tue impostazioni in JSON negli appunti, per conservarle o condividerle';
+  @override String get settingsExportSub => 'Copia le sue impostazioni in JSON negli appunti, per conservarle o condividerle';
   @override String get settingsImport => 'Ripristina un backup';
-  @override String get settingsImportSub => 'Ripristina le tue impostazioni da un JSON esportato in precedenza';
+  @override String get settingsImportSub => 'Ripristina le sue impostazioni da un JSON esportato in precedenza';
   @override String get settingsBackupInfo => 'Include: tema, colori, chiave API, nome utente, intestazione, preferiti. Compatibile tra le versioni.';
   @override String get settingsUpdates => 'Aggiornamenti';
   @override String get settingsAutoUpdate => 'Verifica automatica';
   @override String get settingsAutoUpdateSub => 'Cerca una nuova versione in background, una volta al giorno.';
   @override String get settingsCheckNow => 'Verifica ora';
   @override String get settingsUpToDate => 'Aggiornato';
-  @override String get settingsCheckFailed => 'Impossibile controllare gli aggiornamenti. Verifica la connessione a internet e riprova.';
+  @override String get settingsCheckFailed => 'Impossibile controllare gli aggiornamenti. Verifichi la connessione a internet e riprovi.';
   @override String get settingsDownload => 'Scarica';
   @override String get settingsViewRelease => 'Visualizza';
   @override String get settingsAbout => 'Info';
@@ -256,7 +256,7 @@ class AppStringsIt implements AppStrings {
   @override String get onboardBack => 'Indietro';
   @override String get onboardAppearanceTitle => 'Personalizzi il suo stile';
   @override String get onboardAppearanceSub => 'Scelga il tema chiaro o scuro, il colore di accento e le opzioni di visualizzazione.';
-  @override String get onboardNotifTitle => 'Resta aggiornato';
+  @override String get onboardNotifTitle => 'Resti aggiornato';
   @override String get onboardNotifSub => 'Scelga quali notifiche ricevere e se il telefono deve vibrare.';
   @override String get onboardFavTitle => 'I suoi profili preferiti';
   @override String get onboardFavSub => DataSource.lb ? 'Aggiunga amici di ListenBrainz per ritrovare rapidamente i loro profili nell\'app.' : 'Aggiunga amici di Last.fm per ritrovare rapidamente i loro profili nell\'app.';
@@ -279,7 +279,7 @@ class AppStringsIt implements AppStrings {
   @override String get platformYtMusic => 'YouTube Music';
   @override String get platformOther => 'Altro / mostra tutto';
   @override String get settingsMusicPlatform => 'Piattaforma musicale';
-  @override String get settingsMusicPlatformSub => 'Mostra solo i link del tuo servizio musicale nelle pagine di artista, album e brano';
+  @override String get settingsMusicPlatformSub => 'Mostra solo i link del suo servizio musicale nelle pagine di artista, album e brano';
   @override String get settingsShowAllPlatformLinks => 'Mostra sempre tutto';
   @override String get settingsShowAllPlatformLinksSub => DataSource.lb ? 'Ignora il filtro e mostra ogni link (ListenBrainz, Spotify, YT Music, Web)' : 'Ignora il filtro e mostra ogni link (Last.fm, Spotify, YT Music, Web)';
   @override String get onboardUpdatesTitle => 'Aggiornamenti';
@@ -388,7 +388,7 @@ class AppStringsIt implements AppStrings {
   @override String get aboutTagline => DataSource.lb ? 'Il suo compagno per le statistiche ListenBrainz' : 'Il suo compagno per le statistiche Last.fm';
   @override String get aboutAppInfo => 'Informazioni sull\'app';
   @override String get aboutScrobbleDownloader => 'Downloader scrobble';
-  @override String get aboutScrobbleDownloaderSub => 'Scarica tutta la tua cronologia di scrobble e salvala in un file';
+  @override String get aboutScrobbleDownloaderSub => 'Scarichi tutta la sua cronologia di scrobble e la salvi in un file';
   @override String get aboutPoweredBy => 'Basato su';
   @override String get aboutImageDisclaimer => 'Le immagini di artisti, album e brani vengono recuperate automaticamente da queste fonti e a volte potrebbero essere errate o non corrispondere al contenuto reale.';
   @override String get aboutFooter => 'Fatto con ❤️ · Non affiliato con Last.fm';
@@ -399,7 +399,7 @@ class AppStringsIt implements AppStrings {
   @override String get backupDownloadFile => 'Scarica un file .json';
   @override String get backupChooseFile => 'Scegli un file di backup';
   @override String get backupFileSaved => 'Backup salvato';
-  @override String get backupFileSaveFailed => 'Impossibile salvare il file di backup. Controlla che ci sia spazio libero e che l\'app possa scrivere nella cartella, poi riprova.';
+  @override String get backupFileSaveFailed => 'Impossibile salvare il file di backup. Controlli che ci sia spazio libero e che l\'app possa scrivere nella cartella, poi riprovi.';
   @override String get setupRestoreBackup => 'Ripristina un backup';
   @override String get setupRestoreBackupSub => 'Recuperi il suo account e le sue impostazioni da un file di backup in formato .json.';
   @override String get backupRestoreKeysTitle => 'Ripristina chiavi API';
@@ -473,7 +473,7 @@ class AppStringsIt implements AppStrings {
   @override String get dashChartMonthlyLabel => 'Barre mensili';
   @override String get settingsDisplayNameSection => 'Nome personalizzato';
   @override String get settingsDisplayNameLabel => 'Come vuole essere chiamato?';
-  @override String get settingsDisplayNameHint => "Es. Noham — lascia vuoto per usare il nome dell'account";
+  @override String get settingsDisplayNameHint => "Es. Noham — lasci vuoto per usare il nome dell'account";
   @override String get newsSearchHint => 'Cerchi nelle novità…';
   @override String get aboutOpenSourceLibs => 'Librerie open source';
   @override String get aboutOpenSourceLibsSub => "Tutti i pacchetti Flutter usati per creare l'app.";
@@ -484,7 +484,7 @@ class AppStringsIt implements AppStrings {
   @override String get aboutAiDevNote => "L'IA è stata usata anche per sviluppare questa app.";
   @override String get notifWorkManagerInfo => 'Le notifiche vengono eseguite in background tramite WorkManager. L\'app non deve essere aperta. È richiesta una connessione a internet.';
   @override String get notifIntervalTitle => 'Ogni X scrobble';
-  @override String get notifIntervalSubtitle => 'Ricevi una notifica ogni volta che aggiungi un certo numero di scrobble';
+  @override String get notifIntervalSubtitle => 'Riceva una notifica ogni volta che aggiunge un certo numero di scrobble';
   @override String get notifRecapsSection => 'Riepiloghi d\'ascolto';
   @override String get notifDailyRecapSubtitle => 'Numero di scrobble + artista principale del giorno';
   @override String get notifWeeklyRecapSubtitle => 'Numero di scrobble + artista principale della settimana';
@@ -499,16 +499,16 @@ class AppStringsIt implements AppStrings {
   @override String get notifBadgeSubtitle => 'Mostra un punto sulla campanella delle novità quando ci sono annunci non letti';
   @override String get notifTestLabel => 'Test';
   @override String get notifPermissionDisabledTitle => 'Notifiche disattivate';
-  @override String get notifPermissionDisabledBody => 'Consenti le notifiche nelle impostazioni di sistema così LastStats potrà inviarti riepiloghi, traguardi e novità.';
+  @override String get notifPermissionDisabledBody => 'Consenta le notifiche nelle impostazioni di sistema così LastStats potrà inviarle riepiloghi, traguardi e novità.';
   @override String get notifGrantPermission => 'Concedi permesso';
   @override String get notifThresholdIntro => 'Riceverà una notifica speciale a ciascuno di questi traguardi:';
-  @override String get notifIntervalDescription => 'Riceverai una notifica ogni volta che raggiungi X nuovi scrobble';
+  @override String get notifIntervalDescription => 'Riceverà una notifica ogni volta che raggiunge X nuovi scrobble';
   @override String get notifCustomValueLabel => 'Valore personalizzato';
   @override String get notifTimeNotifyAt => 'Notifica alle';
   @override String get notifDayOfWeek => 'Giorno della settimana';
   @override String get notifSendTest => 'Invia una notifica di prova';
   @override String get notifSentCheckBar => 'Controlli la barra delle notifiche!';
-  @override String get notifMakeSureWorks => 'Verifica che le notifiche funzionino correttamente sul tuo telefono.';
+  @override String get notifMakeSureWorks => 'Verifichi che le notifiche funzionino correttamente sul suo telefono.';
   @override String get notifSentBang => 'Inviata!';
   @override String get notifSendButton => 'Invia';
   @override String get apVisualStyle => 'Stile visivo';
@@ -540,7 +540,7 @@ class AppStringsIt implements AppStrings {
   @override String get acctRemoveTitle => 'Rimuovere l\'account?';
   @override String get acctRemoveAction => 'Rimuovi';
   @override String get acctAlreadyAddedOrFull => 'Questo account è già stato aggiunto oppure l\'elenco è pieno.';
-  @override String get acctLogoutAllBody => 'Tutti gli account verranno rimossi. Tornerai alla schermata di configurazione.';
+  @override String get acctLogoutAllBody => 'Tutti gli account verranno rimossi. Tornerà alla schermata di configurazione.';
   @override String get acctActive => 'Attivo';
   @override String get acctTapSwitchToActivate => 'Tocchi "Cambia" per attivare';
   @override String get acctSwitch => 'Cambia';
@@ -576,7 +576,7 @@ class AppStringsIt implements AppStrings {
   @override String get favConnectDialogBody      => 'Autorizzi l\'app nella pagina Last.fm aperta nel browser, poi torni qui per confermare.';
   @override String get favConnectDialogConfirm   => 'Ho autorizzato';
   @override String get favConnectSuccess         => 'Preferiti attivati con successo!';
-  @override String get favConnectError           => 'Impossibile attivare i preferiti. Controlla che la chiave segreta sia corretta e di aver autorizzato LastStats su Last.fm, poi riprova.';
+  @override String get favConnectError           => 'Impossibile attivare i preferiti. Controlli che la chiave segreta sia corretta e di aver autorizzato LastStats su Last.fm, poi riprovi.';
   @override String get acctApiKeysSection        => 'Chiavi API';
   @override String get acctSecretKeyLabel        => 'Chiave segreta';
   @override String get acctSecretKeyNotSet       => 'Non impostata';
@@ -590,7 +590,7 @@ class AppStringsIt implements AppStrings {
   @override String get commonSeeMore             => 'Vedi altro';
   @override String get favPageTitle              => 'I miei preferiti';
   @override String get favSearchHint             => 'Cerchi un brano o un artista';
-  @override String get favEmpty                  => 'Ancora nessun preferito. Tocca il cuore di un brano per aggiungerlo.';
+  @override String get favEmpty                  => 'Ancora nessun preferito. Tocchi il cuore di un brano per aggiungerlo.';
   @override String get settingsLovedBadgeTitle => 'Icona cuore discreta';
   @override String get settingsLovedBadgeSub   => 'Mostra un piccolo cuore sui brani preferiti in ascolti recenti, cronologia e ricerca';
   @override String get favSortRecent   => 'Recenti';
@@ -601,7 +601,7 @@ class AppStringsIt implements AppStrings {
   @override String get favFoldersAll => 'Tutti';
   @override String get favFolderNew => 'Nuova cartella';
   @override String get favFolderNamePlaceholder => 'Nome cartella';
-  @override String get favFolderCustomEmojiTitle => "Scegli un'emoji";
+  @override String get favFolderCustomEmojiTitle => "Scelga un'emoji";
   @override String get favFolderCustomEmojiHelper => "Solo un'emoji, niente testo.";
   @override String get favFolderDescPlaceholder => 'Descrizione (opzionale)';
   @override String get favFolderRecentlyPlayed => 'Ascoltati di recente';
@@ -621,7 +621,7 @@ class AppStringsIt implements AppStrings {
   @override String get faqQ3 => 'L\'app funziona su macOS o altre piattaforme?';
   @override String get faqA3 => 'LastStats è sviluppato e testato su Android. Il funzionamento su altre piattaforme (macOS, Windows, Linux…) non è verificato: possono verificarsi bug o comportamenti imprevisti.';
   @override String get faqQ4 => 'LastStats è open source?';
-  @override String get faqA4 => 'Sì! Il codice sorgente è liberamente disponibile su GitHub. Il progetto è indipendente, realizzato con passione da SanoBld. Sentiti libero di contribuire, segnalare bug o lasciare una stella ⭐.';
+  @override String get faqA4 => 'Sì! Il codice sorgente è liberamente disponibile su GitHub. Il progetto è indipendente, realizzato con passione da SanoBld. Si senta libero di contribuire, segnalare bug o lasciare una stella ⭐.';
   @override String get faqQ5 => 'Dove vengono archiviati i miei dati?';
   @override String get faqA5 => DataSource.lb ? 'Solo sul suo dispositivo. LastStats non ha alcun server: i suoi scrobble vengono memorizzati localmente per un accesso rapido, e anche le sue credenziali ListenBrainz restano salvate in locale. Nulla viene inviato se non all\'API ufficiale di ListenBrainz.' : 'Solo sul suo dispositivo. LastStats non ha alcun server: i suoi scrobble vengono memorizzati localmente per un accesso rapido, e anche le sue credenziali Last.fm restano salvate in locale. Nulla viene inviato se non all\'API ufficiale di Last.fm.';
   @override String get faqQ6 => 'Come attivo i preferiti?';
@@ -641,7 +641,7 @@ class AppStringsIt implements AppStrings {
   @override String get faqQ13 => 'Come configuro le notifiche?';
   @override String get faqA13 => 'Da Impostazioni > Notifiche può attivare un avviso al termine di una sincronizzazione, scegliere ogni quanto compaiono gli avvisi oppure disattivare del tutto le notifiche.';
   @override String get faqQ14 => 'Mancano le immagini o caricano all’infinito. Cosa fare?';
-  @override String get faqA14 => 'Svuota la cache nell’app (Impostazioni > Cache), poi in Android (Impostazioni > App > LastStats > Archiviazione > Svuota cache). Se le immagini mancano ancora, fai un backup (Impostazioni > Backup), disinstalla e reinstalla l’app, poi ripristina il backup.';
+  @override String get faqA14 => 'Svuoti la cache nell’app (Impostazioni > Cache), poi in Android (Impostazioni > App > LastStats > Archiviazione > Svuota cache). Se le immagini mancano ancora, faccia un backup (Impostazioni > Backup), disinstalli e reinstalli l’app, poi ripristini il backup.';
   @override String get settingsPlatformDisabledByShowAll => 'Disattivato: tutti i link sono già mostrati.';
   @override String get commonInDevelopment => 'In sviluppo';
   @override String get commonSeeLess => 'Vedi meno';
@@ -753,7 +753,7 @@ class AppStringsIt implements AppStrings {
   @override String discoverLike(String names) => 'Come $names';
   @override String get dashReorderSections => 'Cambia l\'ordine delle sezioni';
   @override String get dashInfiniteTitle => 'Scorrimento infinito';
-  @override String get dashInfiniteSub => 'Scopri si ripete e continua a proporre altro';
+  @override String get dashInfiniteSub => 'Scopri riparte in continuazione e propone sempre nuove idee';
   @override String get dashDiscoverTitle => 'Scopri';
   @override String get dashDiscoverSub => 'Idee musicali da scorrere';
   @override String get dashSortButton => 'Ordina';
@@ -822,7 +822,7 @@ class AppStringsIt implements AppStrings {
   @override String get apiSharedKey => 'Chiave di prova pubblica condivisa (piano gratuito)';
   @override String get apiUnofficial => 'Endpoint non ufficiale: nessuna quota garantita, può cambiare o essere bloccato senza preavviso.';
   @override String get apiKeyInUse => 'Chiave in uso';
-  @override String get apiOwnKey => 'La tua chiave Last.fm';
+  @override String get apiOwnKey => 'La sua chiave Last.fm';
   @override String apiBuiltinKey(int n, int total) => 'Chiave integrata $n di $total';
   @override String get apiBackupOn => 'Chiave di riserva: attiva';
   @override String get apiBackupOff => 'Chiave di riserva: disattivata';
@@ -856,7 +856,7 @@ const Map<String, String> kTxIt = {
   'st_bkp_on': 'Backup automatico attivo',
   'st_bkp_off': 'Backup automatico disattivato',
   'st_bkp_on_s': 'Le sue impostazioni vengono salvate automaticamente.',
-  'st_bkp_off_s': 'Attivalo per non perdere mai le impostazioni.',
+  'st_bkp_off_s': 'Lo attivi per non perdere mai le impostazioni.',
   'st_bkp_next': 'Prossimo backup: {d}',
   'cmp_breakdown': 'Cosa li avvicina',
   'cmp_by_artists': 'Artisti',
@@ -896,11 +896,11 @@ const Map<String, String> kTxIt = {
   'bk_prof_s': 'I profili Last.fm che ha messo tra i preferiti',
   'about_legal_t': 'Note legali',
   'about_legal_site_t': 'Note legali e privacy',
-  'about_legal_site_s': 'Editore, dati trattati, servizi di terze parti, i tuoi diritti',
+  'about_legal_site_s': 'Editore, dati trattati, servizi di terze parti, i suoi diritti',
   'about_licenses_t': 'Licenze open source',
   'about_licenses_s': 'Flutter e tutti i pacchetti usati',
   'about_legal_editor': 'Pubblicata da Sano Bld, sviluppatore indipendente. Contattaci su Discord o con le issue su GitHub.',
-  'about_legal_privacy': 'I tuoi dati restano sul tuo dispositivo e non ne conserviamo copie. L\'app contatta direttamente i servizi elencati qui e ognuno riceve almeno il tuo indirizzo IP e la richiesta (ad esempio il nome di un artista). La fotocamera serve solo a scansionare i codici QR. Non è destinata ai minori di 15 anni senza il consenso di un genitore.',
+  'about_legal_privacy': 'I suoi dati restano sul suo dispositivo e non ne conserviamo copie. L\'app contatta direttamente i servizi elencati qui e ognuno riceve almeno il suo indirizzo IP e la richiesta (ad esempio il nome di un artista). La fotocamera serve solo a scansionare i codici QR. Non è destinata ai minori di 15 anni senza il consenso di un genitore.',
   'about_legal_marks': 'LastStats è indipendente e non è affiliata né approvata da Last.fm, Spotify, YouTube, Apple, Deezer, TheAudioDB, MusicBrainz, Wikipedia o GitHub. Nomi e loghi appartengono ai rispettivi proprietari, così come copertine e metadati. I testi di Wikipedia sono sotto licenza CC BY-SA.',
   'about_readme_t': 'README e attività del progetto',
   'about_readme_s': 'Leggi il README, ultimi commit, workflow, versione, download',
@@ -1016,13 +1016,13 @@ const Map<String, String> kTxIt = {
   'gr_morning2': 'Ben svegliato, {name}!',
   'gr_morning3': 'Un ottimo inizio di giornata, {name}',
   'gr_afternoon1': 'Buon pomeriggio, {name}',
-  'gr_afternoon2': 'Che bello rivederti, {name}',
+  'gr_afternoon2': 'Che bello rivederla, {name}',
   'gr_afternoon3': 'Rieccoti, {name}',
   'gr_evening1': 'Buonasera, {name}',
   'gr_evening2': 'Buona serata, {name}',
   'gr_evening3': 'Rieccoti, {name}',
   'gr_weekend1': 'Buon fine settimana, {name}',
-  'gr_weekend2': 'Goditi il weekend, {name}',
+  'gr_weekend2': 'Si goda il weekend, {name}',
   'gr_playing1': 'Ascolto in corso, {name}',
   'gr_playing2': 'Bella scelta, {name}',
   'gr_playing3': 'Che bel suono, {name}',
@@ -1030,8 +1030,8 @@ const Map<String, String> kTxIt = {
   'gr_heavy2': 'Gli scrobble non si fermano, {name}',
   'gr_birthday1': 'Buon anniversario dell\'account, {name}!',
   'gr_birthday2': 'Già {years} anno/i insieme, {name}!',
-  'gr_catchup1': '{friend} ti sta raggiungendo, {name}!',
-  'gr_catchup2': 'Attenzione, {friend} è proprio dietro di te, {name}',
+  'gr_catchup1': '{friend} la sta raggiungendo, {name}!',
+  'gr_catchup2': 'Attenzione, {friend} è proprio dietro di lei, {name}',
   'gr_christmas1': 'Buon Natale, {name}!',
   'gr_christmas2': 'Buone feste, {name}',
   'gr_newyear1': 'Buon anno, {name}!',
@@ -1041,7 +1041,7 @@ const Map<String, String> kTxIt = {
   'gr_spring1': 'È arrivata la primavera, {name}',
   'gr_spring2': 'Una playlist primaverile, {name}?',
   'gr_summer1': 'Aria d\'estate, {name}',
-  'gr_summer2': 'Goditi il sole, {name}',
+  'gr_summer2': 'Si goda il sole, {name}',
   'gr_autumn1': 'Atmosfera autunnale, {name}',
   'gr_autumn2': 'Cadono le foglie, resta la musica, {name}',
   'gr_winter1': 'Un inverno in musica, {name}',
@@ -1082,7 +1082,7 @@ const Map<String, String> kTxIt = {
   'ui_play_preview': 'Riproduci anteprima',
   'ntf_test_title': '🔔 Notifica di prova',
   'ntf_test_body': 'Le notifiche di LastStats funzionano!',
-  'ui_not_enough_data_yet_sy': 'Non ci sono ancora abbastanza dati: sincronizza la cronologia completa nelle impostazioni.',
+  'ui_not_enough_data_yet_sy': 'Non ci sono ancora abbastanza dati: sincronizzi la cronologia completa nelle impostazioni.',
   'ui_level': 'Livello {level}',
   'ui_fetching': 'Recupero {currentYea}… ({yearIndex}/{totalYears})',
   'ui_which_chart': 'Quale grafico?',
@@ -1211,7 +1211,7 @@ const Map<String, String> kTxIt = {
   'ui_daily': 'Ogni giorno',
   'ui_resync_everyone': 'Risincronizza tutto',
   'ui_version_history': 'Cronologia versioni',
-  'ui_could_not_load_release': 'Impossibile caricare la cronologia delle versioni. Controlla la connessione e riprova.',
+  'ui_could_not_load_release': 'Impossibile caricare la cronologia delle versioni. Controlli la connessione e riprovi.',
   'ui_installed_dev_build_un': 'Installata: build di sviluppo (versione sconosciuta)',
   'ui_installed': 'Installata: {displayVer}',
   'ui_search_a_version_or_ch': 'Cerchi una versione o un changelog…',
@@ -1224,7 +1224,7 @@ const Map<String, String> kTxIt = {
   'ui_view_release': 'Vedi release',
   'ui_details': 'Dettagli',
   'ui_all_past_releases_chan': 'Tutte le versioni passate, changelog e download',
-  'ui_please_fill_both_field': 'Compila entrambi i campi per continuare.',
+  'ui_please_fill_both_field': 'Compili entrambi i campi per continuare.',
   'svc_title': 'Scelga il suo servizio',
   'svc_sub': 'LastStats legge i suoi ascolti da uno di questi due servizi.',
   'svc_lfm_s': 'La sua cronologia Last.fm. Attenzione: l\'API di Last.fm diventa a pagamento; una chiave API richiede Last.fm Pro dal 1° dicembre.',
@@ -1266,7 +1266,7 @@ const Map<String, String> kTxIt = {
   'acct_switch': 'Cambia servizio',
   'acct_switch_s': 'Passa da Last.fm a ListenBrainz, o viceversa',
   'ui_api_key_must_be_32_cha': 'La chiave API deve contenere esattamente 32 caratteri.',
-  'ui_profile_not_found': 'Profilo non trovato. Controlla il nome utente e riprova.',
+  'ui_profile_not_found': 'Profilo non trovato. Controlli il nome utente e riprovi.',
   'ui_chart_monthly': 'Barre mensili',
   'ui_chart_cumul': 'Progressione',
   'ui_chart_genres': 'Generi musicali',
@@ -1286,9 +1286,9 @@ const Map<String, String> kTxIt = {
   'qs_t3_t': 'Notifiche notizie',
   'qs_t3_s': 'Avvisi su novità, correzioni e annunci',
   'qs_t4_t': 'Feedback aptico',
-  'qs_t4_s': 'Brevi vibrazioni quando tocchi, selezioni o scorri',
+  'qs_t4_s': 'Brevi vibrazioni quando tocca, seleziona o scorre',
   'qs_t5_t': 'Obiettivi',
-  'qs_t5_s': 'Mostra i traguardi sbloccati e il tuo livello',
+  'qs_t5_s': 'Mostra i traguardi sbloccati e il suo livello',
   'qs_l1_t': 'Colore accento',
   'qs_l2_t': 'Tema',
   'qs_l3_t': 'Lingua',
@@ -1344,7 +1344,7 @@ const Map<String, String> kTxIt = {
   'shape_mix': 'Misto',
   'shape_square': 'Quadrato',
   'shape_circle': 'Cerchio',
-  'shape_pick_one': 'O scegli una sola forma',
+  'shape_pick_one': 'O scelga una sola forma',
   'friend_listening': 'In ascolto',
   'friend_offline': 'Offline',
   'tier_none': 'Nessun livello',
@@ -1360,35 +1360,35 @@ const Map<String, String> kTxIt = {
   'bk_pick_folder': 'Scegli la cartella del backup automatico',
   'bk_save_title': 'Salva il backup di LastStats',
   'bk_pick_file': 'Scegli un file di backup di LastStats',
-  'nch_milestone_d': 'Avvisa quando raggiungi un traguardo di scrobble',
+  'nch_milestone_d': 'Avvisa quando raggiunge un traguardo di scrobble',
   'nch_grand_d': 'Avvisi speciali per i grandi traguardi (1K, 10K, 100K, 1M…)',
   'nch_recap_d': 'Riepiloghi di ascolto giornalieri e settimanali',
   'nch_update_d': 'Avvisa quando è disponibile una nuova versione di LastStats',
   'nch_news_d': 'Novità, correzioni e annunci su LastStats',
   'nch_sync_d': 'Avanzamento della sincronizzazione dell’intera cronologia',
   'ntf_grand_1000000': 'Un milione di scrobble. Leggendario. 🎸',
-  'ntf_grand_500000': 'Mezzo milione di scrobble. Non ti fermi mai. 🎧',
+  'ntf_grand_500000': 'Mezzo milione di scrobble. Lei non si ferma mai. 🎧',
   'ntf_grand_250000': '{n} scrobble: la musica non finisce mai. 🎶',
   'ntf_grand_100000': '{n} scrobble! Sei un vero appassionato di musica. 🔥',
   'ntf_grand_50000': '{n} scrobble. Davvero impressionante. 🎵',
-  'ntf_grand_25000': '{n} scrobble e sei ancora in forma!',
-  'ntf_grand_10000': '{n} scrobble: hai raggiunto le cinque cifre! 🎉',
+  'ntf_grand_25000': '{n} scrobble e lei è ancora in forma!',
+  'ntf_grand_10000': '{n} scrobble: ha raggiunto le cinque cifre! 🎉',
   'ntf_grand_5000': '{n} scrobble e si continua!',
-  'ntf_grand_1000': 'I tuoi primi {n} scrobble. Il viaggio inizia. 🎵',
+  'ntf_grand_1000': 'I suoi primi {n} scrobble. Il viaggio inizia. 🎵',
   'ntf_update_title': 'LastStats {v} disponibile',
   'ntf_update_body': 'Una nuova versione è pronta per essere scaricata.',
   'ntf_milestone_title': '🎵 Traguardo: {n} scrobble',
-  'ntf_milestone_body': 'Hai appena raggiunto {n} scrobble su Last.fm 🎶',
+  'ntf_milestone_body': 'Ha appena raggiunto {n} scrobble su Last.fm 🎶',
   'ntf_daily_title': '📊 Riepilogo del giorno · {d}',
   'ntf_weekly_title': '📅 Riepilogo settimanale · {w}',
-  'ntf_year_title': '👀 Il tuo riepilogo {y} è pronto',
-  'ntf_year_body': 'Scopri il tuo {y} in musica: artisti, brani, album e molto altro.',
+  'ntf_year_title': '👀 Il suo riepilogo {y} è pronto',
+  'ntf_year_body': 'Scopra il suo {y} in musica: artisti, brani, album e molto altro.',
   'ntf_recap_body': '{n} scrobble · Top: {a}',
   'ntf_n_today': '{n} scrobble oggi',
   'ntf_n_week': '{n} scrobble questa settimana',
   'ntf_top_artist': 'Artista più ascoltato: {a}',
   'ntf_update_avail': '🆕 Aggiornamento disponibile',
-  'ntf_update_ready': 'LastStats {v} è pronto: tocca per vedere.',
+  'ntf_update_ready': 'LastStats {v} è pronto: tocchi per vedere.',
   'ntf_sync_title': '🔄 Sincronizzazione scrobble…',
   'ntf_sync_done': '✅ Scrobble sincronizzati',
   'ntf_sync_new': '{n} nuovo/i scrobble aggiunto/i.',
@@ -1398,61 +1398,61 @@ const Map<String, String> kTxIt = {
   'reorder': 'Riordina',
   'sp_login_t': 'Accesso a Spotify',
   'sp_login_hint': 'Acceda con la sua e-mail e la sua password di Spotify. La finestra si chiude da sola al termine.',
-  'sp_risk_note': 'Attenzione: questa funzione si basa su chiamate non ufficiali di Spotify, non su un\'API ufficiale. Spotify può modificarla o bloccarla in qualsiasi momento, può smettere di funzionare e il suo uso può violare i termini di utilizzo di Spotify, con possibili limitazioni al tuo account Spotify. Usala a tuo rischio.',
-  'sp_perf_note': 'Prestazioni: la ricerca dei Canvas avvia un web player nascosto in background ed effettua richieste di rete aggiuntive. Può consumare più batteria, dati e memoria e rallentare un po\' l\'app. Rimuovi Spotify da questo elenco se lo noti.',
+  'sp_risk_note': 'Attenzione: questa funzione si basa su chiamate non ufficiali di Spotify, non su un\'API ufficiale. Spotify può modificarla o bloccarla in qualsiasi momento, può smettere di funzionare e il suo uso può violare i termini di utilizzo di Spotify, con possibili limitazioni al suo account Spotify. La usi a suo rischio.',
+  'sp_perf_note': 'Prestazioni: la ricerca dei Canvas avvia un web player nascosto in background ed effettua richieste di rete aggiuntive. Può consumare più batteria, dati e memoria e rallentare un po\' l\'app. Rimuova Spotify da questo elenco se lo nota.',
   'sp_t': 'Spotify (Canvas)',
   'sp_on': 'Connesso',
   'sp_off': 'Non connesso',
-  'sp_off_s': 'Hai effettuato il logout da Spotify. Accedi di nuovo per ottenere le copertine animate Canvas.',
+  'sp_off_s': 'Ha effettuato il logout da Spotify. Acceda di nuovo per ottenere le copertine animate Canvas.',
   'mv_ytdash_t': 'Anche nella dashboard',
   'mv_ytdash_s': 'Usa YouTube per la copertina animata dietro il profilo nella dashboard (disattivato di default)',
   'yr_title': 'Riepilogo dell\'anno',
-  'yr_loading': 'Il tuo riepilogo sta arrivando, resta con noi…',
-  'yr_error': 'Ops, impossibile caricare i tuoi scrobble. Controlla la connessione.',
+  'yr_loading': 'Il suo riepilogo sta arrivando, resti con noi…',
+  'yr_error': 'Ops, impossibile caricare i suoi scrobble. Controlli la connessione.',
   'yr_retry': 'Riprova',
   'yr_empty': 'Nessuno scrobble nel {year}… anno sabbatico?',
-  'yr_intro_h': 'Il tuo {year} in musica',
+  'yr_intro_h': 'Il suo {year} in musica',
   'yr_scrobbles': 'scrobble',
-  'yr_total_intro': 'Quest’anno hai ascoltato ben:',
-  'yr_hours': 'Sono circa {h} ore di musica. Le tue orecchie meritano una medaglia! (stima)',
-  'yr_top_artist': 'Il tuo artista del cuore',
+  'yr_total_intro': 'Quest’anno ha ascoltato ben:',
+  'yr_hours': 'Sono circa {h} ore di musica. Le sue orecchie meritano una medaglia! (stima)',
+  'yr_top_artist': 'Il suo artista del cuore',
   'yr_top_artists': 'Top artisti',
   'yr_top_tracks': 'Top brani',
   'yr_top_albums': 'Top album',
   'yr_plays': '{n} ascolti',
-  'yr_months_h': 'Il tuo anno, mese per mese',
+  'yr_months_h': 'Il suo anno, mese per mese',
   'yr_months': 'Gen,Feb,Mar,Apr,Mag,Giu,Lug,Ago,Set,Ott,Nov,Dic',
-  'yr_best_month': 'Il tuo mese più attivo: {m}, con {n} scrobble. Che calore!',
-  'yr_best_day': 'Il tuo giorno più intenso: {d}, con {n} scrobble. Le cuffie fumavano!',
-  'yr_when_h': 'Quando ascolti',
-  'yr_p_night': 'Ascolti soprattutto di notte: gufo notturno certificato',
-  'yr_p_morning': 'Ascolti soprattutto al mattino: caffè e playlist, coppia vincente',
-  'yr_p_day': 'Ascolti soprattutto di giorno: la colonna sonora delle tue giornate',
-  'yr_p_evening': 'Ascolti soprattutto la sera: l’atmosfera è la tua passione',
-  'yr_peak': 'Il tuo picco di ascolto è verso le {h}:00 e il tuo giorno preferito è {d}.',
-  'yr_streak_h': 'La tua costanza da metronomo',
+  'yr_best_month': 'Il suo mese più attivo: {m}, con {n} scrobble. Che calore!',
+  'yr_best_day': 'Il suo giorno più intenso: {d}, con {n} scrobble. Le cuffie fumavano!',
+  'yr_when_h': 'Quando ascolta',
+  'yr_p_night': 'Ascolta soprattutto di notte: gufo notturno certificato',
+  'yr_p_morning': 'Ascolta soprattutto al mattino: caffè e playlist, coppia vincente',
+  'yr_p_day': 'Ascolta soprattutto di giorno: la colonna sonora delle sue giornate',
+  'yr_p_evening': 'Ascolta soprattutto la sera: l’atmosfera è la sua passione',
+  'yr_peak': 'Il suo picco di ascolto è verso le {h}:00 e il suo giorno preferito è {d}.',
+  'yr_streak_h': 'La sua costanza da metronomo',
   'yr_streak': 'giorni',
   'yr_style': 'Personalizza',
-  'yr_flame_h': 'La tua canzone della serie',
-  'yr_flame_s': 'riproduzioni durante la tua serie di {n} giorni',
-  'yr_day_h': 'Il tuo record con una canzone',
+  'yr_flame_h': 'La sua canzone della serie',
+  'yr_flame_s': 'riproduzioni durante la sua serie di {n} giorni',
+  'yr_day_h': 'Il suo record con una canzone',
   'yr_day_s': 'in un solo giorno, il {d}. Che passione!',
-  'yr_active': 'Hai ascoltato musica in {n} giorni su {t}. Gli altri? Un silenzio sospetto…',
+  'yr_active': 'Ha ascoltato musica in {n} giorni su {t}. Gli altri? Un silenzio sospetto…',
   'yr_disc_h': 'Scoperte',
-  'yr_new': 'artisti scoperti quest’anno. Che curiosone!',
-  'yr_unique': 'In totale hai ascoltato {a} artisti e {t} brani diversi. Che varietà!',
+  'yr_new': 'artisti scoperti quest’anno. Che curiosità!',
+  'yr_unique': 'In totale ha ascoltato {a} artisti e {t} brani diversi. Che varietà!',
   'yr_card_hours': 'ore (stimate)',
   'yr_card_streak': 'giorni di fila',
-  'yr_friends_h': 'Tu contro i tuoi amici',
+  'yr_friends_h': 'Lei contro i suoi amici',
   'yr_rank': 'Sei il n. {r} su {n}',
   'yr_you': 'Tu',
-  'yr_twin_h': 'Il tuo gemello musicale',
+  'yr_twin_h': 'Il suo gemello musicale',
   'yr_twin_s': 'Avete {n} artisti preferiti in comune. Le grandi menti si incontrano!',
-  'yr_top_track': 'Il tuo tormentone n°1',
-  'yr_top_album': 'Il tuo album feticcio',
-  'yr_line_h': 'Il tuo anno, in crescita',
-  'yr_cal_h': 'Il tuo anno in un calendario',
-  'yr_share_h': 'Dove vanno i tuoi ascolti',
+  'yr_top_track': 'Il suo tormentone n°1',
+  'yr_top_album': 'Il suo album feticcio',
+  'yr_line_h': 'Il suo anno, in crescita',
+  'yr_cal_h': 'Il suo anno in un calendario',
+  'yr_share_h': 'Dove vanno i suoi ascolti',
   'yr_share_err': 'Ops, impossibile creare l’immagine. Riprova.',
   'yr_share_profile': 'Usa la mia foto profilo come sfondo',
   'yr_months_full': 'gennaio,febbraio,marzo,aprile,maggio,giugno,luglio,agosto,settembre,ottobre,novembre,dicembre',
@@ -1487,7 +1487,7 @@ const Map<String, String> kTxIt = {
   'sm_builtin_s': 'È necessario solo il suo nome utente. Il limite di utilizzo è condiviso con gli altri utenti.',
   'wl_title': 'Benvenuto',
   'wl_sub': 'Scelga come desidera connettersi a Last.fm.',
-  'sr_from_recent': 'Dalle tue ricerche recenti',
+  'sr_from_recent': 'Dalle sue ricerche recenti',
   'sr_recent': 'Ricerche recenti',
   'sr_suggestions': 'Suggerimenti',
   'sr_recommended': 'Consigliato',
@@ -1514,11 +1514,11 @@ const Map<String, String> kTxIt = {
   'up_title': 'Aggiornamento',
   'up_downloading': 'Download in corso…',
   'up_perm_title': 'Autorizzazione necessaria',
-  'up_perm_body': 'Consenti l’installazione da LastStats nelle impostazioni di Android, poi torna qui e tocca Riprova.',
+  'up_perm_body': 'Consenta l’installazione da LastStats nelle impostazioni di Android, poi torni qui e tocchi Riprova.',
   'up_installing': 'Apertura dell’installazione…',
   'up_restart': 'LastStats si chiuderà e si riavvierà.',
   'up_failed': 'Download non riuscito',
-  'up_failed_body': 'Apri il link nel browser per installare l’aggiornamento.',
+  'up_failed_body': 'Apra il link nel browser per installare l’aggiornamento.',
   'up_retry': 'Riprova',
   'up_browser': 'Apri nel browser',
   'up_close': 'Chiudi',
@@ -1532,10 +1532,10 @@ const Map<String, String> kTxIt = {
   'ntf_act_read': 'Segna come letto',
   'ntf_act_read_all': 'Segna tutto come letto',
   'ntf_act_install': 'Installa',
-  'ntf_dl_install_hint': 'Tocca per installare l’aggiornamento',
+  'ntf_dl_install_hint': 'Tocchi per installare l’aggiornamento',
   'up_open_downloads': 'Apri Download',
   'ic_title': 'Icona dell’app',
-  'ic_note': 'L’icona cambia quando esci dall’app, nell’elenco delle app. Nella schermata Home, rimetti l’app o aggiungi un collegamento con il pulsante qui sotto.',
+  'ic_note': 'L’icona cambia quando esce dall’app, nell’elenco delle app. Nella schermata Home, rimetta l’app o aggiunga un collegamento con il pulsante qui sotto.',
   'ic_default': 'Classica',
   'ic_white': 'Chiara',
   'ic_nothing_black': 'Nothing scuro',
@@ -1543,39 +1543,39 @@ const Map<String, String> kTxIt = {
   'ic_blue': 'Blu',
   'ic_red': 'Rosso',
   'ic_pin': 'Aggiungi alla schermata Home',
-  'lbl_step1_t': 'Apri la pagina del tuo token',
-  'lbl_step1_s': 'Accedi a ListenBrainz e copia il «Token utente».',
+  'lbl_step1_t': 'Apra la pagina del suo token',
+  'lbl_step1_s': 'Acceda a ListenBrainz e copi il «Token utente».',
   'lbl_open': 'Apri ListenBrainz',
-  'lbl_step2_t': 'Incolla il token',
+  'lbl_step2_t': 'Incolli il token',
   'lbl_paste': 'Incolla',
   'lbl_detected': 'Token trovato negli appunti',
   'lbl_use': 'Usa',
   'lbl_format_ok': 'Formato del token valido',
   'lbl_format_bad': 'Un token somiglia a xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
-  'lbl_err_format': 'Questo non è un token. Non scrivere il tuo nome utente: copia il «Token utente» dalle impostazioni di ListenBrainz.',
-  'lbl_err_invalid': 'ListenBrainz rifiuta questo token. Controlla che sia completo o copiane uno nuovo.',
+  'lbl_err_format': 'Questo non è un token. Non scriva il suo nome utente: copi il «Token utente» dalle impostazioni di ListenBrainz.',
+  'lbl_err_invalid': 'ListenBrainz rifiuta questo token. Controlli che sia completo o ne copi uno nuovo.',
   'lbl_err_rate': 'ListenBrainz chiede di attendere un momento. Riprova tra qualche secondo.',
   'lbl_err_server': 'Il server di ListenBrainz non risponde correttamente. Riprova tra un momento.',
-  'lbl_err_net': 'Impossibile raggiungere ListenBrainz. Controlla la connessione.',
+  'lbl_err_net': 'Impossibile raggiungere ListenBrainz. Controlli la connessione.',
   'lbl_err_after': 'Accesso accettato, ma l\'apertura è fallita: {e}',
   'lbl_options': 'Opzioni',
-  'lbl_why': 'Il token velocizza la lettura della cronologia e permette di aggiungere brani ai preferiti.',
+  'lbl_why': 'Il token velocizza la lettura della sua cronologia e permette di aggiungere brani ai preferiti.',
   'lbl_connected': 'Accesso come {u}',
   'svc_recommended': 'Consigliato',
   'lfm_seg_key': 'La mia chiave',
   'lfm_seg_builtin': 'Chiave integrata',
   'lfm_seg_web': 'Sito web',
   'acct_lb_change': 'Cambia token',
-  'acct_lb_change_s': 'Incolla un nuovo token ListenBrainz',
+  'acct_lb_change_s': 'Incolli un nuovo token ListenBrainz',
   'acct_lb_changed': 'Token aggiornato',
-  'bk_keys_desc_lb': 'Scegli quali dati di accesso ListenBrainz ripristinare da questo backup.',
+  'bk_keys_desc_lb': 'Scelga quali dati di accesso ListenBrainz ripristinare da questo backup.',
   'lbl_restore_bad': 'Questo backup non contiene un accesso utilizzabile.',
   'lbl_restored': 'Backup ripristinato',
-  'lbl_step3_t': 'Accedi',
-  'lbl_api_lb': 'Usa il tuo token ListenBrainz. Limite: 1 richiesta al secondo, gestita automaticamente.',
-  'lbl_key_needed': 'Le chiavi pubbliche sono disattivate: aggiungi la tua chiave API di Last.fm in Impostazioni › Connessioni.',
+  'lbl_step3_t': 'Acceda',
+  'lbl_api_lb': 'Usa il suo token ListenBrainz. Limite: 1 richiesta al secondo, gestita automaticamente.',
+  'lbl_key_needed': 'Le chiavi pubbliche sono disattivate: aggiunga la sua chiave API di Last.fm in Impostazioni › Connessioni.',
   'api_img_sec': 'Fonti delle immagini',
-  'api_img_sub': 'Trascina per ordinare. Viene usata la prima fonte attiva che trova un\'immagine.',
+  'api_img_sub': 'Trascini per ordinare. Viene usata la prima fonte attiva che trova un\'immagine.',
   'api_vid_sec': 'Fonti video',
   'api_img_clear': 'Svuota la cache delle immagini (applica il nuovo ordine)',
   'api_img_cleared': 'Cache delle immagini svuotata',

@@ -455,7 +455,7 @@ class AppStringsPt implements AppStrings {
   @override String get backupRestoreApiKeyLabel => 'Chave de API';
   @override String get backupRestoreSecretKeyLabel => 'Chave secreta';
   @override String get backupIncludeFoldersLabel => 'Incluir pastas';
-  @override String get backupIncludeFoldersDesc => 'Inclui as suas pastas de músicas e o respetivo conteúdo.';
+  @override String get backupIncludeFoldersDesc => 'Inclui as suas pastas de músicas e o conteúdo delas.';
   @override String get backupIncludeKeysDesc => 'Incluir as chaves no arquivo exportado';
 
   @override String get backupIncludeThemesLabel => 'Exportar temas';
@@ -707,7 +707,7 @@ class AppStringsPt implements AppStrings {
   @override String get faqQ13 => 'Como configuro as notificações?';
   @override String get faqA13 => 'Em Configurações > Notificações, você pode ativar um aviso quando uma sincronização terminar, escolher com que frequência os avisos aparecem ou desativar as notificações por completo, se preferir.';
   @override String get faqQ14 => 'Faltam imagens ou carregam sem parar. O que fazer?';
-  @override String get faqA14 => 'Limpe a cache na app (Definições > Cache) e depois no Android (Definições > Aplicações > LastStats > Armazenamento > Limpar cache). Se continuarem a faltar imagens, faça uma cópia de segurança (Definições > Cópia de segurança), desinstale e reinstale a app e restaure a cópia.';
+  @override String get faqA14 => 'Limpe o cache no app (Configurações > Cache) e depois no Android (Configurações > Apps > LastStats > Armazenamento > Limpar cache). Se as imagens continuarem faltando, faça um backup (Configurações > Backup), desinstale e reinstale o app e restaure o backup.';
   @override String get settingsPlatformDisabledByShowAll => 'Desativado: todos os links já estão sendo exibidos.';
   @override String get commonInDevelopment => 'Em desenvolvimento';
   @override String get commonSeeLess => 'Ver menos';
@@ -813,10 +813,10 @@ class AppStringsPt implements AppStrings {
   // ── API tab ──
   @override String get apiTitle => 'API';
   @override String get apiCardSub => 'Serviços usados, cotas e consumo';
-  @override String get apiSumToday => 'Pedidos hoje';
+  @override String get apiSumToday => 'Solicitações hoje';
   @override String get apiSumErrors => 'Erros';
-  @override String get apiSumLimited => 'Limitados';
-  @override String get apiIntro => 'Os contadores cobrem apenas este dispositivo. Os fornecedores aplicam os limites por endereço IP, por isso outras apps na mesma rede também contam. A app abranda ou ignora pedidos automaticamente para os respeitar.';
+  @override String get apiSumLimited => 'Limitadas';
+  @override String get apiIntro => 'Os contadores cobrem apenas este dispositivo. Os provedores aplicam os limites por endereço IP, por isso outros apps na mesma rede também contam. O app desacelera ou ignora solicitações automaticamente para respeitá-los.';
   @override String get apiCatListening => 'Dados de audição';
   @override String get apiCatMetadata => 'Metadados musicais';
   @override String get apiCatArtwork => 'Capas';
@@ -830,7 +830,7 @@ class AppStringsPt implements AppStrings {
   @override String get apiStatusPaused => 'Em pausa';
   @override String get apiProviderLimit => 'Limite do fornecedor';
   @override String get apiNoLimit => 'Nenhum publicado';
-  @override String get apiAppCeiling => 'Teto da app';
+  @override String get apiAppCeiling => 'Teto do app';
   @override String apiLimitPer(int n, String win) => '$n pedidos / $win';
   @override String get apiWinSecond => 'segundo';
   @override String get apiWinMinute => 'minuto';
@@ -844,27 +844,27 @@ class AppStringsPt implements AppStrings {
   @override String get apiLastHour => 'Última hora';
   @override String get apiTotal => 'Total';
   @override String get apiRateLimited => 'Respostas de limite atingido';
-  @override String get apiSkipped => 'Ignorados pela app';
+  @override String get apiSkipped => 'Ignoradas pelo app';
   @override String get apiLastCall => 'Última chamada';
   @override String get apiNever => 'Nunca';
   @override String get apiNoKey => 'Não requer chave API';
-  @override String get apiSharedKey => 'Chave de teste pública partilhada (plano gratuito)';
+  @override String get apiSharedKey => 'Chave de teste pública compartilhada (plano gratuito)';
   @override String get apiUnofficial => 'Ponto de acesso não oficial: sem cota garantida, pode mudar ou ser bloqueado sem aviso.';
   @override String get apiKeyInUse => 'Chave em uso';
   @override String get apiOwnKey => 'A sua própria chave Last.fm';
   @override String apiBuiltinKey(int n, int total) => 'Chave integrada $n de $total';
   @override String get apiBackupOn => 'Chave de reserva: ativada';
   @override String get apiBackupOff => 'Chave de reserva: desativada';
-  @override String get apiPerKey => 'Pedidos por chave (hoje / total)';
-  @override String get apiLastfmNote => 'O Last.fm não publica nenhum valor: devolve o erro 29 quando um IP envia demasiados pedidos, e os seus termos proíbem contorná-lo. Cerca de 5 pedidos por segundo por IP é a orientação habitual; a app fica abaixo de 4.';
+  @override String get apiPerKey => 'Solicitações por chave (hoje / total)';
+  @override String get apiLastfmNote => 'O Last.fm não publica nenhum valor: devolve o erro 29 quando um IP envia solicitações demais, e os termos dele proíbem contorná-lo. Cerca de 5 solicitações por segundo por IP é a orientação habitual; o app fica abaixo de 4.';
   @override String get apiStorageTitle => DataSource.lb ? 'Dados ListenBrainz armazenados' : 'Dados Last.fm armazenados';
   @override String apiStorageValue(String used, String cap) => '$used de $cap permitidos';
   @override String get apiStorageOver => DataSource.lb ? 'Acima do limite de 100 MB definido pelos termos da API do ListenBrainz. Limpe o histórico de scrobbles em Armazenamento para cumprir.' : 'Acima do limite de 100 MB definido pelos termos da API do Last.fm. Limpe o histórico de scrobbles em Armazenamento para cumprir.';
   @override String get apiReset => 'Repor contadores';
-  @override String get apiLimiter => 'Limitar pedidos';
-  @override String get apiLimiterSub => 'Abranda os pedidos para respeitar os limites das APIs. Desligado = mais rápido, sem esperas.';
-  @override String get apiResetBody => 'Todos os contadores de pedidos serão repostos a zero.';
-  @override String get apiResetDone => 'Contadores repostos';
+  @override String get apiLimiter => 'Limitar solicitações';
+  @override String get apiLimiterSub => 'Desacelera as solicitações para respeitar os limites das APIs. Desligado = mais rápido, sem esperas.';
+  @override String get apiResetBody => 'Todos os contadores de solicitações serão zerados.';
+  @override String get apiResetDone => 'Contadores zerados';
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -929,7 +929,7 @@ const Map<String, String> kTxPt = {
   'about_licenses_t': 'Licenças de código aberto',
   'about_licenses_s': 'Flutter e todos os pacotes usados',
   'about_legal_editor': 'Publicada por Sano Bld, programador independente. Contacte-nos no Discord ou nas issues do GitHub.',
-  'about_legal_privacy': 'Os seus dados ficam no seu dispositivo e não guardamos nenhuma cópia. A app contacta diretamente os serviços listados aqui, e cada um recebe no mínimo o seu endereço IP e o pedido (por exemplo, o nome de um artista). A câmara só é usada para ler códigos QR. Não se destina a menores de 15 anos sem autorização de um dos pais.',
+  'about_legal_privacy': 'Os seus dados ficam no seu dispositivo e não guardamos nenhuma cópia. O app entra em contato diretamente com os serviços listados aqui, e cada um recebe no mínimo o seu endereço IP e a solicitação (por exemplo, o nome de um artista). A câmera só é usada para ler códigos QR. Não se destina a menores de 15 anos sem autorização dos pais.',
   'about_legal_marks': 'O LastStats é independente e não é afiliado nem aprovado pelo Last.fm, Spotify, YouTube, Apple, Deezer, TheAudioDB, MusicBrainz, Wikipedia ou GitHub. Os nomes e logótipos pertencem aos seus proprietários, tal como as capas e os metadados. Os textos da Wikipedia estão sob licença CC BY-SA.',
   'about_readme_t': 'README e atividade do projeto',
   'about_readme_s': 'Ler o README, últimos commits, workflows, versão, downloads',
@@ -1045,7 +1045,7 @@ const Map<String, String> kTxPt = {
   'gr_morning2': 'Bem acordado, {name}?',
   'gr_morning3': 'Um ótimo começo de dia, {name}',
   'gr_afternoon1': 'Boa tarde, {name}',
-  'gr_afternoon2': 'Que bom te ver de novo, {name}',
+  'gr_afternoon2': 'Que bom ver você de novo, {name}',
   'gr_afternoon3': 'Você voltou, {name}',
   'gr_evening1': 'Boa noite, {name}',
   'gr_evening2': 'Tenha uma ótima noite, {name}',
@@ -1059,7 +1059,7 @@ const Map<String, String> kTxPt = {
   'gr_heavy2': 'Os scrobbles não param, {name}',
   'gr_birthday1': 'Feliz aniversário de conta, {name}!',
   'gr_birthday2': 'Já são {years} ano(s) juntos, {name}!',
-  'gr_catchup1': '{friend} está te alcançando, {name}!',
+  'gr_catchup1': '{friend} está alcançando você, {name}!',
   'gr_catchup2': 'Cuidado, {friend} está logo atrás de você, {name}',
   'gr_christmas1': 'Feliz Natal, {name}!',
   'gr_christmas2': 'Boas festas, {name}',
@@ -1086,24 +1086,24 @@ const Map<String, String> kTxPt = {
   'cache_api_limit_t': 'Limite de dados da API',
   'cache_api_limit_s': 'Tamanho máximo dos dados da API guardados. Os mais antigos são removidos primeiro.',
   'key_internal_use': 'Usar a chave interna do app',
-  'key_internal_help': 'Opção de reserva: esta chave é partilhada entre utilizadores. Pode atingir o limite ou deixar de funcionar, e algumas funções podem falhar. Prefere a tua própria chave sempre que possível.',
+  'key_internal_help': 'Opção de reserva: esta chave é compartilhada entre usuários. Ela pode atingir o limite ou parar de funcionar, e algumas funções podem falhar. Prefira usar a sua própria chave sempre que possível.',
   'key_internal_active': 'Chave interna do app',
   'key_fallback_title': 'Chave interna como reserva',
-  'key_fallback_sub': 'A tua chave é usada primeiro. Se o Last.fm a recusar, a app tenta de novo automaticamente com a chave interna.',
+  'key_fallback_sub': 'A sua chave é usada primeiro. Se o Last.fm a recusar, o app tenta de novo automaticamente com a chave interna.',
   'key_use_own': 'Usar a minha própria chave API',
   'key_change_title': 'Mudar a chave API',
-  'key_change_sub': 'Substitui a tua chave por outra, ou passa para a chave interna da app.',
-  'key_change_sub_internal': 'Estás a usar a chave partilhada da app. Adiciona a tua própria chave para deixares de depender dos limites de outros utilizadores.',
-  'key_change_intro': 'Introduz uma nova chave API para esta conta, ou volta à chave interna da app. O teu nome de utilizador e as tuas estatísticas não mudam.',
-  'key_change_intro_internal': 'Esta conta usa neste momento a chave interna da app. Cola abaixo a tua própria chave API do Last.fm para a substituir. O teu nome de utilizador e as tuas estatísticas não mudam.',
-  'key_change_hint': 'Uma chave API tem 32 caracteres. Podes criá-la ou encontrá-la em last.fm/api/accounts.',
-  'key_change_invalid_len': 'Uma chave API tem de ter exatamente 32 caracteres. Confirma que a copiaste por inteiro.',
+  'key_change_sub': 'Substitua a sua chave por outra ou passe para a chave interna do app.',
+  'key_change_sub_internal': 'Você está usando a chave compartilhada do app. Adicione a sua própria chave para deixar de depender dos limites de outros usuários.',
+  'key_change_intro': 'Informe uma nova chave de API para esta conta ou volte para a chave interna do app. O seu nome de usuário e as suas estatísticas não mudam.',
+  'key_change_intro_internal': 'Esta conta usa atualmente a chave interna do app. Cole abaixo a sua própria chave de API do Last.fm para substituí-la. O seu nome de usuário e as suas estatísticas não mudam.',
+  'key_change_hint': 'Uma chave de API tem 32 caracteres. Você pode criá-la ou encontrá-la em last.fm/api/accounts.',
+  'key_change_invalid_len': 'Uma chave de API precisa ter exatamente 32 caracteres. Confira se você a copiou por inteiro.',
   'key_change_same': 'Esta conta já usa esta chave. Introduz uma diferente.',
-  'key_change_check_failed': 'O Last.fm não aceitou esta chave. Confirma que está correta e que tens ligação à Internet, e tenta de novo.',
-  'key_change_favorites_warn': 'A ligação aos favoritos vai ser removida, porque depende da chave antiga. Depois podes voltar a ligá-la com a tua chave secreta.',
+  'key_change_check_failed': 'O Last.fm não aceitou esta chave. Confira se ela está correta e se você está conectado à internet, e tente novamente.',
+  'key_change_favorites_warn': 'A conexão com os favoritos será removida, porque depende da chave antiga. Depois você poderá conectá-la de novo com a sua chave secreta.',
   'key_change_apply': 'Aplicar',
   'key_change_success': 'A chave API foi atualizada.',
-  'key_internal_fav_note': 'Os favoritos precisam da tua própria chave API e da tua chave secreta do Last.fm. Adiciona a tua chave acima para os poderes ativar.',
+  'key_internal_fav_note': 'Os favoritos precisam da sua própria chave de API e da sua chave secreta do Last.fm. Adicione a sua chave acima para poder ativá-los.',
   'faq_q15': 'Posso mudar minha chave API depois de entrar?',
   'faq_a15': 'Sim. Acesse Configurações > Conta e toque em "Mudar a chave API". Você pode substituir sua chave por outra, ou adicionar a sua se tiver escolhido a chave interna no início. Suas estatísticas continuam as mesmas, só é preciso configurar de novo a conexão com os favoritos.',
   'nothing_wip_badge': 'Em melhoria',
@@ -1258,21 +1258,21 @@ const Map<String, String> kTxPt = {
   'svc_sub': 'O LastStats lê as suas reproduções a partir de um destes dois serviços.',
   'svc_lfm_s': 'O seu histórico do Last.fm. Atenção: a API do Last.fm passa a ser paga; uma chave API exige Last.fm Pro a partir de 1 de dezembro.',
   'svc_lfm_paid': 'API paga',
-  'svc_lb_s': 'Gratuito e de código aberto (MetaBrainz). Início de sessão simples com o seu token de utilizador.',
+  'svc_lb_s': 'Gratuito e de código aberto (MetaBrainz). Login simples com o seu token de usuário.',
   'svc_free': 'Grátis',
   'svc_back': 'Mudar de serviço',
-  'svc_lfm_note': 'A partir de 1 de dezembro, uma chave API do Last.fm exige uma subscrição Last.fm Pro (para quem possui a chave). A sua conta e o seu histórico não mudam.',
+  'svc_lfm_note': 'A partir de 1º de dezembro, uma chave de API do Last.fm exige uma assinatura do Last.fm Pro (para quem possui a chave). A sua conta e o seu histórico não mudam.',
   'svc_lfm_pro': 'Ver Last.fm Pro',
-  'lb_title': 'Ligação ao ListenBrainz',
-  'lb_steps': '1. Crie uma conta ListenBrainz gratuita ou inicie sessão. 2. Abra as definições do ListenBrainz. 3. Copie o seu token de utilizador e cole-o aqui.',
-  'lb_token': 'Token de utilizador',
+  'lb_title': 'Conexão com o ListenBrainz',
+  'lb_steps': '1. Crie uma conta gratuita do ListenBrainz ou faça login. 2. Abra as configurações do ListenBrainz. 3. Copie o seu token de usuário e cole-o aqui.',
+  'lb_token': 'Token de usuário',
   'lb_create': 'Criar uma conta ListenBrainz',
   'lb_get_token': 'Obter o meu token',
   'lb_docs': 'Ajuda da API',
   'lb_connect': 'Ligar',
-  'lb_invalid': 'Token inválido. Verifique-o nas definições do ListenBrainz.',
-  'lb_neterr': 'Não foi possível contactar o ListenBrainz. Verifique a sua ligação.',
-  'lb_ok': 'ListenBrainz ligado ({name}).',
+  'lb_invalid': 'Token inválido. Verifique-o nas configurações do ListenBrainz.',
+  'lb_neterr': 'Não foi possível acessar o ListenBrainz. Verifique a sua conexão.',
+  'lb_ok': 'ListenBrainz conectado ({name}).',
   'lb_empty': 'Cole o seu token para continuar.',
   'sw_title': 'Dados locais encontrados',
   'sw_body': 'O app já tem {n} reproduções guardadas localmente. O que fazer com o novo serviço?',
@@ -1287,9 +1287,9 @@ const Map<String, String> kTxPt = {
   'sw_merging': 'A mesclar… {year}',
   'sw_fail': 'A transferência falhou. Os seus dados locais foram mantidos.',
   'lfm_create': 'Criar uma conta Last.fm',
-  'conn_lb_desc': 'As suas reproduções são lidas do ListenBrainz com o seu token de utilizador. Nenhum pedido é enviado ao Last.fm.',
+  'conn_lb_desc': 'As suas reproduções são lidas do ListenBrainz com o seu token de usuário. Nenhuma solicitação é enviada ao Last.fm.',
   'acct_lb_token': 'Token do ListenBrainz',
-  'acct_lb_info': 'O token encontra-se nas definições do ListenBrainz. Mantenha-o secreto: dá acesso à sua conta.',
+  'acct_lb_info': 'O token fica nas configurações do ListenBrainz. Mantenha-o em segredo: ele dá acesso à sua conta.',
   'acct_lb_profile': 'Perfil do ListenBrainz',
   'acct_lb_view': 'Ver no ListenBrainz',
   'acct_switch': 'Mudar de serviço',
@@ -1410,8 +1410,8 @@ const Map<String, String> kTxPt = {
   'ntf_milestone_body': 'Você acabou de alcançar {n} scrobbles no Last.fm 🎶',
   'ntf_daily_title': '📊 Resumo do dia · {d}',
   'ntf_weekly_title': '📅 Resumo semanal · {w}',
-  'ntf_year_title': '👀 O teu resumo de {y} está pronto',
-  'ntf_year_body': 'Descobre o teu {y} em música: artistas, faixas, álbuns e muito mais.',
+  'ntf_year_title': '👀 O seu resumo de {y} está pronto',
+  'ntf_year_body': 'Descubra o seu {y} em música: artistas, faixas, álbuns e muito mais.',
   'ntf_recap_body': '{n} scrobbles · Top: {a}',
   'ntf_n_today': '{n} scrobbles hoje',
   'ntf_n_week': '{n} scrobbles esta semana',
@@ -1427,8 +1427,8 @@ const Map<String, String> kTxPt = {
   'reorder': 'Reordenar',
   'sp_login_t': 'Login no Spotify',
   'sp_login_hint': 'Entre com o seu e-mail e a sua senha do Spotify. A janela fecha sozinha quando o login terminar.',
-  'sp_risk_note': 'Atenção: esta função baseia-se em chamadas não oficiais do Spotify, não numa API oficial. O Spotify pode alterá-la ou bloqueá-la a qualquer momento, pode deixar de funcionar, e a sua utilização pode ir contra os termos de utilização do Spotify, o que poderá levar a restrições na sua conta Spotify. Utilize por sua conta e risco.',
-  'sp_perf_note': 'Desempenho: a busca de Canvas executa um player web oculto em segundo plano e faz pedidos de rede extra. Isso pode gastar mais bateria, dados e memória e deixar o app um pouco mais lento. Remova o Spotify desta lista se notar isso.',
+  'sp_risk_note': 'Atenção: esta função se baseia em chamadas não oficiais do Spotify, não em uma API oficial. O Spotify pode alterá-la ou bloqueá-la a qualquer momento, ela pode deixar de funcionar, e o seu uso pode ir contra os termos de uso do Spotify, o que pode levar a restrições na sua conta do Spotify. Use por sua conta e risco.',
+  'sp_perf_note': 'Desempenho: a busca de Canvas executa um player web oculto em segundo plano e faz solicitações de rede extras. Isso pode gastar mais bateria, dados e memória e deixar o app um pouco mais lento. Remova o Spotify desta lista se perceber isso.',
   'sp_t': 'Spotify (Canvas)',
   'sp_on': 'Conectado',
   'sp_off': 'Não conectado',
@@ -1436,7 +1436,7 @@ const Map<String, String> kTxPt = {
   'mv_ytdash_t': 'Também no painel',
   'mv_ytdash_s': 'Usar o YouTube para a capa animada ao fundo do perfil no painel (desativado por padrão)',
   'yr_title': 'Retrospectiva do ano',
-  'yr_loading': 'Seu resumo está a caminho, segura aí…',
+  'yr_loading': 'Seu resumo está a caminho, aguarde…',
   'yr_error': 'Ops, não foi possível carregar seus scrobbles. Verifique sua conexão.',
   'yr_retry': 'Tentar de novo',
   'yr_empty': 'Nenhum scrobble em {year}… ano sabático?',
@@ -1541,13 +1541,13 @@ const Map<String, String> kTxPt = {
   'cx_busiest': 'Dias mais intensos',
   'cx_weekend': 'Semana vs fim de semana',
   'up_title': 'Atualização',
-  'up_downloading': 'A transferir…',
+  'up_downloading': 'Baixando…',
   'up_perm_title': 'Permissão necessária',
-  'up_perm_body': 'Permite instalar a partir do LastStats nas definições do Android, volta aqui e toca em Tentar novamente.',
+  'up_perm_body': 'Permita a instalação a partir do LastStats nas configurações do Android, volte aqui e toque em Tentar novamente.',
   'up_installing': 'A abrir a instalação…',
   'up_restart': 'O LastStats vai fechar e reiniciar.',
   'up_failed': 'Falha na transferência',
-  'up_failed_body': 'Abre a ligação no navegador para instalar a atualização.',
+  'up_failed_body': 'Abra o link no navegador para instalar a atualização.',
   'up_retry': 'Tentar novamente',
   'up_browser': 'Abrir no navegador',
   'up_close': 'Fechar',
@@ -1561,19 +1561,19 @@ const Map<String, String> kTxPt = {
   'ntf_act_read': 'Marcar como lido',
   'ntf_act_read_all': 'Marcar tudo como lido',
   'ntf_act_install': 'Instalar',
-  'ntf_dl_install_hint': 'Toca para instalar a atualização',
+  'ntf_dl_install_hint': 'Toque para instalar a atualização',
   'up_open_downloads': 'Abrir Transferências',
-  'ic_title': 'Ícone da app',
-  'ic_note': 'O ícone muda quando sais da app, na lista de aplicações. No ecrã inicial, volta a colocar a app ou adiciona um atalho com o botão abaixo.',
+  'ic_title': 'Ícone do app',
+  'ic_note': 'O ícone muda quando você sai do app, na lista de aplicativos. Na tela inicial, recoloque o app ou adicione um atalho com o botão abaixo.',
   'ic_default': 'Clássico',
   'ic_white': 'Claro',
   'ic_nothing_black': 'Nothing escuro',
   'ic_nothing_white': 'Nothing claro',
   'ic_blue': 'Azul',
   'ic_red': 'Vermelho',
-  'ic_pin': 'Adicionar ao ecrã inicial',
+  'ic_pin': 'Adicionar à tela inicial',
   'lbl_step1_t': 'Abra a página do seu token',
-  'lbl_step1_s': 'Entre no ListenBrainz e copie o «Token de utilizador».',
+  'lbl_step1_s': 'Entre no ListenBrainz e copie o «Token de usuário».',
   'lbl_open': 'Abrir ListenBrainz',
   'lbl_step2_t': 'Cole o token',
   'lbl_paste': 'Colar',
@@ -1581,11 +1581,11 @@ const Map<String, String> kTxPt = {
   'lbl_use': 'Usar',
   'lbl_format_ok': 'Formato de token válido',
   'lbl_format_bad': 'Um token parece-se com xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
-  'lbl_err_format': 'Isso não é um token. Não escreva o seu nome de utilizador: copie o «Token de utilizador» nas definições do ListenBrainz.',
+  'lbl_err_format': 'Isso não é um token. Não digite o seu nome de usuário: copie o «Token de usuário» nas configurações do ListenBrainz.',
   'lbl_err_invalid': 'O ListenBrainz recusa este token. Verifique se está completo ou copie um novo.',
   'lbl_err_rate': 'O ListenBrainz pede para aguardar um momento. Tente novamente dentro de alguns segundos.',
   'lbl_err_server': 'O servidor do ListenBrainz não responde corretamente. Tente novamente daqui a pouco.',
-  'lbl_err_net': 'Não foi possível contactar o ListenBrainz. Verifique a sua ligação.',
+  'lbl_err_net': 'Não foi possível acessar o ListenBrainz. Verifique a sua conexão.',
   'lbl_err_after': 'Início de sessão aceite, mas a abertura falhou: {e}',
   'lbl_options': 'Opções',
   'lbl_why': 'O token acelera a leitura do seu histórico e permite adicionar faixas aos favoritos.',
@@ -1597,18 +1597,18 @@ const Map<String, String> kTxPt = {
   'acct_lb_change': 'Alterar token',
   'acct_lb_change_s': 'Cole um novo token do ListenBrainz',
   'acct_lb_changed': 'Token atualizado',
-  'bk_keys_desc_lb': 'Escolha que dados de início de sessão do ListenBrainz restaurar desta cópia.',
-  'lbl_restore_bad': 'Esta cópia não tem um início de sessão utilizável.',
-  'lbl_restored': 'Cópia restaurada',
-  'lbl_step3_t': 'Inicie sessão',
-  'lbl_api_lb': 'Usa o seu token do ListenBrainz. Limite: 1 pedido por segundo, gerido automaticamente.',
-  'lbl_key_needed': 'As chaves públicas estão desativadas: adicione a sua própria chave API do Last.fm em Definições › Ligações.',
+  'bk_keys_desc_lb': 'Escolha quais dados de login do ListenBrainz restaurar a partir deste backup.',
+  'lbl_restore_bad': 'Este backup não contém um login utilizável.',
+  'lbl_restored': 'Backup restaurado',
+  'lbl_step3_t': 'Faça login',
+  'lbl_api_lb': 'Usa o seu token do ListenBrainz. Limite: 1 solicitação por segundo, gerenciada automaticamente.',
+  'lbl_key_needed': 'As chaves públicas estão desativadas: adicione a sua própria chave de API do Last.fm em Configurações › Conexões.',
   'api_img_sec': 'Fontes de imagens',
-  'api_img_sub': 'Arraste para ordenar. É usada a primeira fonte ativa que encontrar uma imagem.',
+  'api_img_sub': 'Arraste para ordenar. A primeira fonte ativa que encontrar uma imagem é usada.',
   'api_vid_sec': 'Fontes de vídeo',
   'api_img_clear': 'Limpar a cache de imagens (aplicar a nova ordem)',
   'api_img_cleared': 'Cache de imagens limpa',
-  'api_help': '“Pedidos hoje”: número de chamadas enviadas aos serviços desde a meia-noite. “Erros”: chamadas falhadas (serviço em baixo, acesso negado ou sem rede). “Limitados”: respostas de “demasiados pedidos” de um serviço, que fica em pausa durante algum tempo.',
+  'api_help': '“Solicitações hoje”: número de chamadas enviadas aos serviços desde a meia-noite. “Erros”: chamadas que falharam (serviço fora do ar, acesso negado ou sem rede). “Limitadas”: respostas de “muitas solicitações” de um serviço, que fica em pausa por um tempo.',
   'err_bad_response': 'O servidor devolveu uma resposta inválida (serviço indisponível ou em manutenção). Tente novamente daqui a pouco.',
-  'dash_offline_cache': 'Sem ligação: a mostrar os dados guardados.',
+  'dash_offline_cache': 'Sem conexão: mostrando os dados salvos.',
 };
