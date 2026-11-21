@@ -1272,7 +1272,7 @@ const Map<String, String> kTxPt = {
   'lb_connect': 'Ligar',
   'lb_invalid': 'Token inválido. Verifique-o nas definições do ListenBrainz.',
   'lb_neterr': 'Não foi possível contactar o ListenBrainz. Verifique a sua ligação.',
-  'lb_ok': 'ListenBrainz ligado ({name}). As estatísticas do ListenBrainz chegam em breve.',
+  'lb_ok': 'ListenBrainz ligado ({name}).',
   'lb_empty': 'Cole o seu token para continuar.',
   'sw_title': 'Dados locais encontrados',
   'sw_body': 'O app já tem {n} reproduções guardadas localmente. O que fazer com o novo serviço?',

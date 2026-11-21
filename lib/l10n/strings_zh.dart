@@ -1269,7 +1269,7 @@ const Map<String, String> kTxZh = {
   'lb_connect': '连接',
   'lb_invalid': '令牌无效。请在您的 ListenBrainz 设置中检查。',
   'lb_neterr': '无法连接 ListenBrainz。请检查您的网络连接。',
-  'lb_ok': '已连接 ListenBrainz（{name}）。ListenBrainz 统计即将推出。',
+  'lb_ok': '已连接 ListenBrainz（{name}）。',
   'lb_empty': '请粘贴您的令牌以继续。',
   'sw_title': '发现本地数据',
   'sw_body': '应用中已保存 {n} 条本地播放记录。切换到新服务后要如何处理？',

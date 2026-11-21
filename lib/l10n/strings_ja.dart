@@ -1242,7 +1242,7 @@ const Map<String, String> kTxJa = {
   'lb_connect': '接続',
   'lb_invalid': 'トークンが無効です。ListenBrainzの設定でご確認ください。',
   'lb_neterr': 'ListenBrainzに接続できません。接続をご確認ください。',
-  'lb_ok': 'ListenBrainz に接続しました（{name}）。ListenBrainz の統計は近日対応予定です。',
+  'lb_ok': 'ListenBrainz に接続しました（{name}）。',
   'lb_empty': '続行するにはトークンを貼り付けてください。',
   'sw_title': 'ローカルデータが見つかりました',
   'sw_body': 'アプリには既に{n}件の再生履歴が保存されています。新しいサービスでどうしますか？',

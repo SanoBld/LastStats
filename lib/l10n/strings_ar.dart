@@ -1243,7 +1243,7 @@ const Map<String, String> kTxAr = {
   'lb_connect': 'اتصال',
   'lb_invalid': 'الرمز غير صالح. تحقق منه في إعدادات ListenBrainz.',
   'lb_neterr': 'تعذر الوصول إلى ListenBrainz. تحقق من اتصالك.',
-  'lb_ok': 'تم الاتصال بـ ListenBrainz ({name}). إحصاءات ListenBrainz قادمة قريبًا.',
+  'lb_ok': 'تم الاتصال بـ ListenBrainz ({name}).',
   'lb_empty': 'الصق رمزك للمتابعة.',
   'sw_title': 'تم العثور على بيانات محلية',
   'sw_body': 'يحتوي التطبيق بالفعل على {n} استماعًا محفوظًا محليًا. ماذا نفعل مع الخدمة الجديدة؟',

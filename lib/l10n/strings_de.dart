@@ -1243,7 +1243,7 @@ const Map<String, String> kTxDe = {
   'lb_connect': 'Verbinden',
   'lb_invalid': 'Ungültiges Token. Prüfen Sie es in Ihren ListenBrainz-Einstellungen.',
   'lb_neterr': 'ListenBrainz ist nicht erreichbar. Prüfen Sie Ihre Verbindung.',
-  'lb_ok': 'ListenBrainz verbunden ({name}). ListenBrainz-Statistiken folgen bald.',
+  'lb_ok': 'ListenBrainz verbunden ({name}).',
   'lb_empty': 'Fügen Sie Ihr Token ein, um fortzufahren.',
   'sw_title': 'Lokale Daten gefunden',
   'sw_body': 'Die App enthält bereits {n} lokal gespeicherte Wiedergaben. Was soll mit dem neuen Dienst geschehen?',

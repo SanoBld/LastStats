@@ -1272,7 +1272,7 @@ const Map<String, String> kTxEs = {
   'lb_connect': 'Conectar',
   'lb_invalid': 'Token no válido. Compruébelo en sus ajustes de ListenBrainz.',
   'lb_neterr': 'No se pudo conectar con ListenBrainz. Compruebe su conexión.',
-  'lb_ok': 'ListenBrainz conectado ({name}). Las estadísticas de ListenBrainz llegarán pronto.',
+  'lb_ok': 'ListenBrainz conectado ({name}).',
   'lb_empty': 'Pegue su token para continuar.',
   'sw_title': 'Datos locales encontrados',
   'sw_body': 'La app ya tiene {n} reproducciones guardadas localmente. ¿Qué hacer con el nuevo servicio?',

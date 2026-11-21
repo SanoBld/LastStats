@@ -1243,7 +1243,7 @@ const Map<String, String> kTxIt = {
   'lb_connect': 'Connetti',
   'lb_invalid': 'Token non valido. Lo verifichi nelle impostazioni di ListenBrainz.',
   'lb_neterr': 'Impossibile raggiungere ListenBrainz. Verifichi la connessione.',
-  'lb_ok': 'ListenBrainz connesso ({name}). Le statistiche di ListenBrainz arrivano presto.',
+  'lb_ok': 'ListenBrainz connesso ({name}).',
   'lb_empty': 'Incolli il suo token per continuare.',
   'sw_title': 'Dati locali trovati',
   'sw_body': 'L\'app contiene già {n} ascolti salvati localmente. Cosa fare con il nuovo servizio?',

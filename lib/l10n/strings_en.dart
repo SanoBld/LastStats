@@ -1267,7 +1267,7 @@ const Map<String, String> kTxEn = {
   'lb_connect': 'Connect',
   'lb_invalid': 'Invalid token. Check it in your ListenBrainz settings.',
   'lb_neterr': 'Could not reach ListenBrainz. Check your connection.',
-  'lb_ok': 'ListenBrainz connected ({name}). ListenBrainz statistics are coming soon.',
+  'lb_ok': 'ListenBrainz connected ({name}).',
   'lb_empty': 'Paste your token to continue.',
   'sw_title': 'Local data found',
   'sw_body': 'The app already holds {n} locally saved listens. What should happen with the new service?',
