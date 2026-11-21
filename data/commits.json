@@ -1,6 +1,24 @@
 {
-  "updated": "2026-11-21T10:19:50Z",
+  "updated": "2026-11-21T10:22:47Z",
   "commits": [
+    {
+      "sha": "7fd7d24ec2af0a0853099de60f551d9ace9d78b3",
+      "message": "chore: sync pubspec version with changelog [skip ci]",
+      "date": "2026-11-21T10:22:31Z",
+      "author": "github-actions[bot]",
+      "avatar": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/7fd7d24ec2af0a0853099de60f551d9ace9d78b3",
+      "tags": []
+    },
+    {
+      "sha": "7d0722ee5502035afc03a87bfe39f7ad3e29e702",
+      "message": "feat: mise à jour de la version dans le changelog pour passer à v4.5.0",
+      "date": "2026-11-21T10:22:21Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/7d0722ee5502035afc03a87bfe39f7ad3e29e702",
+      "tags": []
+    },
     {
       "sha": "141a5d48e4daf0ddc04848c0c455de5ac8c94449",
       "message": "feat: mise à jour des messages d'interface pour ListenBrainz dans plusieurs langues",
@@ -2695,24 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/50fbc8a8cee2dc3bd4f297671c2e8ab4cbfda504",
-      "tags": []
-    },
-    {
-      "sha": "633f93d9305a943c4f123ed8098fa82012844a08",
-      "message": "feat: ajouter le support de la teinte d'artwork pour les éléments de l'interface et améliorer l'ouverture de la feuille de détails de l'album",
-      "date": "2026-09-25T19:30:14Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/633f93d9305a943c4f123ed8098fa82012844a08",
-      "tags": []
-    },
-    {
-      "sha": "7f41f05e3015f02c6bda2e25a341440afc3f6222",
-      "message": "feat: ajouter un clip rotatif pour l'art en cours de lecture et améliorer l'affichage des images avec des formes Material You",
-      "date": "2026-09-25T19:09:53Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/7f41f05e3015f02c6bda2e25a341440afc3f6222",
       "tags": []
     }
   ]
