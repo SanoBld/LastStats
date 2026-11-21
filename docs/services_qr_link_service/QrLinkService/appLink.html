@@ -67,7 +67,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static String appLink(String username) =&gt; &#39;laststats:&#47;&#47;profile&#47;$username&#39;;</code></pre>
+  <pre class="language-dart"><code class="language-dart">static String appLink(String username) =&gt; &#39;laststats:&#47;&#47;profile&#47;${Uri.encodeComponent(username)}&#39;;</code></pre>
 </section>
 
 
