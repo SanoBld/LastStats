@@ -178,7 +178,7 @@ Future<void> _runNewsCheck() async {
         .timeout(const Duration(seconds: 10));
     if (res.statusCode != 200) return;
 
-    final json  = jsonDecode(res.body) as Map;
+    final json  = jsonDecode(utf8.decode(res.bodyBytes)) as Map;
     final items = (json['items'] as List? ?? []).cast<Map>();
     if (items.isEmpty) return;
 

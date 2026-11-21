@@ -1579,4 +1579,7 @@ const Map<String, String> kTxDe = {
   'api_vid_sec': 'Videoquellen',
   'api_img_clear': 'Bild-Cache leeren (neue Reihenfolge anwenden)',
   'api_img_cleared': 'Bild-Cache geleert',
+  'api_help': '„Anfragen heute“: Anzahl der seit Mitternacht an die Dienste gesendeten Aufrufe. „Fehler“: fehlgeschlagene Aufrufe (Dienst down, Zugriff verweigert oder kein Netz). „Begrenzt“: Antworten „zu viele Anfragen“ eines Dienstes, der dann kurz pausiert wird.',
+  'err_bad_response': 'Der Server hat eine ungültige Antwort geliefert (Dienst nicht verfügbar oder in Wartung). Bitte gleich noch einmal versuchen.',
+  'dash_offline_cache': 'Keine Verbindung: gespeicherte Daten werden angezeigt.',
 };

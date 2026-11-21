@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 144">
+  <!-- Simplified MusicBrainz-style mark (two hexagonal halves). Monochrome: BrandIcon tints it. -->
+  <path d="M60 6 L8 36 V108 L60 138 Z" fill="#000"/>
+  <path d="M68 6 L120 36 V108 L68 138 Z" fill="none" stroke="#000" stroke-width="10" stroke-linejoin="round"/>
+  <circle cx="34" cy="72" r="9" fill="#fff"/>
+</svg>

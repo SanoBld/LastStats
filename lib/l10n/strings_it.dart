@@ -1579,4 +1579,7 @@ const Map<String, String> kTxIt = {
   'api_vid_sec': 'Fonti video',
   'api_img_clear': 'Svuota la cache delle immagini (applica il nuovo ordine)',
   'api_img_cleared': 'Cache delle immagini svuotata',
+  'api_help': '«Richieste oggi»: numero di chiamate inviate ai servizi da mezzanotte. «Errori»: chiamate fallite (servizio non disponibile, accesso negato o rete assente). «Limitate»: risposte «troppe richieste» di un servizio, che viene messo in pausa per un po\'.',
+  'err_bad_response': 'Il server ha restituito una risposta non valida (servizio non disponibile o in manutenzione). Riprova tra un attimo.',
+  'dash_offline_cache': 'Connessione assente: mostro i dati salvati.',
 };

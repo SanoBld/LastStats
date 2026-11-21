@@ -10,7 +10,7 @@ on:
         description: 'Title (short)'
         required: true
       body:
-        description: 'Message body'
+        description: 'Body (optional). One line: write \n for a line break. **bold** *italic* __underline__ ~~strike~~ ==highlight== `code` / "# Title" / "- list item" / table "| A | B |\n|---|---|\n| 1 | 2 |" / image "![alt](https://...)" / links are automatic'
         required: false
         default: ''
       type:
@@ -43,11 +43,16 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      # Fetch the current news.json from gh-pages (if it exists) so we can
-      # prepend the new item instead of overwriting the whole file.
+      # Fetch the current news.json straight from the gh-pages branch (the
+      # github.io CDN can serve a copy that is a few minutes old, which would
+      # drop a news item published just before). Falls back to the live site.
       - name: Fetch existing news.json
         run: |
-          curl -fsSL https://sanobld.github.io/LastStats/news.json -o existing.json || echo '{"items":[]}' > existing.json
+          git fetch --depth=1 origin gh-pages 2>/dev/null \
+            && git show origin/gh-pages:news.json > existing.json 2>/dev/null \
+            || curl -fsSL https://sanobld.github.io/LastStats/news.json -o existing.json \
+            || echo '{"items":[]}' > existing.json
+          jq -e '.items' existing.json >/dev/null 2>&1 || echo '{"items":[]}' > existing.json
 
       - name: Build new news.json
         env:
@@ -57,6 +62,9 @@ jobs:
           EMOJI: ${{ inputs.emoji }}
         run: |
           mkdir -p public
+          # The input field is a single line: "\n" typed as two characters
+          # becomes a real line break (needed for lists and tables).
+          BODY="${BODY//\\n/$'\n'}"
           ID="news_$(date +%s)"
           DATE=$(date +%d/%m)
 

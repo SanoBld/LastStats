@@ -370,6 +370,7 @@ class AboutPage extends StatelessWidget {
           const Divider(height: 1, indent: 16, endIndent: 16),
           _PoweredByTile(
             icon: Icons.album_rounded,
+            asset: 'assets/icons/musicbrainz.svg',
             label: 'MusicBrainz',
             url: 'https://musicbrainz.org',
           ),
@@ -388,6 +389,7 @@ class AboutPage extends StatelessWidget {
           const Divider(height: 1, indent: 16, endIndent: 16),
           _PoweredByTile(
             icon: Icons.queue_music_rounded,
+            asset: 'assets/icons/listenbrainz.svg',
             label: 'ListenBrainz',
             url: 'https://listenbrainz.org',
           ),

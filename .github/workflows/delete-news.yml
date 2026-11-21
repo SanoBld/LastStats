@@ -1,0 +1,77 @@
+name: Delete app news
+
+# Manually triggered: removes one announcement from news.json on gh-pages
+# (the app's news bell and the website's news page both read that file).
+#   - target = "list"       -> only prints the existing news (id + title), changes nothing
+#   - target = "last"       -> deletes the most recent news
+#   - target = "news_123…"  -> deletes the news with this id (see "list")
+#   - target = "1", "2"…    -> deletes the Nth news of the list (1 = most recent)
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'What to delete: "list" (just show the ids), "last", an id like news_1763712345, or a position (1 = newest)'
+        required: true
+        default: 'list'
+
+permissions:
+  contents: write
+
+# never push to gh-pages at the same time as another workflow
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: false
+
+jobs:
+  delete-news:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Fetch existing news.json
+        run: |
+          git fetch --depth=1 origin gh-pages 2>/dev/null \
+            && git show origin/gh-pages:news.json > existing.json 2>/dev/null \
+            || curl -fsSL https://sanobld.github.io/LastStats/news.json -o existing.json \
+            || echo '{"items":[]}' > existing.json
+          jq -e '.items' existing.json >/dev/null 2>&1 || echo '{"items":[]}' > existing.json
+
+      - name: Show current news
+        run: |
+          echo "### Current news (newest first)" >> "$GITHUB_STEP_SUMMARY"
+          jq -r '.items | to_entries[] | "\(.key + 1). `\(.value.id)` — \(.value.date) — \(.value.title)"' existing.json | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Remove the news
+        id: rm
+        env:
+          TARGET: ${{ inputs.target }}
+        run: |
+          T="$(echo "$TARGET" | xargs)"
+          if [ "$T" = "list" ] || [ -z "$T" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if [ "$T" = "last" ]; then T=1; fi
+          mkdir -p public/data
+          if echo "$T" | grep -Eq '^[0-9]+$' && [ "$T" -le 1000000 ]; then
+            # position in the list (1 = newest)
+            jq --argjson n "$T" '.items |= [to_entries[] | select(.key != ($n - 1)) | .value]' existing.json > public/news.json
+          else
+            jq --arg id "$T" '.items |= map(select(.id != $id))' existing.json > public/news.json
+          fi
+          BEFORE=$(jq '.items | length' existing.json)
+          AFTER=$(jq '.items | length' public/news.json)
+          if [ "$BEFORE" = "$AFTER" ]; then
+            echo "::error::Nothing matched '$T'. Run again with target=list to see the ids."
+            exit 1
+          fi
+          cp public/news.json public/data/news.json
+          echo "Deleted '$T' ($BEFORE -> $AFTER items)" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Publish news.json to gh-pages
+        if: steps.rm.outputs.changed == 'true'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          keep_files: true

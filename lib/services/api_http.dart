@@ -46,6 +46,24 @@ class ApiHttp {
   }) =>
       _run(url, api, keyLabel, headers, timeout, (h) => _client.get(url, headers: h));
 
+
+  /// Decodes a JSON response body. When the server answers with an HTML page
+  /// (maintenance, Cloudflare / proxy error, captive portal…) it throws a
+  /// short readable [ApiBadResponse] instead of a raw FormatException that
+  /// would dump "<!DOCTYPE html>…" on screen.
+  static dynamic decodeJson(http.Response res) {
+    final text = utf8.decode(res.bodyBytes, allowMalformed: true);
+    final head = text.trimLeft();
+    if (head.startsWith('<') || head.isEmpty) {
+      throw ApiBadResponse(res.statusCode, res.request?.url.host ?? '');
+    }
+    try {
+      return jsonDecode(text);
+    } on FormatException {
+      throw ApiBadResponse(res.statusCode, res.request?.url.host ?? '');
+    }
+  }
+
   static Future<http.Response> post(
     Uri url, {
     Map<String, String>? headers,
@@ -130,4 +148,15 @@ class ApiHttp {
     );
     return res;
   }
+}
+
+/// Thrown when an API answers with something that is not JSON (HTML error
+/// page, empty body…). The message is short and safe to show to the user.
+class ApiBadResponse implements Exception {
+  final int status;
+  final String host;
+  const ApiBadResponse(this.status, this.host);
+  @override
+  String toString() =>
+      'Invalid server response${host.isEmpty ? '' : ' ($host)'} – HTTP $status';
 }

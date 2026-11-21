@@ -721,9 +721,35 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     } catch (e) {
       if (!mounted) return;
       if (!silent) {
-        setState(() { _error = e.toString().replaceFirst('Exception: ', ''); _loading = false; });
+        // 1) Offline first: show the last saved data if there is any,
+        //    instead of an error screen.
+        if (_loadFromCache()) {
+          _resolveHeaderImage();
+          if (_showFriends) _loadFriends();
+          if (mounted) {
+            ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(
+              content: Text(tx('dash_offline_cache')),
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 4),
+            ));
+          }
+          return;
+        }
+        // 2) Nothing saved: show a short readable error (never raw HTML).
+        setState(() { _error = _friendlyError(e); _loading = false; });
       }
     }
+  }
+
+  /// Short, human message for a failed load. A server that answers with an
+  /// HTML page (maintenance, proxy error…) must not dump markup on screen.
+  String _friendlyError(Object e) {
+    if (e is ApiBadResponse || e is FormatException) return tx('err_bad_response');
+    final s = e.toString().replaceFirst('Exception: ', '').trim();
+    if (s.contains('<!DOCTYPE') || s.contains('<html') || s.length > 220) {
+      return tx('err_bad_response');
+    }
+    return s;
   }
 
   void _saveToCache(List<dynamic> res) {
@@ -1122,7 +1148,10 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
     if (!mounted) return;
     if (!silent) setState(() => _friendsLoading = true);
     try {
-      final raw = await widget.service.getFriends(limit: 50, withRecentTrack: false);
+      final meName = widget.service.username.trim().toLowerCase();
+      final raw = (await widget.service.getFriends(limit: 50, withRecentTrack: false))
+          .where((u) => (u['name'] ?? '').toString().trim().toLowerCase() != meName)
+          .toList();
       final usernames = raw.map((u) => (u['name'] ?? '').toString()).toList();
 
       final recentResults = await Future.wait(
@@ -1307,7 +1336,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
         Uri.parse('https://sanobld.github.io/LastStats/news.json'),
       ).timeout(const Duration(seconds: 6));
       if (res.statusCode == 200) {
-        final data  = jsonDecode(res.body) as Map<String, dynamic>;
+        final data  = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
         final items = (data['items'] as List?)
                 ?.cast<Map<String, dynamic>>() ?? [];
         allItems.addAll(items);
@@ -4347,7 +4376,7 @@ class _NewsListTileState extends State<_NewsListTile> {
                   ),
                   if (widget.body.isNotEmpty) ...[
                     const SizedBox(height: 4),
-                    Text(widget.body,
+                    Text(MarkdownLite.plain(widget.body),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: text.bodySmall?.copyWith(

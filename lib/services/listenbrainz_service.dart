@@ -16,7 +16,6 @@
 //  resolves them with ImageService like everywhere else.
 // ══════════════════════════════════════════════════════════════════════════
 
-import 'dart:convert';
 import 'api_http.dart';
 
 class ChartEntry {
@@ -48,7 +47,7 @@ class ListenBrainzService {
     });
     final res = await ApiHttp.get(uri).timeout(_timeout);
     if (res.statusCode != 200) return [];
-    final body    = jsonDecode(utf8.decode(res.bodyBytes));
+    final body    = ApiHttp.decodeJson(res);
     final payload = body is Map ? body['payload'] : null;
     if (payload is! Map) return [];
     final key  = switch (entity) {

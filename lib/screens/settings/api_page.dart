@@ -12,6 +12,7 @@ import '../../l10n/extra_strings.dart';
 import '../../services/api_usage.dart';
 import '../../services/internal_keys.dart';
 import '../../services/storage_manager.dart';
+import '../../widgets/brand_icon.dart';
 import '../../widgets/m3_components.dart';
 import '../../widgets/skeleton.dart';
 import 'settings_helpers.dart';
@@ -220,7 +221,8 @@ class _ApiPageState extends State<ApiPage> {
                       const RankItem('deezer', 'Deezer', Icons.graphic_eq_rounded,
                           asset: 'assets/icons/deezer.svg'),
                       const RankItem('audiodb', 'TheAudioDB', Icons.album_rounded),
-                      const RankItem('musicbrainz', 'MusicBrainz', Icons.library_music_rounded),
+                      const RankItem('musicbrainz', 'MusicBrainz', Icons.library_music_rounded,
+                          asset: 'assets/icons/musicbrainz.svg'),
                       const RankItem('wikipedia', 'Wikipedia', Icons.public_rounded),
                       if (!DataSource.lb)
                         const RankItem('lastfm', 'Last.fm', Icons.bar_chart_rounded,
@@ -291,6 +293,18 @@ class _ApiPageState extends State<ApiPage> {
                   ],
                 ],
                 const SizedBox(height: 24),
+                // What the three counters mean (short, translated).
+                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Icon(Icons.info_outline_rounded,
+                      size: 16, color: scheme.onSurfaceVariant),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(tx('api_help'),
+                        style: text.bodySmall
+                            ?.copyWith(color: scheme.onSurfaceVariant)),
+                  ),
+                ]),
+                const SizedBox(height: 20),
                 Center(
                   child: OutlinedButton.icon(
                     onPressed: _confirmReset,
@@ -332,6 +346,25 @@ class _ApiPageState extends State<ApiPage> {
             limited > 0 ? scheme.error : scheme.onPrimaryContainer),
       ]),
     );
+  }
+
+  // Real brand logo for each API when one is bundled (same assets as the rest
+  // of the app), a neutral icon otherwise.
+  Widget _apiLogo(String id, ColorScheme scheme) {
+    final asset = switch (id) {
+      'lastfm'      => 'assets/icons/lastfm.svg',
+      'listenbrainz' => 'assets/icons/listenbrainz.svg',
+      'musicbrainz' => 'assets/icons/musicbrainz.svg',
+      'deezer'      => 'assets/icons/deezer.svg',
+      'itunes' || 'applemusic' => 'assets/icons/applemusic.svg',
+      'ytmusic'     => 'assets/icons/ytmusic.svg',
+      'github' || 'githubstatic' => 'assets/icons/github.svg',
+      _             => null,
+    };
+    if (asset == null) {
+      return Icon(Icons.cloud_outlined, size: 22, color: scheme.onSurfaceVariant);
+    }
+    return BrandIcon(asset, Icons.cloud_outlined, size: 22, color: scheme.primary);
   }
 
   Widget _tile(ColorScheme scheme, TextTheme text, ApiStat s) {
@@ -425,6 +458,7 @@ class _ApiPageState extends State<ApiPage> {
           initiallyExpanded: isLastfm || (isLb && DataSource.lb),
           tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
           childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          leading: _apiLogo(s.def.id, scheme),
           title: Text(s.def.name,
               style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
           subtitle: Padding(

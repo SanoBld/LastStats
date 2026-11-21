@@ -1225,7 +1225,7 @@ class _ItemDetailSheetState extends State<_ItemDetailSheet> {
         : lfmUrl0;
 
     final buttons = [
-      (label: DataSource.lb ? 'MusicBrainz' : 'Last.fm',  color: DataSource.lb ? const Color(0xFFBA478F) : const Color(0xFFD51007), icon: DataSource.lb ? Icons.album_rounded : Icons.bar_chart_rounded, asset: DataSource.lb ? null : 'assets/icons/lastfm.svg',  url: lfmUrl),
+      (label: DataSource.lb ? 'MusicBrainz' : 'Last.fm',  color: DataSource.lb ? const Color(0xFFBA478F) : const Color(0xFFD51007), icon: DataSource.lb ? Icons.album_rounded : Icons.bar_chart_rounded, asset: DataSource.lb ? 'assets/icons/musicbrainz.svg' : 'assets/icons/lastfm.svg',  url: lfmUrl),
       (label: 'Spotify',  color: const Color(0xFF1DB954), icon: Icons.spatial_audio_off_rounded,  asset: 'assets/icons/spotify.svg', url: 'https://open.spotify.com/search/$encoded'),
       (label: 'YT Music', color: const Color(0xFFFF0033), icon: Icons.music_video_rounded,        asset: 'assets/icons/ytmusic.svg', url: 'https://music.youtube.com/search?q=$encoded'),
       (label: 'Web',      color: Colors.white.withValues(alpha: 0.85), icon: Icons.language_rounded, asset: null, url: 'https://www.google.com/search?q=${Uri.encodeComponent('$q music')}'),
@@ -2577,6 +2577,7 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer>
     final (asset, fallback) = switch (name) {
       'Last.fm'       => ('assets/icons/lastfm.svg',     Icons.bar_chart_rounded),
       'ListenBrainz'  => ('assets/icons/listenbrainz.svg', Icons.favorite_rounded),
+      'MusicBrainz'   => ('assets/icons/musicbrainz.svg', Icons.album_rounded),
       'YouTube Music' => ('assets/icons/ytmusic.svg',    Icons.music_video_rounded),
       'Apple Music' || 'iTunes'
                       => ('assets/icons/applemusic.svg', Icons.music_note_rounded),

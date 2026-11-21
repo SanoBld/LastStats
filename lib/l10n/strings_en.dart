@@ -1608,4 +1608,7 @@ const Map<String, String> kTxEn = {
   'api_vid_sec': 'Video sources',
   'api_img_clear': 'Clear image cache (apply the new order)',
   'api_img_cleared': 'Image cache cleared',
+  'api_help': '“Requests today”: number of calls sent to the services since midnight. “Errors”: failed calls (service down, access denied or no network). “Rate-limited”: “too many requests” answers from a service, which is then paused for a short while.',
+  'err_bad_response': 'The server returned an invalid response (service unavailable or under maintenance). Please try again in a moment.',
+  'dash_offline_cache': 'Can\'t connect: showing saved data.',
 };

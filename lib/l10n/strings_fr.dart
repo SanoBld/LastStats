@@ -1608,4 +1608,7 @@ const Map<String, String> kTxFr = {
   'api_vid_sec': 'Sources vidéo',
   'api_img_clear': 'Vider le cache d\'images (appliquer le nouvel ordre)',
   'api_img_cleared': 'Cache d\'images vidé',
+  'api_help': '« Requêtes aujourd\'hui » : nombre d\'appels envoyés aux services depuis minuit. « Erreurs » : appels échoués (service en panne, accès refusé ou pas de réseau). « Limitées » : réponses « trop de requêtes » d\'un service, qui est alors mis en pause quelques instants.',
+  'err_bad_response': 'Le serveur a renvoyé une réponse invalide (service indisponible ou en maintenance). Réessayez dans un instant.',
+  'dash_offline_cache': 'Connexion impossible : données enregistrées affichées.',
 };

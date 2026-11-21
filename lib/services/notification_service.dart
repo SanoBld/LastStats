@@ -10,6 +10,7 @@ import '../screens/notification_detail_page.dart';
 import '../l10n/extra_strings.dart' show tx;
 import '../l10n/l10n.dart';
 import '../widgets/update_install_sheet.dart' show openUpdateUrl;
+import '../widgets/markdown_lite.dart' show MarkdownLite;
 import 'update_installer.dart';
 
 const _kLastFmRed = Color(0xFFD51007);
@@ -518,10 +519,13 @@ class NotificationService {
     final color    = _newsColor(type);
     final em        = emoji.isNotEmpty ? emoji : _newsEmoji(type);
     final fullTitle = '$em $title';
+    // The system notification can't render markdown: show a clean text copy
+    // (the payload below keeps the original so the detail page renders it).
+    final shown     = MarkdownLite.plain(body);
     return _plugin.show(
       _idNews(id),
       fullTitle,
-      body,
+      shown,
       NotificationDetails(
         android: AndroidNotificationDetails(
           _chNewsId, _chNewsName,
@@ -531,7 +535,7 @@ class NotificationService {
           color:   color,
           subText: 'LastStats',
           styleInformation: BigTextStyleInformation(
-            body,
+            shown,
             contentTitle: fullTitle,
             summaryText:  'LastStats',
           ),

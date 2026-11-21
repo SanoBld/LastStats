@@ -142,7 +142,7 @@ class LbAdapter {
     final res = await _getRetry(_uri(host, path, q));
     if (res.statusCode == 204 || res.statusCode == 404 || res.statusCode == 410) return null;
     if (res.statusCode != 200) throw Exception('ListenBrainz error\nCode: HTTP ${res.statusCode} ${res.request?.url.path ?? ''}');
-    final body = jsonDecode(utf8.decode(res.bodyBytes));
+    final body = ApiHttp.decodeJson(res);
     if (body is Map && body['payload'] != null) return body['payload'];
     return body;
   }
@@ -154,7 +154,7 @@ class LbAdapter {
     if (res.statusCode == 204 || res.statusCode == 404 || res.statusCode == 410) return null;
     if (res.statusCode == 429) throw Exception('ListenBrainz rate limit reached\nCode: HTTP 429 ${res.headers['x-laststats-skipped'] == '1' ? '(client limiter)' : '(server)'}');
     if (res.statusCode != 200) throw Exception('ListenBrainz error\nCode: HTTP ${res.statusCode} ${res.request?.url.path ?? ''}');
-    final body = jsonDecode(utf8.decode(res.bodyBytes));
+    final body = ApiHttp.decodeJson(res);
     if (body is! Map) return null;
     final p = body['payload'];
     return p is Map<String, dynamic> ? p : Map<String, dynamic>.from(body);
@@ -238,7 +238,7 @@ class LbAdapter {
         Uri.https(_host, '/1/validate-token'),
         headers: {'Authorization': 'Token $token'},
       ).timeout(_timeout);
-      final b = jsonDecode(utf8.decode(res.bodyBytes));
+      final b = ApiHttp.decodeJson(res);
       final name = (b is Map && b['valid'] == true) ? _s(b['user_name']) : '';
       if (name.isEmpty || name.toLowerCase() == stale.toLowerCase()) return null;
       _alias[stale] = name;
@@ -277,10 +277,30 @@ class LbAdapter {
           {'count': '1', 'time_range': '1'});
       since = _i(l?['oldest_listen_ts']);
     } catch (_) {}
+    // Distinct artists / albums / tracks: Last.fm gives them in user.getInfo,
+    // ListenBrainz only exposes them as "total_*_count" in its all-time stats
+    // (count=1 keeps the answer tiny). A failure just leaves the value empty.
+    Future<int> distinct(String entity, String field) async {
+      try {
+        final d = await _get('/1/stats/user/${Uri.encodeComponent(u)}/$entity',
+            {'range': 'all_time', 'count': '1'});
+        return _i(d?[field]);
+      } catch (_) {
+        return 0;
+      }
+    }
+    final counts = await Future.wait([
+      distinct('artists', 'total_artist_count'),
+      distinct('release-groups', 'total_release_group_count'),
+      distinct('recordings', 'total_recording_count'),
+    ]);
     return {'user': {
       'name': u, 'realname': u,
       'url': 'https://listenbrainz.org/user/${Uri.encodeComponent(u)}/',
       'playcount': '${_i(c['count'])}', 'country': '',
+      'artist_count': '${counts[0]}',
+      'album_count': '${counts[1]}',
+      'track_count': '${counts[2]}',
       'registered': {'unixtime': '$since', '#text': '$since'},
       'image': _img(''),
     }};
@@ -547,7 +567,7 @@ class LbAdapter {
       if (res.statusCode != 200) {
         throw Exception('ListenBrainz error\nCode: HTTP ${res.statusCode}');
       }
-      final body = jsonDecode(utf8.decode(res.bodyBytes));
+      final body = ApiHttp.decodeJson(res);
       final payload = body is Map ? body['payload'] : null;
       final ls = ((payload is Map ? payload['listens'] : null) as List? ?? [])
           .whereType<Map>().toList();
@@ -618,7 +638,15 @@ class LbAdapter {
   // ── Friends = people you follow ─────────────────────────────────────────
   static Future<Map<String, dynamic>> _friends(String user, int limit) async {
     final d = await _get('/1/user/${Uri.encodeComponent(user)}/following');
-    final names = ((d?['following'] as List?) ?? []).map(_s).toList();
+    // ListenBrainz lets you follow yourself: never list the account owner
+    // as one of their own friends (also drops blanks and duplicates).
+    final me = user.trim().toLowerCase();
+    final seen = <String>{};
+    final names = ((d?['following'] as List?) ?? [])
+        .map(_s)
+        .where((n) => n.trim().isNotEmpty && n.trim().toLowerCase() != me)
+        .where((n) => seen.add(n.toLowerCase()))
+        .toList();
     return {'friends': {
       'user': [for (final n in names.take(limit)) {
         'name': n, 'realname': n, 'playcount': '0',
@@ -696,7 +724,7 @@ class LbAdapter {
               continue; // one more try
             }
             if (res.statusCode != 200) return null;
-            final body = jsonDecode(utf8.decode(res.bodyBytes));
+            final body = ApiHttp.decodeJson(res);
             if (body is! Map<String, dynamic>) return null;
             _mbCache[key] = body;
             return body;
@@ -780,7 +808,7 @@ class LbAdapter {
         body: jsonEncode({'${field}_mbids': [mbid]}),
       ).timeout(_timeout);
       if (res.statusCode != 200) return none;
-      final b = jsonDecode(utf8.decode(res.bodyBytes));
+      final b = ApiHttp.decodeJson(res);
       if (b is! List || b.isEmpty || b.first is! Map) return none;
       final m = b.first as Map;
       final r = (listens: '${_i(m['total_listen_count'])}',

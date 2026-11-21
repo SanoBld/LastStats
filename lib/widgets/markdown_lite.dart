@@ -19,6 +19,34 @@ class MarkdownLite extends StatelessWidget {
     required this.linkColor,
   });
 
+  /// Strips the markdown syntax from [md] so it can be shown as a short plain
+  /// preview (news list, system notification): no **, no table pipes, no #.
+  static String plain(String md) {
+    final out = <String>[];
+    for (var line in md.replaceAll('\r\n', '\n').split('\n')) {
+      final t = line.trim();
+      if (t.isEmpty) continue;
+      // table separator row (|---|---|): skip
+      if (RegExp(r'^\|?[\s:\-|]+\|?$').hasMatch(t) && t.contains('-')) continue;
+      if (RegExp(r'^!\[[^\]]*\]\(\S+\)$').hasMatch(t)) continue; // image
+      line = t
+          .replaceFirst(RegExp(r'^#{1,3}\s+'), '')
+          .replaceFirst(RegExp(r'^[-*]\s+'), '• ');
+      if (line.contains('|')) {
+        line = line.split('|').map((c) => c.trim()).where((c) => c.isNotEmpty).join(' · ');
+      }
+      line = line
+          .replaceAllMapped(RegExp(r'\*\*(.+?)\*\*'), (m) => m.group(1)!)
+          .replaceAllMapped(RegExp(r'__(.+?)__'), (m) => m.group(1)!)
+          .replaceAllMapped(RegExp(r'~~(.+?)~~'), (m) => m.group(1)!)
+          .replaceAllMapped(RegExp(r'==(.+?)=='), (m) => m.group(1)!)
+          .replaceAllMapped(RegExp(r'`([^`]+)`'), (m) => m.group(1)!)
+          .replaceAllMapped(RegExp(r'(?<!\*)\*(?!\*)(.+?)\*(?!\*)'), (m) => m.group(1)!);
+      out.add(line);
+    }
+    return out.join('\n');
+  }
+
   static final RegExp _urlRegex =
       RegExp(r'(https?:\/\/[^\s]+)', caseSensitive: false);
   // Inline tokens, order matters (checked left to right per match position).
@@ -161,7 +189,10 @@ class MarkdownLite extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lines = text.split('\n');
+    // The publish-news workflow field is a single line: a "\n" typed as two
+    // characters means a line break (only when the text has no real one).
+    final src = text.contains('\n') ? text : text.replaceAll(r'\n', '\n');
+    final lines = src.split('\n');
     final widgets = <Widget>[];
     int i = 0;
 

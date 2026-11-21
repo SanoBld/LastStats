@@ -1608,4 +1608,7 @@ const Map<String, String> kTxPt = {
   'api_vid_sec': 'Fontes de vídeo',
   'api_img_clear': 'Limpar a cache de imagens (aplicar a nova ordem)',
   'api_img_cleared': 'Cache de imagens limpa',
+  'api_help': '“Pedidos hoje”: número de chamadas enviadas aos serviços desde a meia-noite. “Erros”: chamadas falhadas (serviço em baixo, acesso negado ou sem rede). “Limitados”: respostas de “demasiados pedidos” de um serviço, que fica em pausa durante algum tempo.',
+  'err_bad_response': 'O servidor devolveu uma resposta inválida (serviço indisponível ou em manutenção). Tente novamente daqui a pouco.',
+  'dash_offline_cache': 'Sem ligação: a mostrar os dados guardados.',
 };

@@ -1608,4 +1608,7 @@ const Map<String, String> kTxEs = {
   'api_vid_sec': 'Fuentes de vídeo',
   'api_img_clear': 'Vaciar la caché de imágenes (aplicar el nuevo orden)',
   'api_img_cleared': 'Caché de imágenes vaciada',
+  'api_help': '«Solicitudes hoy»: número de llamadas enviadas a los servicios desde medianoche. «Errores»: llamadas fallidas (servicio caído, acceso denegado o sin red). «Limitadas»: respuestas de «demasiadas solicitudes» de un servicio, que se pausa durante un rato.',
+  'err_bad_response': 'El servidor devolvió una respuesta no válida (servicio no disponible o en mantenimiento). Inténtalo de nuevo en un momento.',
+  'dash_offline_cache': 'Sin conexión: se muestran los datos guardados.',
 };
