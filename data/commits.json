@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-21T20:24:31Z",
+  "updated": "2026-11-21T20:30:01Z",
   "commits": [
+    {
+      "sha": "0c43ba6198b7ae07c92d3b859d2b7241728c257e",
+      "message": "feat: amélioration du chargement des données avec affichage instantané et rafraîchissement en arrière-plan",
+      "date": "2026-11-21T20:29:41Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/0c43ba6198b7ae07c92d3b859d2b7241728c257e",
+      "tags": []
+    },
     {
       "sha": "cea4584a55de5761539d13f27e3f5d0ffbb4d7e5",
       "message": "feat: ajout de la gestion des erreurs réseau et du cache d'images hors ligne",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/5c7aa29ccc4886380015ba9261c2066fa0162d2a",
-      "tags": []
-    },
-    {
-      "sha": "1ae31d3de81701fe693e1d1082115d058db3fb77",
-      "message": "feat: améliorer l'affichage des statistiques avec un nouveau design Material You et remplacer les cartes de statistiques par une disposition plus cohérente",
-      "date": "2026-09-25T21:14:20Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/1ae31d3de81701fe693e1d1082115d058db3fb77",
       "tags": []
     }
   ]
