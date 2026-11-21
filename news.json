@@ -1,6 +1,14 @@
 {
   "items": [
     {
+      "id": "news_1795255118",
+      "title": "TEST",
+      "body": "# Titre niveau 1\n## Titre niveau 2\n### Titre niveau 3\n\nTexte normal avec **gras**, *italique*, ~~barré~~, ==surligné== et `code`.\nCeci est un retour à la ligne simple.\n\nUn [lien](https://github.com/SanoBld/LastStats) cliquable.\n\n### Liste à puces\n- Premier point\n- Deuxième point avec **gras**\n- Troisième point\n\n### Liste numérotée\n1. Étape une\n2. Étape deux\n3. Étape trois\n\n### Tableau\n| Fonction | Statut | Plateforme |\n|---|---|---|\n| Tableau de bord | ✅ Corrigé | Android |\n| Titres uniques | ✅ Corrigé | iOS |\n| Actualités | 🚧 En test | Site + App |\n\n> Une citation pour terminer.\n\nEmojis : 🎵 🚀 ✨",
+      "type": "info",
+      "emoji": "✨",
+      "date": "21/11"
+    },
+    {
       "id": "news_1795078638",
       "title": "Back Up Your Last.fm History on ListenBrainz Now",
       "body": "Before Last.fm's API becomes paid on December 1st, it is strongly recommended that you back up all your listening history to ListenBrainz (https://listenbrainz.org/).  Creating a free account and importing your Last.fm scrobbles now ensures your music data remains safe, accessible, and ready for future free open-source integrations in LastStats.",
