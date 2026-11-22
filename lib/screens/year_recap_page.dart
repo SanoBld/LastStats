@@ -120,6 +120,11 @@ class _YearRecapPageState extends State<YearRecapPage> {
   List<_PvReq?> _pvList = const [];
   List<bool> _heroList = const []; // slides whose #1 cover is the full-bleed background
   List<_PvReq?> _bgList = const []; // cover used as the background of each slide
+  _YrBg _heroBg = _YrBg.full; // #1 slides: own choice, full screen by default
+  Color _hFg = Colors.white; // text colour of the #1 slides (white on image, theme colour otherwise)
+  List<Shadow> get _hSh => _hFg == Colors.white ? const [Shadow(blurRadius: 18, color: Color(0x99000000))] : const [];
+  bool _isHero(int i) => i >= 0 && i < _heroList.length && _heroList[i];
+  _YrBg _modeOf(int i) => _isHero(i) ? _heroBg : _bgMode;
   _YrBg _bgMode = _YrBg.band; // other slides: full screen / top band / none (also drives the share)
   final ValueNotifier<String> _sumBg = ValueNotifier('cover'); // summary card: cover / profile / none
   _YrRanked? _twinTrack;
@@ -418,8 +423,10 @@ class _YearRecapPageState extends State<YearRecapPage> {
       _profileOn.value = p.getBool('ls_year_share_profile') ?? true;
       _sumBg.value = p.getString('ls_year_sum_bg') ?? 'cover';
       final savedBg = p.getString('ls_year_bg');
+      final savedHero = p.getString('ls_year_hero_bg');
       for (final m in _YrBg.values) {
         if (m.name == savedBg && mounted) setState(() => _bgMode = m);
+        if (m.name == savedHero && mounted) setState(() => _heroBg = m);
       }
       final me = await widget.service.getUserInfo();
       final imgs = me?['image'];
@@ -913,8 +920,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     _sharingN.value = true;
     try {
       // Download the cover first, so the poster never gets captured with an empty background
-      final heroNow = _slide < _heroList.length && _heroList[_slide];
-      final req = ((heroNow || _bgMode != _YrBg.none) && _slide < _bgList.length) ? _bgList[_slide] : null;
+      final req = (_modeOf(_slide) != _YrBg.none && _slide < _bgList.length) ? _bgList[_slide] : null;
       if (req != null) {
         try {
           final url = await _yrResolveUrl(req.type, req.name, req.artist).timeout(const Duration(seconds: 6));
@@ -948,10 +954,11 @@ class _YearRecapPageState extends State<YearRecapPage> {
 
   // Image behind the slides: full screen -> top band -> none (saved, also used by the share)
   Future<void> _cycleBg() async {
-    final next = _YrBg.values[(_bgMode.index + 1) % _YrBg.values.length];
-    setState(() => _bgMode = next);
+    final hero = _isHero(_slide);
+    final next = _YrBg.values[(_modeOf(_slide).index + 1) % _YrBg.values.length];
+    setState(() { if (hero) { _heroBg = next; } else { _bgMode = next; } });
     final p = await SharedPreferences.getInstance();
-    await p.setString('ls_year_bg', next.name);
+    await p.setString(hero ? 'ls_year_hero_bg' : 'ls_year_bg', next.name);
   }
 
   // Colours of the slide texts when a full-screen image sits behind them
@@ -999,8 +1006,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     final slides = ready ? _buildSlides(scheme) : const <Widget>[];
     // Image behind the page (also behind the status bar, top bar and buttons)
     final lastSlide = ready && _slide >= slides.length - 1;
-    final isHero = ready && _slide < _heroList.length && _heroList[_slide];
-    final bgMode = isHero ? _YrBg.full : _bgMode;
+    final bgMode = _modeOf(_slide);
     final bgReq = (ready && !lastSlide && bgMode != _YrBg.none && _slide < _bgList.length) ? _bgList[_slide] : null;
     final bgFull = bgReq != null && bgMode == _YrBg.full;
     final bgBand = bgReq != null && bgMode == _YrBg.band;
@@ -1107,13 +1113,13 @@ class _YearRecapPageState extends State<YearRecapPage> {
                           ),
                         ),
                         // Cover behind the slide: full screen / top band / none (also changes the share)
-                        if (!isHero) ...[
+                        ...[
                           const SizedBox(width: 6),
                           IconButton.filledTonal(
                             visualDensity: VisualDensity.compact,
-                            tooltip: tx('yr_bg_${_bgMode.name}'),
+                            tooltip: tx('yr_bg_${bgMode.name}'),
                             onPressed: _cycleBg,
-                            icon: Icon(switch (_bgMode) {
+                            icon: Icon(switch (bgMode) {
                               _YrBg.full => Icons.fullscreen_rounded,
                               _YrBg.band => Icons.crop_landscape_rounded,
                               _YrBg.none => Icons.hide_image_outlined,
@@ -1148,7 +1154,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                       builder: (_, on, _) {
                         // The slide's own cover replaces the profile picture
                         final isHeroSlide = idx < _heroList.length && _heroList[idx];
-                        final mode = isHeroSlide ? _YrBg.full : _bgMode;
+                        final mode = _modeOf(idx);
                         final cover = (mode != _YrBg.none && idx < _bgList.length) ? _bgList[idx] : null;
                         final hero = cover != null && mode == _YrBg.full;
                         return RepaintBoundary(
@@ -1307,6 +1313,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     if (d == null || d.total == 0) return const [];
     // Full-screen image behind the slides: their texts turn white
     final s = _bgMode == _YrBg.full ? _onImageScheme(base) : base;
+    _hFg = _heroBg == _YrBg.full ? Colors.white : base.onSurface;
     final bgFallback = d.tracks.isNotEmpty
         ? _PvReq.of('tracks', d.tracks.first)
         : (d.artists.isNotEmpty ? _PvReq.of('artists', d.artists.first) : null);
@@ -1727,7 +1734,6 @@ class _YearRecapPageState extends State<YearRecapPage> {
 
   // ── Hero slides: the cover fills the slide, the name is big in the middle ──
   // Texts are always white: they sit on the dark veil over the cover.
-  static const _heroShadow = [Shadow(blurRadius: 18, color: Color(0x99000000))];
 
   double _heroFont(String name) {
     final n = name.length;
@@ -1736,7 +1742,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
 
   Widget _heroLabel(String t) => Text(t.toUpperCase(),
       textAlign: TextAlign.center,
-      style: TextStyle(color: Colors.white.withValues(alpha: 0.88), fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: 2.2, shadows: _heroShadow));
+      style: TextStyle(color: _hFg.withValues(alpha: 0.88), fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: 2.2, shadows: _hSh));
 
   Widget _heroName(String t) => _YrReveal(
         delayMs: 350,
@@ -1744,7 +1750,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
             textAlign: TextAlign.center,
             maxLines: 4,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: Colors.white, fontSize: _heroFont(t), fontWeight: FontWeight.w900, height: 1.05, shadows: _heroShadow)),
+            style: TextStyle(color: _hFg, fontSize: _heroFont(t), fontWeight: FontWeight.w900, height: 1.05, shadows: _hSh)),
       );
 
   Widget _heroArtist(String t) => t.isEmpty
@@ -1757,7 +1763,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.92), fontSize: 20, fontWeight: FontWeight.w700, shadows: _heroShadow)),
+                style: TextStyle(color: _hFg.withValues(alpha: 0.92), fontSize: 20, fontWeight: FontWeight.w700, shadows: _hSh)),
           ),
         );
 
@@ -1773,12 +1779,12 @@ class _YearRecapPageState extends State<YearRecapPage> {
           const SizedBox(height: 18),
           Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
             _YrCountUp(value: bigN, fmt: _fmt, delayMs: 300, durationMs: 1400,
-                style: const TextStyle(color: Colors.white, fontSize: 56, fontWeight: FontWeight.w900, height: 1, shadows: _heroShadow)),
-            const Text('×', style: TextStyle(color: Colors.white, fontSize: 56, fontWeight: FontWeight.w900, height: 1, shadows: _heroShadow)),
+                style: TextStyle(color: _hFg, fontSize: 56, fontWeight: FontWeight.w900, height: 1, shadows: _hSh)),
+            Text('×', style: TextStyle(color: _hFg, fontSize: 56, fontWeight: FontWeight.w900, height: 1, shadows: _hSh)),
           ]),
           const SizedBox(height: 8),
           _YrReveal(delayMs: 900, child: Text(sub, textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 15, fontWeight: FontWeight.w600, shadows: _heroShadow))),
+              style: TextStyle(color: _hFg.withValues(alpha: 0.9), fontSize: 15, fontWeight: FontWeight.w600, shadows: _hSh))),
         ],
       );
 
@@ -1800,7 +1806,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
             fmt: (n) => tx('yr_plays', {'n': _fmt(n)}),
             delayMs: 900,
             durationMs: 1000,
-            style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, shadows: _heroShadow)),
+            style: TextStyle(color: _hFg, fontSize: 22, fontWeight: FontWeight.w900, shadows: _hSh)),
       ],
       bottom: rest.isEmpty ? null : _rankList(s, rest, type, startAt: 2, baseDelay: 1300, onImage: true),
     );
@@ -1883,10 +1889,10 @@ class _YearRecapPageState extends State<YearRecapPage> {
 
   // Rows are revealed from the last to the first, so #1 lands last.
   Widget _rankList(ColorScheme s, List<_YrRanked> items, String type, {int startAt = 1, int baseDelay = 300, bool onImage = false}) {
-    final cNum = onImage ? Colors.white.withValues(alpha: 0.78) : _yrSoft(s);
-    final cMain = onImage ? Colors.white : s.onPrimaryContainer;
-    final cSub = onImage ? Colors.white.withValues(alpha: 0.78) : _yrSoft(s);
-    final cPlays = onImage ? Colors.white : s.primary;
+    final cNum = onImage ? _hFg.withValues(alpha: 0.78) : _yrSoft(s);
+    final cMain = onImage ? _hFg : s.onPrimaryContainer;
+    final cSub = onImage ? _hFg.withValues(alpha: 0.78) : _yrSoft(s);
+    final cPlays = onImage ? _hFg : s.primary;
     return Column(
       children: [
         for (var i = 0; i < items.length; i++)

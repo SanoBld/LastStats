@@ -47,22 +47,37 @@
 - ListenBrainz requests are retried on temporary network errors ("Connection terminated during handshake")
 - Public (built-in) API keys are turned off, because Last.fm requires a paid subscription for API keys from December 1. Your own key is always the one used (the code is kept and can be switched back on); the built-in key and Last.fm website login choices are removed
 - Official ListenBrainz and MusicBrainz icons in About, in the API image sources and in the detail page links; texts, dialogs and links follow the service in all 10 languages
-- New: "News" button on the login screen (outages, maintenance, announcements), available before logging in, with a retry button when offline
-- The preferred-platform choices (first setup and Settings > Startup) and the connection card now show ListenBrainz instead of Last.fm in ListenBrainz mode; the friends glyph follows the service too
-- Fixed outdated texts that still mentioned the built-in key / Last.fm website login (10 languages)
-- Performance: ListenBrainz requests no longer read and decode the offline copy unless the network fails
-- New: a Last.fm FAQ and a ListenBrainz FAQ (5 questions each: API key, Last.fm Pro from December 1, 2026, user token, statistics, history import) in the app and on the help page of the site, in 10 languages
-- Year recap: the #1 artist / track / album (and the streak and record-day tracks) now use their cover as a full-screen background with the name big in the middle; animated covers play there when enabled in Settings > Appearance
-- Year recap: the cover of the #1 slides now fills the whole screen, behind the status bar, the top bar and the buttons; on the other slides a new button switches the cover between full screen, top band and none, and the share follows the choice
-- Year recap summary card: choose the picture with a selector (top 1 cover, profile picture, none)
-- Covers are never stretched or shrunk any more: they fill the area and are cropped (also in the shared image and everywhere a cover is shown in a box that is not square)
-- Year recap: the charts (best month, listening hours, top artist share, discoveries) now name the most played track of their context
-- Year recap sharing: the slide's own cover replaces the profile picture at the top of the shared image (full-bleed for the #1 slides); the cover is downloaded before the capture so the poster is never empty
-- Site: new "ListenBrainz" help theme (tutorial, how it works, account and token, scrobbling, switching service, troubleshooting) mirroring the Last.fm one, in 10 languages
-- Site and app: the general FAQ no longer talks about Last.fm only (scrobbles, data storage, favorites, backup, switching account or service); removed the outdated "3 accounts" and "built-in key" mentions
-- Settings > Account: no more "My accounts (1/3)" counter when there is a single account
-- Settings > Appearance: the video-cover options now unroll under their switch instead of appearing in a separate section; the two "Interactions" sections no longer share the same title
-- Removed the BETA badge on the artwork color theme; tab titles of the site use "|"
+
+### Login screen
+- New "News" button (before logging in) to check for outages, maintenance and announcements. If you are offline, an error message with a "Retry" button is shown
+- The News and Language buttons now match the style of the app (same shape, height and press effect). Tooltips use the app style too
+- Buttons that name the service (first setup, Settings > Startup, Settings > Connection, friends icon) show "ListenBrainz" or "Last.fm" depending on the service you use
+- Last.fm Pro date written in full ("from December 1, 2026") on the login screen and in Settings > Connections
+- Removed outdated texts that still mentioned the built-in key and the Last.fm website login
+
+### Year recap
+- The #1 artist, #1 track, #1 album, streak track and record-day track now use their cover as a full-screen background, with the name big in the middle (for example "Your #1 hit"). The background also covers the status bar, the top bar and the buttons
+- Animated covers (videos) play on these slides when enabled in Settings > Appearance. They follow the per-type switches and the eco mode. During sharing, a still image is used
+- New button next to the share icon, available on every slide: switch the cover between full screen, top banner and no image. Your choice is saved, applies to the shared image, and is remembered separately for the #1 slides and for the other slides
+- Each chart (best month, listening hours, top artist share, discoveries) now shows the most played track of its context
+- Last slide: choose the image of the summary card (top 1 cover, profile picture or none). The choice is saved and used for the shared image
+- Sharing: the cover of the slide replaces the profile picture at the top of the shared image (full poster for the #1 slides). The cover is downloaded before the capture so the image is never empty
+- Covers are never stretched or squashed anymore: they fill the area and are cropped. This also fixes distorted covers elsewhere in the app when the area is not square
+
+### Help and FAQ
+- New Last.fm FAQ and ListenBrainz FAQ (5 questions each: API key, Last.fm Pro, user token, statistics, history import) in the app and on the help page of the website
+- New "ListenBrainz" help section on the website (tutorial, how it works, account and token, scrobbling, switching service, troubleshooting), built like the Last.fm one
+- The general FAQ (app and website) now covers both services: scrobbles, data storage, favorites, backup and switching account or service. Outdated "3 accounts" and "built-in key" mentions removed
+
+### Settings
+- Account: the "My accounts (1/3)" counter and the "Active" label are hidden when there is only one account
+- Appearance: the video cover options now unroll under their switch. The two "Interactions" sections no longer share a title (the first is now "Covers and achievements")
+- Removed the BETA badge on the artwork color theme
+
+### Texts and translations
+- Error messages and the "saved data shown" notice are now full sentences in the 10 languages
+- Website tab titles use "|" as separator
+- Performance: ListenBrainz requests no longer read the offline copy unless the network fails
 
 ### News & announcements
 - Texts now support **bold**, __underline__, ==highlight==, ~~strikethrough~~, *italic*, `code`, titles, bullet and numbered lists, quotes, links, tables and line breaks (type \n in the workflow field), in the app and on the website. The workflow field describes the whole syntax, so you can hand it to an AI
