@@ -29,6 +29,8 @@
     { id: 'app', icon: 'smartphone', desc: 'hp.hub.d.app' },
     { id: 'trouble', icon: 'healing', desc: 'hp.hub.d.trouble' },
     { id: 'faq', icon: 'live_help', desc: 'hp.hub.d.faq' },
+    { id: 'faq-lastfm', icon: 'help', desc: 'hp.hub.d.faqlfm' },
+    { id: 'faq-listenbrainz', icon: 'help', desc: 'hp.hub.d.faqlb' },
     { id: 'sources', icon: 'article', desc: 'hp.hub.d.sources' },
   ].filter((th) => document.getElementById(th.id));
 
@@ -49,7 +51,7 @@
 
   /* ---------------- hub (tiles) ---------------- */
   function countLabel(section, id) {
-    if (id === 'faq') return t('hp.hub.questions').replace('{n}', section.querySelectorAll('.faq-item').length);
+    if (id === 'faq' || id.indexOf('faq-') === 0) return t('hp.hub.questions').replace('{n}', section.querySelectorAll('.faq-item').length);
     const n = section.querySelectorAll('.help-card').length;
     return n > 1 ? t('hp.hub.guides').replace('{n}', n) : '';
   }

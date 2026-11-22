@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-22T14:13:04Z",
+  "updated": "2026-11-22T15:07:52Z",
   "commits": [
+    {
+      "sha": "06215a3474918593fbadefed394b10955afadb19",
+      "message": "Add FAQ sections for Last.fm and ListenBrainz in multiple languages\n\n- Updated Spanish, French, Italian, Japanese, Portuguese, Russian, and Chinese translations to include FAQs for Last.fm and ListenBrainz.\n- Enhanced help hub to include new FAQ sections for Last.fm and ListenBrainz with appropriate icons and descriptions.\n- Modified the counting function for FAQ items to accommodate the new sections.",
+      "date": "2026-11-22T15:07:25Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/06215a3474918593fbadefed394b10955afadb19",
+      "tags": []
+    },
     {
       "sha": "433f83e6a8ac2efa80ee1b08347e684096414f5b",
       "message": "feat: mise à jour des messages d'alerte concernant l'API Last.fm pour inclure la date limite de 2026",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/f4b8b276f306833dfcfcd9a5160c55e54f51c7ab",
-      "tags": []
-    },
-    {
-      "sha": "a5653d070040116e274564575caa41d7b5f8f60a",
-      "message": "feat: ajouter des formes M3 pour les cartes d'amis et ajuster le style de remplissage en fonction de l'état en ligne",
-      "date": "2026-09-26T19:37:37Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/a5653d070040116e274564575caa41d7b5f8f60a",
       "tags": []
     }
   ]
