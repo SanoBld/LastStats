@@ -14,9 +14,7 @@ import '../services/lastfm_service.dart';
 import '../widgets/m3_components.dart';
 import '../services/backup_service.dart';
 import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
-import 'settings/lastfm_login_page.dart';
 import '../services/favorites_auth.dart';
-import '../services/internal_keys.dart';
 import 'onboarding_flow.dart';
 import 'home_screen.dart' show NewsLauncher;
 import '../services/data_source.dart';
@@ -55,8 +53,6 @@ class _SetupScreenState extends State<SetupScreen>
   bool    _obscureApiKey   = true;
   bool    _obscureSecret   = true;
   bool    _enableFavorites = false;
-  bool    _useInternalKey  = false;
-  int     _method          = 0; // 0 own key, 1 built-in key, 2 Last.fm website
   bool    _rememberMe      = true;
   bool    _isLoading       = false;
   String? _errorMessage;
@@ -260,26 +256,12 @@ class _SetupScreenState extends State<SetupScreen>
       _service           = 'lfm';
       _usernameCtrl.text = result.username!;
       _apikeyCtrl.text   = result.apiKey!;
-      _useInternalKey    = false;
-      _method            = 0;
       _errorMessage      = null;
       if (secretKeyNotifier.value.isNotEmpty) {
         _secretCtrl.text   = secretKeyNotifier.value;
         _enableFavorites   = true;
       }
     });
-  }
-
-  // Log in on the Last.fm website, then connect with the built-in key.
-  Future<void> _lastfmWeb() async {
-    final name = await LastfmLoginPage.open(context);
-    if (name == null || !mounted) return;
-    setState(() {
-      _usernameCtrl.text = name;
-      _useInternalKey = true;
-      _errorMessage = null;
-    });
-    await _launch();
   }
 
   Future<void> _open(String url) async {
@@ -624,15 +606,13 @@ class _SetupScreenState extends State<SetupScreen>
   // Validate + connect
   Future<void> _launch() async {
     final username = _usernameCtrl.text.trim();
-    final apiKey   = _useInternalKey
-        ? await InternalKeys.pick()
-        : _apikeyCtrl.text.trim();
+    final apiKey   = _apikeyCtrl.text.trim();
 
     if (username.isEmpty || apiKey.isEmpty) {
       setState(() => _errorMessage = tx('ui_please_fill_both_field'));
       return;
     }
-    if (!_useInternalKey && apiKey.length != 32) {
+    if (apiKey.length != 32) {
       setState(() => _errorMessage = tx('ui_api_key_must_be_32_cha'));
       return;
     }
@@ -678,7 +658,7 @@ class _SetupScreenState extends State<SetupScreen>
       }
 
       // Optional: authorize favorites (loved tracks) — doesn't block setup on failure.
-      if (!_useInternalKey && _enableFavorites && _secretCtrl.text.trim().isNotEmpty) {
+      if (_enableFavorites && _secretCtrl.text.trim().isNotEmpty) {
         if (!mounted) return;
         await connectFavorites(
           context, username: username, apiKey: apiKey, secret: _secretCtrl.text,
@@ -864,7 +844,7 @@ class _SetupScreenState extends State<SetupScreen>
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.stretch,
                                     children: [
-                                      if (_method != 2) ...[
+                                      ...[
                                         TextField(
                                           controller: _usernameCtrl,
                                           textInputAction: TextInputAction.next,
@@ -883,7 +863,7 @@ class _SetupScreenState extends State<SetupScreen>
                                             Icons.badge_outlined,
                                             hint: L.settingsDisplayNameHint),
                                       ),
-                                      if (!_useInternalKey) ...[
+                                      ...[
                                         const SizedBox(height: 12),
                                         TextField(
                                           controller: _apikeyCtrl,
@@ -982,11 +962,11 @@ class _SetupScreenState extends State<SetupScreen>
                                   kind: M3ButtonKind.filled,
                                   expand: true,
                                   loading: _isLoading,
-                                  icon: _method == 2 ? Icons.login_rounded : Icons.arrow_forward_rounded,
+                                  icon: Icons.arrow_forward_rounded,
                                   label: _isLoading
                                       ? L.setupConnecting
-                                      : (_method == 2 ? tx('conn_lfm_web') : tx('conn_connect')),
-                                  onTap: _method == 2 ? _lastfmWeb : _launch,
+                                      : tx('conn_connect'),
+                                  onTap: _launch,
                                 ),
 
                                 // Error message
@@ -1059,7 +1039,7 @@ class _SetupScreenState extends State<SetupScreen>
                                       color: scheme.onSurfaceVariant),
                             ]),
                           ),
-                          if (_service == 'lfm' && _method == 0) ...[
+                          if (_service == 'lfm') ...[
                             const SizedBox(height: 6),
                             Center(
                               child: M3LabelButton(

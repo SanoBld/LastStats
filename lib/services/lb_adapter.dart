@@ -27,7 +27,7 @@ import 'net_status.dart';
 class LbAdapter {
   static const _host    = 'api.listenbrainz.org';
   static const _timeout = Duration(seconds: 20);
-  static const _maxListens = 100; // listens per request (safe for every server)
+  static const _maxListens = 100; // normal calls; history sync asks for 1000 (API maximum)
 
   // Last.fm period -> ListenBrainz range
   static const _ranges = {

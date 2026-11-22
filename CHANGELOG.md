@@ -141,6 +141,7 @@
 - Performance: ListenBrainz requests no longer read the offline copy unless the network fails
 
 ### Fixes
+- Spotify login: the login page now uses an up-to-date browser identity and allows cookies, storage and pop-ups, so the "Log in" button works again; app links (spotify://) are ignored
 - Android notification: "Mark all as read" works when the app is closed
 - Rankings: removed the duplicated year / month buttons, the date chip opens the picker again
 - Formal address (vous) everywhere in French, including the update dialog, notifications and icon note

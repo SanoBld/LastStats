@@ -63,8 +63,24 @@ class _SpotifyLoginPageState extends State<SpotifyLoginPage> {
             initialUserScripts: SpotifyWebSession.scripts(),
             initialSettings: InAppWebViewSettings(
               javaScriptEnabled: true,
+              domStorageEnabled: true,
+              databaseEnabled: true,
+              thirdPartyCookiesEnabled: true,
+              sharedCookiesEnabled: true,
+              javaScriptCanOpenWindowsAutomatically: true,
+              supportMultipleWindows: false,
+              useShouldOverrideUrlLoading: true,
+              mixedContentMode: MixedContentMode.MIXED_CONTENT_COMPATIBILITY_MODE,
               userAgent: SpotifyWebSession.ua,
             ),
+            // Never follow app links (spotify://, intent://): they break the login
+            shouldOverrideUrlLoading: (c, action) async {
+              final sc = action.request.url?.scheme ?? '';
+              if (sc == 'http' || sc == 'https' || sc == 'about' || sc == 'blob' || sc == 'data') {
+                return NavigationActionPolicy.ALLOW;
+              }
+              return NavigationActionPolicy.CANCEL;
+            },
             onWebViewCreated: (c) {
               c.addJavaScriptHandler(
                 handlerName: 'lsTok',
