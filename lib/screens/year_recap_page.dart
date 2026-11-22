@@ -43,6 +43,8 @@ class _YrData {
   Map<int, int> weekdayMap = {}; // 1 (Mon) .. 7 (Sun)
   List<_YrRanked> tracksAll = [];
   _YrRanked? busiestTrack, peakTrack, streakTrack, randomTrack, dayRecord;
+  // Most played track of a chart's context (best month, top artist, discoveries)
+  _YrRanked? monthTrack, artistTrack, discTrack;
   String dayRecordDate = '';
 }
 
@@ -113,6 +115,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
   int _playToken = 0;
 
   List<_PvReq?> _pvList = const [];
+  List<bool> _heroList = const []; // slides whose #1 cover is the full-bleed background
   _YrRanked? _twinTrack;
   final ValueNotifier<bool> _playing = ValueNotifier(false);
   final ValueNotifier<String> _nowTitle = ValueNotifier('');
@@ -690,6 +693,25 @@ class _YearRecapPageState extends State<YearRecapPage> {
       final b = c.entries.reduce((a, x) => x.value > a.value ? x : a);
       return _YrRanked(rp[b.key]!.track, rp[b.key]!.artist, b.value);
     }
+    _YrRanked? topOfRec(bool Function(ScrobbleRecord) test) {
+      final c = <String, int>{};
+      final rp = <String, ScrobbleRecord>{};
+      for (final r in records) {
+        if (r.artist.isEmpty || r.track.isEmpty || !test(r)) continue;
+        final k = '${r.artist} — ${r.track}';
+        c[k] = (c[k] ?? 0) + 1;
+        rp.putIfAbsent(k, () => r);
+      }
+      if (c.isEmpty) return null;
+      final b = c.entries.reduce((a, x) => x.value > a.value ? x : a);
+      return _YrRanked(rp[b.key]!.track, rp[b.key]!.artist, b.value);
+    }
+    final bestMonthIdx = d.monthly.indexOf(d.monthly.fold<int>(0, (m, v) => v > m ? v : m));
+    d.monthTrack = topOf((t) => t.month == bestMonthIdx + 1);
+    if (d.artists.isNotEmpty) {
+      final top = d.artists.first.name.toLowerCase();
+      d.artistTrack = topOfRec((r) => r.artist.toLowerCase().contains(top));
+    }
     d.busiestTrack = topOf((t) => dk(t) == d.busiestDay);
     d.peakTrack = topOf((t) => bucketOf(t.hour) == persona);
     d.streakTrack = topOf((t) => streakDays.contains(dk(t)));
@@ -732,6 +754,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
     }
     if (allPrior && year > reg) {
       d.newArtists = artistCount.keys.where((a) => !before.contains(a)).length;
+      d.discTrack = topOfRec((r) => !before.contains(r.artist));
     }
     return d;
   }
@@ -844,7 +867,14 @@ class _YearRecapPageState extends State<YearRecapPage> {
     _sharing = true;
     _sharingN.value = true;
     try {
-      await Future.delayed(const Duration(milliseconds: 80));
+      final top = _data?.artists.isNotEmpty == true ? _data!.artists.first : null;
+      if (top != null) {
+        try {
+          final url = await _yrResolveUrl('artists', top.name, '').timeout(const Duration(seconds: 6));
+          if (url.isNotEmpty) await ImageService.prefetchBytes(url).timeout(const Duration(seconds: 8));
+        } catch (_) {}
+      }
+      await Future.delayed(const Duration(milliseconds: 300));
       await WidgetsBinding.instance.endOfFrame;
       final rb = _shareKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
       if (rb == null) throw StateError('no boundary');
@@ -870,10 +900,19 @@ class _YearRecapPageState extends State<YearRecapPage> {
     _sharing = true;
     _sharingN.value = true;
     try {
+      // Download the cover first, so the poster never gets captured with an empty background
+      final req = _slide < _pvList.length ? _pvList[_slide] : null;
+      if (req != null) {
+        try {
+          final url = await _yrResolveUrl(req.type, req.name, req.artist).timeout(const Duration(seconds: 6));
+          if (url.isNotEmpty) await ImageService.prefetchBytes(url).timeout(const Duration(seconds: 8));
+        } catch (_) {}
+      }
       _yrInstant = true;
       _frameIdx.value = _slide;
       // Let the frame (and the pictures) build and load before the capture
-      await Future.delayed(const Duration(milliseconds: 1800));
+      await Future.delayed(const Duration(milliseconds: 1600));
+      await WidgetsBinding.instance.endOfFrame;
       await WidgetsBinding.instance.endOfFrame;
       final fb = _frameKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
       if (fb == null) throw StateError('no frame');
@@ -1033,23 +1072,30 @@ class _YearRecapPageState extends State<YearRecapPage> {
                     valueListenable: _photo,
                     builder: (_, photo, _) => ValueListenableBuilder<bool>(
                       valueListenable: _profileOn,
-                      builder: (_, on, _) => RepaintBoundary(
-                        key: _frameKey,
-                        child: _YrShareCard(
-                          scheme: scheme,
-                          year: _year,
-                          username: widget.username,
-                          data: d,
-                          hours: (d.total * _kYrAvgTrackMinutes / 60).round(),
-                          fmt: _fmt,
-                          photo: on ? photo : null,
-                          photoDark: _photoDark,
-                          slide: () {
-                            final all = _buildSlides(scheme, frame: true);
-                            return idx < all.length ? all[idx] : const SizedBox();
-                          }(),
-                        ),
-                      ),
+                      builder: (_, on, _) {
+                        // The slide's own cover replaces the profile picture
+                        final cover = idx < _pvList.length ? _pvList[idx] : null;
+                        final hero = cover != null && idx < _heroList.length && _heroList[idx];
+                        return RepaintBoundary(
+                          key: _frameKey,
+                          child: _YrShareCard(
+                            scheme: scheme,
+                            year: _year,
+                            username: widget.username,
+                            data: d,
+                            hours: (d.total * _kYrAvgTrackMinutes / 60).round(),
+                            fmt: _fmt,
+                            photo: cover == null && on ? photo : null,
+                            photoDark: _photoDark,
+                            cover: cover,
+                            heroCover: hero,
+                            slide: () {
+                              final all = _buildSlides(scheme, frame: true);
+                              return idx < all.length ? all[idx] : const SizedBox();
+                            }(),
+                          ),
+                        );
+                      },
                     ),
                   ),
           ),
@@ -1187,7 +1233,8 @@ class _YearRecapPageState extends State<YearRecapPage> {
     final out = <Widget>[];
     final pv = <_PvReq?>[];
     _PvReq? cur;
-    void add(Widget w) { out.add(w); pv.add(cur); cur = null; }
+    final heroes = <bool>[];
+    void add(Widget w, {bool hero = false}) { out.add(w); pv.add(cur); heroes.add(hero); cur = null; }
     final used = <String>{};
     String kk(_YrRanked r) => '${r.artist}|${r.name}'.toLowerCase();
     final reserved = <String>{
@@ -1243,14 +1290,14 @@ class _YearRecapPageState extends State<YearRecapPage> {
     ));
 
     // 2-4. Top artist / track / album: #1 big in the middle, then the rest
-    if (d.artists.isNotEmpty) { cur = _PvReq.of('artists', d.artists.first); add(_topSlide(s, d.artists, 'artists', tx('yr_top_artist'))); }
-    if (d.tracks.isNotEmpty) { cur = _PvReq.of('tracks', d.tracks.first); add(_topSlide(s, d.tracks, 'tracks', tx('yr_top_track'))); }
-    if (d.albums.isNotEmpty) { cur = _PvReq.of('albums', d.albums.first); add(_topSlide(s, d.albums, 'albums', tx('yr_top_album'))); }
+    if (d.artists.isNotEmpty) { cur = _PvReq.of('artists', d.artists.first); add(_topSlide(s, d.artists, 'artists', tx('yr_top_artist')), hero: true); }
+    if (d.tracks.isNotEmpty) { cur = _PvReq.of('tracks', d.tracks.first); add(_topSlide(s, d.tracks, 'tracks', tx('yr_top_track')), hero: true); }
+    if (d.albums.isNotEmpty) { cur = _PvReq.of('albums', d.albums.first); add(_topSlide(s, d.albums, 'albums', tx('yr_top_album')), hero: true); }
 
     // 5. Month by month
-    cur = uniqT(d.busiestTrack);
     final maxM = d.monthly.fold<int>(0, (m, v) => v > m ? v : m);
     final bestMonth = d.monthly.indexOf(maxM);
+    cur = d.monthTrack != null ? _PvReq.of('tracks', d.monthTrack!) : uniqT(d.busiestTrack);
     add(_YrSlide(
       scheme: s,
       children: [
@@ -1302,11 +1349,13 @@ class _YearRecapPageState extends State<YearRecapPage> {
           Text(tx('yr_best_day', {'d': _dayLabel(d.busiestDay!), 'n': _fmt(d.busiestDayCount)}),
               textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 14)),
         ],
+        if (d.monthTrack != null)
+          _ctxTrack(s, tx('yr_ctx_month', {'m': bestMonth < _monthsFull.length ? _monthsFull[bestMonth] : ''}), d.monthTrack!),
       ],
     ));
 
     // 6. When you listen
-    cur = uniqT(d.peakTrack);
+    cur = d.peakTrack != null ? _PvReq.of('tracks', d.peakTrack!) : uniqT(d.peakTrack);
     final buckets = <String, int>{
       'night': [for (var h = 0; h < 24; h++) if (h < 5 || h >= 22) d.hourly[h]].fold(0, (a, b) => a + b),
       'morning': [for (var h = 5; h < 12; h++) d.hourly[h]].fold(0, (a, b) => a + b),
@@ -1361,6 +1410,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
         const SizedBox(height: 22),
         Text(tx('yr_peak', {'h': '$peakHour', 'd': favDay < wd.length ? wd[favDay] : ''}),
             textAlign: TextAlign.center, style: TextStyle(color: s.onPrimaryContainer, fontSize: 16, fontWeight: FontWeight.w800)),
+        if (d.peakTrack != null) _ctxTrack(s, tx('yr_ctx_peak'), d.peakTrack!),
       ],
     ));
 
@@ -1385,16 +1435,18 @@ class _YearRecapPageState extends State<YearRecapPage> {
     // 7a. Streak song + biggest single-day song
     if (d.streakTrack != null && d.longestStreak > 1) {
       cur = _PvReq.of('tracks', d.streakTrack!);
-      add(_trackSlide(s, tx('yr_flame_h'), d.streakTrack!, 6, d.streakTrack!.count, tx('yr_flame_s', {'n': '${d.longestStreak}'})));
+      add(_trackSlide(s, tx('yr_flame_h'), d.streakTrack!, 6, d.streakTrack!.count, tx('yr_flame_s', {'n': '${d.longestStreak}'})), hero: true);
     }
     if (d.dayRecord != null && d.dayRecord!.count >= 2) {
       cur = _PvReq.of('tracks', d.dayRecord!);
-      add(_trackSlide(s, tx('yr_day_h'), d.dayRecord!, 7, d.dayRecord!.count, tx('yr_day_s', {'d': d.dayRecordDate})));
+      add(_trackSlide(s, tx('yr_day_h'), d.dayRecord!, 7, d.dayRecord!.count, tx('yr_day_s', {'d': d.dayRecordDate})), hero: true);
     }
 
     // 7b. Where the plays go (Charts tab donut)
     if (d.artistsWide.length > 1) {
-      cur = _PvReq.of('artists', d.artistsWide.firstWhere((a) => d.artists.isEmpty || a.name != d.artists.first.name, orElse: () => d.artistsWide.first));
+      cur = d.artistTrack != null
+          ? _PvReq.of('tracks', d.artistTrack!)
+          : _PvReq.of('artists', d.artistsWide.firstWhere((a) => d.artists.isEmpty || a.name != d.artists.first.name, orElse: () => d.artistsWide.first));
       add(_YrSlide(
         scheme: s,
         children: [
@@ -1406,12 +1458,14 @@ class _YearRecapPageState extends State<YearRecapPage> {
             getLabel: (e) => (e as _YrRanked).name,
             getPlays: (e) => (e as _YrRanked).count,
           ),
+          if (d.artistTrack != null && d.artists.isNotEmpty)
+            _ctxTrack(s, tx('yr_ctx_artist', {'a': d.artists.first.name}), d.artistTrack!),
         ],
       ));
     }
 
     // 8. Discoveries
-    cur = uniqT(d.randomTrack);
+    cur = d.discTrack != null ? _PvReq.of('tracks', d.discTrack!) : uniqT(d.randomTrack);
     add(_YrSlide(
       scheme: s,
       children: [
@@ -1430,6 +1484,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
                 color: d.newArtists != null ? _yrSoft(s) : s.onPrimaryContainer,
                 fontSize: d.newArtists != null ? 14 : 20,
                 fontWeight: d.newArtists != null ? FontWeight.w600 : FontWeight.w800)),
+        if (d.discTrack != null) _ctxTrack(s, tx('yr_ctx_disc'), d.discTrack!),
       ],
     ));
 
@@ -1517,32 +1572,13 @@ class _YearRecapPageState extends State<YearRecapPage> {
                 valueListenable: _profileOn,
                 builder: (_, on, _) => RepaintBoundary(
                   key: _shareKey,
-                  child: _YrShareCard(scheme: s, year: _year, username: widget.username, data: d, hours: hours, fmt: _fmt, rankLine: rankLine, photo: on ? photo : null, photoDark: _photoDark),
+                  child: _YrShareCard(scheme: s, year: _year, username: widget.username, data: d, hours: hours, fmt: _fmt, rankLine: rankLine, photo: null, photoDark: _photoDark, cover: d.artists.isNotEmpty ? _PvReq.of('artists', d.artists.first) : null),
                 ),
               ),
             ),
           ),
         ),
-        // Option: use the profile picture colours for the share image
-        ValueListenableBuilder<Uint8List?>(
-          valueListenable: _photo,
-          builder: (_, photo, _) => photo == null
-              ? const SizedBox(height: 14)
-              : ValueListenableBuilder<bool>(
-                  valueListenable: _profileOn,
-                  builder: (_, on, _) => SwitchListTile(
-                    dense: true,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-                    title: Text(tx('yr_share_profile'), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                    value: on,
-                    onChanged: (v) async {
-                      _profileOn.value = v;
-                      final p = await SharedPreferences.getInstance();
-                      await p.setBool('ls_year_share_profile', v);
-                    },
-                  ),
-                ),
-        ),
+        const SizedBox(height: 14),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           ValueListenableBuilder<bool>(
             valueListenable: _sharingN,
@@ -1559,7 +1595,7 @@ class _YearRecapPageState extends State<YearRecapPage> {
         ]),
       ],
     ));
-    if (!frame) _pvList = pv;
+    if (!frame) { _pvList = pv; _heroList = heroes; }
     return out;
   }
 
@@ -1571,88 +1607,119 @@ class _YearRecapPageState extends State<YearRecapPage> {
     return pool[(i - 1 + (type == 'artists' ? 0 : type == 'tracks' ? 2 : 4)) % pool.length];
   }
 
-  Widget _trackSlide(ColorScheme s, String label, _YrRanked r, int shape, int bigN, String sub) => _YrSlide(
-        scheme: s,
-        compact: true,
-        children: [
-          _label(s, label),
-          const SizedBox(height: 18),
-          _YrImg(name: r.name, artist: r.artist, type: 'tracks', size: 170, shapeIndex: shape, spin: _playing),
-          const SizedBox(height: 16),
-          Text(r.name, textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: s.onPrimaryContainer, fontSize: 22, fontWeight: FontWeight.w900)),
-          const SizedBox(height: 2),
-          Text(r.artist, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: _yrSoft(s), fontSize: 15)),
-          const SizedBox(height: 14),
-          Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
-            _YrCountUp(value: bigN, fmt: _fmt, delayMs: 300, durationMs: 1400,
-                style: TextStyle(color: s.primary, fontSize: 44, fontWeight: FontWeight.w900, height: 1)),
-            Text('×', style: TextStyle(color: s.primary, fontSize: 44, fontWeight: FontWeight.w900, height: 1)),
-          ]),
-          const SizedBox(height: 6),
-          _YrReveal(delayMs: 900, child: Text(sub, textAlign: TextAlign.center, style: TextStyle(color: _yrSoft(s), fontSize: 14))),
-        ],
-      );
-
   // #1 never uses the circle: clover / burst / cookie
   int _heroShape(String type) => type == 'artists' ? 2 : (type == 'tracks' ? 4 : 0);
 
+  // ── Hero slides: the cover fills the slide, the name is big in the middle ──
+  // Texts are always white: they sit on the dark veil over the cover.
+  static const _heroShadow = [Shadow(blurRadius: 18, color: Color(0x99000000))];
+
+  double _heroFont(String name) {
+    final n = name.length;
+    return n <= 12 ? 54 : n <= 22 ? 44 : n <= 36 ? 36 : 28;
+  }
+
+  Widget _heroLabel(String t) => Text(t.toUpperCase(),
+      textAlign: TextAlign.center,
+      style: TextStyle(color: Colors.white.withValues(alpha: 0.88), fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: 2.2, shadows: _heroShadow));
+
+  Widget _heroName(String t) => _YrReveal(
+        delayMs: 350,
+        child: Text(t,
+            textAlign: TextAlign.center,
+            maxLines: 4,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: Colors.white, fontSize: _heroFont(t), fontWeight: FontWeight.w900, height: 1.05, shadows: _heroShadow)),
+      );
+
+  Widget _heroArtist(String t) => t.isEmpty
+      ? const SizedBox.shrink()
+      : Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: _YrReveal(
+            delayMs: 650,
+            child: Text(t,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.92), fontSize: 20, fontWeight: FontWeight.w700, shadows: _heroShadow)),
+          ),
+        );
+
+  Widget _trackSlide(ColorScheme s, String label, _YrRanked r, int shape, int bigN, String sub) => _YrHeroSlide(
+        type: 'tracks',
+        name: r.name,
+        artist: r.artist,
+        center: [
+          _heroLabel(label),
+          const SizedBox(height: 16),
+          _heroName(r.name),
+          _heroArtist(r.artist),
+          const SizedBox(height: 18),
+          Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
+            _YrCountUp(value: bigN, fmt: _fmt, delayMs: 300, durationMs: 1400,
+                style: const TextStyle(color: Colors.white, fontSize: 56, fontWeight: FontWeight.w900, height: 1, shadows: _heroShadow)),
+            const Text('×', style: TextStyle(color: Colors.white, fontSize: 56, fontWeight: FontWeight.w900, height: 1, shadows: _heroShadow)),
+          ]),
+          const SizedBox(height: 8),
+          _YrReveal(delayMs: 900, child: Text(sub, textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 15, fontWeight: FontWeight.w600, shadows: _heroShadow))),
+        ],
+      );
+
   Widget _topSlide(ColorScheme s, List<_YrRanked> items, String type, String label) {
     final first = items.first;
-    return _YrSlide(
-      scheme: s,
-      compact: true,
-      children: [
-        if (_yrInstant)
-          Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-            Expanded(
-              child: Text('${label.toUpperCase()}${localeNotifier.value == 'fr' ? ' :' : ':'}',
-                  textAlign: TextAlign.left,
-                  style: TextStyle(color: s.primary, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 1.0, height: 1.25)),
-            ),
-            const SizedBox(width: 12),
-            _YrImg(name: first.name, artist: first.artist, type: type, size: 120, shapeIndex: _heroShape(type)),
-          ])
-        else ...[
-          _label(s, label),
-          const SizedBox(height: 18),
-          _YrReveal(
-            delayMs: 300,
-            pop: true,
-            child: _YrImg(name: first.name, artist: first.artist, type: type, size: 190, shapeIndex: _heroShape(type), spin: _playing),
-          ),
-        ],
-        SizedBox(height: _yrInstant ? 14 : 18),
-        _YrReveal(
-          delayMs: 900,
-          child: Text(first.name,
-              textAlign: TextAlign.center,
-              maxLines: _yrInstant ? 1 : 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: s.onPrimaryContainer, fontSize: _yrInstant ? 26 : 22, fontWeight: FontWeight.w900)),
-        ),
-        if (first.artist.isNotEmpty)
-          _YrReveal(
-            delayMs: 1000,
-            child: Text(first.artist,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: _yrSoft(s), fontSize: 14, fontWeight: FontWeight.w700)),
-          ),
-        const SizedBox(height: 4),
+    final rest = items.skip(1).take(4).toList();
+    return _YrHeroSlide(
+      type: type,
+      name: first.name,
+      artist: first.artist,
+      center: [
+        _heroLabel(label),
+        const SizedBox(height: 16),
+        _heroName(first.name),
+        _heroArtist(first.artist),
+        const SizedBox(height: 10),
         _YrCountUp(
             value: first.count,
             fmt: (n) => tx('yr_plays', {'n': _fmt(n)}),
-            delayMs: 1200,
+            delayMs: 900,
             durationMs: 1000,
-            style: TextStyle(color: s.primary, fontSize: 16, fontWeight: FontWeight.w800)),
-        SizedBox(height: _yrInstant ? 14 : 22),
-        _rankList(s, items.skip(1).toList(), type, startAt: 2, baseDelay: 1800),
+            style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, shadows: _heroShadow)),
       ],
+      bottom: rest.isEmpty ? null : _rankList(s, rest, type, startAt: 2, baseDelay: 1300, onImage: true),
     );
   }
+
+  // Title of the most played track in the context of a chart (best month,
+  // main listening period, top artist, discoveries).
+  Widget _ctxTrack(ColorScheme s, String label, _YrRanked r) => _YrReveal(
+        delayMs: 1500,
+        child: Container(
+          margin: const EdgeInsets.only(top: 20),
+          padding: const EdgeInsets.fromLTRB(10, 10, 18, 10),
+          decoration: BoxDecoration(
+            color: s.primaryContainer.withValues(alpha: 0.55),
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            _YrImg(name: r.name, artist: r.artist, type: 'tracks', size: 52),
+            const SizedBox(width: 12),
+            Flexible(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                Text(label, maxLines: 2, overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: _yrSoft(s), fontSize: 11.5, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 2),
+                Text(r.name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: s.onPrimaryContainer, fontSize: 15, fontWeight: FontWeight.w900)),
+                Text(r.artist.isEmpty ? tx('yr_plays', {'n': _fmt(r.count)}) : '${r.artist} · ${tx('yr_plays', {'n': _fmt(r.count)})}',
+                    maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: _yrSoft(s), fontSize: 12, fontWeight: FontWeight.w600)),
+              ]),
+            ),
+          ]),
+        ),
+      );
 
   Widget _label(ColorScheme s, String t) => Text(t.toUpperCase(),
       textAlign: TextAlign.center,
@@ -1700,7 +1767,11 @@ class _YearRecapPageState extends State<YearRecapPage> {
   }
 
   // Rows are revealed from the last to the first, so #1 lands last.
-  Widget _rankList(ColorScheme s, List<_YrRanked> items, String type, {int startAt = 1, int baseDelay = 300}) {
+  Widget _rankList(ColorScheme s, List<_YrRanked> items, String type, {int startAt = 1, int baseDelay = 300, bool onImage = false}) {
+    final cNum = onImage ? Colors.white.withValues(alpha: 0.78) : _yrSoft(s);
+    final cMain = onImage ? Colors.white : s.onPrimaryContainer;
+    final cSub = onImage ? Colors.white.withValues(alpha: 0.78) : _yrSoft(s);
+    final cPlays = onImage ? Colors.white : s.primary;
     return Column(
       children: [
         for (var i = 0; i < items.length; i++)
@@ -1713,19 +1784,19 @@ class _YearRecapPageState extends State<YearRecapPage> {
               SizedBox(
                 width: 28,
                 child: Text('${startAt + i}',
-                    style: TextStyle(color: i == 0 && startAt == 1 ? s.primary : _yrSoft(s), fontSize: 18, fontWeight: FontWeight.w900)),
+                    style: TextStyle(color: i == 0 && startAt == 1 && !onImage ? s.primary : cNum, fontSize: 18, fontWeight: FontWeight.w900)),
               ),
               _YrImg(name: items[i].name, artist: items[i].artist, type: type, size: 46, shapeIndex: _listShape(type, i)),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(items[i].name, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppText.itemTitle.copyWith(color: s.onPrimaryContainer)),
+                  Text(items[i].name, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppText.itemTitle.copyWith(color: cMain)),
                   if (items[i].artist.isNotEmpty)
-                    Text(items[i].artist, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppText.label.copyWith(color: _yrSoft(s))),
+                    Text(items[i].artist, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppText.label.copyWith(color: cSub)),
                 ]),
               ),
               const SizedBox(width: 8),
-              Text(tx('yr_plays', {'n': _fmt(items[i].count)}), style: AppText.badge.copyWith(color: s.primary)),
+              Text(tx('yr_plays', {'n': _fmt(items[i].count)}), style: AppText.badge.copyWith(color: cPlays)),
             ]),
           ),
           ),
@@ -2031,6 +2102,251 @@ class _YrImgState extends State<_YrImg> {
   }
 }
 
+// Artwork URL of an item, through the same chain as the rest of the app.
+Future<String> _yrResolveUrl(String type, String name, String artist) => switch (type) {
+      'artists' => ImageService.resolveArtist(name),
+      'albums' => ImageService.resolveAlbum(name, artist),
+      _ => ImageService.resolveTrack(name, artist),
+    };
+
+// Full-bleed cover behind a hero slide. When animated covers are enabled in
+// Settings > Appearance (and one exists for this item), the video plays on
+// top of the still cover; the still cover stays as the fallback.
+class _YrBackdrop extends StatefulWidget {
+  final String type, name, artist;
+  const _YrBackdrop({required this.type, required this.name, required this.artist});
+
+  @override
+  State<_YrBackdrop> createState() => _YrBackdropState();
+}
+
+class _YrBackdropState extends State<_YrBackdrop> {
+  late final Future<String> _future = _yrResolveUrl(widget.type, widget.name, widget.artist);
+  String? _video;
+  bool _videoFailed = false;
+
+  // Never while a slide is being captured for sharing (a video cannot be captured).
+  bool get _motionWanted =>
+      !_yrInstant &&
+      motionArtworkNotifier.value &&
+      !ecoModeActiveNotifier.value &&
+      MotionArtworkService.supported;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMotion();
+  }
+
+  Future<void> _loadMotion() async {
+    if (!_motionWanted) return;
+    try {
+      final String? url;
+      if (widget.type == 'artists') {
+        url = await MotionArtworkService.findArtist(widget.name);
+      } else if (widget.artist.isEmpty) {
+        url = null;
+      } else {
+        url = await MotionArtworkService.find(
+          artist: widget.artist,
+          album: widget.type == 'albums' ? widget.name : '',
+          track: widget.type == 'tracks' ? widget.name : '',
+        );
+      }
+      if (mounted && url != null) setState(() => _video = url);
+    } catch (_) {}
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Theme.of(context).colorScheme;
+    final fallback = ColoredBox(
+      color: s.primaryContainer,
+      child: Center(
+        child: Icon(
+          widget.type == 'artists' ? Icons.person_rounded : (widget.type == 'albums' ? Icons.album_rounded : Icons.music_note_rounded),
+          size: 96,
+          color: _yrSoft(s),
+        ),
+      ),
+    );
+    return Stack(fit: StackFit.expand, children: [
+      ColoredBox(color: s.primaryContainer),
+      LayoutBuilder(
+        builder: (_, c) => FutureBuilder<String>(
+          future: _future,
+          builder: (_, snap) {
+            final url = snap.data ?? '';
+            if (url.isEmpty) return fallback;
+            return TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: 1),
+              duration: const Duration(milliseconds: 500),
+              builder: (_, v, child) => Opacity(opacity: v, child: child),
+              child: ImageService.widgetImage(url: url, width: c.maxWidth, height: c.maxHeight, fit: BoxFit.cover, errorWidget: fallback),
+            );
+          },
+        ),
+      ),
+      if (_video != null && !_videoFailed && _motionWanted)
+        MotionArtworkVideo(
+          key: ValueKey(_video),
+          url: _video!,
+          onFailed: () {
+            if (mounted) setState(() => _videoFailed = true);
+          },
+        ),
+    ]);
+  }
+}
+
+// Slide whose #1 cover is the background, with the name big in the middle and
+// an optional list at the bottom. In the share frame only the content is built:
+// the share card paints the cover over the whole poster itself.
+class _YrHeroSlide extends StatelessWidget {
+  final String type, name, artist;
+  final List<Widget> center;
+  final Widget? bottom;
+  const _YrHeroSlide({required this.type, required this.name, required this.artist, required this.center, this.bottom});
+
+  @override
+  Widget build(BuildContext context) {
+    if (_yrInstant) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(8, 24, 8, 0),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          ...center,
+          if (bottom != null) ...[const SizedBox(height: 26), bottom!],
+        ]),
+      );
+    }
+    final s = Theme.of(context).colorScheme;
+    return Stack(fit: StackFit.expand, children: [
+      Positioned.fill(child: _YrBackdrop(type: type, name: name, artist: artist)),
+      const Positioned.fill(
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0x66000000), Color(0x8C000000), Color(0xD1000000)],
+              stops: [0, 0.5, 1],
+            ),
+          ),
+        ),
+      ),
+      // Soft blend with the page colour right under the header
+      Positioned(
+        top: 0,
+        left: 0,
+        right: 0,
+        height: 70,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [s.surface, s.surface.withValues(alpha: 0)],
+            ),
+          ),
+        ),
+      ),
+      Column(children: [
+        Expanded(
+          child: Center(
+            child: SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 8),
+              child: Column(mainAxisSize: MainAxisSize.min, children: center),
+            ),
+          ),
+        ),
+        // Room for the mini player at the bottom
+        Padding(
+          padding: const EdgeInsets.fromLTRB(22, 0, 22, 78),
+          child: bottom ?? const SizedBox(height: 0),
+        ),
+      ]),
+    ]);
+  }
+}
+
+// Cover painted by the share card: full-bleed (hero slides) or as a band
+// at the top that fades into the card colour (other slides).
+class _YrCardCover extends StatefulWidget {
+  final _PvReq req;
+  final bool full;
+  const _YrCardCover({required this.req, required this.full});
+
+  @override
+  State<_YrCardCover> createState() => _YrCardCoverState();
+}
+
+class _YrCardCoverState extends State<_YrCardCover> {
+  late final Future<String> _future = _yrResolveUrl(widget.req.type, widget.req.name, widget.req.artist);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<String>(
+      future: _future,
+      builder: (_, snap) {
+        final url = snap.data ?? '';
+        if (url.isEmpty) return const SizedBox.shrink();
+        final img = ImageService.widgetImage(
+          url: url,
+          width: 360,
+          height: widget.full ? 640 : 360,
+          fit: BoxFit.cover,
+          errorWidget: const SizedBox.shrink(),
+        );
+        if (widget.full) {
+          return Stack(fit: StackFit.expand, children: [
+            img,
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0x59000000), Color(0x99000000), Color(0xDB000000)],
+                  stops: [0, 0.5, 1],
+                ),
+              ),
+            ),
+          ]);
+        }
+        return Stack(fit: StackFit.expand, children: [
+          ShaderMask(
+            blendMode: BlendMode.dstIn,
+            shaderCallback: (r) => const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xE6000000), Color(0x00000000)],
+            ).createShader(r),
+            child: ClipRect(
+              child: OverflowBox(
+                minWidth: 360,
+                maxWidth: 360,
+                minHeight: 360,
+                maxHeight: 360,
+                alignment: Alignment.center,
+                child: img,
+              ),
+            ),
+          ),
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0x73000000), Color(0x00000000)],
+              ),
+            ),
+          ),
+        ]);
+      },
+    );
+  }
+}
+
 // Fixed-size portrait card, exported as a PNG by the share button.
 class _YrShareCard extends StatelessWidget {
   final ColorScheme scheme;
@@ -2043,7 +2359,9 @@ class _YrShareCard extends StatelessWidget {
   final bool photoDark; // dark picture -> white header text
   final Widget? slide; // single-slide share: this slide is shown instead of the lists
   final Uint8List? photo; // profile picture bytes shown as background (null = theme gradient)
-  const _YrShareCard({required this.scheme, required this.year, required this.username, required this.data, required this.hours, required this.fmt, this.rankLine, this.photo, this.photoDark = false, this.slide});
+  final _PvReq? cover; // single-slide share: the slide's own cover replaces the profile picture
+  final bool heroCover; // cover fills the whole poster (hero slides) instead of a top band
+  const _YrShareCard({required this.scheme, required this.year, required this.username, required this.data, required this.hours, required this.fmt, this.rankLine, this.photo, this.photoDark = false, this.slide, this.cover, this.heroCover = false});
 
   Widget _list(String title, List<_YrRanked> items, String type) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -2081,6 +2399,15 @@ class _YrShareCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(28),
       clipBehavior: Clip.antiAlias,
       child: Stack(children: [
+        // The slide's cover (instead of the profile picture) as background
+        if (cover != null)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: heroCover ? 640 : (slide != null ? 170 : 118),
+            child: _YrCardCover(req: cover!, full: heroCover),
+          ),
         // Profile picture as background, fading into the card colour
         if (photo != null)
           Positioned(
@@ -2124,15 +2451,17 @@ class _YrShareCard extends StatelessWidget {
               ),
             ),
           ),
-        if (photo == null) ...[
+        if (photo == null && !heroCover) ...[
           Positioned(top: -60, right: -60, child: ShareBlob(size: 200, color: scheme.primary.withValues(alpha: 0.10))),
           Positioned(bottom: 90, left: -80, child: ShareBlob(size: 170, lobes: 12, color: scheme.tertiary.withValues(alpha: 0.08))),
         ],
         // Extra background shapes (varied sizes / lobes) so the empty areas
         // of the poster, mostly on the single-slide shares, don't look bare.
-        Positioned(top: 250, right: -75, child: ShareBlob(size: 190, lobes: 6, amplitude: 0.14, color: scheme.secondary.withValues(alpha: 0.09))),
-        Positioned(bottom: -80, right: -55, child: ShareBlob(size: 240, lobes: 10, amplitude: 0.09, color: scheme.primary.withValues(alpha: 0.08))),
-        if (slide != null) ...[
+        if (!heroCover) ...[
+          Positioned(top: 250, right: -75, child: ShareBlob(size: 190, lobes: 6, amplitude: 0.14, color: scheme.secondary.withValues(alpha: 0.09))),
+          Positioned(bottom: -80, right: -55, child: ShareBlob(size: 240, lobes: 10, amplitude: 0.09, color: scheme.primary.withValues(alpha: 0.08))),
+        ],
+        if (slide != null && !heroCover) ...[
           Positioned(top: 205, left: -45, child: ShareBlob(size: 125, lobes: 8, amplitude: 0.10, color: scheme.primary.withValues(alpha: 0.07))),
           Positioned(top: 430, left: 150, child: ShareBlob(size: 90, lobes: 5, amplitude: 0.20, color: scheme.tertiary.withValues(alpha: 0.07))),
           Positioned(top: 120, left: 110, child: ShareBlob(size: 60, lobes: 7, amplitude: 0.16, color: scheme.secondary.withValues(alpha: 0.07))),
@@ -2159,7 +2488,7 @@ class _YrShareCard extends StatelessWidget {
           const SizedBox(height: 14),
           Align(
             alignment: Alignment.bottomRight,
-            child: ShareMark(color: _yrSoft(scheme).withValues(alpha: 0.7)),
+            child: ShareMark(color: heroCover ? Colors.white.withValues(alpha: 0.8) : _yrSoft(scheme).withValues(alpha: 0.7)),
           ),
         ])))
           // Full recap: uses the whole height. The picture ends in the middle
@@ -2198,8 +2527,9 @@ class _YrShareCard extends StatelessWidget {
   // Name + title. The title is forced on one line so the stat tiles always
   // start at the same height (needed to centre the picture edge on them).
   Widget _header(bool full) {
-    final c1 = photo == null ? _yrSoft(scheme) : (photoDark ? Colors.white : const Color(0xFF111111));
-    final c2 = photo == null ? scheme.onSurface : (photoDark ? Colors.white : const Color(0xFF111111));
+    final onCover = cover != null; // cover band/background is always veiled dark: white text
+    final c1 = onCover ? Colors.white : (photo == null ? _yrSoft(scheme) : (photoDark ? Colors.white : const Color(0xFF111111)));
+    final c2 = onCover ? Colors.white : (photo == null ? scheme.onSurface : (photoDark ? Colors.white : const Color(0xFF111111)));
     final name = displayNameNotifier.value.trim().isNotEmpty ? displayNameNotifier.value.trim() : username;
     final t = Text(tx('yr_intro_h', {'year': '$year'}), maxLines: 1, style: TextStyle(color: c2, fontSize: full ? 23 : 22, fontWeight: FontWeight.w900, height: 1.1));
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

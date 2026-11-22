@@ -1608,4 +1608,8 @@ const Map<String, String> kTxIt = {
   'faq_lb_a4': 'Acceda a listenbrainz.org (serve un account MusicBrainz) e apra listenbrainz.org/import-data/ per importare i suoi ascolti di Last.fm. Quando molte persone importano contemporaneamente, può richiedere del tempo. Quando cambia servizio, LastStats le propone anche di trasferire gli scrobble salvati sul dispositivo.',
   'faq_lb_q5': 'Come invio i miei ascolti a ListenBrainz?',
   'faq_lb_a5': 'LastStats si limita a mostrare i suoi ascolti. Per registrarli, usi un lettore o un’app di scrobbling compatibile con ListenBrainz, con l’accesso tramite il suo token; l’elenco delle app supportate è su listenbrainz.org. Ricordi che i suoi ascolti sono pubblici.',
+  'yr_ctx_month': 'Brano più ascoltato ({m})',
+  'yr_ctx_peak': 'Brano più ascoltato a queste ore',
+  'yr_ctx_artist': 'Brano più ascoltato di {a}',
+  'yr_ctx_disc': 'Brano più ascoltato tra le sue scoperte',
 };

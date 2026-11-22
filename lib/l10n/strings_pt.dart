@@ -1637,4 +1637,8 @@ const Map<String, String> kTxPt = {
   'faq_lb_a4': 'Inicie sessão em listenbrainz.org (é necessária uma conta do MusicBrainz) e abra listenbrainz.org/import-data/ para importar as suas audições do Last.fm. Quando muitas pessoas importam ao mesmo tempo, pode demorar. Ao mudar de serviço, o LastStats também propõe transferir os scrobbles guardados no seu dispositivo.',
   'faq_lb_q5': 'Como envio as minhas audições para o ListenBrainz?',
   'faq_lb_a5': 'O LastStats limita-se a mostrar as suas audições. Para as registar, utilize um leitor ou uma aplicação de scrobbling compatível com o ListenBrainz, com sessão iniciada através do seu token; a lista de aplicações compatíveis está em listenbrainz.org. Lembre-se de que as suas audições são públicas.',
+  'yr_ctx_month': 'Faixa mais ouvida ({m})',
+  'yr_ctx_peak': 'Faixa mais ouvida a estas horas',
+  'yr_ctx_artist': 'Faixa mais ouvida de {a}',
+  'yr_ctx_disc': 'Faixa mais ouvida entre as suas descobertas',
 };

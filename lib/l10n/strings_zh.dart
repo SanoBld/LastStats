@@ -1634,4 +1634,8 @@ const Map<String, String> kTxZh = {
   'faq_lb_a4': '登录 listenbrainz.org（需要 MusicBrainz 账户），打开 listenbrainz.org/import-data/ 即可导入您的 Last.fm 收听记录。许多人同时导入时可能需要一些时间。切换服务时，LastStats 也会提供转移保存在您设备上的 Scrobble 的选项。',
   'faq_lb_q5': '如何把我的收听记录发送到 ListenBrainz？',
   'faq_lb_a5': 'LastStats 只显示您的收听记录。若要记录，请使用兼容 ListenBrainz 的播放器或 Scrobble 应用，并使用您的令牌登录；支持的应用列表见 listenbrainz.org。请注意，您的收听记录是公开的。',
+  'yr_ctx_month': '播放次数最多的曲目（{m}）',
+  'yr_ctx_peak': '这些时段播放次数最多的曲目',
+  'yr_ctx_artist': '{a} 播放次数最多的曲目',
+  'yr_ctx_disc': '在您的新发现中播放次数最多的曲目',
 };

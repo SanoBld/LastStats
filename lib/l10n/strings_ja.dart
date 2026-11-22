@@ -1607,4 +1607,8 @@ const Map<String, String> kTxJa = {
   'faq_lb_a4': 'listenbrainz.org にログインし（MusicBrainz アカウントが必要です）、listenbrainz.org/import-data/ を開いて Last.fm の再生履歴をインポートします。多くの人が同時にインポートすると、時間がかかることがあります。サービスを切り替える際、LastStats は端末に保存されたスクロブルの転送も提案します。',
   'faq_lb_q5': '再生記録を ListenBrainz に送るにはどうすればよいですか？',
   'faq_lb_a5': 'LastStats は再生履歴を表示するだけです。記録するには、ListenBrainz に対応したプレーヤーまたはスクロブル用アプリを使い、トークンでログインしてください。対応アプリの一覧は listenbrainz.org にあります。再生履歴は公開される点にご注意ください。',
+  'yr_ctx_month': '最も再生された曲（{m}）',
+  'yr_ctx_peak': 'この時間帯に最も再生された曲',
+  'yr_ctx_artist': '{a} の最も再生された曲',
+  'yr_ctx_disc': '新しく出会ったアーティストの中で最も再生された曲',
 };

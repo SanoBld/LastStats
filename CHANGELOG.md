@@ -52,6 +52,9 @@
 - Fixed outdated texts that still mentioned the built-in key / Last.fm website login (10 languages)
 - Performance: ListenBrainz requests no longer read and decode the offline copy unless the network fails
 - New: a Last.fm FAQ and a ListenBrainz FAQ (5 questions each: API key, Last.fm Pro from December 1, 2026, user token, statistics, history import) in the app and on the help page of the site, in 10 languages
+- Year recap: the #1 artist / track / album (and the streak and record-day tracks) now use their cover as a full-screen background with the name big in the middle; animated covers play there when enabled in Settings > Appearance
+- Year recap: the charts (best month, listening hours, top artist share, discoveries) now name the most played track of their context
+- Year recap sharing: the slide's own cover replaces the profile picture at the top of the shared image (full-bleed for the #1 slides); the cover is downloaded before the capture so the poster is never empty
 - Site: new "ListenBrainz" help theme (tutorial, how it works, account and token, scrobbling, switching service, troubleshooting) mirroring the Last.fm one, in 10 languages
 - Site and app: the general FAQ no longer talks about Last.fm only (scrobbles, data storage, favorites, backup, switching account or service); removed the outdated "3 accounts" and "built-in key" mentions
 - Settings > Account: no more "My accounts (1/3)" counter when there is a single account

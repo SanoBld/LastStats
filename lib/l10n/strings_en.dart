@@ -1637,4 +1637,8 @@ const Map<String, String> kTxEn = {
   'faq_lb_a4': 'Sign in on listenbrainz.org (a MusicBrainz account is required) and open listenbrainz.org/import-data/ to import your Last.fm listens. When many people import at the same time, it can take a while. When you switch service, LastStats also offers to transfer the scrobbles saved on your device.',
   'faq_lb_q5': 'How do I send my listens to ListenBrainz?',
   'faq_lb_a5': 'LastStats only displays your listens. To record them, use a player or scrobbler app compatible with ListenBrainz, signed in with your token; the list of supported apps is on listenbrainz.org. Remember that your listens are public.',
+  'yr_ctx_month': 'Most played track ({m})',
+  'yr_ctx_peak': 'Most played track at these hours',
+  'yr_ctx_artist': 'Most played track by {a}',
+  'yr_ctx_disc': 'Most played track among your discoveries',
 };

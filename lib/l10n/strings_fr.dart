@@ -1637,4 +1637,8 @@ const Map<String, String> kTxFr = {
   'faq_lb_a4': 'Connectez-vous sur listenbrainz.org (un compte MusicBrainz est nécessaire) et ouvrez listenbrainz.org/import-data/ pour importer vos écoutes Last.fm. Quand beaucoup de personnes importent en même temps, cela peut prendre du temps. Au changement de service, LastStats propose aussi de transférer les scrobbles enregistrés sur votre appareil.',
   'faq_lb_q5': 'Comment envoyer mes écoutes sur ListenBrainz ?',
   'faq_lb_a5': 'LastStats se contente d’afficher vos écoutes. Pour les enregistrer, utilisez un lecteur ou une application de scrobbling compatible avec ListenBrainz, connectée avec votre jeton ; la liste des applications prises en charge se trouve sur listenbrainz.org. Rappel : vos écoutes sont publiques.',
+  'yr_ctx_month': 'Titre le plus écouté ({m})',
+  'yr_ctx_peak': 'Titre le plus écouté à ces heures',
+  'yr_ctx_artist': 'Titre le plus écouté de {a}',
+  'yr_ctx_disc': 'Titre le plus écouté parmi vos découvertes',
 };

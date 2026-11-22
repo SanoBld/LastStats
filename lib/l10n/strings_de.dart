@@ -1608,4 +1608,8 @@ const Map<String, String> kTxDe = {
   'faq_lb_a4': 'Melden Sie sich auf listenbrainz.org an (ein MusicBrainz-Konto ist erforderlich) und öffnen Sie listenbrainz.org/import-data/, um Ihre Last.fm-Wiedergaben zu importieren. Wenn viele Personen gleichzeitig importieren, kann es dauern. Beim Wechsel des Dienstes bietet LastStats außerdem an, die auf Ihrem Gerät gespeicherten Scrobbles zu übertragen.',
   'faq_lb_q5': 'Wie sende ich meine Wiedergaben an ListenBrainz?',
   'faq_lb_a5': 'LastStats zeigt Ihre Wiedergaben nur an. Um sie aufzuzeichnen, verwenden Sie einen Player oder eine Scrobbler-App, die mit ListenBrainz kompatibel ist und mit Ihrem Token angemeldet ist; die Liste der unterstützten Apps finden Sie auf listenbrainz.org. Bedenken Sie, dass Ihre Wiedergaben öffentlich sind.',
+  'yr_ctx_month': 'Meistgespielter Titel ({m})',
+  'yr_ctx_peak': 'Meistgespielter Titel zu diesen Uhrzeiten',
+  'yr_ctx_artist': 'Meistgespielter Titel von {a}',
+  'yr_ctx_disc': 'Meistgespielter Titel unter Ihren Entdeckungen',
 };
