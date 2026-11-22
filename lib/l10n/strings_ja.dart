@@ -530,7 +530,6 @@ class AppStringsJa implements AppStrings {
   @override String get apKeepLastArtworkSub => '何も再生していないときにリセットせず最後のアートワークカラーを保持します';
   @override String get apDetailPagesSection => '詳細ページ';
   @override String get apArtworkColorTheme => 'アートワークカラーテーマ';
-  @override String get apBeta => 'ベータ';
   @override String get apArtworkColorThemeSub => '詳細ページの色がアートワークの主要色に合わせて変化します';
   @override String get apNavBarSection => 'ナビゲーションバー';
   @override String get apShowTabLabels => 'タブラベルを表示';
@@ -1241,7 +1240,7 @@ const Map<String, String> kTxJa = {
   'lb_docs': 'APIヘルプ',
   'lb_connect': '接続',
   'lb_invalid': 'トークンが無効です。ListenBrainzの設定でご確認ください。',
-  'lb_neterr': 'ListenBrainzに接続できません。接続をご確認ください。',
+  'lb_neterr': 'ListenBrainzに接続できません。インターネット接続をご確認ください。',
   'lb_ok': 'ListenBrainz に接続しました（{name}）。',
   'lb_empty': '続行するにはトークンを貼り付けてください。',
   'sw_title': 'ローカルデータが見つかりました',
@@ -1470,7 +1469,7 @@ const Map<String, String> kTxJa = {
   'conn_test': 'Spotify をテスト',
   'conn_testing': 'テスト中…',
   'conn_q_note': 'Spotify Canvas の画質は1種類です。画質設定は Apple Music と YouTube にのみ適用されます。',
-  'conn_lfm_desc': '方法は2つです：Last.fm のサイトでログインする（アプリ内蔵のキーを使用）か、ご自身の API キーを使用します。',
+  'conn_lfm_desc': 'Last.fm の履歴はご自身の API キーで読み込まれます（12月1日以降は Last.fm Pro が必要です）。',
   'conn_lfm_web': 'Last.fm でログイン',
   'lfm_login_t': 'Last.fm にログイン',
   'lfm_login_hint': 'Last.fm のサイトでログインしてください。アプリがユーザー名を検出し、この画面を閉じます。',
@@ -1485,7 +1484,7 @@ const Map<String, String> kTxJa = {
   'sm_builtin_t': '内蔵キー',
   'sm_builtin_s': '必要なのはユーザー名だけです。利用上限は他のユーザーと共有されます。',
   'wl_title': 'ようこそ',
-  'wl_sub': 'Last.fm への接続方法をお選びください。',
+  'wl_sub': 'Last.fm のユーザー名とご自身の API キーを入力してください。',
   'sr_from_recent': '最近の検索から',
   'sr_recent': '最近の検索',
   'sr_suggestions': '候補',
@@ -1579,6 +1578,10 @@ const Map<String, String> kTxJa = {
   'api_img_clear': '画像キャッシュを消去（新しい順序を適用）',
   'api_img_cleared': '画像キャッシュを消去しました',
   'api_help': '「本日のリクエスト」：0時以降にサービスへ送信した呼び出し回数。「エラー」：失敗した呼び出し（サービス停止、アクセス拒否、ネットワークなし）。「制限」：サービスから「リクエスト過多」と返された回数で、そのサービスはしばらく一時停止されます。',
-  'err_bad_response': 'サーバーから無効な応答が返されました（サービス停止またはメンテナンス中）。しばらくしてからもう一度お試しください。',
-  'dash_offline_cache': '接続できません。保存済みのデータを表示しています。',
+  'err_bad_response': 'サーバーから無効な応答が返されました。サービスが利用できないか、メンテナンス中の可能性があります。しばらくしてから、もう一度お試しください。',
+  'dash_offline_cache': 'サーバーに接続できません。このデバイスに保存されているデータを表示しています。',
+  'news_btn': 'お知らせ',
+  'news_btn_sub': '障害、メンテナンス、各種のお知らせ',
+  'news_load_failed': 'お知らせを読み込めませんでした。インターネット接続を確認してから、もう一度お試しください。',
+  'news_retry': 'もう一度試す',
 };

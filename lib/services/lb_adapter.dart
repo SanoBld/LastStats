@@ -149,9 +149,17 @@ class LbAdapter {
   static Future<http.Response> _fetch(Uri uri) async {
     Object? last;
     final headers = await _authHeaders(uri);
-    final stale = await _loadStale(uri);
+    // The saved copy is only read when the network fails (it can be up to
+    // 300 KB of JSON: decoding it on every successful call was wasted work).
+    http.Response? stale;
+    var staleLoaded = false;
+    Future<http.Response?> getStale() async {
+      if (!staleLoaded) { stale = await _loadStale(uri); staleLoaded = true; }
+      return stale;
+    }
     if (DateTime.now().millisecondsSinceEpoch < _downUntil) {
-      if (stale != null) return stale;
+      final st = await getStale();
+      if (st != null) return st;
       throw Exception('${tx('lb_neterr')}\nCode: pause');
     }
     for (var i = 0; i < 4; i++) {
@@ -179,7 +187,7 @@ class LbAdapter {
       } catch (e) {
         last = e;
         // Saved copy exists: stop retrying early, no long wait for the user.
-        if (stale != null && _isNet(e) && i >= 1) break;
+        if (_isNet(e) && i >= 1 && await getStale() != null) break;
         await Future.delayed(Duration(milliseconds: 700 * (i + 1)));
       }
     }
@@ -188,7 +196,8 @@ class LbAdapter {
       var w = last.toString().replaceAll('\n', ' ');
       if (w.length > 200) w = w.substring(0, 200);
       NetStatus.error.value = '${tx('lb_neterr')}\nCode: $w';
-      if (stale != null) return stale; // show saved data, keep the error icon
+      final st = await getStale();
+      if (st != null) return st; // show saved data, keep the error icon
       // Keep the technical reason visible (blocked TLS, timeout, DNS...)
       var why = last.toString().replaceAll('\n', ' ');
       if (why.length > 110) why = why.substring(0, 110);

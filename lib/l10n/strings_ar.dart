@@ -530,7 +530,6 @@ class AppStringsAr implements AppStrings {
   @override String get apKeepLastArtworkSub => 'الاحتفاظ بآخر لون غلاف بدلًا من إعادة الضبط عند عدم تشغيل أي شيء';
   @override String get apDetailPagesSection => 'صفحات التفاصيل';
   @override String get apArtworkColorTheme => 'سمة لون الغلاف';
-  @override String get apBeta => 'تجريبي';
   @override String get apArtworkColorThemeSub => 'تُكيّف صفحات التفاصيل ألوانها مع اللون السائد في الغلاف';
   @override String get apNavBarSection => 'شريط التنقل';
   @override String get apShowTabLabels => 'إظهار تسميات التبويبات';
@@ -1242,7 +1241,7 @@ const Map<String, String> kTxAr = {
   'lb_docs': 'مساعدة API',
   'lb_connect': 'اتصال',
   'lb_invalid': 'الرمز غير صالح. تحقق منه في إعدادات ListenBrainz.',
-  'lb_neterr': 'تعذر الوصول إلى ListenBrainz. تحقق من اتصالك.',
+  'lb_neterr': 'تعذر الوصول إلى ListenBrainz. يرجى التحقق من اتصالك بالإنترنت.',
   'lb_ok': 'تم الاتصال بـ ListenBrainz ({name}).',
   'lb_empty': 'الصق رمزك للمتابعة.',
   'sw_title': 'تم العثور على بيانات محلية',
@@ -1471,7 +1470,7 @@ const Map<String, String> kTxAr = {
   'conn_test': 'اختبار Spotify',
   'conn_testing': 'جارٍ الاختبار…',
   'conn_q_note': 'لـ Spotify Canvas جودة واحدة. إعدادات الجودة تخص Apple Music وYouTube فقط.',
-  'conn_lfm_desc': 'طريقتان: تسجيل الدخول عبر موقع Last.fm (يُستخدم المفتاح المدمج في التطبيق) أو استخدام مفتاح API الخاص بكم.',
+  'conn_lfm_desc': 'يُقرأ سجلّ Last.fm الخاص بكم بمفتاح API الخاص بكم (يتطلب Last.fm Pro اعتبارًا من 1 ديسمبر).',
   'conn_lfm_web': 'تسجيل الدخول عبر Last.fm',
   'lfm_login_t': 'تسجيل الدخول إلى Last.fm',
   'lfm_login_hint': 'سجّلوا الدخول في موقع Last.fm. سيتعرّف التطبيق على اسم المستخدم ثم تُغلق النافذة.',
@@ -1486,7 +1485,7 @@ const Map<String, String> kTxAr = {
   'sm_builtin_t': 'المفتاح المدمج',
   'sm_builtin_s': 'يلزم اسم المستخدم فقط. حد الاستخدام مشترك مع المستخدمين الآخرين.',
   'wl_title': 'مرحبًا',
-  'wl_sub': 'اختاروا طريقة الاتصال بـ Last.fm.',
+  'wl_sub': 'أدخلوا اسم مستخدم Last.fm ومفتاح API الخاص بكم.',
   'sr_from_recent': 'من عمليات بحثك الأخيرة',
   'sr_recent': 'عمليات البحث الأخيرة',
   'sr_suggestions': 'اقتراحات',
@@ -1580,6 +1579,10 @@ const Map<String, String> kTxAr = {
   'api_img_clear': 'مسح ذاكرة الصور المؤقتة (لتطبيق الترتيب الجديد)',
   'api_img_cleared': 'تم مسح ذاكرة الصور المؤقتة',
   'api_help': '«طلبات اليوم»: عدد الاستدعاءات المرسلة إلى الخدمات منذ منتصف الليل. «الأخطاء»: استدعاءات فاشلة (الخدمة متوقفة أو الوصول مرفوض أو لا توجد شبكة). «المحدودة»: ردود «طلبات كثيرة جدًا» من خدمة ما، فتُوقَف مؤقتًا لفترة قصيرة.',
-  'err_bad_response': 'أعاد الخادم ردًا غير صالح (الخدمة غير متاحة أو قيد الصيانة). حاول مرة أخرى بعد قليل.',
-  'dash_offline_cache': 'تعذّر الاتصال: يتم عرض البيانات المحفوظة.',
+  'err_bad_response': 'أعاد الخادم ردًا غير صالح. قد تكون الخدمة غير متاحة أو قيد الصيانة. يرجى المحاولة مرة أخرى بعد قليل.',
+  'dash_offline_cache': 'تعذر الاتصال بالخادم. يتم عرض البيانات المحفوظة على هذا الجهاز.',
+  'news_btn': 'الأخبار',
+  'news_btn_sub': 'الأعطال وأعمال الصيانة والإعلانات',
+  'news_load_failed': 'تعذر تحميل الأخبار. يرجى التحقق من اتصالك بالإنترنت ثم المحاولة مرة أخرى.',
+  'news_retry': 'إعادة المحاولة',
 };

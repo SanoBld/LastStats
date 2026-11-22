@@ -674,20 +674,7 @@ class _AppearancePageState extends State<AppearancePage> {
           children: [
             SwitchListTile(
               secondary: Icon(Icons.style_rounded, color: scheme.primary),
-              title: Row(children: [
-                Flexible(child: Text(L.apArtworkColorTheme)),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                      color: scheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: scheme.outlineVariant)),
-                  child: Text(L.apBeta,
-                      style: text.labelSmall?.copyWith(
-                          color: scheme.onSurfaceVariant)),
-                ),
-              ]),
+              title: Text(L.apArtworkColorTheme),
               subtitle: Text(L.apArtworkColorThemeSub),
               value: _artworkColorTheme,
               onChanged: (v) async {

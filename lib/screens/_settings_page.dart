@@ -700,7 +700,7 @@ class _SettingsPageState extends State<_SettingsPage> {
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(tx('conn_btn_t'),
                         style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
-                    Text(tx('conn_btn_s'),
+                    Text(DataSource.lb ? tx('conn_btn_s').replaceAll('Last.fm', 'ListenBrainz') : tx('conn_btn_s'),
                         style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                   ])),
                   Icon(Icons.chevron_right_rounded, color: scheme.onSecondaryContainer),

@@ -47,6 +47,10 @@
 - ListenBrainz requests are retried on temporary network errors ("Connection terminated during handshake")
 - Public (built-in) API keys are turned off, because Last.fm requires a paid subscription for API keys from December 1. Your own key is always the one used (the code is kept and can be switched back on); the built-in key and Last.fm website login choices are removed
 - Official ListenBrainz and MusicBrainz icons in About, in the API image sources and in the detail page links; texts, dialogs and links follow the service in all 10 languages
+- New: "News" button on the login screen (outages, maintenance, announcements), available before logging in, with a retry button when offline
+- The preferred-platform choices (first setup and Settings > Startup) and the connection card now show ListenBrainz instead of Last.fm in ListenBrainz mode; the friends glyph follows the service too
+- Fixed outdated texts that still mentioned the built-in key / Last.fm website login (10 languages)
+- Performance: ListenBrainz requests no longer read and decode the offline copy unless the network fails
 
 ### News & announcements
 - Texts now support **bold**, __underline__, ==highlight==, ~~strikethrough~~, *italic*, `code`, titles, bullet and numbered lists, quotes, links, tables and line breaks (type \n in the workflow field), in the app and on the website. The workflow field describes the whole syntax, so you can hand it to an AI

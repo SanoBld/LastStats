@@ -262,7 +262,7 @@ class _CardBack extends StatelessWidget {
 }
 
 
-// ── Artwork color theme (beta) ──────────────────────────────────────────────
+// ── Artwork color theme ──────────────────────────────────────────────
 // Builds the fully artwork-themed variant of [base]. We only need the two
 // endpoints (base vs. themed) — AnimatedTheme cross-fades between them on
 // its own, so no manual interpolation is needed here.

@@ -3967,6 +3967,85 @@ class _AmbientHeaderState extends State<_AmbientHeader>
 //  In-app news sheet
 // ══════════════════════════════════════════════════════════════════════════════
 
+/// Public entry point used by the login screen: fetches the remote news
+/// feed (outage / maintenance notices, announcements) and shows it, without
+/// needing a logged-in account.
+class NewsLauncher {
+  /// Remote news.json only (no update check, works logged out).
+  static Future<List<Map<String, dynamic>>?> fetchRemote() async {
+    try {
+      final res = await ApiHttp.get(
+        Uri.parse('https://sanobld.github.io/LastStats/news.json'),
+      ).timeout(const Duration(seconds: 8));
+      if (res.statusCode != 200) return null;
+      final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+      return (data['items'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<void> open(BuildContext context) =>
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (_) => const _NewsLoaderPage(),
+      ));
+}
+
+class _NewsLoaderPage extends StatefulWidget {
+  const _NewsLoaderPage();
+  @override
+  State<_NewsLoaderPage> createState() => _NewsLoaderPageState();
+}
+
+class _NewsLoaderPageState extends State<_NewsLoaderPage> {
+  List<Map<String, dynamic>>? _items;
+  bool _failed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() { _items = null; _failed = false; });
+    final r = await NewsLauncher.fetchRemote();
+    if (!mounted) return;
+    setState(() { _items = r; _failed = r == null; });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final items = _items;
+    if (items != null) return _NewsPage(items: items);
+    final scheme = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    return Scaffold(
+      appBar: M3AppBar(title: L.newsWhatsNew),
+      body: Center(
+        child: _failed
+            ? Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(Icons.cloud_off_rounded, size: 48, color: scheme.onSurfaceVariant),
+                  const SizedBox(height: 12),
+                  Text(tx('news_load_failed'),
+                      textAlign: TextAlign.center,
+                      style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
+                  const SizedBox(height: 16),
+                  FilledButton.tonalIcon(
+                    onPressed: _load,
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: Text(tx('news_retry')),
+                  ),
+                ]),
+              )
+            : const M3Spinner(),
+      ),
+    );
+  }
+}
+
 class _NewsPage extends StatefulWidget {
   final List<Map<String, dynamic>> items;
   const _NewsPage({required this.items});

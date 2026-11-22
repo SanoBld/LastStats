@@ -591,7 +591,6 @@ class AppStringsEn implements AppStrings {
   @override String get apKeepLastArtworkSub      => 'Keep last artwork color instead of resetting when nothing plays';
   @override String get apDetailPagesSection      => 'Detail pages';
   @override String get apArtworkColorTheme       => 'Artwork color theme';
-  @override String get apBeta                    => 'BETA';
   @override String get apArtworkColorThemeSub    => "Detail pages adapt their colors to the artwork's dominant color";
   @override String get apNavBarSection           => 'Navigation bar';
   @override String get apShowTabLabels           => 'Show tab labels';
@@ -1266,7 +1265,7 @@ const Map<String, String> kTxEn = {
   'lb_docs': 'API help',
   'lb_connect': 'Connect',
   'lb_invalid': 'Invalid token. Check it in your ListenBrainz settings.',
-  'lb_neterr': 'Could not reach ListenBrainz. Check your connection.',
+  'lb_neterr': 'ListenBrainz could not be reached. Please check your internet connection.',
   'lb_ok': 'ListenBrainz connected ({name}).',
   'lb_empty': 'Paste your token to continue.',
   'sw_title': 'Local data found',
@@ -1495,7 +1494,7 @@ const Map<String, String> kTxEn = {
   'conn_test': 'Test Spotify',
   'conn_testing': 'Testing…',
   'conn_q_note': 'Spotify Canvas has a single quality. Quality settings only apply to Apple Music and YouTube.',
-  'conn_lfm_desc': 'Two methods: sign in on the Last.fm website (the key built into the app is used) or use your own API key.',
+  'conn_lfm_desc': 'Your Last.fm history is read with your own API key (it requires Last.fm Pro from December 1).',
   'conn_lfm_web': 'Sign in with Last.fm',
   'lfm_login_t': 'Last.fm login',
   'lfm_login_hint': 'Sign in on the Last.fm website. The app will detect your username, then close this window.',
@@ -1510,7 +1509,7 @@ const Map<String, String> kTxEn = {
   'sm_builtin_t': 'Built-in key',
   'sm_builtin_s': 'Only your username is needed. The usage limit is shared with the other users.',
   'wl_title': 'Welcome',
-  'wl_sub': 'Choose how you want to connect to Last.fm.',
+  'wl_sub': 'Enter your Last.fm username and your own API key.',
   'sr_from_recent': 'From your recent searches',
   'sr_recent': 'Recent searches',
   'sr_suggestions': 'Suggestions',
@@ -1609,6 +1608,10 @@ const Map<String, String> kTxEn = {
   'api_img_clear': 'Clear image cache (apply the new order)',
   'api_img_cleared': 'Image cache cleared',
   'api_help': '“Requests today”: number of calls sent to the services since midnight. “Errors”: failed calls (service down, access denied or no network). “Rate-limited”: “too many requests” answers from a service, which is then paused for a short while.',
-  'err_bad_response': 'The server returned an invalid response (service unavailable or under maintenance). Please try again in a moment.',
-  'dash_offline_cache': 'Can\'t connect: showing saved data.',
+  'err_bad_response': 'The server returned an invalid response. The service may be unavailable or under maintenance. Please try again in a few moments.',
+  'dash_offline_cache': 'Unable to connect to the server. The data saved on this device is being displayed.',
+  'news_btn': 'News',
+  'news_btn_sub': 'Outages, maintenance and announcements',
+  'news_load_failed': 'The news could not be loaded. Please check your internet connection and try again.',
+  'news_retry': 'Try again',
 };

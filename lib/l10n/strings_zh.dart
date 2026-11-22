@@ -588,7 +588,6 @@ class AppStringsZh implements AppStrings {
   @override String get apKeepLastArtworkSub      => '无播放时保留上次封面颜色，而不是重置';
   @override String get apDetailPagesSection      => '详情页';
   @override String get apArtworkColorTheme       => '封面配色主题';
-  @override String get apBeta                    => '测试版';
   @override String get apArtworkColorThemeSub    => '详情页会根据封面的主色调调整配色';
   @override String get apNavBarSection           => '导航栏';
   @override String get apShowTabLabels           => '显示标签文字';
@@ -1497,7 +1496,7 @@ const Map<String, String> kTxZh = {
   'conn_test': '测试 Spotify',
   'conn_testing': '测试中…',
   'conn_q_note': 'Spotify Canvas 只有一种画质。画质设置仅适用于 Apple Music 和 YouTube。',
-  'conn_lfm_desc': '两种方式：在 Last.fm 网站登录（使用应用内置密钥），或使用您自己的 API 密钥。',
+  'conn_lfm_desc': '您的 Last.fm 历史记录通过您自己的 API 密钥读取（12 月 1 日起需要 Last.fm Pro）。',
   'conn_lfm_web': '使用 Last.fm 登录',
   'lfm_login_t': '登录 Last.fm',
   'lfm_login_hint': '请在 Last.fm 网站登录。应用会识别您的用户名，然后关闭此窗口。',
@@ -1512,7 +1511,7 @@ const Map<String, String> kTxZh = {
   'sm_builtin_t': '内置密钥',
   'sm_builtin_s': '只需要您的用户名。使用额度与其他用户共享。',
   'wl_title': '欢迎',
-  'wl_sub': '请选择连接 Last.fm 的方式。',
+  'wl_sub': '请输入您的 Last.fm 用户名和您自己的 API 密钥。',
   'sr_from_recent': '来自您最近的搜索',
   'sr_recent': '最近搜索',
   'sr_suggestions': '搜索建议',
@@ -1606,6 +1605,10 @@ const Map<String, String> kTxZh = {
   'api_img_clear': '清除图片缓存（应用新顺序）',
   'api_img_cleared': '图片缓存已清除',
   'api_help': '“今日请求”：自午夜起发送给各服务的调用次数。“错误”：失败的调用（服务宕机、拒绝访问或无网络）。“被限流”：服务返回“请求过多”，该服务会暂停一小段时间。',
-  'err_bad_response': '服务器返回了无效响应（服务不可用或正在维护）。请稍后重试。',
-  'dash_offline_cache': '无法连接：正在显示已保存的数据。',
+  'err_bad_response': '服务器返回了无效的响应。服务可能不可用或正在维护。请稍后重试。',
+  'dash_offline_cache': '无法连接到服务器。正在显示此设备上已保存的数据。',
+  'news_btn': '公告',
+  'news_btn_sub': '故障、维护和各类通知',
+  'news_load_failed': '无法加载公告。请检查您的网络连接，然后重试。',
+  'news_retry': '重试',
 };

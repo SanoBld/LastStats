@@ -530,7 +530,6 @@ class AppStringsDe implements AppStrings {
   @override String get apKeepLastArtworkSub => 'Letzte Coverfarbe beibehalten, statt zurückzusetzen, wenn nichts läuft';
   @override String get apDetailPagesSection => 'Detailseiten';
   @override String get apArtworkColorTheme => 'Cover-Farbdesign';
-  @override String get apBeta => 'BETA';
   @override String get apArtworkColorThemeSub => 'Detailseiten passen ihre Farben an die dominante Farbe des Covers an';
   @override String get apNavBarSection => 'Navigationsleiste';
   @override String get apShowTabLabels => 'Tab-Beschriftungen anzeigen';
@@ -1242,7 +1241,7 @@ const Map<String, String> kTxDe = {
   'lb_docs': 'API-Hilfe',
   'lb_connect': 'Verbinden',
   'lb_invalid': 'Ungültiges Token. Prüfen Sie es in Ihren ListenBrainz-Einstellungen.',
-  'lb_neterr': 'ListenBrainz ist nicht erreichbar. Prüfen Sie Ihre Verbindung.',
+  'lb_neterr': 'ListenBrainz ist nicht erreichbar. Bitte überprüfen Sie Ihre Internetverbindung.',
   'lb_ok': 'ListenBrainz verbunden ({name}).',
   'lb_empty': 'Fügen Sie Ihr Token ein, um fortzufahren.',
   'sw_title': 'Lokale Daten gefunden',
@@ -1471,7 +1470,7 @@ const Map<String, String> kTxDe = {
   'conn_test': 'Spotify testen',
   'conn_testing': 'Test läuft…',
   'conn_q_note': 'Spotify Canvas hat nur eine Qualität. Die Qualitätseinstellungen gelten nur für Apple Music und YouTube.',
-  'conn_lfm_desc': 'Zwei Methoden: Anmeldung auf der Last.fm-Website (der in der App integrierte Schlüssel wird verwendet) oder Ihr eigener API-Schlüssel.',
+  'conn_lfm_desc': 'Ihr Last.fm-Verlauf wird mit Ihrem eigenen API-Schlüssel gelesen (ab dem 1. Dezember ist dafür Last.fm Pro nötig).',
   'conn_lfm_web': 'Mit Last.fm anmelden',
   'lfm_login_t': 'Last.fm-Anmeldung',
   'lfm_login_hint': 'Melden Sie sich auf der Last.fm-Website an. Die App erkennt Ihren Benutzernamen und schließt dann das Fenster.',
@@ -1486,7 +1485,7 @@ const Map<String, String> kTxDe = {
   'sm_builtin_t': 'Integrierter Schlüssel',
   'sm_builtin_s': 'Es wird nur Ihr Benutzername benötigt. Das Nutzungslimit wird mit den anderen Nutzern geteilt.',
   'wl_title': 'Willkommen',
-  'wl_sub': 'Wählen Sie, wie Sie sich mit Last.fm verbinden möchten.',
+  'wl_sub': 'Geben Sie Ihren Last.fm-Benutzernamen und Ihren eigenen API-Schlüssel ein.',
   'sr_from_recent': 'Aus Ihren letzten Suchen',
   'sr_recent': 'Letzte Suchen',
   'sr_suggestions': 'Vorschläge',
@@ -1580,6 +1579,10 @@ const Map<String, String> kTxDe = {
   'api_img_clear': 'Bild-Cache leeren (neue Reihenfolge anwenden)',
   'api_img_cleared': 'Bild-Cache geleert',
   'api_help': '„Anfragen heute“: Anzahl der seit Mitternacht an die Dienste gesendeten Aufrufe. „Fehler“: fehlgeschlagene Aufrufe (Dienst down, Zugriff verweigert oder kein Netz). „Begrenzt“: Antworten „zu viele Anfragen“ eines Dienstes, der dann kurz pausiert wird.',
-  'err_bad_response': 'Der Server hat eine ungültige Antwort geliefert (Dienst nicht verfügbar oder in Wartung). Bitte gleich noch einmal versuchen.',
-  'dash_offline_cache': 'Keine Verbindung: gespeicherte Daten werden angezeigt.',
+  'err_bad_response': 'Der Server hat eine ungültige Antwort geliefert. Möglicherweise ist der Dienst nicht verfügbar oder wird gewartet. Bitte versuchen Sie es in einigen Augenblicken erneut.',
+  'dash_offline_cache': 'Die Verbindung zum Server ist nicht möglich. Die auf diesem Gerät gespeicherten Daten werden angezeigt.',
+  'news_btn': 'Neuigkeiten',
+  'news_btn_sub': 'Störungen, Wartungsarbeiten und Ankündigungen',
+  'news_load_failed': 'Die Neuigkeiten konnten nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.',
+  'news_retry': 'Erneut versuchen',
 };

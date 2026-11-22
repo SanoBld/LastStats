@@ -18,6 +18,7 @@ import 'settings/lastfm_login_page.dart';
 import '../services/favorites_auth.dart';
 import '../services/internal_keys.dart';
 import 'onboarding_flow.dart';
+import 'home_screen.dart' show NewsLauncher;
 import '../services/data_source.dart';
 import '../services/source_switch.dart';
 import '../services/account_manager.dart';
@@ -758,14 +759,29 @@ class _SetupScreenState extends State<SetupScreen>
                         position: _langSlide,
                         child: FadeTransition(
                           opacity: _langFade,
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: _LangSelectorButton(
+                          child: Row(children: [
+                            // News: outages, maintenance, announcements
+                            Tooltip(
+                              message: tx('news_btn_sub'),
+                              child: ActionChip(
+                                avatar: Icon(Icons.campaign_rounded,
+                                    size: 18, color: scheme.onSecondaryContainer),
+                                label: Text(tx('news_btn')),
+                                backgroundColor: scheme.secondaryContainer,
+                                labelStyle: TextStyle(
+                                    color: scheme.onSecondaryContainer,
+                                    fontWeight: FontWeight.w700),
+                                side: BorderSide.none,
+                                onPressed: () => NewsLauncher.open(context),
+                              ),
+                            ),
+                            const Spacer(),
+                            _LangSelectorButton(
                               current: supportedLocaleFor(localeNotifier.value),
                               scheme: scheme, text: text,
                               onTap: () => _openLanguageSheet(context),
                             ),
-                          ),
+                          ]),
                         ),
                       ),
                       const SizedBox(height: 20),

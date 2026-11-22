@@ -530,7 +530,6 @@ class AppStringsIt implements AppStrings {
   @override String get apKeepLastArtworkSub => 'Mantieni l\'ultimo colore della copertina invece di reimpostarlo quando nulla è in riproduzione';
   @override String get apDetailPagesSection => 'Pagine di dettaglio';
   @override String get apArtworkColorTheme => 'Tema colore copertina';
-  @override String get apBeta => 'BETA';
   @override String get apArtworkColorThemeSub => 'Le pagine di dettaglio adattano i colori al colore dominante della copertina';
   @override String get apNavBarSection => 'Barra di navigazione';
   @override String get apShowTabLabels => 'Mostra etichette schede';
@@ -1242,7 +1241,7 @@ const Map<String, String> kTxIt = {
   'lb_docs': 'Aiuto API',
   'lb_connect': 'Connetti',
   'lb_invalid': 'Token non valido. Lo verifichi nelle impostazioni di ListenBrainz.',
-  'lb_neterr': 'Impossibile raggiungere ListenBrainz. Verifichi la connessione.',
+  'lb_neterr': 'Impossibile raggiungere ListenBrainz. Verifichi la connessione a Internet.',
   'lb_ok': 'ListenBrainz connesso ({name}).',
   'lb_empty': 'Incolli il suo token per continuare.',
   'sw_title': 'Dati locali trovati',
@@ -1471,7 +1470,7 @@ const Map<String, String> kTxIt = {
   'conn_test': 'Prova Spotify',
   'conn_testing': 'Prova in corso…',
   'conn_q_note': 'Spotify Canvas ha una sola qualità. Le impostazioni di qualità valgono solo per Apple Music e YouTube.',
-  'conn_lfm_desc': 'Due metodi: accedere dal sito di Last.fm (viene usata la chiave integrata nell\'app) oppure usare la sua chiave API.',
+  'conn_lfm_desc': 'La sua cronologia Last.fm viene letta con la sua chiave API (richiede Last.fm Pro dal 1° dicembre).',
   'conn_lfm_web': 'Accedi con Last.fm',
   'lfm_login_t': 'Accesso a Last.fm',
   'lfm_login_hint': 'Acceda al sito di Last.fm. L\'app rileverà il suo nome utente e chiuderà la finestra.',
@@ -1486,7 +1485,7 @@ const Map<String, String> kTxIt = {
   'sm_builtin_t': 'Chiave integrata',
   'sm_builtin_s': 'È necessario solo il suo nome utente. Il limite di utilizzo è condiviso con gli altri utenti.',
   'wl_title': 'Benvenuto',
-  'wl_sub': 'Scelga come desidera connettersi a Last.fm.',
+  'wl_sub': 'Inserisca il suo nome utente Last.fm e la sua chiave API.',
   'sr_from_recent': 'Dalle sue ricerche recenti',
   'sr_recent': 'Ricerche recenti',
   'sr_suggestions': 'Suggerimenti',
@@ -1580,6 +1579,10 @@ const Map<String, String> kTxIt = {
   'api_img_clear': 'Svuota la cache delle immagini (applica il nuovo ordine)',
   'api_img_cleared': 'Cache delle immagini svuotata',
   'api_help': '«Richieste oggi»: numero di chiamate inviate ai servizi da mezzanotte. «Errori»: chiamate fallite (servizio non disponibile, accesso negato o rete assente). «Limitate»: risposte «troppe richieste» di un servizio, che viene messo in pausa per un po\'.',
-  'err_bad_response': 'Il server ha restituito una risposta non valida (servizio non disponibile o in manutenzione). Riprova tra un attimo.',
-  'dash_offline_cache': 'Connessione assente: mostro i dati salvati.',
+  'err_bad_response': 'Il server ha restituito una risposta non valida. Il servizio potrebbe non essere disponibile o essere in manutenzione. Riprovi tra qualche istante.',
+  'dash_offline_cache': 'Impossibile connettersi al server. Vengono mostrati i dati salvati su questo dispositivo.',
+  'news_btn': 'Novità',
+  'news_btn_sub': 'Interruzioni, manutenzione e annunci',
+  'news_load_failed': 'Non è stato possibile caricare le novità. Verifichi la connessione a Internet e riprovi.',
+  'news_retry': 'Riprova',
 };

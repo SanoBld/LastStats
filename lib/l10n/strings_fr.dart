@@ -591,7 +591,6 @@ class AppStringsFr implements AppStrings {
   @override String get apKeepLastArtworkSub      => 'Conserver la couleur de la dernière pochette plutôt qu\'une image de secours';
   @override String get apDetailPagesSection      => 'Fiches détail';
   @override String get apArtworkColorTheme       => "Thème couleur de la pochette";
-  @override String get apBeta                    => 'BÊTA';
   @override String get apArtworkColorThemeSub    => "Les fiches adaptent leurs couleurs à la couleur dominante de la pochette";
   @override String get apNavBarSection           => 'Barre de navigation';
   @override String get apShowTabLabels           => 'Afficher les libellés';
@@ -1266,7 +1265,7 @@ const Map<String, String> kTxFr = {
   'lb_docs': 'Aide sur l\'API',
   'lb_connect': 'Se connecter',
   'lb_invalid': 'Jeton invalide. Vérifiez-le dans vos réglages ListenBrainz.',
-  'lb_neterr': 'Impossible de joindre ListenBrainz. Vérifiez votre connexion.',
+  'lb_neterr': 'ListenBrainz est injoignable. Veuillez vérifier votre connexion Internet.',
   'lb_ok': 'ListenBrainz connecté ({name}).',
   'lb_empty': 'Collez votre jeton pour continuer.',
   'sw_title': 'Données locales trouvées',
@@ -1495,7 +1494,7 @@ const Map<String, String> kTxFr = {
   'conn_test': 'Tester Spotify',
   'conn_testing': 'Test en cours…',
   'conn_q_note': 'Canvas Spotify : une seule qualité. Les réglages de qualité ne s\'appliquent qu\'à Apple Music et YouTube.',
-  'conn_lfm_desc': 'Deux méthodes : vous connecter sur le site Last.fm (la clé intégrée à l\'application est utilisée) ou utiliser votre propre clé API.',
+  'conn_lfm_desc': 'Votre historique Last.fm est lu avec votre propre clé API (elle demande Last.fm Pro à partir du 1er décembre).',
   'conn_lfm_web': 'Se connecter avec Last.fm',
   'lfm_login_t': 'Connexion à Last.fm',
   'lfm_login_hint': 'Connectez-vous sur le site Last.fm. L\'application détectera votre nom d\'utilisateur, puis fermera la fenêtre.',
@@ -1510,7 +1509,7 @@ const Map<String, String> kTxFr = {
   'sm_builtin_t': 'Clé intégrée',
   'sm_builtin_s': 'Seul votre nom d\'utilisateur est nécessaire. La limite d\'utilisation est partagée avec les autres utilisateurs.',
   'wl_title': 'Bienvenue',
-  'wl_sub': 'Choisissez comment vous connecter à Last.fm.',
+  'wl_sub': 'Renseignez votre pseudo Last.fm et votre propre clé API.',
   'sr_from_recent': 'Depuis vos recherches récentes',
   'sr_recent': 'Recherches récentes',
   'sr_suggestions': 'Suggestions',
@@ -1609,6 +1608,10 @@ const Map<String, String> kTxFr = {
   'api_img_clear': 'Vider le cache d\'images (appliquer le nouvel ordre)',
   'api_img_cleared': 'Cache d\'images vidé',
   'api_help': '« Requêtes aujourd\'hui » : nombre d\'appels envoyés aux services depuis minuit. « Erreurs » : appels échoués (service en panne, accès refusé ou pas de réseau). « Limitées » : réponses « trop de requêtes » d\'un service, qui est alors mis en pause quelques instants.',
-  'err_bad_response': 'Le serveur a renvoyé une réponse invalide (service indisponible ou en maintenance). Réessayez dans un instant.',
-  'dash_offline_cache': 'Connexion impossible : données enregistrées affichées.',
+  'err_bad_response': 'Le serveur a renvoyé une réponse invalide. Le service est peut-être indisponible ou en maintenance. Veuillez réessayer dans quelques instants.',
+  'dash_offline_cache': 'Impossible de se connecter au serveur. Les données enregistrées sur cet appareil sont affichées.',
+  'news_btn': 'Actualités',
+  'news_btn_sub': 'Pannes, maintenance et annonces',
+  'news_load_failed': 'Les actualités n\'ont pas pu être chargées. Veuillez vérifier votre connexion Internet et réessayer.',
+  'news_retry': 'Réessayer',
 };

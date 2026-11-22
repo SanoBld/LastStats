@@ -5,6 +5,7 @@ import '../../l10n/extra_strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/l10n.dart';
 import '../../app_state.dart';
+import '../../services/data_source.dart';
 import '../../widgets/m3_components.dart';
 import 'settings_helpers.dart';
 import 'settings_rows.dart';
@@ -114,7 +115,7 @@ class _StartupPageState extends State<StartupPage> {
                 avatar: Icon(icon, size: 16),
                 label: Text(switch (key) {
                   'all'     => L.settingsShowAllPlatformLinks,
-                  'lastfm'  => L.platformLastfm,
+                  'lastfm'  => DataSource.lb ? 'ListenBrainz' : L.platformLastfm,
                   'spotify' => L.platformSpotify,
                   _         => L.platformYtMusic,
                 }),

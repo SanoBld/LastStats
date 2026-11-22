@@ -24,6 +24,7 @@ import '../services/notification_worker.dart';
 import '../services/notification_service.dart';
 import '../services/cache_owner.dart';
 import '../services/data_cache.dart';
+import '../services/data_source.dart';
 import '../services/prefetch_service.dart';
 import '../services/all_scrobbles_service.dart';
 import 'home_screen.dart';
@@ -1068,7 +1069,7 @@ class _MusicPlatformStepState extends State<_MusicPlatformStep> {
     final scheme = Theme.of(context).colorScheme;
     final options = [
       (value: 'all',     icon: Icons.done_all_rounded,          asset: null,                        label: L.settingsShowAllPlatformLinks),
-      (value: 'lastfm',  icon: Icons.bar_chart_rounded,        asset: 'assets/icons/lastfm.svg',  label: L.platformLastfm),
+      (value: 'lastfm',  icon: Icons.bar_chart_rounded,        asset: DataSource.lb ? 'assets/icons/listenbrainz.svg' : 'assets/icons/lastfm.svg',  label: DataSource.lb ? 'ListenBrainz' : L.platformLastfm),
       (value: 'spotify', icon: Icons.spatial_audio_off_rounded, asset: 'assets/icons/spotify.svg', label: L.platformSpotify),
       (value: 'ytmusic', icon: Icons.music_video_rounded,      asset: 'assets/icons/ytmusic.svg', label: L.platformYtMusic),
     ];
@@ -1405,11 +1406,13 @@ class _LastfmGlyph extends StatelessWidget {
   const _LastfmGlyph({required this.size, required this.color});
 
   static bool? _exists;
+  static String get _asset =>
+      DataSource.lb ? 'assets/icons/listenbrainz.svg' : 'assets/icons/lastfm.svg';
 
   Future<bool> _check() async {
     if (_exists != null) return _exists!;
     try {
-      await rootBundle.load('assets/icons/lastfm.svg');
+      await rootBundle.load(_asset);
       return _exists = true;
     } catch (_) {
       return _exists = false;
@@ -1423,7 +1426,7 @@ class _LastfmGlyph extends StatelessWidget {
       future: _check(),
       builder: (_, snap) {
         if (snap.data != true) return fallback;
-        return SvgPicture.asset('assets/icons/lastfm.svg',
+        return SvgPicture.asset(_asset,
             width: size, height: size,
             colorFilter: ColorFilter.mode(color, BlendMode.srcIn));
       },

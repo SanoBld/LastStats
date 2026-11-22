@@ -638,7 +638,6 @@ abstract class AppStrings {
   String get apKeepLastArtworkSub;
   String get apDetailPagesSection;
   String get apArtworkColorTheme;
-  String get apBeta;
   String get apArtworkColorThemeSub;
   String get apNavBarSection;
   String get apShowTabLabels;
