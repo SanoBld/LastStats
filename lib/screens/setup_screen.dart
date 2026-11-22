@@ -13,7 +13,6 @@ import '../supported_locales.dart';
 import '../services/lastfm_service.dart';
 import '../widgets/m3_components.dart';
 import '../services/backup_service.dart';
-import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import '../services/favorites_auth.dart';
 import 'onboarding_flow.dart';
 import 'home_screen.dart' show NewsLauncher;
@@ -27,13 +26,6 @@ import 'package:flutter/services.dart' show Clipboard;
 // ══════════════════════════════════════════════════════════════════════════
 //  SetupScreen — credentials entry (animated redesign)
 // ══════════════════════════════════════════════════════════════════════════
-
-/// Picks the self-contained logo SVG (own background baked in) matching the
-/// current brightness.
-String _logoAsset(BuildContext context) {
-  final dark = Theme.of(context).brightness == Brightness.dark;
-  return 'assets/icons/app_logo_${dark ? 'black_bg' : 'white_bg'}.svg';
-}
 
 class SetupScreen extends StatefulWidget {
   const SetupScreen({super.key});
@@ -815,7 +807,7 @@ class _SetupScreenState extends State<SetupScreen>
                               color: scheme.surfaceContainer,
                               borderRadius: BorderRadius.circular(32),
                             ),
-                            child: AnimatedSwitcher(duration: const Duration(milliseconds: 300), switchInCurve: Curves.easeOutCubic, switchOutCurve: Curves.easeInCubic, layoutBuilder: (cur, prev) => Stack(alignment: Alignment.topCenter, children: [...prev, if (cur != null) cur]), transitionBuilder: (c, a) => FadeTransition(opacity: a, child: SlideTransition(position: Tween<Offset>(begin: const Offset(0.06, 0), end: Offset.zero).animate(a), child: c)), child: Column(key: ValueKey<String>(_service ?? 'choice'),
+                            child: AnimatedSwitcher(duration: const Duration(milliseconds: 300), switchInCurve: Curves.easeOutCubic, switchOutCurve: Curves.easeInCubic, layoutBuilder: (cur, prev) => Stack(alignment: Alignment.topCenter, children: [...prev, ?cur]), transitionBuilder: (c, a) => FadeTransition(opacity: a, child: SlideTransition(position: Tween<Offset>(begin: const Offset(0.06, 0), end: Offset.zero).animate(a), child: c)), child: Column(key: ValueKey<String>(_service ?? 'choice'),
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 if (_service == null) ..._choiceWidgets(scheme, text)
@@ -1193,65 +1185,6 @@ class _HeaderPill extends StatelessWidget {
     );
     if (tooltip != null) pill = Tooltip(message: tooltip!, child: pill);
     return Semantics(button: true, label: label, child: pill);
-  }
-}
-
-// One choice of the connection method list.
-class _MethodTile extends StatelessWidget {
-  final bool selected;
-  final IconData icon;
-  final String title, subtitle;
-  final VoidCallback onTap;
-  const _MethodTile({
-    required this.selected,
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final text = Theme.of(context).textTheme;
-    return M3PressCard(
-      color: selected ? scheme.primaryContainer : scheme.surfaceContainerHigh,
-      padding: const EdgeInsets.all(14),
-      onTap: onTap,
-      child: Row(children: [
-        M3CookieBadge(
-          color: selected ? scheme.primary : scheme.secondaryContainer,
-          size: 44,
-          child: Icon(icon,
-              size: 22,
-              color: selected ? scheme.onPrimary : scheme.onSecondaryContainer),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title,
-                style: text.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: selected ? scheme.onPrimaryContainer : null)),
-            const SizedBox(height: 2),
-            Text(subtitle,
-                style: text.bodySmall?.copyWith(
-                    color: selected
-                        ? scheme.onPrimaryContainer
-                        : scheme.onSurfaceVariant)),
-          ]),
-        ),
-        const SizedBox(width: 8),
-        AnimatedSwitcher(
-          duration: M3Motion.effectsFastDuration,
-          child: Icon(
-            selected ? Icons.check_circle_rounded : Icons.circle_outlined,
-            key: ValueKey(selected),
-            color: selected ? scheme.primary : scheme.outline,
-          ),
-        ),
-      ]),
-    );
   }
 }
 

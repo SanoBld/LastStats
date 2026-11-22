@@ -1153,7 +1153,6 @@ class _YearRecapPageState extends State<YearRecapPage> {
                       valueListenable: _profileOn,
                       builder: (_, on, _) {
                         // The slide's own cover replaces the profile picture
-                        final isHeroSlide = idx < _heroList.length && _heroList[idx];
                         final mode = _modeOf(idx);
                         final cover = (mode != _YrBg.none && idx < _bgList.length) ? _bgList[idx] : null;
                         final hero = cover != null && mode == _YrBg.full;
