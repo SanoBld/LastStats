@@ -624,7 +624,7 @@ class AppStringsJa implements AppStrings {
   @override String get faqQ5 => 'データはどこに保存されますか？';
   @override String get faqA5 => DataSource.lb ? 'お使いの端末のみです。LastStatsにはサーバーがなく、スクロブルは高速アクセスのためにローカルにキャッシュされ、ListenBrainzの認証情報もローカルに保存されます。公式ListenBrainz API以外にデータが送信されることはありません。' : 'お使いの端末のみです。LastStatsにはサーバーがなく、スクロブルは高速アクセスのためにローカルにキャッシュされ、Last.fmの認証情報もローカルに保存されます。公式Last.fm API以外にデータが送信されることはありません。';
   @override String get faqQ6 => 'お気に入りを有効にするには？';
-  @override String get faqA6 => '設定 > アカウントを開き、Last.fmのシークレットキー（last.fm/api/accounts のAPIキーの隣にあります）を入力して、画面の案内に従ってください。接続後は、アプリから直接曲をお気に入りに登録できます。アプリ内蔵キーでは、この機能は使えません。';
+  @override String get faqA6 => 'Last.fm の場合は「設定」>「アカウント」でシークレットキーを入力します（last.fm/api/accounts の API キーの隣にあります）。ListenBrainz の場合は追加で必要なものはなく、トークンだけで使えます。接続後は、アプリから直接お気に入りに曲を追加できます。';
   @override String get faqQ7 => '\u300cscrobble\uff08\u30b9\u30af\u30ed\u30d6\u30eb\uff09\u300d\u3068\u306f\uff1f';
   @override String get faqA7 => DataSource.lb ? '\u300cscrobble\u300d\u3068\u306f\u3001ListenBrainz\u30a2\u30ab\u30a6\u30f3\u30c8\u306b\u518d\u751f\u3068\u3057\u3066\u8a18\u9332\u3055\u308c\u305f\u697d\u66f2\u3092\u6307\u3057\u3001ListenBrainz\u56fa\u6709\u306e\u7528\u8a9e\u3067\u300c1\u56de\u306e\u30ab\u30a6\u30f3\u30c8\u3055\u308c\u305f\u518d\u751f\u300d\u3092\u610f\u5473\u3057\u307e\u3059\u3002\u3059\u3079\u3066\u306e\u5408\u8a08\uff08\u30c8\u30c3\u30d7\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8\u3084\u7d71\u8a08\u306a\u3069\uff09\u306f\u3053\u308c\u306b\u57fa\u3065\u3044\u3066\u3044\u307e\u3059\u3002' : '\u300cscrobble\u300d\u3068\u306f\u3001Last.fm\u30a2\u30ab\u30a6\u30f3\u30c8\u306b\u518d\u751f\u3068\u3057\u3066\u8a18\u9332\u3055\u308c\u305f\u697d\u66f2\u3092\u6307\u3057\u3001Last.fm\u56fa\u6709\u306e\u7528\u8a9e\u3067\u300c1\u56de\u306e\u30ab\u30a6\u30f3\u30c8\u3055\u308c\u305f\u518d\u751f\u300d\u3092\u610f\u5473\u3057\u307e\u3059\u3002\u3059\u3079\u3066\u306e\u5408\u8a08\uff08\u30c8\u30c3\u30d7\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8\u3084\u7d71\u8a08\u306a\u3069\uff09\u306f\u3053\u308c\u306b\u57fa\u3065\u3044\u3066\u3044\u307e\u3059\u3002';
   @override String get faqQ8 => '\u30ec\u30d9\u30eb\u3068\u5b9f\u7e3e\u306e\u4ed5\u7d44\u307f\u306f\uff1f';
@@ -632,11 +632,11 @@ class AppStringsJa implements AppStrings {
   @override String get faqQ9 => '省電力モードはどのように機能しますか？';
   @override String get faqA9 => '省電力モードでは、バッテリーを節約するためにアプリの動作を抑えます。傾きによるパララックス効果をオフにし、画面のリフレッシュレートを約 60 Hz に制限し、バックグラウンド更新の頻度を下げ、動くカバーやバッジの輝きを一時停止します。画像、エクスポート、シェアカードは通常の品質のままです。\n\n常にオンにするほか、端末の省電力モードに合わせたり、指定したバッテリー残量を下回ったときに自動でオンにしたりできます。設定 > バッテリーセーバー から変更できます。';
   @override String get faqQ10 => 'データのバックアップや復元はどうすればいいですか？';
-  @override String get faqA10 => DataSource.lb ? '設定 > バックアップを開くと、バックアップファイルを書き出せます。ListenBrainzキーを含めるかどうかは選べます。後からこの端末や別の端末に読み込めば、設定を元に戻せます。' : '設定 > バックアップを開くと、バックアップファイルを書き出せます。Last.fmキーを含めるかどうかは選べます。後からこの端末や別の端末に読み込めば、設定を元に戻せます。';
+  @override String get faqA10 => '「設定」>「バックアップ」を開きます。バックアップファイルを書き出し（Last.fm のキーまたは ListenBrainz のトークンを含める／含めないを選べます）、後で、または別の端末で読み込めます。';
   @override String get faqQ11 => 'オフラインでも使えますか？';
   @override String get faqA11 => 'ある程度は可能です。読み込み済みの統計はローカルキャッシュのおかげでオフラインでも見られますが、新しいスクロブルの取得には通信が必要です。';
-  @override String get faqQ12 => DataSource.lb ? 'ListenBrainzアカウントを切り替えられますか？' : 'Last.fmアカウントを切り替えられますか？';
-  @override String get faqA12 => DataSource.lb ? 'はい、ListenBrainzアカウントは最大3つまで登録できます。設定 > アカウントで「アカウントを追加」をタップし、好きなときに切り替えてください。切り替えるとローカルキャッシュは自動的にリセットされるので、2つのアカウントのデータが混ざることはありません。' : 'はい、Last.fmアカウントは最大3つまで登録できます。設定 > アカウントで「アカウントを追加」をタップし、好きなときに切り替えてください。切り替えるとローカルキャッシュは自動的にリセットされるので、2つのアカウントのデータが混ざることはありません。';
+  @override String get faqQ12 => 'アカウントやサービスを切り替えられますか？';
+  @override String get faqA12 => 'はい。「設定」>「アカウント」でログアウトし、別のユーザー名で再ログインするか、ログイン画面でもう一方のサービス（Last.fm または ListenBrainz）を選んでください。データが混ざらないよう、ローカルキャッシュは自動的にリセットされます。';
   @override String get faqQ13 => '通知はどう設定しますか？';
   @override String get faqA13 => '設定 > 通知から、同期が終わったときの通知をオンにしたり、通知の頻度を選んだり、通知をすべてオフにしたりできます。';
   @override String get faqQ14 => '画像が表示されない／読み込みが終わらない場合は？';

@@ -26,6 +26,7 @@
     { id: 'start', icon: 'flag', desc: 'hp.hub.d.start' },
     { id: 'understand', icon: 'school', desc: 'hp.hub.d.understand' },
     { id: 'scrobblers', icon: 'headphones', desc: 'hp.hub.d.scrobblers' },
+    { id: 'listenbrainz', icon: 'graphic_eq', desc: 'hp.hub.d.listenbrainz' },
     { id: 'app', icon: 'smartphone', desc: 'hp.hub.d.app' },
     { id: 'trouble', icon: 'healing', desc: 'hp.hub.d.trouble' },
     { id: 'faq', icon: 'live_help', desc: 'hp.hub.d.faq' },

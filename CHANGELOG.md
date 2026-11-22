@@ -52,6 +52,8 @@
 - Fixed outdated texts that still mentioned the built-in key / Last.fm website login (10 languages)
 - Performance: ListenBrainz requests no longer read and decode the offline copy unless the network fails
 - New: a Last.fm FAQ and a ListenBrainz FAQ (5 questions each: API key, Last.fm Pro from December 1, 2026, user token, statistics, history import) in the app and on the help page of the site, in 10 languages
+- Site: new "ListenBrainz" help theme (tutorial, how it works, account and token, scrobbling, switching service, troubleshooting) mirroring the Last.fm one, in 10 languages
+- Site and app: the general FAQ no longer talks about Last.fm only (scrobbles, data storage, favorites, backup, switching account or service); removed the outdated "3 accounts" and "built-in key" mentions
 - Settings > Account: no more "My accounts (1/3)" counter when there is a single account
 - Settings > Appearance: the video-cover options now unroll under their switch instead of appearing in a separate section; the two "Interactions" sections no longer share the same title
 - Removed the BETA badge on the artwork color theme; tab titles of the site use "|"

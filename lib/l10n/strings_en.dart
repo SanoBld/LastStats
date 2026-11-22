@@ -690,7 +690,7 @@ class AppStringsEn implements AppStrings {
   @override String get faqQ5 => 'Where is my data stored?';
   @override String get faqA5 => DataSource.lb ? 'On your device only. LastStats has no server: your scrobbles are cached locally for fast access, and your ListenBrainz credentials are stored locally too. Nothing is sent anywhere except ListenBrainz\'s official API.' : 'On your device only. LastStats has no server: your scrobbles are cached locally for fast access, and your Last.fm credentials are stored locally too. Nothing is sent anywhere except Last.fm\'s official API.';
   @override String get faqQ6 => 'How do I enable favorites?';
-  @override String get faqA6 => 'Go to Settings > Account and enter your Last.fm secret key (you can find it next to your API key at last.fm/api/accounts), then follow the steps on screen. Once connected, you can favorite tracks directly from the app. This is not available with the app\'s built-in key.';
+  @override String get faqA6 => 'With Last.fm, go to Settings > Account and enter your secret key (it is next to your API key at last.fm/api/accounts). With ListenBrainz, there is nothing more to add: your token is enough. Once connected, you can favorite tracks directly from the app.';
   @override String get faqQ7 => 'What is a \'scrobble\'?';
   @override String get faqA7 => DataSource.lb ? 'A scrobble is a track logged as played on your ListenBrainz account \u2014 it\'s ListenBrainz\'s own term for \'one counted listen\'. All your totals (top artists, stats, etc.) are based on it.' : 'A scrobble is a track logged as played on your Last.fm account \u2014 it\'s Last.fm\'s own term for \'one counted listen\'. All your totals (top artists, stats, etc.) are based on it.';
   @override String get faqQ8 => 'How do levels and achievements work?';
@@ -698,11 +698,11 @@ class AppStringsEn implements AppStrings {
   @override String get faqQ9 => 'How does power saving mode work?';
   @override String get faqA9 => 'Power saving mode reduces what the app does to save battery: tilt parallax is turned off, the screen refresh rate is capped at about 60 Hz, background updates run less often, and animated artwork and badge shine are paused. Images, exports and share cards keep full quality.\n\nYou can keep it always on, make it follow your phone\'s own battery saver, or have it turn on below a battery level you choose. You\'ll find it in Settings > Power saving mode.';
   @override String get faqQ10 => 'How do I back up or restore my data?';
-  @override String get faqA10 => DataSource.lb ? 'Go to Settings > Backup. You can export a backup file, with or without your ListenBrainz key as you prefer, and import it later on this phone or on another device to get your settings back.' : 'Go to Settings > Backup. You can export a backup file, with or without your Last.fm key as you prefer, and import it later on this phone or on another device to get your settings back.';
+  @override String get faqA10 => 'Go to Settings > Backup. You can export a backup file (with or without your Last.fm key or ListenBrainz token) and import it later or on another device.';
   @override String get faqQ11 => 'Does the app work offline?';
   @override String get faqA11 => 'Yes, to some extent. Stats already loaded stay available offline thanks to local caching, but a connection is still needed to fetch new scrobbles.';
-  @override String get faqQ12 => DataSource.lb ? 'Can I switch ListenBrainz accounts?' : 'Can I switch Last.fm accounts?';
-  @override String get faqA12 => DataSource.lb ? 'Yes, you can save up to 3 ListenBrainz accounts. From Settings > Account, tap "Add an account" and then switch between them whenever you like. The local cache is automatically reset when you switch, so the data of two accounts never gets mixed.' : 'Yes, you can save up to 3 Last.fm accounts. From Settings > Account, tap "Add an account" and then switch between them whenever you like. The local cache is automatically reset when you switch, so the data of two accounts never gets mixed.';
+  @override String get faqQ12 => 'Can I switch accounts or service?';
+  @override String get faqA12 => 'Yes. From Settings > Account, sign out and sign in again with another username, or choose the other service (Last.fm or ListenBrainz) on the login screen. The local cache is reset automatically so that data is never mixed.';
   @override String get faqQ13 => 'How do I set up notifications?';
   @override String get faqA13 => 'From Settings > Notifications, you can turn on an alert when a sync finishes, choose how often alerts appear, or turn notifications off completely if you prefer.';
   @override String get faqQ14 => 'Artwork is missing or keeps loading. What can I do?';

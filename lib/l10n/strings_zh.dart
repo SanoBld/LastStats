@@ -687,7 +687,7 @@ class AppStringsZh implements AppStrings {
   @override String get faqQ5 => '我的数据存储在哪里？';
   @override String get faqA5 => DataSource.lb ? '仅存储在您的设备上。LastStats 没有服务器：您的播放记录会在本地缓存以便快速访问，您的 ListenBrainz 账户信息也保存在本地。除官方 ListenBrainz API 外，不会向任何地方发送数据。' : '仅存储在您的设备上。LastStats 没有服务器：您的播放记录会在本地缓存以便快速访问，您的 Last.fm 账户信息也保存在本地。除官方 Last.fm API 外，不会向任何地方发送数据。';
   @override String get faqQ6 => '如何启用收藏功能？';
-  @override String get faqA6 => '前往设置 > 账号，输入您的 Last.fm 私密密钥（可在 last.fm/api/accounts 页面中 API 密钥旁边找到），然后按屏幕提示操作。连接成功后，即可直接在应用中收藏歌曲。使用应用内置密钥时无法使用此功能。';
+  @override String get faqA6 => '使用 Last.fm 时，请前往“设置”>“账户”并输入您的密钥（Secret，位于 last.fm/api/accounts 上 API 密钥的旁边）。使用 ListenBrainz 时无需再添加任何内容：令牌就足够了。连接后，您可以直接在应用中收藏曲目。';
   @override String get faqQ7 => '\u4ec0\u4e48\u662f\u201cscrobble\u201d\uff1f';
   @override String get faqA7 => DataSource.lb ? 'scrobble \u662f\u6307\u5728\u4f60\u7684 ListenBrainz \u8d26\u6237\u4e0a\u8bb0\u5f55\u4e00\u6b21\u64ad\u653e\u2014\u2014\u8fd9\u662f ListenBrainz \u5b98\u65b9\u672f\u8bed\uff0c\u8868\u793a\u201c\u4e00\u6b21\u88ab\u8ba1\u5165\u7684\u64ad\u653e\u201d\u3002\u4f60\u7684\u6240\u6709\u7edf\u8ba1\u6570\u636e\uff08\u6392\u884c\u699c\u3001\u603b\u91cf\u7b49\uff09\u90fd\u57fa\u4e8e\u5b83\u3002' : 'scrobble \u662f\u6307\u5728\u4f60\u7684 Last.fm \u8d26\u6237\u4e0a\u8bb0\u5f55\u4e00\u6b21\u64ad\u653e\u2014\u2014\u8fd9\u662f Last.fm \u5b98\u65b9\u672f\u8bed\uff0c\u8868\u793a\u201c\u4e00\u6b21\u88ab\u8ba1\u5165\u7684\u64ad\u653e\u201d\u3002\u4f60\u7684\u6240\u6709\u7edf\u8ba1\u6570\u636e\uff08\u6392\u884c\u699c\u3001\u603b\u91cf\u7b49\uff09\u90fd\u57fa\u4e8e\u5b83\u3002';
   @override String get faqQ8 => '\u7b49\u7ea7\u4e0e\u6210\u5c31\u7cfb\u7edf\u662f\u600e\u4e48\u8fd0\u4f5c\u7684\uff1f';
@@ -695,11 +695,11 @@ class AppStringsZh implements AppStrings {
   @override String get faqQ9 => '省电模式是如何工作的？';
   @override String get faqA9 => '省电模式会减少应用的活动以节省电量：关闭倾斜视差效果，将屏幕刷新率限制在约 60 Hz，降低后台更新频率，并暂停动态封面和徽章光泽。图片、导出内容和分享卡片仍保持完整画质。\n\n您可以让它始终开启，也可以跟随手机自带的省电模式，或在电量低于您设定的值时自动开启。可在“设置”>“省电模式”中找到。';
   @override String get faqQ10 => '如何备份或恢复我的数据？';
-  @override String get faqA10 => DataSource.lb ? '前往设置 > 备份，您可以导出备份文件，并自行选择是否包含 ListenBrainz 密钥。之后可以在本机或其他设备上重新导入，找回您的设置。' : '前往设置 > 备份，您可以导出备份文件，并自行选择是否包含 Last.fm 密钥。之后可以在本机或其他设备上重新导入，找回您的设置。';
+  @override String get faqA10 => '前往“设置”>“备份”。您可以导出备份文件（可选择是否包含 Last.fm 密钥或 ListenBrainz 令牌），之后可在本机或其他设备上导入。';
   @override String get faqQ11 => '应用可以离线使用吗？';
   @override String get faqA11 => '可以，在一定程度上。已加载的统计数据会通过本地缓存离线保留，但获取新的 scrobble 仍需要联网。';
-  @override String get faqQ12 => DataSource.lb ? '可以切换 ListenBrainz 账号吗？' : '可以切换 Last.fm 账号吗？';
-  @override String get faqA12 => DataSource.lb ? '可以，最多可保存 3 个 ListenBrainz 账号。在设置 > 账号中点按“添加账号”，之后可随时在它们之间切换。切换时本地缓存会自动重置，因此两个账号的数据不会混在一起。' : '可以，最多可保存 3 个 Last.fm 账号。在设置 > 账号中点按“添加账号”，之后可随时在它们之间切换。切换时本地缓存会自动重置，因此两个账号的数据不会混在一起。';
+  @override String get faqQ12 => '我可以切换账户或服务吗？';
+  @override String get faqA12 => '可以。在“设置”>“账户”中退出登录，然后用其他用户名重新登录，或在登录界面选择另一项服务（Last.fm 或 ListenBrainz）。本地缓存会自动重置，以免数据混杂。';
   @override String get faqQ13 => '如何设置通知？';
   @override String get faqA13 => '在设置 > 通知中，您可以开启同步完成时的提醒、选择提醒出现的频率，也可以完全关闭通知。';
   @override String get faqQ14 => '图片缺失或一直加载怎么办？';
