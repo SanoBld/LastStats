@@ -51,6 +51,10 @@
 - The preferred-platform choices (first setup and Settings > Startup) and the connection card now show ListenBrainz instead of Last.fm in ListenBrainz mode; the friends glyph follows the service too
 - Fixed outdated texts that still mentioned the built-in key / Last.fm website login (10 languages)
 - Performance: ListenBrainz requests no longer read and decode the offline copy unless the network fails
+- New: a Last.fm FAQ and a ListenBrainz FAQ (5 questions each: API key, Last.fm Pro from December 1, 2026, user token, statistics, history import) in the app and on the help page of the site, in 10 languages
+- Settings > Account: no more "My accounts (1/3)" counter when there is a single account
+- Settings > Appearance: the video-cover options now unroll under their switch instead of appearing in a separate section; the two "Interactions" sections no longer share the same title
+- Removed the BETA badge on the artwork color theme; tab titles of the site use "|"
 
 ### News & announcements
 - Texts now support **bold**, __underline__, ==highlight==, ~~strikethrough~~, *italic*, `code`, titles, bullet and numbered lists, quotes, links, tables and line breaks (type \n in the workflow field), in the app and on the website. The workflow field describes the whole syntax, so you can hand it to an AI

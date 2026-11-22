@@ -564,7 +564,10 @@ class _AccountPageState extends State<AccountPage> {
 
         // ── Account list ───────────────────────────────────────────────────
         SettingsSection(
-          label: L.acctMyAccounts(_accounts.length, AccountManager.maxAccounts),
+          // Only one account is used now: no "My accounts (1/3)" counter.
+          label: _accounts.length > 1
+              ? L.acctMyAccounts(_accounts.length, AccountManager.maxAccounts)
+              : L.settingsAccount,
           children: [
             ..._accounts.asMap().entries.map((entry) {
               final idx   = entry.key;
@@ -593,7 +596,9 @@ class _AccountPageState extends State<AccountPage> {
                   ),
                   title: Text('@${acc.username}',
                       style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-                  subtitle: isAct
+                  subtitle: _accounts.length <= 1
+                      ? null
+                      : isAct
                       ? Row(mainAxisSize: MainAxisSize.min, children: [
                           Icon(Icons.circle, size: 8, color: scheme.primary),
                           const SizedBox(width: 5),

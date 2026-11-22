@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../widgets/m3_components.dart';
 import '../../l10n/l10n.dart';
 import '../../app_state.dart';
+import '../../services/data_source.dart';
 import '../../l10n/extra_strings.dart';
 import 'settings_rows.dart';
 
@@ -77,6 +78,28 @@ class _FaqPageState extends State<FaqPage> {
                       color: scheme.onSurfaceVariant, height: 1.5)),
             ),
           ),
+
+        // ── One FAQ per service (the one in use comes first) ──────────────
+        for (final svc in (DataSource.lb ? const ['lb', 'lfm'] : const ['lfm', 'lb'])) ...[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Text(tx('faq_${svc}_h'),
+                style: text.titleSmall?.copyWith(
+                    color: scheme.primary, fontWeight: FontWeight.w800, letterSpacing: 0.4)),
+          ),
+          for (var i = 1; i <= 5; i++)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: SettingExpandable(
+                boxed: true,
+                icon: svc == 'lfm' ? Icons.help_outline_rounded : Icons.help_center_outlined,
+                title: tx('faq_${svc}_q$i'),
+                body: Text(tx('faq_${svc}_a$i'),
+                    style: text.bodyMedium?.copyWith(
+                        color: scheme.onSurfaceVariant, height: 1.5)),
+              ),
+            ),
+        ],
 
         const SizedBox(height: 16),
 

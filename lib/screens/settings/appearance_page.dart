@@ -949,7 +949,7 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
     final scheme = Theme.of(context).colorScheme;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
     SettingsSection(
-      label: L.apInteractionsSection,
+      label: tx('ap_cov_section'),
       children: [
         SwitchListTile(
           secondary: Icon(Icons.blur_on_rounded, color: scheme.primary),
@@ -975,6 +975,101 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
             motionArtworkNotifier.value = v;
           },
         ),
+        // Video-cover options unroll right under their switch (no separate
+        // section with the same title): everything stays in one place.
+        _Unroll(
+          visible: _motionOn,
+          child: Container(
+            margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+            decoration: BoxDecoration(
+              color: scheme.surfaceContainerHigh.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              // Presets: one tap sets everything. "Recommended" is the default.
+              _mvBlock(context, L.mvModeT, Icons.tune_rounded, [
+                for (final (key, label) in [
+                  ('best', L.mvModeBest),
+                  ('saver', L.mvModeSaver),
+                  ('max', L.mvModeMax),
+                  ('custom', L.mvModeCustom),
+                ])
+                  M3Chip(
+                    label: Text(label),
+                    selected: _mvMode == key,
+                    // "Custom" is only an indicator: it lights up by itself
+                    // when the settings below match no preset.
+                    onSelected: key == 'custom' ? null : (_) => _mvPreset(key),
+                  ),
+              ]),
+              SettingActionRow(
+                icon: Icons.video_library_rounded,
+                title: L.mvSource,
+                subtitle: [for (final k in _mvOrder) _mvLabel(k)].join(' → '),
+                onTap: _pickMvSources,
+              ),
+              // Always shown: lets YouTube be used for the dashboard cover
+              // even when it is not one of the sources. Off by default.
+              SettingSwitchRow(
+                icon: Icons.dashboard_customize_rounded,
+                title: tx('mv_ytdash_t'),
+                subtitle: tx('mv_ytdash_s'),
+                value: _mvYtDash,
+                onChanged: (v) {
+                  _mvSet('ls_motion_yt_dash', v);
+                  setState(() => _mvYtDash = v);
+                },
+              ),
+              _mvBlock(context, L.mvQualityT, Icons.high_quality_rounded, [
+                for (final (key, label) in [
+                  ('auto', L.mvQAuto),
+                  ('360', L.mvQLow),
+                  ('480', '480p'),
+                  ('720', '720p'),
+                  ('1080', '1080p'),
+                ])
+                  M3Chip(
+                    label: Text(label),
+                    selected: _mvQuality == key,
+                    onSelected: (_) {
+                      _mvSet('ls_motion_quality', key);
+                      setState(() => _mvQuality = key);
+                    },
+                  ),
+              ]),
+              _mvBlock(context, L.mvTypesT, Icons.checklist_rounded, [
+                for (final (key, icon, label, on) in [
+                  ('ls_motion_tracks', Icons.music_note_rounded, L.mvTracks, _mvTracks),
+                  ('ls_motion_albums', Icons.album_rounded, L.mvAlbums, _mvAlbums),
+                  ('ls_motion_artists', Icons.person_rounded, L.mvArtists, _mvArtists),
+                ])
+                  // YouTube only has videos of songs: with "YouTube only",
+                  // the albums and artists chips are greyed out.
+                  Opacity(
+                    opacity: _mvGrey(key)
+                        ? 0.4
+                        : 1,
+                    child: M3Chip(
+                      avatar: Icon(icon, size: 16),
+                      label: Text(label),
+                      selected: on,
+                      onSelected: _mvGrey(key)
+                          ? null
+                          : (v) {
+                              _mvSet(key, v);
+                              setState(() {
+                                if (key == 'ls_motion_tracks') _mvTracks = v;
+                                if (key == 'ls_motion_albums') _mvAlbums = v;
+                                if (key == 'ls_motion_artists') _mvArtists = v;
+                              });
+                            },
+                    ),
+                  ),
+              ]),
+            ]),
+          ),
+        ),
         SwitchListTile(
           secondary: Icon(Icons.emoji_events_outlined, color: scheme.primary),
           title: Text(tx('set_achv_t')),
@@ -989,96 +1084,6 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
         ),
       ],
     ),
-    // Video covers: only shown while the main switch is on. Same chip
-    // look as the music-platform picker (Settings > Startup).
-    if (_motionOn) ...[
-      const SizedBox(height: 20),
-      SettingsSection(
-        label: tx('set_motion_t'),
-        children: [
-          // Presets: one tap sets everything. "Recommended" is the default.
-          _mvBlock(context, L.mvModeT, Icons.tune_rounded, [
-            for (final (key, label) in [
-              ('best', L.mvModeBest),
-              ('saver', L.mvModeSaver),
-              ('max', L.mvModeMax),
-              ('custom', L.mvModeCustom),
-            ])
-              M3Chip(
-                label: Text(label),
-                selected: _mvMode == key,
-                // "Custom" is only an indicator: it lights up by itself
-                // when the settings below match no preset.
-                onSelected: key == 'custom' ? null : (_) => _mvPreset(key),
-              ),
-          ]),
-          SettingActionRow(
-            icon: Icons.video_library_rounded,
-            title: L.mvSource,
-            subtitle: [for (final k in _mvOrder) _mvLabel(k)].join(' → '),
-            onTap: _pickMvSources,
-          ),
-          // Always shown: lets YouTube be used for the dashboard cover
-          // even when it is not one of the sources. Off by default.
-          SwitchListTile(
-              secondary: Icon(Icons.dashboard_customize_rounded, color: scheme.primary),
-              title: Text(tx('mv_ytdash_t')),
-              subtitle: Text(tx('mv_ytdash_s')),
-              value: _mvYtDash,
-              onChanged: (v) {
-                _mvSet('ls_motion_yt_dash', v);
-                setState(() => _mvYtDash = v);
-              },
-            ),
-          _mvBlock(context, L.mvQualityT, Icons.high_quality_rounded, [
-            for (final (key, label) in [
-              ('auto', L.mvQAuto),
-              ('360', L.mvQLow),
-              ('480', '480p'),
-              ('720', '720p'),
-              ('1080', '1080p'),
-            ])
-              M3Chip(
-                label: Text(label),
-                selected: _mvQuality == key,
-                onSelected: (_) {
-                  _mvSet('ls_motion_quality', key);
-                  setState(() => _mvQuality = key);
-                },
-              ),
-          ]),
-          _mvBlock(context, L.mvTypesT, Icons.checklist_rounded, [
-            for (final (key, icon, label, on) in [
-              ('ls_motion_tracks', Icons.music_note_rounded, L.mvTracks, _mvTracks),
-              ('ls_motion_albums', Icons.album_rounded, L.mvAlbums, _mvAlbums),
-              ('ls_motion_artists', Icons.person_rounded, L.mvArtists, _mvArtists),
-            ])
-              // YouTube only has videos of songs: with "YouTube only",
-              // the albums and artists chips are greyed out.
-              Opacity(
-                opacity: _mvGrey(key)
-                    ? 0.4
-                    : 1,
-                child: M3Chip(
-                  avatar: Icon(icon, size: 16),
-                  label: Text(label),
-                  selected: on,
-                  onSelected: _mvGrey(key)
-                      ? null
-                      : (v) {
-                          _mvSet(key, v);
-                          setState(() {
-                            if (key == 'ls_motion_tracks') _mvTracks = v;
-                            if (key == 'ls_motion_albums') _mvAlbums = v;
-                            if (key == 'ls_motion_artists') _mvArtists = v;
-                          });
-                        },
-                ),
-              ),
-          ]),
-        ],
-      ),
-    ],
     const SizedBox(height: 20),
     // Library clean-up: same two switches as the welcome flow.
     SettingsSection(
@@ -1108,6 +1113,28 @@ class _LivingArtworkSectionState extends State<_LivingArtworkSection> {
     ),
     ]);
   }
+}
+
+/// Smoothly unrolls (and rolls back) a block of options under a switch.
+class _Unroll extends StatelessWidget {
+  final bool visible;
+  final Widget child;
+  const _Unroll({required this.visible, required this.child});
+
+  @override
+  Widget build(BuildContext context) => AnimatedSize(
+        duration: M3Motion.spatialFastDuration,
+        curve: M3Motion.emphasizedDecelerate,
+        alignment: Alignment.topCenter,
+        child: AnimatedSwitcher(
+          duration: M3Motion.effectsDefaultDuration,
+          switchInCurve: M3Motion.effectsDefault,
+          switchOutCurve: M3Motion.effectsDefault,
+          child: visible
+              ? KeyedSubtree(key: const ValueKey('open'), child: child)
+              : const SizedBox(key: ValueKey('closed'), width: double.infinity),
+        ),
+      );
 }
 
 // ── Haptic feedback toggle ────────────────────────────────────────────────────

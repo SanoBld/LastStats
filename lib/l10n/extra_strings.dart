@@ -30,7 +30,7 @@ const Map<String, Map<String, String>> _kTx = {
 };
 
 final RegExp _lfmKeep = RegExp(
-    r'^(svc_|lfm_|conn_|sw_|key_|img_src_lastfm|ui_to_last_fm|ui_view_on_last_fm|ui_source_last_fm|ui_original_text|wl_|about_legal_marks|acct_switch)');
+    r'^(svc_|lfm_|faq_lfm_|faq_lb_|conn_|sw_|key_|img_src_lastfm|ui_to_last_fm|ui_view_on_last_fm|ui_source_last_fm|ui_original_text|wl_|about_legal_marks|acct_switch)');
 
 String tx(String key, [Map<String, String>? args]) {
   var s = _kTx[localeNotifier.value]?[key] ?? kTxEn[key] ?? kTxFr[key] ?? key;
