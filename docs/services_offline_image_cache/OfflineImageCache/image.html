@@ -89,13 +89,14 @@
   if (hot != null &amp;&amp; _meta.containsKey(url)) {
     return Builder(builder: (context) {
       final dpr = MediaQuery.of(context).devicePixelRatio;
+      final (hw, hh) = _decodeSize(width, height, dpr);
       return Image.memory(
         hot,
         width: width,
         height: height,
         fit: fit,
-        cacheWidth:  width  != null ? (width * dpr).round()  : null,
-        cacheHeight: height != null ? (height * dpr).round() : null,
+        cacheWidth:  hw,
+        cacheHeight: hh,
         gaplessPlayback: true,
         errorBuilder: (_, _, _) =&gt;
             errorWidget ?? placeholder ?? const SizedBox.shrink(),
@@ -117,8 +118,7 @@
       &#47;&#47; display size was actually requested; omitted otherwise (e.g. the
       &#47;&#47; detail sheet&#39;s full-size hero image still wants native quality).
       final dpr = MediaQuery.of(context).devicePixelRatio;
-      final cacheWidth  = width  != null ? (width * dpr).round()  : null;
-      final cacheHeight = height != null ? (height * dpr).round() : null;
+      final (cacheWidth, cacheHeight) = _decodeSize(width, height, dpr);
 
       if (snap.data != null) {
         return Image.memory(
