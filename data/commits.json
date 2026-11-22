@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-22T10:23:38Z",
+  "updated": "2026-11-22T13:22:34Z",
   "commits": [
+    {
+      "sha": "4f6eef2804a4db2ce3eed8fe881ba1b4c609db1b",
+      "message": "feat: refactor setup screen with _HeaderPill component and enhance tooltip styling",
+      "date": "2026-11-22T13:20:16Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/4f6eef2804a4db2ce3eed8fe881ba1b4c609db1b",
+      "tags": []
+    },
     {
       "sha": "fae30a3d50725c866d96bb164e801f1555fc8f8c",
       "message": "feat: update localization strings for multiple languages and improve error handling\n\n- Removed beta label from various language files (Spanish, French, Italian, Japanese, Portuguese, Russian, Chinese).\n- Enhanced network error messages in localization files to provide clearer instructions for users.\n- Added new localization strings for news functionality, including buttons and error messages.\n- Implemented a news fetching feature in the dashboard, allowing users to view outages, maintenance notices, and announcements.\n- Updated UI components to reflect changes in localization and new news functionality.\n- Refactored settings and onboarding screens to accommodate new data source logic for Last.fm and ListenBrainz.",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/2a07c67f59506d758e11a44a741453418f46c39d",
-      "tags": []
-    },
-    {
-      "sha": "dbb8281b92314fc03e47f7f83189eaff570478cf",
-      "message": "feat: ajuster le seuil de défilement pour la barre d'état et harmoniser la zone de tap sur l'avatar avec les affichages de poster",
-      "date": "2026-09-26T18:57:35Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/dbb8281b92314fc03e47f7f83189eaff570478cf",
       "tags": []
     }
   ]
