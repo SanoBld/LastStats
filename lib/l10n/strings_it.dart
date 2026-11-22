@@ -1612,4 +1612,10 @@ const Map<String, String> kTxIt = {
   'yr_ctx_peak': 'Brano più ascoltato a queste ore',
   'yr_ctx_artist': 'Brano più ascoltato di {a}',
   'yr_ctx_disc': 'Brano più ascoltato tra le sue scoperte',
+  'yr_bg_full': 'Immagine a schermo intero',
+  'yr_bg_band': 'Immagine in banda superiore',
+  'yr_bg_none': 'Nessuna immagine',
+  'yr_sum_cover': 'Immagine del top 1',
+  'yr_sum_profile': 'Profilo',
+  'yr_sum_none': 'Nessuna',
 };

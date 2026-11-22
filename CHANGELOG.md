@@ -53,6 +53,9 @@
 - Performance: ListenBrainz requests no longer read and decode the offline copy unless the network fails
 - New: a Last.fm FAQ and a ListenBrainz FAQ (5 questions each: API key, Last.fm Pro from December 1, 2026, user token, statistics, history import) in the app and on the help page of the site, in 10 languages
 - Year recap: the #1 artist / track / album (and the streak and record-day tracks) now use their cover as a full-screen background with the name big in the middle; animated covers play there when enabled in Settings > Appearance
+- Year recap: the cover of the #1 slides now fills the whole screen, behind the status bar, the top bar and the buttons; on the other slides a new button switches the cover between full screen, top band and none, and the share follows the choice
+- Year recap summary card: choose the picture with a selector (top 1 cover, profile picture, none)
+- Covers are never stretched or shrunk any more: they fill the area and are cropped (also in the shared image and everywhere a cover is shown in a box that is not square)
 - Year recap: the charts (best month, listening hours, top artist share, discoveries) now name the most played track of their context
 - Year recap sharing: the slide's own cover replaces the profile picture at the top of the shared image (full-bleed for the #1 slides); the cover is downloaded before the capture so the poster is never empty
 - Site: new "ListenBrainz" help theme (tutorial, how it works, account and token, scrobbling, switching service, troubleshooting) mirroring the Last.fm one, in 10 languages

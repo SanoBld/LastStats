@@ -1641,4 +1641,10 @@ const Map<String, String> kTxEn = {
   'yr_ctx_peak': 'Most played track at these hours',
   'yr_ctx_artist': 'Most played track by {a}',
   'yr_ctx_disc': 'Most played track among your discoveries',
+  'yr_bg_full': 'Full-screen image',
+  'yr_bg_band': 'Image in a top band',
+  'yr_bg_none': 'No image',
+  'yr_sum_cover': 'Top 1 image',
+  'yr_sum_profile': 'Profile',
+  'yr_sum_none': 'None',
 };

@@ -1641,4 +1641,10 @@ const Map<String, String> kTxPt = {
   'yr_ctx_peak': 'Faixa mais ouvida a estas horas',
   'yr_ctx_artist': 'Faixa mais ouvida de {a}',
   'yr_ctx_disc': 'Faixa mais ouvida entre as suas descobertas',
+  'yr_bg_full': 'Imagem em ecrã inteiro',
+  'yr_bg_band': 'Imagem em faixa superior',
+  'yr_bg_none': 'Sem imagem',
+  'yr_sum_cover': 'Imagem do top 1',
+  'yr_sum_profile': 'Perfil',
+  'yr_sum_none': 'Nenhuma',
 };

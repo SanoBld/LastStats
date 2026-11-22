@@ -1611,4 +1611,10 @@ const Map<String, String> kTxJa = {
   'yr_ctx_peak': 'この時間帯に最も再生された曲',
   'yr_ctx_artist': '{a} の最も再生された曲',
   'yr_ctx_disc': '新しく出会ったアーティストの中で最も再生された曲',
+  'yr_bg_full': '全画面の画像',
+  'yr_bg_band': '上部バナーの画像',
+  'yr_bg_none': '画像なし',
+  'yr_sum_cover': '1位の画像',
+  'yr_sum_profile': 'プロフィール',
+  'yr_sum_none': 'なし',
 };

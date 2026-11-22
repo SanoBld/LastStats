@@ -1612,4 +1612,10 @@ const Map<String, String> kTxDe = {
   'yr_ctx_peak': 'Meistgespielter Titel zu diesen Uhrzeiten',
   'yr_ctx_artist': 'Meistgespielter Titel von {a}',
   'yr_ctx_disc': 'Meistgespielter Titel unter Ihren Entdeckungen',
+  'yr_bg_full': 'Bild im Vollbild',
+  'yr_bg_band': 'Bild als Banner oben',
+  'yr_bg_none': 'Kein Bild',
+  'yr_sum_cover': 'Bild von Platz 1',
+  'yr_sum_profile': 'Profil',
+  'yr_sum_none': 'Keines',
 };

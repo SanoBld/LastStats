@@ -1638,4 +1638,10 @@ const Map<String, String> kTxZh = {
   'yr_ctx_peak': '这些时段播放次数最多的曲目',
   'yr_ctx_artist': '{a} 播放次数最多的曲目',
   'yr_ctx_disc': '在您的新发现中播放次数最多的曲目',
+  'yr_bg_full': '全屏图片',
+  'yr_bg_band': '顶部横幅图片',
+  'yr_bg_none': '无图片',
+  'yr_sum_cover': '第 1 名的图片',
+  'yr_sum_profile': '个人资料',
+  'yr_sum_none': '无',
 };

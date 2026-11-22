@@ -291,6 +291,19 @@ class OfflineImageCache {
   // ── Widget helper ─────────────────────────────────────────────────────────
 
   // Returns a widget that shows the cached image or falls back to network.
+
+  // Decode size for a picture shown in a width x height box. Giving BOTH
+  // cacheWidth and cacheHeight makes Flutter decode the image to exactly that
+  // size, which stretches any cover that is not the same shape as the box.
+  // Only the larger side is given, so the picture keeps its own proportions
+  // and BoxFit.cover crops it instead.
+  static (int?, int?) _decodeSize(double? width, double? height, double dpr) {
+    final w = width != null && width.isFinite ? (width * dpr).round() : null;
+    final h = height != null && height.isFinite ? (height * dpr).round() : null;
+    if (w != null && h != null) return w >= h ? (w, null) : (null, h);
+    return (w, h);
+  }
+
   static Widget image({
     required String url,
     double? width,
@@ -308,13 +321,14 @@ class OfflineImageCache {
     if (hot != null && _meta.containsKey(url)) {
       return Builder(builder: (context) {
         final dpr = MediaQuery.of(context).devicePixelRatio;
+        final (hw, hh) = _decodeSize(width, height, dpr);
         return Image.memory(
           hot,
           width: width,
           height: height,
           fit: fit,
-          cacheWidth:  width  != null ? (width * dpr).round()  : null,
-          cacheHeight: height != null ? (height * dpr).round() : null,
+          cacheWidth:  hw,
+          cacheHeight: hh,
           gaplessPlayback: true,
           errorBuilder: (_, _, _) =>
               errorWidget ?? placeholder ?? const SizedBox.shrink(),
@@ -336,8 +350,7 @@ class OfflineImageCache {
         // display size was actually requested; omitted otherwise (e.g. the
         // detail sheet's full-size hero image still wants native quality).
         final dpr = MediaQuery.of(context).devicePixelRatio;
-        final cacheWidth  = width  != null ? (width * dpr).round()  : null;
-        final cacheHeight = height != null ? (height * dpr).round() : null;
+        final (cacheWidth, cacheHeight) = _decodeSize(width, height, dpr);
 
         if (snap.data != null) {
           return Image.memory(
