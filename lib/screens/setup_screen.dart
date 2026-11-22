@@ -761,19 +761,13 @@ class _SetupScreenState extends State<SetupScreen>
                           opacity: _langFade,
                           child: Row(children: [
                             // News: outages, maintenance, announcements
-                            Tooltip(
-                              message: tx('news_btn_sub'),
-                              child: ActionChip(
-                                avatar: Icon(Icons.campaign_rounded,
-                                    size: 18, color: scheme.onSecondaryContainer),
-                                label: Text(tx('news_btn')),
-                                backgroundColor: scheme.secondaryContainer,
-                                labelStyle: TextStyle(
-                                    color: scheme.onSecondaryContainer,
-                                    fontWeight: FontWeight.w700),
-                                side: BorderSide.none,
-                                onPressed: () => NewsLauncher.open(context),
-                              ),
+                            _HeaderPill(
+                              scheme: scheme, text: text,
+                              tooltip: tx('news_btn_sub'),
+                              leading: Icon(Icons.campaign_rounded,
+                                  size: 20, color: scheme.primary),
+                              label: tx('news_btn'),
+                              onTap: () => NewsLauncher.open(context),
                             ),
                             const Spacer(),
                             _LangSelectorButton(
@@ -1153,35 +1147,72 @@ class _LangSelectorButton extends StatelessWidget {
   });
 
   @override
+  Widget build(BuildContext context) => _HeaderPill(
+        scheme: scheme, text: text,
+        leading: Text(current.flag, style: const TextStyle(fontSize: 18)),
+        label: current.nativeName,
+        trailing: Icon(Icons.expand_more_rounded,
+            size: 20, color: scheme.onSurfaceVariant),
+        onTap: onTap,
+      );
+}
+
+/// Pill used in the top bar of the login screen (News, Language): same
+/// shape, height, color and pressed effect as the rest of the app.
+class _HeaderPill extends StatelessWidget {
+  final ColorScheme scheme;
+  final TextTheme   text;
+  final Widget      leading;
+  final String      label;
+  final Widget?     trailing;
+  final String?     tooltip;
+  final VoidCallback onTap;
+
+  const _HeaderPill({
+    required this.scheme,
+    required this.text,
+    required this.leading,
+    required this.label,
+    required this.onTap,
+    this.trailing,
+    this.tooltip,
+  });
+
+  @override
   Widget build(BuildContext context) {
-    return Material(
-      color: scheme.surfaceContainerHighest,
-      borderRadius: BorderRadius.circular(20),
+    const shape = StadiumBorder();
+    Widget pill = Material(
+      color: scheme.surfaceContainerHigh,
+      shape: shape,
       child: M3InkWell(
-        onTap:        onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: scheme.outlineVariant),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Text(current.flag, style: const TextStyle(fontSize: 17)),
-            const SizedBox(width: 8),
-            Text(
-              current.nativeName,
-              style: text.labelLarge?.copyWith(
-                color:       scheme.onSurface,
-                fontWeight:  FontWeight.w700,
+        customBorder: shape,
+        onTap: onTap,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 44),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              leading,
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: text.labelLarge?.copyWith(
+                    color: scheme.onSurface,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(width: 6),
-            Icon(Icons.expand_more_rounded, size: 18, color: scheme.onSurfaceVariant),
-          ]),
+              if (trailing != null) ...[const SizedBox(width: 4), trailing!],
+            ]),
+          ),
         ),
       ),
     );
+    if (tooltip != null) pill = Tooltip(message: tooltip!, child: pill);
+    return Semantics(button: true, label: label, child: pill);
   }
 }
 

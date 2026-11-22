@@ -25,6 +25,29 @@ ThemeData applyM3Interaction(ThemeData t) {
     splashFactory: kM3SplashFactory,
     splashColor: Colors.transparent,
     highlightColor: s.onSurface.withValues(alpha: kM3PressAlpha),
+    // Tooltips (long-press / hover): app style instead of the default grey box.
+    tooltipTheme: TooltipThemeData(
+      waitDuration: const Duration(milliseconds: 400),
+      showDuration: const Duration(seconds: 3),
+      preferBelow: false,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: ShapeDecoration(
+        color: s.surfaceContainerHighest,
+        shape: StadiumBorder(side: BorderSide(color: s.outlineVariant)),
+        shadows: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.18),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      textStyle: t.textTheme.labelLarge?.copyWith(
+        color: s.onSurface,
+        fontWeight: FontWeight.w700,
+      ),
+    ),
     appBarTheme: t.appBarTheme.copyWith(
       backgroundColor: s.surface,
       scrolledUnderElevation: 0,
