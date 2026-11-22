@@ -1,6 +1,24 @@
 {
-  "updated": "2026-11-22T20:36:28Z",
+  "updated": "2026-11-22T20:44:36Z",
   "commits": [
+    {
+      "sha": "1659d2c56005f76a535620cda1c17417605eb18c",
+      "message": "feat: réorganiser le changelog pour mettre en avant les nouvelles fonctionnalités et améliorations",
+      "date": "2026-11-22T20:44:22Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/1659d2c56005f76a535620cda1c17417605eb18c",
+      "tags": []
+    },
+    {
+      "sha": "a2597465dc18571a28aa5ac5513893ece2b23dc0",
+      "message": "feat: améliorer l'écran de récapitulatif annuel avec des options de couverture personnalisables et des mises à jour de style",
+      "date": "2026-11-22T20:42:42Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/a2597465dc18571a28aa5ac5513893ece2b23dc0",
+      "tags": []
+    },
     {
       "sha": "c7de4c768df1a0de3a5cc4fd669bc3be5c0287ba",
       "message": "feat: ajouter des options de couverture pour la récapitulation annuelle, y compris l'image en plein écran, en bandeau et sans image",
@@ -2695,24 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/4b7cb7bbc8f65fca05313cc5ade68a32b37e96d5",
-      "tags": []
-    },
-    {
-      "sha": "43d7fa786ae34e353a38d422213e6c88760c9afa",
-      "message": "feat: améliorer le design des cartes de réalisations et des podiums avec des couleurs tonales douces, et optimiser le chargement des vidéos Apple Music",
-      "date": "2026-09-28T20:58:47Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/43d7fa786ae34e353a38d422213e6c88760c9afa",
-      "tags": []
-    },
-    {
-      "sha": "d23e00ba2a90ce6a37d18fc3d40f91623caaaf39",
-      "message": "feat: mettre à jour le changelog pour la version 3.6.0 et améliorer la page des réalisations avec un design Material 3",
-      "date": "2026-09-28T20:40:42Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/d23e00ba2a90ce6a37d18fc3d40f91623caaaf39",
       "tags": []
     }
   ]
