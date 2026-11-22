@@ -83,6 +83,10 @@ or null if the scanned text isn't a recognized profile link.</p>
   final webMatch = RegExp(r&#39;^https?:&#47;&#47;(?:www\.)?last\.fm&#47;user&#47;([^&#47;?#]+)&#39;).firstMatch(text);
   if (webMatch != null) return Uri.decodeComponent(webMatch.group(1)!);
 
+  &#47;&#47; https:&#47;&#47;listenbrainz.org&#47;user&#47;&lt;username&gt;&#47; (also the api. &#47; www. hosts)
+  final lbMatch = RegExp(r&#39;^https?:&#47;&#47;(?:www\.|api\.)?listenbrainz\.org&#47;user&#47;([^&#47;?#]+)&#39;).firstMatch(text);
+  if (lbMatch != null) return Uri.decodeComponent(lbMatch.group(1)!);
+
   return null;
 }</code></pre>
 </section>
