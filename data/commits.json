@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-22T15:26:02Z",
+  "updated": "2026-11-22T20:07:56Z",
   "commits": [
+    {
+      "sha": "1b719abdf0ddc3dfddeb90387a4d45619d22e860",
+      "message": "Add contextual track information for year recap feature\n\n- Introduced new localized strings for Portuguese, Russian, and Chinese to support contextual track information such as most played track of the month, peak hours, top artist, and discoveries.\n- Enhanced the year recap page to include logic for determining the most played track in various contexts (month, artist, discoveries).\n- Updated UI components to display contextual track information prominently in the year recap slides.\n- Implemented hero slides that feature the cover art prominently, enhancing the visual appeal of the recap.",
+      "date": "2026-11-22T20:06:02Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/1b719abdf0ddc3dfddeb90387a4d45619d22e860",
+      "tags": []
+    },
     {
       "sha": "69abc24c9ddce5e12c734e590ef7140a285e2475",
       "message": "fix: corriger l'icône du thème ListenBrainz dans le hub d'aide",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/db58996ce51c2a5257fc2aca9c9cb9a6a9527fd6",
-      "tags": []
-    },
-    {
-      "sha": "767622547ac2bd2c84e373a2fd0064f92c7c9606",
-      "message": "feat: ajouter des œuvres animées Apple Music pour les pistes en cours et améliorer l'affichage du statut en ligne sur les cartes de profil d'amis",
-      "date": "2026-09-27T09:21:21Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/767622547ac2bd2c84e373a2fd0064f92c7c9606",
       "tags": []
     }
   ]
