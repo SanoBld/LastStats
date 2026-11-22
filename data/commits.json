@@ -1,6 +1,24 @@
 {
-  "updated": "2026-11-22T15:07:52Z",
+  "updated": "2026-11-22T15:16:21Z",
   "commits": [
+    {
+      "sha": "69abc24c9ddce5e12c734e590ef7140a285e2475",
+      "message": "fix: corriger l'icône du thème ListenBrainz dans le hub d'aide",
+      "date": "2026-11-22T15:16:04Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/69abc24c9ddce5e12c734e590ef7140a285e2475",
+      "tags": []
+    },
+    {
+      "sha": "5fb154a77a5e143b8e41c5187c46bc4690e3319e",
+      "message": "Update translations for help content in Portuguese, Russian, and Chinese; add ListenBrainz section to help hub",
+      "date": "2026-11-22T15:13:54Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/5fb154a77a5e143b8e41c5187c46bc4690e3319e",
+      "tags": []
+    },
     {
       "sha": "06215a3474918593fbadefed394b10955afadb19",
       "message": "Add FAQ sections for Last.fm and ListenBrainz in multiple languages\n\n- Updated Spanish, French, Italian, Japanese, Portuguese, Russian, and Chinese translations to include FAQs for Last.fm and ListenBrainz.\n- Enhanced help hub to include new FAQ sections for Last.fm and ListenBrainz with appropriate icons and descriptions.\n- Modified the counting function for FAQ items to accommodate the new sections.",
@@ -2695,24 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/767622547ac2bd2c84e373a2fd0064f92c7c9606",
-      "tags": []
-    },
-    {
-      "sha": "8343950d96959eeab29541a020716c6cdb54d2fc",
-      "message": "feat: uniformiser la forme des cartes d'amis en un carré arrondi et améliorer l'affichage du statut en ligne",
-      "date": "2026-09-27T09:00:16Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/8343950d96959eeab29541a020716c6cdb54d2fc",
-      "tags": []
-    },
-    {
-      "sha": "f4b8b276f306833dfcfcd9a5160c55e54f51c7ab",
-      "message": "feat: mettre à jour le nom de la plateforme YT Music en YouTube Music dans plusieurs langues",
-      "date": "2026-09-26T20:16:14Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/f4b8b276f306833dfcfcd9a5160c55e54f51c7ab",
       "tags": []
     }
   ]
