@@ -1,6 +1,24 @@
 {
-  "updated": "2026-11-22T20:54:00Z",
+  "updated": "2026-11-22T21:33:58Z",
   "commits": [
+    {
+      "sha": "0494ada591d48fca7acdfc8b2478b43768744647",
+      "message": "refactor: supprimer le code inutilisé et améliorer la lisibilité de l'écran de configuration et de la page de récapitulatif annuel",
+      "date": "2026-11-22T21:32:23Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/0494ada591d48fca7acdfc8b2478b43768744647",
+      "tags": []
+    },
+    {
+      "sha": "7bf50e48b6bf243fcb7ac38ffdd143d22e4b3453",
+      "message": "feat: mettre à jour la page de connexion Spotify pour utiliser une identité de navigateur à jour et permettre les cookies, le stockage et les pop-ups",
+      "date": "2026-11-22T21:29:52Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/7bf50e48b6bf243fcb7ac38ffdd143d22e4b3453",
+      "tags": []
+    },
     {
       "sha": "1659d2c56005f76a535620cda1c17417605eb18c",
       "message": "feat: réorganiser le changelog pour mettre en avant les nouvelles fonctionnalités et améliorations",
@@ -2695,24 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/078fca1871a692457ae9d0fbd7c8414a26839f54",
-      "tags": []
-    },
-    {
-      "sha": "74f17d105e65efda7148c53b113207b809c115a3",
-      "message": "fix: corriger une erreur de syntaxe dans le texte de sous-titre des options de bibliothèque",
-      "date": "2026-09-29T05:15:53Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/74f17d105e65efda7148c53b113207b809c115a3",
-      "tags": []
-    },
-    {
-      "sha": "4b7cb7bbc8f65fca05313cc5ade68a32b37e96d5",
-      "message": "feat: enhance backup service and library management\n\n- Added new keys to exclude from backup, including notification preferences and dashboard layout settings.\n- Introduced options for including/excluding library, dashboard, notifications, and profiles in backup.\n- Implemented merging and splitting of artist/album versions in the library for better organization.\n- Updated scrobble synchronization to handle new entries more efficiently.\n- Enhanced LastFmService to support merged/split options for top artist/album/track retrieval.\n- Added a new LibraryMerge service to manage linking of different versions of tracks/albums and splitting collaborations.",
-      "date": "2026-09-29T05:09:26Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/4b7cb7bbc8f65fca05313cc5ade68a32b37e96d5",
       "tags": []
     }
   ]
