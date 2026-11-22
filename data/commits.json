@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-22T21:44:06Z",
+  "updated": "2026-11-22T21:59:54Z",
   "commits": [
+    {
+      "sha": "0d4ee7d542676b2130371e7a6ced716346062b73",
+      "message": "chore: bump version to 4.5.0 [skip ci]",
+      "date": "2026-11-22T21:47:17Z",
+      "author": "github-actions[bot]",
+      "avatar": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/0d4ee7d542676b2130371e7a6ced716346062b73",
+      "tags": []
+    },
     {
       "sha": "0494ada591d48fca7acdfc8b2478b43768744647",
       "message": "refactor: supprimer le code inutilisé et améliorer la lisibilité de l'écran de configuration et de la page de récapitulatif annuel",
@@ -8,7 +17,9 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/0494ada591d48fca7acdfc8b2478b43768744647",
-      "tags": []
+      "tags": [
+        "v4.5.0"
+      ]
     },
     {
       "sha": "7bf50e48b6bf243fcb7ac38ffdd143d22e4b3453",
@@ -2704,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/ac805242414f5440f0d91b75ce8cc018d62afd18",
-      "tags": []
-    },
-    {
-      "sha": "078fca1871a692457ae9d0fbd7c8414a26839f54",
-      "message": "feat: ajouter une page README et améliorer la gestion des options d'exportation dans les paramètres de sauvegarde",
-      "date": "2026-09-29T21:41:42Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/078fca1871a692457ae9d0fbd7c8414a26839f54",
       "tags": []
     }
   ]
