@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-22T05:33:28Z",
+  "updated": "2026-11-22T10:13:42Z",
   "commits": [
+    {
+      "sha": "fae30a3d50725c866d96bb164e801f1555fc8f8c",
+      "message": "feat: update localization strings for multiple languages and improve error handling\n\n- Removed beta label from various language files (Spanish, French, Italian, Japanese, Portuguese, Russian, Chinese).\n- Enhanced network error messages in localization files to provide clearer instructions for users.\n- Added new localization strings for news functionality, including buttons and error messages.\n- Implemented a news fetching feature in the dashboard, allowing users to view outages, maintenance notices, and announcements.\n- Updated UI components to reflect changes in localization and new news functionality.\n- Refactored settings and onboarding screens to accommodate new data source logic for Last.fm and ListenBrainz.",
+      "date": "2026-11-22T10:11:26Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/fae30a3d50725c866d96bb164e801f1555fc8f8c",
+      "tags": []
+    },
     {
       "sha": "f453e7e22d00c3c98509e30f3c785bf9a2f15884",
       "message": "feat: mise à jour des liens QR pour prendre en charge ListenBrainz",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/dbb8281b92314fc03e47f7f83189eaff570478cf",
-      "tags": []
-    },
-    {
-      "sha": "19a44f2fce94fed1679ee81c90855bab2f605994",
-      "message": "feat: ajouter un effet de fondu pour les cartes d'amis et implémenter un composant _ScrollingLabel pour un affichage dynamique des noms",
-      "date": "2026-09-26T18:33:35Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/19a44f2fce94fed1679ee81c90855bab2f605994",
       "tags": []
     }
   ]
