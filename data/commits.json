@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-22T13:22:34Z",
+  "updated": "2026-11-22T13:25:03Z",
   "commits": [
+    {
+      "sha": "433f83e6a8ac2efa80ee1b08347e684096414f5b",
+      "message": "feat: mise à jour des messages d'alerte concernant l'API Last.fm pour inclure la date limite de 2026",
+      "date": "2026-11-22T13:22:36Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/433f83e6a8ac2efa80ee1b08347e684096414f5b",
+      "tags": []
+    },
     {
       "sha": "4f6eef2804a4db2ce3eed8fe881ba1b4c609db1b",
       "message": "feat: refactor setup screen with _HeaderPill component and enhance tooltip styling",
@@ -2704,15 +2713,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/a5653d070040116e274564575caa41d7b5f8f60a",
-      "tags": []
-    },
-    {
-      "sha": "2a07c67f59506d758e11a44a741453418f46c39d",
-      "message": "feat: améliorer l'affichage des cartes d'amis en ajustant la largeur et en modifiant le style des éléments de la section de profil",
-      "date": "2026-09-26T19:18:43Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/2a07c67f59506d758e11a44a741453418f46c39d",
       "tags": []
     }
   ]
