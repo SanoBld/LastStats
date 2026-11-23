@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-22T23:20:30Z",
+  "updated": "2026-11-23T06:13:26Z",
   "stars": 6,
   "releases": [
     {
@@ -13,7 +13,7 @@
         {
           "name": "app-arm64-v8a-release.apk",
           "size": 49058569,
-          "download_count": 1,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.5.0/app-arm64-v8a-release.apk"
         },
         {
@@ -25,7 +25,7 @@
         {
           "name": "app-universal-release.apk",
           "size": 108272159,
-          "download_count": 1,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.5.0/app-universal-release.apk"
         },
         {
@@ -179,7 +179,7 @@
         {
           "name": "app-universal-release.apk",
           "size": 107004600,
-          "download_count": 2,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0/app-universal-release.apk"
         },
         {
@@ -487,7 +487,7 @@
         {
           "name": "app-universal-release.apk",
           "size": 105922012,
-          "download_count": 6,
+          "download_count": 7,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/app-universal-release.apk"
         },
         {
@@ -505,7 +505,7 @@
         {
           "name": "LastStats-ios.ipa",
           "size": 25473603,
-          "download_count": 123,
+          "download_count": 124,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/LastStats-ios.ipa"
         },
         {
