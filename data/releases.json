@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-23T06:13:26Z",
+  "updated": "2026-11-23T23:30:14Z",
   "stars": 6,
   "releases": [
     {
@@ -25,7 +25,7 @@
         {
           "name": "app-universal-release.apk",
           "size": 108272159,
-          "download_count": 3,
+          "download_count": 4,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.5.0/app-universal-release.apk"
         },
         {
@@ -49,7 +49,7 @@
         {
           "name": "LastStats-ios.ipa",
           "size": 25831305,
-          "download_count": 1,
+          "download_count": 7,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.5.0/LastStats-ios.ipa"
         },
         {
@@ -133,7 +133,7 @@
         {
           "name": "LastStats-Setup-x64.exe",
           "size": 17206050,
-          "download_count": 1,
+          "download_count": 2,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.5.0/LastStats-Setup-x64.exe"
         },
         {
@@ -197,7 +197,7 @@
         {
           "name": "LastStats-ios.ipa",
           "size": 25609504,
-          "download_count": 123,
+          "download_count": 124,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0/LastStats-ios.ipa"
         },
         {
