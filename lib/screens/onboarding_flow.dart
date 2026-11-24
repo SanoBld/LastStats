@@ -1294,7 +1294,7 @@ class _FavoritesStepState extends State<_FavoritesStep> {
 
   Widget _userAvatar(String? url) {
     if (url != null) {
-      return CircleAvatar(radius: 16, backgroundImage: NetworkImage(url));
+      return CircleAvatar(radius: 16, backgroundImage: ResizeImage(NetworkImage(url), width: 256));
     }
     return CircleAvatar(
       radius: 16,

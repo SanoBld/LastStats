@@ -663,7 +663,7 @@ class _SettingsPageState extends State<_SettingsPage> {
                         color: scheme.primary,
                         image: _avatarUrl != null
                             ? DecorationImage(
-                                image: NetworkImage(_avatarUrl!), fit: BoxFit.cover)
+                                image: ResizeImage(NetworkImage(_avatarUrl!), width: 256), fit: BoxFit.cover)
                             : null,
                         shape: const M3CookieBorder(lobes: 8, amplitude: 0.07),
                       ),

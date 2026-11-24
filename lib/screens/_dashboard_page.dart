@@ -1021,7 +1021,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                       CircleAvatar(
                         radius: 34,
                         backgroundColor: sc.primaryContainer,
-                        backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                        backgroundImage: avatarUrl.isNotEmpty ? ResizeImage(NetworkImage(avatarUrl), width: 256) : null,
                         child: avatarUrl.isEmpty ? Icon(Icons.person_rounded, size: 34, color: sc.onPrimaryContainer) : null,
                       ),
                       const SizedBox(width: 14),
@@ -2093,7 +2093,7 @@ class _DashboardPageState extends State<_DashboardPage> with WidgetsBindingObser
                                 radius: 28,
                                 backgroundColor: scheme.primary.withValues(alpha: 0.3),
                                 backgroundImage: avatarUrl.isNotEmpty
-                                    ? NetworkImage(avatarUrl) : null,
+                                    ? ResizeImage(NetworkImage(avatarUrl), width: 256) : null,
                                 child: avatarUrl.isEmpty
                                     ? const Icon(Icons.person_rounded,
                                         size: 28, color: Colors.white)
@@ -2497,7 +2497,7 @@ class _FriendCardState extends State<_FriendCard> {
                         backgroundColor: listening
                             ? scheme.onPrimary.withValues(alpha: 0.2)
                             : scheme.primary.withValues(alpha: 0.2),
-                        backgroundImage: _hasAvatar ? NetworkImage(friend.avatarUrl) : null,
+                        backgroundImage: _hasAvatar ? ResizeImage(NetworkImage(friend.avatarUrl), width: 256) : null,
                         child: _hasAvatar
                             ? null
                             : Text(

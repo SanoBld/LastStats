@@ -480,7 +480,7 @@ class _SearchPageState extends State<_SearchPage> {
           CircleAvatar(
             radius: 24,
             backgroundColor: scheme.primaryContainer,
-            backgroundImage: has ? NetworkImage(avatar) : null,
+            backgroundImage: has ? ResizeImage(NetworkImage(avatar), width: 256) : null,
             child: has ? null : Text(uname.isNotEmpty ? uname[0].toUpperCase() : '?',
                 style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w900)),
           ),

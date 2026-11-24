@@ -51,6 +51,205 @@ class _YrData {
   String dayRecordDate = '';
 }
 
+class _YrIn {
+  final List<ScrobbleRecord> records;
+  final int year, reg;
+  final Set<String> known;
+  final bool splitOn, mergeOn;
+  final List<List<ScrobbleRecord>>? prior; // null = an earlier year is not cached
+  const _YrIn(this.records, this.year, this.reg, this.known, this.splitOn, this.mergeOn, this.prior);
+}
+
+_YrData _yrCompute(_YrIn a) {
+    // Isolates have their own static state: copy the two settings here.
+    splitCollabsNotifier.value = a.splitOn;
+    mergeVersionsNotifier.value = a.mergeOn;
+    final records = a.records;
+    final year = a.year;
+    final d = _YrData();
+    d.total = records.length;
+    if (records.isEmpty) return d;
+
+    final known = a.known;
+    final artistCount = <String, int>{};
+    final trackCount = <String, int>{};
+    final trackRep = <String, ScrobbleRecord>{};
+    final albumCount = <String, int>{};
+    final albumRep = <String, ScrobbleRecord>{};
+    final dayCount = <String, int>{};
+
+    // Dates are built once and reused by every pass below.
+    final dts = List<DateTime>.generate(
+        records.length, (i) => DateTime.fromMillisecondsSinceEpoch(records[i].ts * 1000));
+    // Same artist / same title always gives the same keys: compute them once.
+    final partsMemo = <String, List<String>>{};
+    final tKeyMemo = <String, Map<String, String>>{};
+    for (var i = 0; i < records.length; i++) {
+      final r = records[i];
+      final dt = dts[i];
+      d.monthly[dt.month - 1]++;
+      d.hourly[dt.hour]++;
+      d.weekday[dt.weekday - 1]++;
+      final dayKey = '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
+      dayCount[dayKey] = (dayCount[dayKey] ?? 0) + 1;
+
+      if (r.artist.isEmpty) continue;
+      final parts = LibraryMerge.splitOn
+          ? (partsMemo[r.artist] ??=
+              LibraryMerge.artistParts(r.artist, known, ambiguous: true))
+          : [r.artist];
+      for (final a in parts) {
+        artistCount[a] = (artistCount[a] ?? 0) + 1;
+      }
+      final tKey = LibraryMerge.mergeOn
+          ? ((tKeyMemo[r.artist] ??= {})[r.track] ??=
+              LibraryMerge.trackKey(r.track, r.artist, known))
+          : '${r.artist} — ${r.track}';
+      trackCount[tKey] = (trackCount[tKey] ?? 0) + 1;
+      trackRep.putIfAbsent(tKey, () => r);
+      if (r.album.isNotEmpty) {
+        final aKey = '${r.artist} — ${r.album}';
+        albumCount[aKey] = (albumCount[aKey] ?? 0) + 1;
+        albumRep.putIfAbsent(aKey, () => r);
+      }
+    }
+
+    List<T> top<T>(Map<String, int> m, T Function(String, int) build) {
+      final e = m.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+      return e.take(5).map((x) => build(x.key, x.value)).toList();
+    }
+
+    d.artists = top(artistCount, (k, c) => _YrRanked(k, '', c));
+    d.artistsWide = (artistCount.entries.toList()..sort((a, b) => b.value.compareTo(a.value)))
+        .take(20).map((e) => _YrRanked(e.key, '', e.value)).toList();
+    d.calendar = dayCount;
+    d.cumulative = AllScrobblesService.computeYearCumulative(records, year);
+    d.hourlyMap = {for (var h = 0; h < 24; h++) h: d.hourly[h]};
+    d.weekdayMap = {for (var w = 0; w < 7; w++) w + 1: d.weekday[w]};
+    d.tracks = top(trackCount, (k, c) => _YrRanked(trackRep[k]!.track, trackRep[k]!.artist, c));
+    d.tracksAll = (trackCount.entries.toList()..sort((a, b) => b.value.compareTo(a.value)))
+        .take(300).map((e) => _YrRanked(trackRep[e.key]!.track, trackRep[e.key]!.artist, e.value)).toList();
+    d.albums = top(albumCount, (k, c) => _YrRanked(albumRep[k]!.album, albumRep[k]!.artist, c));
+    final ranked = artistCount.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    d.topArtistNames = ranked.take(50).map((e) => e.key).toList();
+    d.uniqueArtists = artistCount.length;
+    d.uniqueTracks = trackCount.length;
+
+    // Active days, busiest day, longest streak (consecutive calendar days).
+    d.activeDays = dayCount.length;
+    final days = dayCount.keys.toList()..sort();
+    var streak = 0, best = 0;
+    DateTime? prev;
+    for (final k in days) {
+      final p = k.split('-');
+      final day = DateTime(int.parse(p[0]), int.parse(p[1]), int.parse(p[2]));
+      streak = (prev != null && day.difference(prev).inHours <= 36) ? streak + 1 : 1;
+      if (streak > best) best = streak;
+      prev = day;
+      final c = dayCount[k]!;
+      if (c > d.busiestDayCount) {
+        d.busiestDayCount = c;
+        d.busiestDay = k;
+      }
+    }
+    d.longestStreak = best;
+    final now = DateTime.now();
+    final end = year == now.year ? now : DateTime(year, 12, 31);
+    d.daysInRange = end.difference(DateTime(year, 1, 1)).inDays + 1;
+
+    // Tracks tied to specific slides (busiest day, main listening period, longest streak, random)
+    String bucketOf(int h) => (h < 5 || h >= 22) ? 'night' : h < 12 ? 'morning' : h < 18 ? 'day' : 'evening';
+    final bk = <String, int>{};
+    for (var h = 0; h < 24; h++) { bk[bucketOf(h)] = (bk[bucketOf(h)] ?? 0) + d.hourly[h]; }
+    final persona = bk.entries.reduce((a, b) => b.value > a.value ? b : a).key;
+    final streakDays = <String>{};
+    {
+      var st = 0; DateTime? pv;
+      for (var i = 0; i < days.length; i++) {
+        final q = days[i].split('-');
+        final dd = DateTime(int.parse(q[0]), int.parse(q[1]), int.parse(q[2]));
+        st = (pv != null && dd.difference(pv).inHours <= 36) ? st + 1 : 1;
+        pv = dd;
+        if (st == best && streakDays.isEmpty) streakDays.addAll(days.sublist(i - best + 1, i + 1));
+      }
+    }
+    String dk(DateTime t) => '${t.year}-${t.month.toString().padLeft(2, '0')}-${t.day.toString().padLeft(2, '0')}';
+    _YrRanked? topOf(bool Function(DateTime) test) {
+      final c = <String, int>{};
+      final rp = <String, ScrobbleRecord>{};
+      for (var i = 0; i < records.length; i++) {
+        final r = records[i];
+        if (r.artist.isEmpty || r.track.isEmpty) continue;
+        if (!test(dts[i])) continue;
+        final k = '${r.artist} — ${r.track}';
+        c[k] = (c[k] ?? 0) + 1;
+        rp.putIfAbsent(k, () => r);
+      }
+      if (c.isEmpty) return null;
+      final b = c.entries.reduce((a, x) => x.value > a.value ? x : a);
+      return _YrRanked(rp[b.key]!.track, rp[b.key]!.artist, b.value);
+    }
+    _YrRanked? topOfRec(bool Function(ScrobbleRecord) test) {
+      final c = <String, int>{};
+      final rp = <String, ScrobbleRecord>{};
+      for (final r in records) {
+        if (r.artist.isEmpty || r.track.isEmpty || !test(r)) continue;
+        final k = '${r.artist} — ${r.track}';
+        c[k] = (c[k] ?? 0) + 1;
+        rp.putIfAbsent(k, () => r);
+      }
+      if (c.isEmpty) return null;
+      final b = c.entries.reduce((a, x) => x.value > a.value ? x : a);
+      return _YrRanked(rp[b.key]!.track, rp[b.key]!.artist, b.value);
+    }
+    final bestMonthIdx = d.monthly.indexOf(d.monthly.fold<int>(0, (m, v) => v > m ? v : m));
+    d.monthTrack = topOf((t) => t.month == bestMonthIdx + 1);
+    if (d.artists.isNotEmpty) {
+      final top = d.artists.first.name.toLowerCase();
+      d.artistTrack = topOfRec((r) => r.artist.toLowerCase().contains(top));
+    }
+    d.busiestTrack = topOf((t) => dk(t) == d.busiestDay);
+    d.peakTrack = topOf((t) => bucketOf(t.hour) == persona);
+    d.streakTrack = topOf((t) => streakDays.contains(dk(t)));
+    {
+      final c = <String, int>{};
+      final rp = <String, ScrobbleRecord>{};
+      for (var i = 0; i < records.length; i++) {
+        final r = records[i];
+        if (r.artist.isEmpty || r.track.isEmpty) continue;
+        final k = '${dk(dts[i])}|${r.artist} — ${r.track}';
+        c[k] = (c[k] ?? 0) + 1;
+        rp.putIfAbsent(k, () => r);
+      }
+      if (c.isNotEmpty) {
+        final b = c.entries.reduce((a, x) => x.value > a.value ? x : a);
+        d.dayRecord = _YrRanked(rp[b.key]!.track, rp[b.key]!.artist, b.value);
+        final q = b.key.split('|').first.split('-');
+        d.dayRecordDate = '${q[2]}/${q[1]}/${q[0]}';
+      }
+    }
+    final withTrack = records.where((r) => r.artist.isNotEmpty && r.track.isNotEmpty).toList();
+    if (withTrack.isNotEmpty) {
+      final r = withTrack[math.Random(year).nextInt(withTrack.length)];
+      d.randomTrack = _YrRanked(r.track, r.artist, 1);
+    }
+
+    // Discoveries: artists never scrobbled in any earlier year. Only computed
+    // when every earlier year since registration is in the local cache.
+    final reg = a.reg;
+    if (a.prior != null && year > reg) {
+      final before = <String>{};
+      for (final rs in a.prior!) {
+        for (final r in rs) {
+          before.add(r.artist);
+        }
+      }
+      d.newArtists = artistCount.keys.where((x) => !before.contains(x)).length;
+      d.discTrack = topOfRec((r) => !before.contains(r.artist));
+    }
+    return d;
+  }
+
 // What to play on a slide (type: tracks / artists / albums).
 class _PvReq {
   final String type, name, artist;
@@ -581,7 +780,17 @@ class _YearRecapPageState extends State<YearRecapPage> {
         },
       );
       if (!mounted) return;
-      final data = _compute(records, _year);
+      final reg = AllScrobblesService.getRegistrationYear();
+      List<List<ScrobbleRecord>>? prior = [];
+      for (var y = reg; y < _year; y++) {
+        final rs = AllScrobblesService.isYearCached(y) ? AllScrobblesService.getRecordsForYear(y) : null;
+        if (rs == null) { prior = null; break; }
+        prior!.add(rs);
+      }
+      final data = await compute(_yrCompute, _YrIn(
+        records, _year, reg, LibraryMerge.knownSync(widget.service.username),
+        LibraryMerge.splitOn, LibraryMerge.mergeOn, prior));
+      if (!mounted || token != _token) return;
       setState(() {
         _data = data;
         _loading = false;
@@ -598,185 +807,6 @@ class _YearRecapPageState extends State<YearRecapPage> {
   }
 
   // ── Aggregation ──────────────────────────────────────────────────────────
-  _YrData _compute(List<ScrobbleRecord> records, int year) {
-    final d = _YrData();
-    d.total = records.length;
-    if (records.isEmpty) return d;
-
-    final known = LibraryMerge.knownSync(widget.service.username);
-    final artistCount = <String, int>{};
-    final trackCount = <String, int>{};
-    final trackRep = <String, ScrobbleRecord>{};
-    final albumCount = <String, int>{};
-    final albumRep = <String, ScrobbleRecord>{};
-    final dayCount = <String, int>{};
-
-    for (final r in records) {
-      final dt = DateTime.fromMillisecondsSinceEpoch(r.ts * 1000);
-      d.monthly[dt.month - 1]++;
-      d.hourly[dt.hour]++;
-      d.weekday[dt.weekday - 1]++;
-      final dayKey = '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
-      dayCount[dayKey] = (dayCount[dayKey] ?? 0) + 1;
-
-      if (r.artist.isEmpty) continue;
-      final parts = LibraryMerge.splitOn
-          ? LibraryMerge.artistParts(r.artist, known, ambiguous: true)
-          : [r.artist];
-      for (final a in parts) {
-        artistCount[a] = (artistCount[a] ?? 0) + 1;
-      }
-      final tKey = LibraryMerge.mergeOn
-          ? LibraryMerge.trackKey(r.track, r.artist, known)
-          : '${r.artist} — ${r.track}';
-      trackCount[tKey] = (trackCount[tKey] ?? 0) + 1;
-      trackRep.putIfAbsent(tKey, () => r);
-      if (r.album.isNotEmpty) {
-        final aKey = '${r.artist} — ${r.album}';
-        albumCount[aKey] = (albumCount[aKey] ?? 0) + 1;
-        albumRep.putIfAbsent(aKey, () => r);
-      }
-    }
-
-    List<T> top<T>(Map<String, int> m, T Function(String, int) build) {
-      final e = m.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
-      return e.take(5).map((x) => build(x.key, x.value)).toList();
-    }
-
-    d.artists = top(artistCount, (k, c) => _YrRanked(k, '', c));
-    d.artistsWide = (artistCount.entries.toList()..sort((a, b) => b.value.compareTo(a.value)))
-        .take(20).map((e) => _YrRanked(e.key, '', e.value)).toList();
-    d.calendar = dayCount;
-    d.cumulative = AllScrobblesService.computeYearCumulative(records, year);
-    d.hourlyMap = {for (var h = 0; h < 24; h++) h: d.hourly[h]};
-    d.weekdayMap = {for (var w = 0; w < 7; w++) w + 1: d.weekday[w]};
-    d.tracks = top(trackCount, (k, c) => _YrRanked(trackRep[k]!.track, trackRep[k]!.artist, c));
-    d.tracksAll = (trackCount.entries.toList()..sort((a, b) => b.value.compareTo(a.value)))
-        .take(300).map((e) => _YrRanked(trackRep[e.key]!.track, trackRep[e.key]!.artist, e.value)).toList();
-    d.albums = top(albumCount, (k, c) => _YrRanked(albumRep[k]!.album, albumRep[k]!.artist, c));
-    final ranked = artistCount.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
-    d.topArtistNames = ranked.take(50).map((e) => e.key).toList();
-    d.uniqueArtists = artistCount.length;
-    d.uniqueTracks = trackCount.length;
-
-    // Active days, busiest day, longest streak (consecutive calendar days).
-    d.activeDays = dayCount.length;
-    final days = dayCount.keys.toList()..sort();
-    var streak = 0, best = 0;
-    DateTime? prev;
-    for (final k in days) {
-      final p = k.split('-');
-      final day = DateTime(int.parse(p[0]), int.parse(p[1]), int.parse(p[2]));
-      streak = (prev != null && day.difference(prev).inHours <= 36) ? streak + 1 : 1;
-      if (streak > best) best = streak;
-      prev = day;
-      final c = dayCount[k]!;
-      if (c > d.busiestDayCount) {
-        d.busiestDayCount = c;
-        d.busiestDay = k;
-      }
-    }
-    d.longestStreak = best;
-    final now = DateTime.now();
-    final end = year == now.year ? now : DateTime(year, 12, 31);
-    d.daysInRange = end.difference(DateTime(year, 1, 1)).inDays + 1;
-
-    // Tracks tied to specific slides (busiest day, main listening period, longest streak, random)
-    String bucketOf(int h) => (h < 5 || h >= 22) ? 'night' : h < 12 ? 'morning' : h < 18 ? 'day' : 'evening';
-    final bk = <String, int>{};
-    for (var h = 0; h < 24; h++) { bk[bucketOf(h)] = (bk[bucketOf(h)] ?? 0) + d.hourly[h]; }
-    final persona = bk.entries.reduce((a, b) => b.value > a.value ? b : a).key;
-    final streakDays = <String>{};
-    {
-      var st = 0; DateTime? pv;
-      for (var i = 0; i < days.length; i++) {
-        final q = days[i].split('-');
-        final dd = DateTime(int.parse(q[0]), int.parse(q[1]), int.parse(q[2]));
-        st = (pv != null && dd.difference(pv).inHours <= 36) ? st + 1 : 1;
-        pv = dd;
-        if (st == best && streakDays.isEmpty) streakDays.addAll(days.sublist(i - best + 1, i + 1));
-      }
-    }
-    String dk(DateTime t) => '${t.year}-${t.month.toString().padLeft(2, '0')}-${t.day.toString().padLeft(2, '0')}';
-    _YrRanked? topOf(bool Function(DateTime) test) {
-      final c = <String, int>{};
-      final rp = <String, ScrobbleRecord>{};
-      for (final r in records) {
-        if (r.artist.isEmpty || r.track.isEmpty) continue;
-        if (!test(DateTime.fromMillisecondsSinceEpoch(r.ts * 1000))) continue;
-        final k = '${r.artist} — ${r.track}';
-        c[k] = (c[k] ?? 0) + 1;
-        rp.putIfAbsent(k, () => r);
-      }
-      if (c.isEmpty) return null;
-      final b = c.entries.reduce((a, x) => x.value > a.value ? x : a);
-      return _YrRanked(rp[b.key]!.track, rp[b.key]!.artist, b.value);
-    }
-    _YrRanked? topOfRec(bool Function(ScrobbleRecord) test) {
-      final c = <String, int>{};
-      final rp = <String, ScrobbleRecord>{};
-      for (final r in records) {
-        if (r.artist.isEmpty || r.track.isEmpty || !test(r)) continue;
-        final k = '${r.artist} — ${r.track}';
-        c[k] = (c[k] ?? 0) + 1;
-        rp.putIfAbsent(k, () => r);
-      }
-      if (c.isEmpty) return null;
-      final b = c.entries.reduce((a, x) => x.value > a.value ? x : a);
-      return _YrRanked(rp[b.key]!.track, rp[b.key]!.artist, b.value);
-    }
-    final bestMonthIdx = d.monthly.indexOf(d.monthly.fold<int>(0, (m, v) => v > m ? v : m));
-    d.monthTrack = topOf((t) => t.month == bestMonthIdx + 1);
-    if (d.artists.isNotEmpty) {
-      final top = d.artists.first.name.toLowerCase();
-      d.artistTrack = topOfRec((r) => r.artist.toLowerCase().contains(top));
-    }
-    d.busiestTrack = topOf((t) => dk(t) == d.busiestDay);
-    d.peakTrack = topOf((t) => bucketOf(t.hour) == persona);
-    d.streakTrack = topOf((t) => streakDays.contains(dk(t)));
-    {
-      final c = <String, int>{};
-      final rp = <String, ScrobbleRecord>{};
-      for (final r in records) {
-        if (r.artist.isEmpty || r.track.isEmpty) continue;
-        final k = '${dk(DateTime.fromMillisecondsSinceEpoch(r.ts * 1000))}|${r.artist} — ${r.track}';
-        c[k] = (c[k] ?? 0) + 1;
-        rp.putIfAbsent(k, () => r);
-      }
-      if (c.isNotEmpty) {
-        final b = c.entries.reduce((a, x) => x.value > a.value ? x : a);
-        d.dayRecord = _YrRanked(rp[b.key]!.track, rp[b.key]!.artist, b.value);
-        final q = b.key.split('|').first.split('-');
-        d.dayRecordDate = '${q[2]}/${q[1]}/${q[0]}';
-      }
-    }
-    final withTrack = records.where((r) => r.artist.isNotEmpty && r.track.isNotEmpty).toList();
-    if (withTrack.isNotEmpty) {
-      final r = withTrack[math.Random(year).nextInt(withTrack.length)];
-      d.randomTrack = _YrRanked(r.track, r.artist, 1);
-    }
-
-    // Discoveries: artists never scrobbled in any earlier year. Only computed
-    // when every earlier year since registration is in the local cache.
-    final reg = AllScrobblesService.getRegistrationYear();
-    var allPrior = true;
-    final before = <String>{};
-    for (var y = reg; y < year; y++) {
-      final rs = AllScrobblesService.isYearCached(y) ? AllScrobblesService.getRecordsForYear(y) : null;
-      if (rs == null) {
-        allPrior = false;
-        break;
-      }
-      for (final r in rs) {
-        before.add(r.artist);
-      }
-    }
-    if (allPrior && year > reg) {
-      d.newArtists = artistCount.keys.where((a) => !before.contains(a)).length;
-      d.discTrack = topOfRec((r) => !before.contains(r.artist));
-    }
-    return d;
-  }
 
   // ── Friends ──────────────────────────────────────────────────────────────
   // Yearly totals: one cheap call per friend (limit 1 -> only the total).

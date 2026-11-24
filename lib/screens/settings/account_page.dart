@@ -516,7 +516,7 @@ class _AccountPageState extends State<AccountPage> {
             CircleAvatar(
               radius: 40,
               backgroundColor: scheme.primaryContainer,
-              backgroundImage: _avatarUrl != null ? NetworkImage(_avatarUrl!) : null,
+              backgroundImage: _avatarUrl != null ? ResizeImage(NetworkImage(_avatarUrl!), width: 256) : null,
               child: _avatarUrl == null
                   ? Text(
                       active.username[0].toUpperCase(),
@@ -582,7 +582,7 @@ class _AccountPageState extends State<AccountPage> {
                         isAct ? scheme.primary : scheme.surfaceContainerHighest,
                     // Show avatar only for active account (others load on demand).
                     backgroundImage: (isAct && _avatarUrl != null)
-                        ? NetworkImage(_avatarUrl!)
+                        ? ResizeImage(NetworkImage(_avatarUrl!), width: 256)
                         : null,
                     child: (isAct && _avatarUrl != null)
                         ? null

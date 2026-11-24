@@ -1,6 +1,51 @@
 // ignore_for_file: unused_import
 part of 'home_screen.dart';
 
+// ── Off-thread helpers (isolates do not share static state) ────────────────
+class _CtIn {
+  final List<ScrobbleRecord> records;
+  final String type;
+  final Set<String> known;
+  final bool splitOn, mergeOn;
+  const _CtIn(this.records, this.type, this.known, this.splitOn, this.mergeOn);
+}
+
+List<Map<String, dynamic>> _chartsLocalTop(_CtIn a) {
+  splitCollabsNotifier.value = a.splitOn;
+  mergeVersionsNotifier.value = a.mergeOn;
+  final tally = LocalTally(a.known);
+  for (final r in a.records) {
+    if (a.type == 'artists') {
+      if (r.artist.isEmpty) continue;
+      tally.addScrobble('artists', name: r.artist, artist: '');
+    } else {
+      if (r.album.isEmpty) continue;
+      tally.addScrobble('albums', name: r.album, artist: r.artist);
+    }
+  }
+  return tally.sorted().take(10).map((e) => <String, dynamic>{
+        'name': e.name,
+        'playcount': e.plays.toString(),
+        'image': <dynamic>[],
+        if (a.type != 'artists') 'artist': {'name': e.artist},
+      }).toList();
+}
+
+// Returns [hours, weekdays, {0: total}].
+List<Map<int, int>> _chartsHabits(List<List<ScrobbleRecord>> lists) {
+  final hours    = <int, int>{for (var i = 0; i < 24; i++) i: 0};
+  final weekdays = <int, int>{for (var i = 1; i <= 7; i++) i: 0};
+  var count = 0;
+  for (final records in lists) {
+    AllScrobblesService.computeHourly(records)
+        .forEach((k, v) => hours[k] = (hours[k] ?? 0) + v);
+    AllScrobblesService.computeWeekday(records)
+        .forEach((k, v) => weekdays[k] = (weekdays[k] ?? 0) + v);
+    count += records.length;
+  }
+  return [hours, weekdays, {0: count}];
+}
+
 List<String> get _chartWeekdayLabels => L.weekdaysShort;
 
 const _kTwoPi  = 6.283185307179586;
@@ -151,22 +196,9 @@ class _ChartsPageState extends State<_ChartsPage>
     }
     if (records.isEmpty) return [];
     if (LibraryMerge.active) await LibraryMerge.ensureKnown(widget.service, null);
-    final tally = LocalTally(LibraryMerge.knownSync(widget.service.username));
-    for (final r in records) {
-      if (type == 'artists') {
-        if (r.artist.isEmpty) continue;
-        tally.addScrobble('artists', name: r.artist, artist: '');
-      } else {
-        if (r.album.isEmpty) continue;
-        tally.addScrobble('albums', name: r.album, artist: r.artist);
-      }
-    }
-    return tally.sorted().take(10).map((e) => <String, dynamic>{
-          'name': e.name,
-          'playcount': e.plays.toString(),
-          'image': <dynamic>[],
-          if (type != 'artists') 'artist': {'name': e.artist},
-        }).toList();
+    return compute(_chartsLocalTop, _CtIn(records, type,
+        LibraryMerge.knownSync(widget.service.username),
+        LibraryMerge.splitOn, LibraryMerge.mergeOn));
   }
 
   String _topSig(List<dynamic> l) =>
@@ -370,18 +402,15 @@ class _ChartsPageState extends State<_ChartsPage>
   /// Aggregate hourly & weekday data across ALL cached years.
   Future<void> _loadAllTimeHabits() async {
     setState(() { _hourlyLoading = true; });
-    final hours    = <int, int>{for (var i = 0; i < 24; i++) i: 0};
-    final weekdays = <int, int>{for (var i = 1; i <= 7; i++) i: 0};
-    int count = 0;
+    final lists = <List<ScrobbleRecord>>[];
     for (final year in AllScrobblesService.getCachedYears()) {
       final records = AllScrobblesService.getRecordsForYear(year);
-      if (records == null) continue;
-      final h = AllScrobblesService.computeHourly(records);
-      final w = AllScrobblesService.computeWeekday(records);
-      h.forEach((k, v) => hours[k]    = (hours[k]    ?? 0) + v);
-      w.forEach((k, v) => weekdays[k] = (weekdays[k] ?? 0) + v);
-      count += records.length;
+      if (records != null) lists.add(records);
     }
+    final res = await compute(_chartsHabits, lists);
+    final hours = res[0];
+    final weekdays = res[1];
+    final count = res[2][0] ?? 0;
     if (!mounted) return;
     // Fallback to recent scrobbles if nothing cached
     if (count == 0) { await _loadHourlyFallback(); return; }

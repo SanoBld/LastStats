@@ -23,7 +23,7 @@ import 'dart:ui';
 import 'dart:ui' as ui;
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform, compute;
 import '../widgets/update_install_sheet.dart';
 import '../services/movie_easter_egg.dart';
 import 'package:flutter/gestures.dart' show TapGestureRecognizer;
