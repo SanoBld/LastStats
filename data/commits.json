@@ -1,6 +1,42 @@
 {
-  "updated": "2026-11-24T08:50:23Z",
+  "updated": "2026-11-24T12:19:47Z",
   "commits": [
+    {
+      "sha": "74c75a8314c9f2b2fc0d97595bd6f984b7c9d655",
+      "message": "feat: ajouter le décodage asynchrone des réponses API pour éviter le gel de l'interface",
+      "date": "2026-11-24T12:18:23Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/74c75a8314c9f2b2fc0d97595bd6f984b7c9d655",
+      "tags": []
+    },
+    {
+      "sha": "7460a9c691823ba7301c774de629e937e429d9b3",
+      "message": "feat: mise à jour du changelog pour la version 4.6.0 et amélioration des performances des graphiques",
+      "date": "2026-11-24T12:17:04Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/7460a9c691823ba7301c774de629e937e429d9b3",
+      "tags": []
+    },
+    {
+      "sha": "52a76d446e1657fa86a03a7833614d8aec8f4929",
+      "message": "Merge branch 'master' of https://github.com/SanoBld/LastStats",
+      "date": "2026-11-24T12:13:47Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/52a76d446e1657fa86a03a7833614d8aec8f4929",
+      "tags": []
+    },
+    {
+      "sha": "b946b312b0864943bc99b1ecd32ece54a30e739f",
+      "message": "feat: ajouter des options de redimensionnement des images de profil pour améliorer l'affichage sur différentes pages",
+      "date": "2026-11-24T12:13:35Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/b946b312b0864943bc99b1ecd32ece54a30e739f",
+      "tags": []
+    },
     {
       "sha": "0d4ee7d542676b2130371e7a6ced716346062b73",
       "message": "chore: bump version to 4.5.0 [skip ci]",
@@ -2679,42 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/7d19597d05b3ee9899583cef28cc462b8b1b0196",
-      "tags": []
-    },
-    {
-      "sha": "57d9c031dcbeec242f7563ca6b83fbda0a35c98f",
-      "message": "Refactor localization handling and UI updates across settings screens\n\n- Moved string localization to a new centralized file (screen_strings.dart) for better management and consistency.\n- Updated various settings screens (cache_page, faq_page, readme_page, startup_page, sync_page, update_history_page, setup_screen) to remove direct locale checks and utilize the new localization method.\n- Enhanced UI components in cache_page to display percentage and formatted values more clearly.\n- Removed unused imports and redundant code related to localization.",
-      "date": "2026-09-30T18:59:18Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/57d9c031dcbeec242f7563ca6b83fbda0a35c98f",
-      "tags": []
-    },
-    {
-      "sha": "b7b4b8f4d3453e1b530947f6890f27a9155fdad3",
-      "message": "feat(video_disk_cache): ajouter une fonction pour mettre à jour la date de dernière lecture des vidéos",
-      "date": "2026-09-30T18:20:47Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/b7b4b8f4d3453e1b530947f6890f27a9155fdad3",
-      "tags": []
-    },
-    {
-      "sha": "41844a59e8b6b111dc5d2e8e7d50baecdfdd7e8d",
-      "message": "feat(video_disk_cache): implement disk caching for motion artwork videos on Android\n\n- Added `video_disk_cache.dart` to export platform-specific implementations.\n- Implemented `video_disk_cache_native.dart` for Android, enabling offline storage of motion artwork videos with HLS and MP4 support.\n- Created a no-op `video_disk_cache_stub.dart` for web platforms, ensuring videos are streamed without caching.\n- Introduced LRU eviction policy for managing disk space and maintaining cache efficiency.",
-      "date": "2026-09-30T18:09:03Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/41844a59e8b6b111dc5d2e8e7d50baecdfdd7e8d",
-      "tags": []
-    },
-    {
-      "sha": "ac805242414f5440f0d91b75ce8cc018d62afd18",
-      "message": "feat: Enhance library merging and caching mechanisms\n\n- Introduced comparison keys for taste comparison in LibraryMerge.\n- Improved raw data fetching to handle up to 600 entries for better taste profile merging.\n- Cleared cached friend libraries upon settings change in LibraryMerge.\n- Added memory management features in MotionArtworkService, including limits on cache size and memory clearing.\n- Implemented cache eviction strategy in TasteEngine to maintain cache size.\n- Enhanced MotionArtworkVideo to manage live video players and lifecycle events.\n- Added extra localization strings for new features and settings.",
-      "date": "2026-09-30T06:40:13Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/ac805242414f5440f0d91b75ce8cc018d62afd18",
       "tags": []
     }
   ]
