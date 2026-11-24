@@ -652,7 +652,23 @@ class _ChartsPageState extends State<_ChartsPage>
     }
   }
 
+  // "All time" maps are rebuilt only when the cached data really changed
+  // (build() runs often: animations, scrolling, theme changes…).
+  Map<String, int>? _atMonthlyMemo, _atCalendarMemo;
+  Object? _atMonthlySig, _atCalendarSig;
+
+  Object _allTimeSig(Object? fallback) => Object.hashAll([
+        identityHashCode(fallback),
+        for (final y in _availableYears) ...[
+          y,
+          identityHashCode(AllScrobblesService.getRecordsForYear(y)),
+          AllScrobblesService.getRecordsForYear(y)?.length ?? -1,
+        ],
+      ]);
+
   Map<String, int> _buildAllTimeMonthly() {
+    final sig = _allTimeSig(_monthly);
+    if (_atMonthlyMemo != null && _atMonthlySig == sig) return _atMonthlyMemo!;
     final result = <String, int>{};
     for (final year in _availableYears) {
       final ts = AllScrobblesService.getRecordsForYear(year);
@@ -662,12 +678,15 @@ class _ChartsPageState extends State<_ChartsPage>
       }
     }
     if (result.isEmpty && _monthly != null) result.addAll(_monthly!);
-    return result;
+    _atMonthlySig = sig;
+    return _atMonthlyMemo = result;
   }
 
   /// Merge daily calendar data across every cached year into one continuous
   /// map, used by the "All time" heatmap.
   Map<String, int> _buildAllTimeCalendar() {
+    final sig = _allTimeSig(_calendarData);
+    if (_atCalendarMemo != null && _atCalendarSig == sig) return _atCalendarMemo!;
     final result = <String, int>{};
     for (final year in _availableYears) {
       final ts = AllScrobblesService.getRecordsForYear(year);
@@ -677,7 +696,8 @@ class _ChartsPageState extends State<_ChartsPage>
       }
     }
     if (result.isEmpty && _calendarData != null) result.addAll(_calendarData!);
-    return result;
+    _atCalendarSig = sig;
+    return _atCalendarMemo = result;
   }
 
   /// PC: pairs compact chart sections side by side. Phones: untouched.
