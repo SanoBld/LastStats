@@ -47,7 +47,7 @@ class ListenBrainzService {
     });
     final res = await ApiHttp.get(uri).timeout(_timeout);
     if (res.statusCode != 200) return [];
-    final body    = ApiHttp.decodeJson(res);
+    final body    = await ApiHttp.decodeJsonAsync(res);
     final payload = body is Map ? body['payload'] : null;
     if (payload is! Map) return [];
     final key  = switch (entity) {

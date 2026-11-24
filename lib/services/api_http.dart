@@ -15,7 +15,7 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, compute;
 import 'package:http/http.dart' as http;
 import 'api_registry.dart';
 import 'data_source.dart';
@@ -62,6 +62,19 @@ class ApiHttp {
     } on FormatException {
       throw ApiBadResponse(res.statusCode, res.request?.url.host ?? '');
     }
+  }
+
+  /// Same result and same errors as [decodeJson], but big bodies (long
+  /// scrobble pages, lists of stats…) are parsed in a background isolate so
+  /// the interface never freezes while they are decoded.
+  static Future<dynamic> decodeJsonAsync(http.Response res) async {
+    // Small bodies: starting an isolate would cost more than parsing here.
+    if (res.bodyBytes.length < 32 * 1024) return decodeJson(res);
+    final out = await compute(_decodeJsonBytes, res.bodyBytes);
+    if (out[0] != true) {
+      throw ApiBadResponse(res.statusCode, res.request?.url.host ?? '');
+    }
+    return out[1];
   }
 
   static Future<http.Response> post(
@@ -159,4 +172,17 @@ class ApiBadResponse implements Exception {
   @override
   String toString() =>
       'Invalid server response${host.isEmpty ? '' : ' ($host)'} – HTTP $status';
+}
+
+// Runs in a background isolate: [true, value] or [false, null] when the body
+// is not JSON (HTML error page, empty, malformed) — same rules as decodeJson.
+List<Object?> _decodeJsonBytes(List<int> bytes) {
+  final text = utf8.decode(bytes, allowMalformed: true);
+  final head = text.trimLeft();
+  if (head.startsWith('<') || head.isEmpty) return [false, null];
+  try {
+    return [true, jsonDecode(text)];
+  } on FormatException {
+    return [false, null];
+  }
 }

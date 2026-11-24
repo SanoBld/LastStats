@@ -74,7 +74,7 @@ class LastFmService {
     }
     if (res.statusCode == 403) throw _KeyRejected('HTTP 403');
     if (res.statusCode != 200) throw Exception('HTTP ${res.statusCode}');
-    final body = ApiHttp.decodeJson(res);
+    final body = await ApiHttp.decodeJsonAsync(res);
     if (body['error'] != null) {
       final msg  = (body['message'] ?? 'Last.fm API error').toString();
       final code = int.tryParse(body['error'].toString());
@@ -106,7 +106,7 @@ class LastFmService {
         ? await ApiHttp.post(uri, body: full, keyLabel: keyLabel(apiKey)).timeout(_timeout)
         : await ApiHttp.get(uri.replace(queryParameters: full), keyLabel: keyLabel(apiKey)).timeout(_timeout);
     if (res.statusCode != 200) throw Exception('HTTP ${res.statusCode}');
-    final body = ApiHttp.decodeJson(res);
+    final body = await ApiHttp.decodeJsonAsync(res);
     if (body['error'] != null) throw Exception(body['message'] ?? 'Last.fm API error');
     return body;
   }

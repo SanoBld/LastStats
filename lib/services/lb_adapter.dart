@@ -213,7 +213,7 @@ class LbAdapter {
     final res = await _getRetry(_uri(host, path, q));
     if (res.statusCode == 204 || res.statusCode == 404 || res.statusCode == 410) return null;
     if (res.statusCode != 200) throw Exception('ListenBrainz error\nCode: HTTP ${res.statusCode} ${res.request?.url.path ?? ''}');
-    final body = ApiHttp.decodeJson(res);
+    final body = await ApiHttp.decodeJsonAsync(res);
     if (body is Map && body['payload'] != null) return body['payload'];
     return body;
   }
@@ -225,7 +225,7 @@ class LbAdapter {
     if (res.statusCode == 204 || res.statusCode == 404 || res.statusCode == 410) return null;
     if (res.statusCode == 429) throw Exception('ListenBrainz rate limit reached\nCode: HTTP 429 ${res.headers['x-laststats-skipped'] == '1' ? '(client limiter)' : '(server)'}');
     if (res.statusCode != 200) throw Exception('ListenBrainz error\nCode: HTTP ${res.statusCode} ${res.request?.url.path ?? ''}');
-    final body = ApiHttp.decodeJson(res);
+    final body = await ApiHttp.decodeJsonAsync(res);
     if (body is! Map) return null;
     final p = body['payload'];
     return p is Map<String, dynamic> ? p : Map<String, dynamic>.from(body);
@@ -309,7 +309,7 @@ class LbAdapter {
         Uri.https(_host, '/1/validate-token'),
         headers: {'Authorization': 'Token $token'},
       ).timeout(_timeout);
-      final b = ApiHttp.decodeJson(res);
+      final b = await ApiHttp.decodeJsonAsync(res);
       final name = (b is Map && b['valid'] == true) ? _s(b['user_name']) : '';
       if (name.isEmpty || name.toLowerCase() == stale.toLowerCase()) return null;
       _alias[stale] = name;
@@ -638,7 +638,7 @@ class LbAdapter {
       if (res.statusCode != 200) {
         throw Exception('ListenBrainz error\nCode: HTTP ${res.statusCode}');
       }
-      final body = ApiHttp.decodeJson(res);
+      final body = await ApiHttp.decodeJsonAsync(res);
       final payload = body is Map ? body['payload'] : null;
       final ls = ((payload is Map ? payload['listens'] : null) as List? ?? [])
           .whereType<Map>().toList();
@@ -795,7 +795,7 @@ class LbAdapter {
               continue; // one more try
             }
             if (res.statusCode != 200) return null;
-            final body = ApiHttp.decodeJson(res);
+            final body = await ApiHttp.decodeJsonAsync(res);
             if (body is! Map<String, dynamic>) return null;
             _mbCache[key] = body;
             return body;
@@ -879,7 +879,7 @@ class LbAdapter {
         body: jsonEncode({'${field}_mbids': [mbid]}),
       ).timeout(_timeout);
       if (res.statusCode != 200) return none;
-      final b = ApiHttp.decodeJson(res);
+      final b = await ApiHttp.decodeJsonAsync(res);
       if (b is! List || b.isEmpty || b.first is! Map) return none;
       final m = b.first as Map;
       final r = (listens: '${_i(m['total_listen_count'])}',
