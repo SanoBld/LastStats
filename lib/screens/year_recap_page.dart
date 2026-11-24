@@ -81,19 +81,44 @@ _YrData _yrCompute(_YrIn a) {
     // Dates are built once and reused by every pass below.
     final dts = List<DateTime>.generate(
         records.length, (i) => DateTime.fromMillisecondsSinceEpoch(records[i].ts * 1000));
+    // Day keys: one string per distinct day, one small int per scrobble.
+    final dayStrs = <String>[];
+    final dayCounts = <int>[];
+    final dayIdMemo = <int, int>{};
+    int dayOf(DateTime t) => dayIdMemo[t.year * 512 + t.month * 32 + t.day] ??= () {
+          dayStrs.add('${t.year}-${t.month.toString().padLeft(2, '0')}-${t.day.toString().padLeft(2, '0')}');
+          dayCounts.add(0);
+          return dayStrs.length - 1;
+        }();
+    String dk(DateTime t) => dayStrs[dayOf(t)];
     // Same artist / same title always gives the same keys: compute them once.
     final partsMemo = <String, List<String>>{};
     final tKeyMemo = <String, Map<String, String>>{};
+    // Every distinct "artist — title" gets one int id (pairId = -1 when the
+    // artist or the title is empty), so later passes never build strings.
+    final pairIds = <String, int>{};
+    final pairStrs = <String>[];
+    final pairMemo = <String, Map<String, int>>{};
+    final pairId = List<int>.filled(records.length, -1);
+    final dayIdOf = List<int>.filled(records.length, 0);
     for (var i = 0; i < records.length; i++) {
       final r = records[i];
       final dt = dts[i];
       d.monthly[dt.month - 1]++;
       d.hourly[dt.hour]++;
       d.weekday[dt.weekday - 1]++;
-      final dayKey = '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
-      dayCount[dayKey] = (dayCount[dayKey] ?? 0) + 1;
+      final di = dayOf(dt);
+      dayIdOf[i] = di;
+      dayCounts[di]++;
 
       if (r.artist.isEmpty) continue;
+      if (r.track.isNotEmpty) {
+        pairId[i] = (pairMemo[r.artist] ??= {})[r.track] ??= pairIds.putIfAbsent(
+            '${r.artist} — ${r.track}', () {
+          pairStrs.add('${r.artist} — ${r.track}');
+          return pairStrs.length - 1;
+        });
+      }
       final parts = LibraryMerge.splitOn
           ? (partsMemo[r.artist] ??=
               LibraryMerge.artistParts(r.artist, known, ambiguous: true))
@@ -104,7 +129,7 @@ _YrData _yrCompute(_YrIn a) {
       final tKey = LibraryMerge.mergeOn
           ? ((tKeyMemo[r.artist] ??= {})[r.track] ??=
               LibraryMerge.trackKey(r.track, r.artist, known))
-          : '${r.artist} — ${r.track}';
+          : (pairId[i] >= 0 ? pairStrs[pairId[i]] : '${r.artist} — ${r.track}');
       trackCount[tKey] = (trackCount[tKey] ?? 0) + 1;
       trackRep.putIfAbsent(tKey, () => r);
       if (r.album.isNotEmpty) {
@@ -112,6 +137,10 @@ _YrData _yrCompute(_YrIn a) {
         albumCount[aKey] = (albumCount[aKey] ?? 0) + 1;
         albumRep.putIfAbsent(aKey, () => r);
       }
+    }
+    // Same order as before: days in order of first appearance.
+    for (var k = 0; k < dayStrs.length; k++) {
+      dayCount[dayStrs[k]] = dayCounts[k];
     }
 
     List<T> top<T>(Map<String, int> m, T Function(String, int) build) {
@@ -173,34 +202,34 @@ _YrData _yrCompute(_YrIn a) {
         if (st == best && streakDays.isEmpty) streakDays.addAll(days.sublist(i - best + 1, i + 1));
       }
     }
-    String dk(DateTime t) => '${t.year}-${t.month.toString().padLeft(2, '0')}-${t.day.toString().padLeft(2, '0')}';
     _YrRanked? topOf(bool Function(DateTime) test) {
-      final c = <String, int>{};
-      final rp = <String, ScrobbleRecord>{};
+      final c = <int, int>{};
+      final rp = <int, int>{};
       for (var i = 0; i < records.length; i++) {
-        final r = records[i];
-        if (r.artist.isEmpty || r.track.isEmpty) continue;
+        final id = pairId[i];
+        if (id < 0) continue;
         if (!test(dts[i])) continue;
-        final k = '${r.artist} — ${r.track}';
-        c[k] = (c[k] ?? 0) + 1;
-        rp.putIfAbsent(k, () => r);
+        c[id] = (c[id] ?? 0) + 1;
+        rp.putIfAbsent(id, () => i);
       }
       if (c.isEmpty) return null;
       final b = c.entries.reduce((a, x) => x.value > a.value ? x : a);
-      return _YrRanked(rp[b.key]!.track, rp[b.key]!.artist, b.value);
+      final r = records[rp[b.key]!];
+      return _YrRanked(r.track, r.artist, b.value);
     }
     _YrRanked? topOfRec(bool Function(ScrobbleRecord) test) {
-      final c = <String, int>{};
-      final rp = <String, ScrobbleRecord>{};
-      for (final r in records) {
-        if (r.artist.isEmpty || r.track.isEmpty || !test(r)) continue;
-        final k = '${r.artist} — ${r.track}';
-        c[k] = (c[k] ?? 0) + 1;
-        rp.putIfAbsent(k, () => r);
+      final c = <int, int>{};
+      final rp = <int, int>{};
+      for (var i = 0; i < records.length; i++) {
+        final id = pairId[i];
+        if (id < 0 || !test(records[i])) continue;
+        c[id] = (c[id] ?? 0) + 1;
+        rp.putIfAbsent(id, () => i);
       }
       if (c.isEmpty) return null;
       final b = c.entries.reduce((a, x) => x.value > a.value ? x : a);
-      return _YrRanked(rp[b.key]!.track, rp[b.key]!.artist, b.value);
+      final r = records[rp[b.key]!];
+      return _YrRanked(r.track, r.artist, b.value);
     }
     final bestMonthIdx = d.monthly.indexOf(d.monthly.fold<int>(0, (m, v) => v > m ? v : m));
     d.monthTrack = topOf((t) => t.month == bestMonthIdx + 1);
@@ -212,25 +241,30 @@ _YrData _yrCompute(_YrIn a) {
     d.peakTrack = topOf((t) => bucketOf(t.hour) == persona);
     d.streakTrack = topOf((t) => streakDays.contains(dk(t)));
     {
-      final c = <String, int>{};
-      final rp = <String, ScrobbleRecord>{};
+      final m = pairStrs.length + 1;
+      final c = <int, int>{};
+      final rp = <int, int>{};
       for (var i = 0; i < records.length; i++) {
-        final r = records[i];
-        if (r.artist.isEmpty || r.track.isEmpty) continue;
-        final k = '${dk(dts[i])}|${r.artist} — ${r.track}';
+        final id = pairId[i];
+        if (id < 0) continue;
+        final k = dayIdOf[i] * m + id;
         c[k] = (c[k] ?? 0) + 1;
-        rp.putIfAbsent(k, () => r);
+        rp.putIfAbsent(k, () => i);
       }
       if (c.isNotEmpty) {
         final b = c.entries.reduce((a, x) => x.value > a.value ? x : a);
-        d.dayRecord = _YrRanked(rp[b.key]!.track, rp[b.key]!.artist, b.value);
-        final q = b.key.split('|').first.split('-');
+        final r = records[rp[b.key]!];
+        d.dayRecord = _YrRanked(r.track, r.artist, b.value);
+        final q = dayStrs[b.key ~/ m].split('-');
         d.dayRecordDate = '${q[2]}/${q[1]}/${q[0]}';
       }
     }
-    final withTrack = records.where((r) => r.artist.isNotEmpty && r.track.isNotEmpty).toList();
+    final withTrack = <int>[
+      for (var i = 0; i < records.length; i++)
+        if (pairId[i] >= 0) i
+    ];
     if (withTrack.isNotEmpty) {
-      final r = withTrack[math.Random(year).nextInt(withTrack.length)];
+      final r = records[withTrack[math.Random(year).nextInt(withTrack.length)]];
       d.randomTrack = _YrRanked(r.track, r.artist, 1);
     }
 

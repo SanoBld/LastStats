@@ -38,7 +38,7 @@
 
 ### Performance
 - Year recap: the whole calculation now runs in the background instead of on the interface thread, with the same results as before
-- Year recap: merged and split artists and titles are computed once per song instead of once per scrobble, and dates are built only once
+- Year recap: merged and split artists and titles, day labels and song names are computed once instead of once per scrobble, and dates are built only once (the recap is noticeably faster on big histories)
 - Charts: top artists and albums and the listening habits (hours and weekdays) over all years are calculated in the background
 - Charts: the "All time" monthly and calendar data are kept in memory and rebuilt only when your history changes, instead of at every redraw
 - Last.fm and ListenBrainz: large answers (long scrobble pages, big lists) are now decoded in the background, so loading them no longer freezes the interface
