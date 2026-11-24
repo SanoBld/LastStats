@@ -1,6 +1,15 @@
 {
-  "updated": "2026-11-24T12:29:49Z",
+  "updated": "2026-11-24T16:00:39Z",
   "commits": [
+    {
+      "sha": "31d1bcee07a82aa5b29c13afc25ccc8440ee6d99",
+      "message": "feat: améliorer le calcul des récapitulatifs annuels avec un traitement optimisé des artistes et titres",
+      "date": "2026-11-24T15:58:31Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/31d1bcee07a82aa5b29c13afc25ccc8440ee6d99",
+      "tags": []
+    },
     {
       "sha": "74c75a8314c9f2b2fc0d97595bd6f984b7c9d655",
       "message": "feat: ajouter le décodage asynchrone des réponses API pour éviter le gel de l'interface",
@@ -2706,15 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/e3bfcd72ce5fc7b355348cb122f0cf26cde1dac9",
-      "tags": []
-    },
-    {
-      "sha": "7d19597d05b3ee9899583cef28cc462b8b1b0196",
-      "message": "feat: ajouter des installateurs pour Linux (deb, rpm, AppImage) et macOS (dmg) avec un script d'installation unique",
-      "date": "2026-09-30T19:17:51Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/7d19597d05b3ee9899583cef28cc462b8b1b0196",
       "tags": []
     }
   ]
