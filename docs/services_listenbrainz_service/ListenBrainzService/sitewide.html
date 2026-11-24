@@ -85,7 +85,7 @@
   });
   final res = await ApiHttp.get(uri).timeout(_timeout);
   if (res.statusCode != 200) return [];
-  final body    = ApiHttp.decodeJson(res);
+  final body    = await ApiHttp.decodeJsonAsync(res);
   final payload = body is Map ? body[&#39;payload&#39;] : null;
   if (payload is! Map) return [];
   final key  = switch (entity) {

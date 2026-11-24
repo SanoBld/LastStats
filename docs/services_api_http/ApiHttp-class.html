@@ -166,6 +166,21 @@ would dump "…" on screen.
 
 </dd>
 
+        <dt id="decodeJsonAsync" class="callable">
+  <span class="name"><a href="../services_api_http/ApiHttp/decodeJsonAsync.html">decodeJsonAsync</a></span><span class="signature">(<wbr><span class="parameter" id="decodeJsonAsync-param-res"><span class="type-annotation"><a href="https://pub.dev/documentation/http/1.6.0/http/Response-class.html">Response</a></span> <span class="parameter-name">res</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Same result and same errors as <a href="../services_api_http/ApiHttp/decodeJson.html">decodeJson</a>, but big bodies (long
+scrobble pages, lists of stats…) are parsed in a background isolate so
+the interface never freezes while they are decoded.
+  
+
+</dd>
+
         <dt id="get" class="callable">
   <span class="name"><a href="../services_api_http/ApiHttp/get.html">get</a></span><span class="signature">(<wbr><span class="parameter" id="get-param-url"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Uri-class.html">Uri</a></span> <span class="parameter-name">url</span>, {</span><span class="parameter" id="get-param-headers"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span>?</span> <span class="parameter-name">headers</span>, </span><span class="parameter" id="get-param-api"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">api</span>, </span><span class="parameter" id="get-param-keyLabel"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">keyLabel</span>, </span><span class="parameter" id="get-param-timeout"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Duration-class.html">Duration</a>?</span> <span class="parameter-name">timeout</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/http/1.6.0/http/Response-class.html">Response</a></span>&gt;</span></span>
