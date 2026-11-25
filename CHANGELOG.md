@@ -30,7 +30,7 @@
 -->
 
 
-## v4.6.0
+## v4.5.1
 
 ### Highlights
 - Much smoother app: heavy calculations no longer freeze the interface
