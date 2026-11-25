@@ -1,6 +1,24 @@
 {
-  "updated": "2026-11-25T07:25:16Z",
+  "updated": "2026-11-25T07:55:13Z",
   "commits": [
+    {
+      "sha": "1ffc26ee3db72d35b064acd8c8edb7cb6067d8fc",
+      "message": "chore: sync pubspec version with changelog [skip ci]",
+      "date": "2026-11-25T07:55:00Z",
+      "author": "github-actions[bot]",
+      "avatar": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/1ffc26ee3db72d35b064acd8c8edb7cb6067d8fc",
+      "tags": []
+    },
+    {
+      "sha": "8e2806bdaf55057aa71e5df04112efb426d26c20",
+      "message": "feat: mise à jour du changelog pour la version 4.5.1",
+      "date": "2026-11-25T07:54:48Z",
+      "author": "SanoBld",
+      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
+      "url": "https://github.com/SanoBld/LastStats/commit/8e2806bdaf55057aa71e5df04112efb426d26c20",
+      "tags": []
+    },
     {
       "sha": "31d1bcee07a82aa5b29c13afc25ccc8440ee6d99",
       "message": "feat: améliorer le calcul des récapitulatifs annuels avec un traitement optimisé des artistes et titres",
@@ -2697,24 +2715,6 @@
       "author": "SanoBld",
       "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
       "url": "https://github.com/SanoBld/LastStats/commit/1961ab5bae8db0f0be82c7a1c34142e0dc2ecf00",
-      "tags": []
-    },
-    {
-      "sha": "c732179a92ffc2b7f1ddd8b737427dcc43b0f17f",
-      "message": "feat: améliorer les workflows de construction pour macOS et Android avec des cibles spécifiques par architecture",
-      "date": "2026-09-30T19:59:56Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/c732179a92ffc2b7f1ddd8b737427dcc43b0f17f",
-      "tags": []
-    },
-    {
-      "sha": "e3bfcd72ce5fc7b355348cb122f0cf26cde1dac9",
-      "message": "feat: ajouter le support de la construction iOS et mettre à jour les workflows pour inclure toutes les plateformes",
-      "date": "2026-09-30T19:32:39Z",
-      "author": "SanoBld",
-      "avatar": "https://avatars.githubusercontent.com/u/117576435?v=4",
-      "url": "https://github.com/SanoBld/LastStats/commit/e3bfcd72ce5fc7b355348cb122f0cf26cde1dac9",
       "tags": []
     }
   ]
