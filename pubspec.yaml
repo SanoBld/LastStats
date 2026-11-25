@@ -2,7 +2,7 @@ name: laststats_mobile
 description: "LastStats — Your Last.fm stats, reinvented."
 publish_to: 'none'
 
-version: 4.6.0+32
+version: 4.5.1+32
 
 environment:
   sdk: ^3.11.5
