@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-27T02:30:07Z",
+  "updated": "2026-11-27T07:10:28Z",
   "stars": 6,
   "releases": [
     {
@@ -25,7 +25,7 @@
         {
           "name": "app-universal-release.apk",
           "size": 108288543,
-          "download_count": 2,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.5.1/app-universal-release.apk"
         },
         {
@@ -333,7 +333,7 @@
         {
           "name": "app-universal-release.apk",
           "size": 107004600,
-          "download_count": 4,
+          "download_count": 5,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.3.0/app-universal-release.apk"
         },
         {
@@ -641,7 +641,7 @@
         {
           "name": "app-universal-release.apk",
           "size": 105922012,
-          "download_count": 7,
+          "download_count": 8,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/app-universal-release.apk"
         },
         {
@@ -659,7 +659,7 @@
         {
           "name": "LastStats-ios.ipa",
           "size": 25473603,
-          "download_count": 127,
+          "download_count": 128,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.1/LastStats-ios.ipa"
         },
         {
@@ -795,7 +795,7 @@
         {
           "name": "app-universal-release.apk",
           "size": 105922012,
-          "download_count": 2,
+          "download_count": 3,
           "browser_download_url": "https://github.com/SanoBld/LastStats/releases/download/v4.2.0/app-universal-release.apk"
         },
         {
